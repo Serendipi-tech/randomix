@@ -1,0 +1,27 @@
+model Notification {
+    id String @id @default(cuid())
+
+    title            String
+    body             String?
+    notificationType NOTIFICATION_TYPE
+
+    markedAsRead Boolean @default(false)
+
+    senderId    String?
+    receiverId  String
+    groupId     String?
+    challengeId String?
+
+    sender    User?           @relation("Sender", fields: [senderId], references: [id])
+    receiver  User            @relation("Receiver", fields: [receiverId], references: [id])
+    group     Group?          @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    challenge GroupChallenge? @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([senderId, receiverId, groupId])
+    @@index([receiverId])
+    @@index([notificationType])
+    @@index([markedAsRead])
+}

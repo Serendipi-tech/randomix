@@ -1,0 +1,20 @@
+model Membership {
+    id String @id @default(cuid())
+
+    plan        MEMBERSHIP_PLAN
+    description String?
+
+    price    Float
+    currency String  @default("EUR") // verificare se serve enum per currency
+    billing  BILLING @default(NEVER)
+
+    limitations Json? // max liste, max elementi, etc
+
+    subscriptions Subscription[]
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
+
+    @@index([plan])
+}

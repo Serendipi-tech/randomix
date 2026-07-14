@@ -1,0 +1,30 @@
+model Subscription {
+    id String @id @default(uuid())
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    membershipId String
+    membership   Membership @relation(fields: [membershipId], references: [id])
+
+    status STATUS_SUBSCRIPTION @default(ACTIVE)
+
+    // momentaneamente non funzionerà
+    stripeSubId String? @unique // ID dell'abbonamento su Stripe
+
+    startDate DateTime  @default(now())
+    endDate   DateTime? // Data di scadenza o fine periodo
+
+    payments Payment[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId])
+    @@index([membershipId])
+    @@index([status])
+    @@index([startDate])
+    @@index([endDate])
+    @@index([membershipId, startDate])
+    @@index([membershipId, status])
+}

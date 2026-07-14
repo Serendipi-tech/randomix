@@ -1,0 +1,62 @@
+model User {
+    id String @id @default(cuid())
+
+    username String @unique
+    email    String @unique
+
+    avatarUrl String?
+    language  String? @default("en")
+
+    role ROLES @default(USER)
+
+    subscriptions Subscription[] // Storico abbonamenti (o usi @unique se può averne solo uno alla volta)
+    payments      Payment[]
+
+    friendshipSender   Friendship[] @relation("Sender")
+    friendshipReceiver Friendship[] @relation("Receiver")
+
+    notificationSender   Notification[] @relation("Sender")
+    notificationReceiver Notification[] @relation("Receiver")
+
+    reportSender   Report[] @relation("Sender")
+    reportReported Report[] @relation("Reported")
+
+    groups            Group[]
+    groupMemberships  Group_User[]
+    groupListsCreated GroupList[] // liste dei gruppi create dall'utente
+
+    lists     List[]
+    tags      Tag[]
+    userItems User_Item[]
+    ratings   Rating[]
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
+
+    @@unique([username, email])
+    @@index([username])
+    @@index([email])
+    @@index([username, email])
+}
+
+model Friendship {
+    id String @id @default(cuid())
+
+    senderId   String
+    receiverId String
+
+    status STATUS_FRIENDSHIP @default(PENDING)
+
+    sender   User @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
+    receiver User @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([senderId, receiverId])
+    @@index([senderId, receiverId])
+    @@index([senderId])
+    @@index([receiverId])
+    @@index([status])
+}

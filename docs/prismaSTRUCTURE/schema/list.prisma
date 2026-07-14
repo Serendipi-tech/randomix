@@ -1,0 +1,41 @@
+model List {
+    id String @id @default(cuid())
+
+    name        String
+    icon        String
+    color       String
+    description String?
+
+    isHidden               Boolean @default(false) // nasconde o mostra la lista agli amici
+    isGiftedAtRegistration Boolean @default(false) // se è "gratis" all'iscrizione
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    categories ListCategory[]
+    items      List_UserItem[] // items che l'utente ha inserito nella lista    
+    groupLists GroupList[] // gruppi ai quali è associata la lista
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId])
+}
+
+model List_UserItem {
+    id String
+    
+    listId     String
+    userItemId String
+
+    count         Int @default(0) // quante volte è stato sorteggiato l'elemento in questa lista
+    skippedCount  Int @default(0) // quante volte è stato saltato l'elemento in questa lista
+    // skipped aumenta SOLO quando viene rigenerato il randomizzatore, NON quando si chiude l'app
+    // né in altri casi (es. chiude randomizzatore per cambiare lista, etc)
+    acceptedCount Int @default(0) // se escono dall'app NON conta come accettato
+
+    list     List      @relation(fields: [listId], references: [id], onDelete: Cascade)
+    userItem User_Item @relation(fields: [userItemId], references: [id], onDelete: Cascade)
+
+    @@unique([listId, userItemId])
+}

@@ -19,51 +19,59 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-- **Dev server**: `npx expo start` (add `--android`, `--ios`, or `--web` for specific platforms)
-  [!!!] - **GraphQL codegen**: `npm run codegen` — regenerates types/hooks in `src/graphql/__generated__/` from Supabase schema. Run after changing `.gql` files.
-  [!!!] - **Edge functions deploy**: After modifying any file in `supabase/functions/`, always deploy with `npx supabase functions deploy <function-name>`. Never leave a modified edge function undeployed.
+- **Web dev server**: `cd web && npm run dev` (Next.js)
+- **Mobile dev server**: `cd mobile && npx expo start` (add `--android`, `--ios`, or `--web`)
+- **GraphQL codegen**: `npm run codegen` in `packages/graphql-schema` — regenerates the schema + typed operations shared by both apps from the Next.js GraphQL endpoint. Run after changing any `.gql` file in `gql_crud/`. Both `web` and `mobile` import the generated output as a workspace dependency (build-time only — never a runtime call between the two apps).
+- **Edge functions deploy**: After modifying any file in `web/supabase/functions/`, always deploy with `npx supabase functions deploy <function-name>`. Never leave a modified edge function undeployed.
 
 ## Architecture
 
-[!!!] - **Stack**: Expo 54 (React Native 0.81) + TypeScript + Expo Router (file-based routing) + Supabase (backend) + Apollo Client (GraphQL)
+- **Monorepo, two independently hosted apps**:
+  - `web/` — Next.js. Backend (API routes / GraphQL resolvers) + admin dashboard. Deployed standalone (e.g. Vercel).
+  - `mobile/` — Expo 57 (React Native 0.86) + TypeScript + Expo Router. Consumer app, published to Play Store/App Store.
+  - `packages/graphql-schema` — shared GraphQL schema + generated typed operations, consumed by both apps at build time only.
+  - No shared i18n: each app keeps its own `locales/it/`, since user-facing copy differs by nature between admin and consumer app.
 
-[!!!] - **Stack is final**: No migration planned. Expo + Expo Router is the long-term architecture. Supabase stays as backend.
+- **Stack is final**: No further migration planned. Next.js (web) + Expo/Expo Router (mobile) is the long-term architecture. Supabase stays as the single database (Postgres).
 
-### Routing (`app/`)
+- **Data flow**: Next.js is the only service that talks to Supabase. Both web (admin) and mobile (consumer) consume the **same GraphQL API exposed by Next.js** via Apollo Client — including subscriptions for realtime (e.g. live group draw). Mobile never calls Supabase directly, not even for auth — everything goes through the Next.js GraphQL layer.
+- **Backend logic split**: some logic stays in Supabase Edge Functions (DB triggers, cron jobs); everything else (resolvers, business rules reachable from clients) lives in Next.js API routes / GraphQL resolvers.
+
+### Routing (`mobile/app/`)
 
 File-based routing via Expo Router with route groups:
 
 - `(auth)` — Login (Google OAuth)
-- `(onboarding)` — Email consent flow
 - `(app)` — Main tabbed app (Home, Applications, Analytics, Settings)
-- `(admin)` — Admin dashboard (role-gated)
 
-Auth flow in `_layout.tsx`: splash stays visible until fonts + auth resolve, then redirects based on state (no consent → onboarding, admin role → admin, else → app).
+Admin dashboard lives only in `web/` now — no `(admin)` route group on mobile.
 
-### Source (`src/`)
+Auth flow in `_layout.tsx`: splash stays visible until fonts + auth resolve, then redirects based on state (no consent → onboarding, else → app).
 
-- `graphql/` — `.gql` query/mutation files + `__generated__/` codegen output. All data flows through Apollo + Supabase GraphQL endpoint.
+### Source (`mobile/src/`, mirrored conceptually in `web/src/`)
+
+- `gql_crud/` (in `packages/graphql-schema`) — `.gql` query/mutation files shared between web and mobile where the underlying data is the same, split by model. Each app's own `__generated__` hooks import from there.
 - `hooks/` — Business logic layer: `useAuth` (session + profile + routing), `useApplications` (filtered/paginated queries), `usePipeline`, `useCreateApplication`, `useUpdateApplication`.
-- `lib/apollo.ts` — Apollo Client setup with auth header injection. `lib/supabase.ts` — Supabase client with platform-adaptive storage (SecureStore on native, localStorage on web).
-  [!!!] - `components/` — Split by domain (`applications/`, `analytics/`, `admin/`) and shared (`ui/`).
-- `theme/` — ThemeContext with 2 themes (dark, light), persisted per-platform. Includes typography, spacing, glassmorphism tokens.
+- `lib/apollo.ts` — Apollo Client setup with auth header injection, pointed at the Next.js GraphQL endpoint.
+- `components/` — Split by domain (`applications/`, `analytics/`) and shared (`ui/`). Admin-domain components live only in `web/`.
+- `theme/` — Tailwind/NativeWind tokens (colors, typography, spacing, glassmorphism), shared design language between web and mobile via a common Tailwind config.
 
 ### Key Patterns
 
-- **Path alias**: `@/*` maps to `src/*`
-  [!!!] - **GraphQL-first**: Never use Supabase REST; always go through Apollo + codegen hooks for type safety.
+- **Path alias**: `@/*` maps to `src/*` in each app.
+- **GraphQL-first, shared endpoint**: Never call Supabase REST or SDK directly from either app; always go through Apollo + codegen hooks against the Next.js GraphQL API, for type safety on both web and mobile.
 - **Cursor pagination**: Applications list uses cursor-based pagination with infinite scroll.
-  [!!!] - **Responsive layout**: Sidebar on desktop/tablet, bottom tabs on mobile (`useResponsive` + Platform checks).
+- **Responsive layout — split by project, not by breakpoint**: `web/` always renders the sidebar layout (desktop-first admin), `mobile/` always renders bottom tabs. No shared cross-platform `useResponsive` layout switch — each app owns one fixed layout shape.
 - **Cache strategy**: Apollo uses `cache-and-network` fetch policy.
-  [!!!] - **Sorting**: Always by date descending (`last_event_at > updated_at > created_at`).
-  [!!!] - **UI language**: Italian (app targets Italian users). **All user-facing text must go through i18n** (`t('key')` via react-i18next). Never hardcode strings in JSX — even if only the Italian locale exists. Translation files live in `locales/it/`. When English is added, we'll translate the folder directly.
+- **Sorting**: Always by date descending (`last_event_at > updated_at > created_at`).
+- **UI language**: Italian (app targets Italian users). **All user-facing text must go through i18n** (`t('key')` via react-i18next). Never hardcode strings in JSX — even if only the Italian locale exists. Translation files live in each app's own `locales/it/` (not shared). When English is added, we'll translate the folder directly.
 - **Naming**: PascalCase for components/files. camelCase with `use` prefix for hooks. File name matches primary export.
 - **Components**: Prefer "dumb" components (no external logic, render data from props). Reuse existing components — if a similar one exists, extend it rather than duplicate. Generic components (tables, cards, charts) should stay generic and reusable.
 - **Typography minimum**: No font size below 14px in the app. `fontSize.sm` (14px) is the minimum for readable text. `fontSize.xs` (12px) is reserved for badges/captions only.
 - **Dependencies**: Pragmatic approach — use established libraries when they save significant time, don't over-engineer.
 - **Error handling**: User-friendly — show visual feedback (toast, inline messages) for errors.
 - **Testing**: Write complete tests (unit + integration) for new features.
-  [!!!] - **Database**: Supabase PostgreSQL, schema managed via `db push` (no migration files). User comfortable with SQL, RLS, triggers — but may need guidance on advanced patterns.
+- **Database**: Supabase PostgreSQL as the instance, Prisma as the ORM/schema layer (`web/prisma/schema/`). Schema changes go through `prisma db push` — no Prisma migration files, and never `supabase db push`. Reachable only from `web/` (Next.js). Connection pooling via **Prisma Accelerate** (Postgres-standard, not Supabase-specific — keeps the DB layer portable). RLS/triggers as needed. User comfortable with SQL, RLS, triggers — but may need guidance on advanced patterns.
 
 ### Other specifics
 
@@ -128,9 +136,14 @@ export function useCreateFood() {
 
 ## 5. GraphQL Rules
 
-    [!!!] - All GraphQL operations live **only** in `gql_crud/`
+Two distinct layers — do not confuse them:
 
-- Split by model (one folder per model)
+- **Schema/resolver definition** (backend, code-first): `web/graphql/` (`builder.ts`, `schema.ts`, `models/.../model.queries.ts`, `model.mutations.ts`). Defines what the API can do. Lives only in `web/`.
+- **Client operation layer** (frontend consumption): `packages/graphql-schema/gql_crud/`, shared by `web/` and `mobile/` (workspace dependency, build-time only — no runtime coupling between the two deployed apps). Each file just references an operation name defined in `web/graphql/` plus the variables to pass — this is what gets fed to codegen to produce typed hooks for the frontend.
+
+Rules:
+
+- Split by model (one folder per model), in both layers
 - Queries and mutations in separate files
 - **Never** write `gql` inline inside components
 
@@ -151,15 +164,15 @@ export function useCreateFood() {
 
 ---
 
-[!!!]
-
 ## 7. Styling Rules
 
-- Colors and design variables come **only** from `index.css`
-- No inline colors that are not defined in `index.css`
-- **Tailwind utility-first**
+Applies to **both** `web/` (Tailwind) and `mobile/` (NativeWind) — same design tokens, shared via a common Tailwind config so the two apps stay visually consistent.
+
+- Colors and design variables come **only** from the shared Tailwind config / `index.css` (web) — no ad-hoc hex values in either app
+- No inline colors that are not defined there
+- **Tailwind utility-first** on web, **NativeWind** (Tailwind classes) on mobile
 - Avoid excessively long class strings — extract reusable components instead
-- Prefer `@apply` classes defined in `index.css` for repeated patterns
+- Prefer `@apply` classes (web) / shared style presets (mobile) for repeated patterns
 
 ---
 

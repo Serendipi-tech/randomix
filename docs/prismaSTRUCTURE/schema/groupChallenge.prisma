@@ -1,0 +1,58 @@
+model GroupChallenge {
+    id String @id @default(cuid())
+
+    groupId String
+    group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+    name        String
+    icon        String
+    color       String
+    description String?
+
+    status STATUS_CHALLENGE @default(DRAFT)
+
+    numericGoal Int                 @default(1) // obiettivo numerico da raggiungere (es. 3 libri)
+    timeframe   CHALLENGE_TIMEFRAME @default(MONTHLY) // entro quando (entro un mese)
+
+    // A SCELTA, MA OBBLIGATORIO ALMENO UNO FRA:
+    item         Item[] // item specifici per completare la lista
+    category     CATEGORY[] // categoria di item da completare
+    allowedLists GroupList[] // liste del gruppo da cui pescare gli item per la sfida
+    allowedTags  Tag[] // considerare front-end SOLO i tag di sistema, non personali
+
+    groupUserProgression GroupUser_Challenge[]
+    notification         Notification[]
+    report               Report[]
+
+    manualAdvancement Boolean @default(false) // per i casi di "leggi 500 pagine, o 3 capitoli"
+    allowCompleted    Boolean @default(false) // si possono riguardare film già visti etc
+
+    startDate DateTime
+    endDate   DateTime
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([groupId])
+    @@index([status])
+}
+
+model GroupUser_Challenge {
+    id String @id @default(cuid())
+
+    groupUserId String
+    challengeId String
+
+    numericGoalProgression Int         @default(0) // per l'avanzamento manuale
+    itemsForChallenge      User_Item[] // per l'avanzamento automatico
+
+    challengeCompletedAt DateTime?
+
+    group     Group_User     @relation(fields: [groupUserId], references: [id], onDelete: Cascade)
+    challenge GroupChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([groupUserId, challengeId])
+}

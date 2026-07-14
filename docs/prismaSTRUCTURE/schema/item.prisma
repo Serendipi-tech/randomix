@@ -1,0 +1,51 @@
+model Item {
+    id String @id @default(cuid())
+
+    name        String // db se c'è, altrimenti api se c'è, altrimenti manuale
+    description String? // opzionale, può essere presa da api o manuale
+    imageUrl    String? // opzionale, può essere presa da api o (in futuro) manuale
+
+    category CATEGORY // ereditata dalla lista se possibile, altrimenti manuale
+    // se la lista è "custom", è SEMPRE manuale
+
+    userItems User_Item[]
+    ratings   Rating[]
+
+    groupLists GroupList[] // liste dei gruppi in cui è presente l'item
+    challenges GroupChallenge[] // sfide a cui l'item è associato
+
+    acceptedItemsHistory GroupList_AcceptedItemHistory[] // storico accettazione dell'item nelle liste gruppi
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([name, category])
+}
+
+model User_Item {
+    id String @id @default(cuid())
+
+    userId String
+    itemId String
+
+    description String?           @db.VarChar(500)
+    note        String?           @db.VarChar(500)
+    status      STATUS_COMPLETION @default(NOT_STARTED)
+    completedAt DateTime?
+
+    tags  Tag[] // tags personali dell'utente per l'item
+    lists List_UserItem[] // liste in cui l'utente ha inserito l'item
+
+    usedInChallenge GroupUser_Challenge[]
+
+    isHidden Boolean @default(false) // nasconde l'elemento agli amici > PREMIUM
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([userId, itemId])
+    @@index([status])
+}

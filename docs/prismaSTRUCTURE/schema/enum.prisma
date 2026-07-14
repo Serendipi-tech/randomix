@@ -1,0 +1,126 @@
+enum ROLES {
+    ADMIN
+    USER
+}
+
+enum ROLES_GROUP {
+    OWNER // proprietario
+    ADMIN // gestione membri, gestione item, gestione obiettivi
+    AUTO_CONTRIBUTOR // contributor automatizzato
+    CONTRIBUTOR // contributor "a scelta" solo se vuole
+    MEMBER // interagisce, senza contribuire alle liste
+}
+
+enum BILLING {
+    NEVER // per free, unlimited e full_access
+    MONTHLY
+    YEARLY
+}
+
+enum CATEGORY {
+    APPS
+    ART
+    BOOKS
+    NOVELS
+    COMICS
+    MANGA
+    SUBJECTS
+    MOVIES
+    TV_SHOWS
+    MUSIC
+    OTHER_GAMES
+    VIDEOGAMES
+    BOARDGAMES
+    CARDGAMES
+    SHOPS
+    RESTAURANTS
+    ACTIVITIES
+    SERVICES
+    FOOD
+    CUISINE
+    TRAVEL
+    FANFICTIONS
+    VIDEOS
+    PODCASTS
+    MAGAZINES
+    SPORTS
+    EVENTS
+    EDUCATION
+    CINEMA
+    THEATRE
+    EXPERIENCES
+    BEVERAGES
+    CUSTOM // tutto ciò che non rientra nelle altre categorie
+}
+
+enum MEMBERSHIP_PLAN {
+    FREE
+    PREMIUM
+    UNLIMITED
+    FREE_TRIAL // free trial come duolingo
+    FULL_ACCESS // attribuibile solo da admin
+}
+
+enum NOTIFICATION_TYPE {
+    CHALLENGE_NEW
+    CHALLENGE_COMPLETED
+    CHALLENGE_FAILED
+    FRIENDSHIP
+    GROUP_INVITE
+    GROUP_AUTOCONTRIBUTOR
+    SYSTEM
+}
+
+enum REPORT_TYPE {
+    BUG
+    FEEDBACK
+    REPORT // user, group, ecc
+}
+
+enum STATUS_COMPLETION {
+    NOT_STARTED
+    IN_PROGRESS
+    COMPLETED
+}
+
+enum STATUS_FRIENDSHIP {
+    PENDING
+    ACCEPTED
+    REJECTED
+    CANCELED
+}
+
+enum STATUS_PAYMENT {
+    SUCCESS
+    PENDING
+    FAILED
+}
+
+enum STATUS_REPORT {
+    SENT
+    IN_PROGRESS
+    SOLVED
+    REJECTED
+}
+
+enum STATUS_SUBSCRIPTION {
+    ACTIVE
+    PAST_DUE
+    CANCELED
+    UNPAID
+}
+
+enum STATUS_CHALLENGE {
+    DRAFT
+    NOT_STARTED
+    IN_PROGRESS
+    COMPLETED
+    FAILED
+}
+
+enum CHALLENGE_TIMEFRAME {
+    DAILY
+    WEEKLY
+    MONTHLY
+    YEARLY
+}

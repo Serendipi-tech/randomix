@@ -1,0 +1,35 @@
+model Report {
+    id String @id @default(cuid())
+
+    title         String
+    body          String?
+    attachedFiles String[] // devono essere URL (per ora)
+
+    reportType REPORT_TYPE
+    status     STATUS_REPORT
+
+    senderId String
+
+    reportedId  String?
+    itemId      String?
+    groupId     String?
+    challengeId String? // bug
+
+    sender    User            @relation("Sender", fields: [senderId], references: [id])
+    reported  User?           @relation("Reported", fields: [reportedId], references: [id])
+    group     Group?          @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    challenge GroupChallenge? @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([senderId, reportedId])
+    @@unique([senderId, itemId])
+    @@unique([senderId, groupId])
+    @@unique([senderId, challengeId])
+    @@index([status])
+    @@index([reportType])
+    @@index([reportedId])
+    @@index([itemId])
+    @@index([groupId])
+}

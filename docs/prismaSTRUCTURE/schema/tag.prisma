@@ -1,0 +1,30 @@
+model Tag {
+    id String @id @default(cuid())
+
+    name  String
+    color String
+
+    userId String? // solo se lo crea l'utente ed è personale e non di sistema
+    user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    useItems            User_Item[] // items a cui è associato il tag
+    connectedChallenges GroupChallenge[] // sfide a cui è associato il tag
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    /**
+     * io creo ROMANCE e lo collego a 5 item
+     * jessica crea ROMANCE e lo collega a 3 item
+     * ROMANCE non è un tag di sistema
+     * se voglio trasformare ROMANCE in un tag di sistema, devo:
+     * - creare un tag ROMANCE di sistema
+     * - accorpare tutti gli elementi che sono in ROMANCE personali (io, jessica) in quello di sistema
+     * - eliminare i tag personali ROMANCE (io, jessica)
+     * - prende il colore più usato da tutti e diventa immodificabile
+     * in parità sorteggia a caso
+     */
+
+    @@index([name])
+    @@index([userId])
+}

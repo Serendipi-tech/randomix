@@ -1,0 +1,17 @@
+model ListCategory {
+    id String @id @default(cuid())
+
+    name        String
+    description String? // opzionale
+    icon        String
+
+    includedCategories CATEGORY[] // categorie di item racchiuse in questa macro categoria
+    lists              List[] // liste cui è collegato
+    groupLists         GroupList[] // liste dei gruppi a cui è collegato
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([name])
+    @@index([includedCategories])
+}

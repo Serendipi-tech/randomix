@@ -1,0 +1,91 @@
+model Group {
+    id String @id @default(cuid())
+
+    name        String
+    description String?
+
+    ownerId String
+    owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+    randomizingRoles ROLES_GROUP[]
+
+    members         Group_User[]
+    groupLists      GroupList[] // liste del gruppo
+    groupChallenges GroupChallenge[] // sfide del gruppo
+    notification    Notification[]
+    report          Report[]
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
+
+    @@index([ownerId])
+}
+
+model Group_User {
+    id String @id @default(cuid())
+
+    groupId String
+    userId  String
+
+    // l'utente decide SE vuole che i suoi item cambino stato a causa del gruppo
+    // oppure SE vengono creati (non ha harry potter, viene randomizzato, glielo crea come in progress)
+    autoUpdateItems Boolean @default(false)
+
+    role ROLES_GROUP @default(MEMBER) // ruolo dell'utente nel gruppo
+
+    group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    groupUserProgression         GroupUser_Challenge[]
+    groupListAcceptedItemHistory GroupList_AcceptedItemHistory[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([groupId, userId])
+    @@index([groupId])
+    @@index([userId])
+    @@index([role])
+}
+
+model GroupList {
+    id String @id @default(cuid())
+
+    creatorId String?
+    creator   User?   @relation(fields: [creatorId], references: [id], onDelete: SetNull)
+
+    name        String
+    icon        String
+    color       String
+    description String?
+
+    groupId String
+    group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+    memberLists         List[] // liste dei membri del gruppo
+    items               Item[] // items del gruppo non collegati a liste condivise dagli utenti
+    listCategories      ListCategory[] // categorie di item del gruppo
+    connectedChallenges GroupChallenge[] // sfide del gruppo a cui partecipare
+
+    acceptedItemsHistory GroupList_AcceptedItemHistory[] // storico degli item accettati per la lista
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model GroupList_AcceptedItemHistory {
+    id String @id @default(cuid())
+
+    groupListId String
+    groupList   GroupList @relation(fields: [groupListId], references: [id], onDelete: Cascade)
+
+    randomizingFor Group_User[] // di default devono essere tutti i membri attualmente nel gruppo
+
+    itemId String
+    item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+    randomizedAt DateTime @default(now())
+
+    @@index([groupListId])
+}

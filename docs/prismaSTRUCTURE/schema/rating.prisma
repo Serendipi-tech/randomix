@@ -1,0 +1,17 @@
+model Rating {
+    id String @id @default(cuid())
+
+    value Int // da 1 a 5
+    note String? @db.VarChar(1000)
+
+    userId String?
+    itemId String
+
+    user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+    item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([userId, itemId])
+}
