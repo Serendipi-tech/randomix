@@ -16,18 +16,18 @@ Agile, no server dedicato. 2 persone in parallelo — dove possibile, split web/
   - [x] Install Apollo Client
   - [x] Install NativeWind (+ Tailwind 3, compatibile con NativeWind 4)
 - [x] Init `packages/graphql-schema` (package condiviso `@randomix/graphql-schema`, linkato come dipendenza di web/mobile via workspace)
-- [ ] Scaffolding cartelle interne come da `docs/architecture.md` (graphql/, gql_crud/, prisma/schema/, ecc. — solo i package.json/tool di base sono pronti)
-- [ ] Import schema Prisma completo (già pronto in `docs/prismaSTRUCTURE/schema/`) in `web/prisma/schema/` + `prisma db push`
+- [x] Scaffolding cartelle interne come da `docs/architecture.md` (graphql/, gql_crud/, prisma/schema/, ecc. — solo i package.json/tool di base sono pronti)
+- [x] Import schema Prisma completo (già pronto in `docs/prismaSTRUCTURE/schema/`) in `web/prisma/schema/` + `prisma db push`
   - [x] Schema copiato in `web/prisma/schema/`
   - [x] `web/prisma.config.ts` creato (Prisma 7: url del datasource si configura qui, non più nello `.prisma`)
   - [x] `web/.env.example` creato (`DATABASE_URL` diretto + placeholder Accelerate)
-  - [ ] Collegamento DB reale (in corso lato utente) → poi `prisma db push`
-- [ ] GraphQL builder/schema base (Next.js)
-- [ ] Expo Router skeleton + NativeWind config condiviso
+  - [x] Collegamento DB reale → `prisma db push` completato
+- [x] GraphQL builder/schema base (Next.js)
+- [x] Expo Router skeleton + NativeWind config condiviso
 
 ### Test
 
-- [ ] `prisma db push` esegue senza errori, tabelle visibili sul DB
+- [x] `prisma db push` esegue senza errori, tabelle visibili sul DB
 - [x] `next build` (`web/`) completa senza errori
 - [x] `expo-doctor` (`mobile/`) 20/20 check passati, nessuna dipendenza duplicata
 - [x] `web/` e `mobile/` importano correttamente `packages/graphql-schema` (verificato con `npm ls`)
