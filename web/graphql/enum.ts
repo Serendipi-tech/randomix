@@ -1,6 +1,6 @@
 import { builder } from './builder';
 
-builder.enumType('ROLES', {
+export const RolesEnum = builder.enumType('ROLES', {
   values: ['ADMIN', 'USER'] as const,
 });
 

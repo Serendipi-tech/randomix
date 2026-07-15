@@ -1,0 +1,108 @@
+import bcrypt from 'bcryptjs';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
+import { randomBytes } from 'crypto';
+import { GraphQLError } from 'graphql';
+import { Prisma, User } from '../../../prisma/generated/prisma/client';
+import { builder, prisma } from '../../builder';
+import { signToken } from '../../../src/lib/jwt';
+import { AuthPayloadRef } from './index';
+
+const GOOGLE_JWKS = createRemoteJWKSet(
+  new URL('https://www.googleapis.com/oauth2/v3/certs'),
+);
+
+async function makeAuthPayload(user: User) {
+  const accessToken = await signToken(user.id, user.email);
+  const refreshToken = await signToken(user.id, user.email);
+  return { accessToken, refreshToken, user };
+}
+
+builder.mutationField('registerWithCredentials', (t) =>
+  t.field({
+    type: AuthPayloadRef,
+    args: {
+      email: t.arg.string({ required: true }),
+      password: t.arg.string({ required: true }),
+      username: t.arg.string({ required: true }),
+    },
+    resolve: async (_root, { email, password, username }) => {
+      const passwordHash = await bcrypt.hash(password, 12);
+      try {
+        const user = await prisma.user.create({ data: { email, username, passwordHash } });
+        return makeAuthPayload(user);
+      } catch (e) {
+        if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+          throw new GraphQLError('Email o username già in uso.', {
+            extensions: { code: 'BAD_USER_INPUT' },
+          });
+        }
+        throw e;
+      }
+    },
+  }),
+);
+
+builder.mutationField('loginWithCredentials', (t) =>
+  t.field({
+    type: AuthPayloadRef,
+    args: {
+      email: t.arg.string({ required: true }),
+      password: t.arg.string({ required: true }),
+    },
+    resolve: async (_root, { email, password }) => {
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user?.passwordHash) {
+        throw new GraphQLError('Credenziali non valide.', { extensions: { code: 'UNAUTHORIZED' } });
+      }
+      const valid = await bcrypt.compare(password, user.passwordHash);
+      if (!valid) {
+        throw new GraphQLError('Credenziali non valide.', { extensions: { code: 'UNAUTHORIZED' } });
+      }
+      return makeAuthPayload(user);
+    },
+  }),
+);
+
+builder.mutationField('loginWithGoogle', (t) =>
+  t.field({
+    type: AuthPayloadRef,
+    args: { idToken: t.arg.string({ required: true }) },
+    resolve: async (_root, { idToken }) => {
+      let payload: Record<string, unknown>;
+      try {
+        const result = await jwtVerify(idToken, GOOGLE_JWKS, {
+          issuer: ['https://accounts.google.com', 'accounts.google.com'],
+          audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        payload = result.payload as Record<string, unknown>;
+      } catch {
+        throw new GraphQLError('Token Google non valido.', { extensions: { code: 'UNAUTHORIZED' } });
+      }
+
+      const email = payload.email as string;
+      const name = payload.name as string | undefined;
+      const picture = payload.picture as string | undefined;
+
+      const user = await prisma.user.upsert({
+        where: { email },
+        create: {
+          email,
+          username: name?.replace(/\s+/g, '').toLowerCase() ?? email.split('@')[0],
+          avatarUrl: picture ?? null,
+          passwordHash: await bcrypt.hash(randomBytes(32).toString('hex'), 12),
+        },
+        update: { avatarUrl: picture ?? undefined },
+      });
+
+      return makeAuthPayload(user);
+    },
+  }),
+);
+
+builder.mutationField('logout', (t) =>
+  t.field({
+    type: 'Boolean',
+    // Il client rimuove il token localmente — nessuna sessione server-side da invalidare
+    resolve: () => true,
+  }),
+);

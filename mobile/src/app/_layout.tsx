@@ -1,29 +1,51 @@
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { ApolloProvider } from '@apollo/client';
+import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { apolloClient } from '@/lib/apollo';
+import { tokenStorage } from '@/utils/tokenStorage';
 import '../global.css';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const router = useRouter();
 
   useEffect(() => {
-    // TODO Fase 1: attendere font + auth, poi redirect a (onboarding), (auth) o (app)
-    SplashScreen.hideAsync();
+    const init = async () => {
+      try {
+        const token = await tokenStorage.init();
+
+        if (!token) {
+          router.replace('/(auth)/login');
+          return;
+        }
+
+        const hasConsent = await tokenStorage.hasEmailConsent();
+        if (!hasConsent) {
+          router.replace('/(onboarding)/consent');
+          return;
+        }
+
+        router.replace('/(app)');
+      } finally {
+        SplashScreen.hideAsync();
+      }
+    };
+
+    init();
   }, []);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ApolloProvider client={apolloClient}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(onboarding)" />
         <Stack.Screen name="(app)" />
       </Stack>
       <AnimatedSplashOverlay />
-    </ThemeProvider>
+    </ApolloProvider>
   );
 }

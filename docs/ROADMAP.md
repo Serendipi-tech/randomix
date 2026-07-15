@@ -43,16 +43,46 @@ Agile, no server dedicato. 2 persone in parallelo — dove possibile, split web/
 
 ## Fase 1 — Fondamenta (parallelo)
 
-- [ ] **Dev A (web)**
-  - [ ] Login Google OAuth
-  - [ ] Login credentials
-  - [ ] Resolver `User` (query/mutation base: me, update profilo)
-- [ ] **Dev B (mobile)**
-  - [ ] Schermata login
-  - [ ] Schermata onboarding (consenso email)
-  - [ ] ThemeContext/NativeWind setup
-  - [ ] Apollo Client setup (auth header injection)
-- [ ] Blocking point comune: contratto schema GraphQL (query/mutation auth + user) da concordare prima di separarsi
+- [x] **Dev A (web)**
+  - [x] Login Google OAuth (`loginWithGoogle` mutation via Supabase signInWithIdToken)
+  - [x] Login credentials (`loginWithCredentials` mutation via Supabase signInWithPassword)
+  - [x] Resolver `User` (query/mutation base: `me`, `updateProfile`, `logout`)
+  - [x] Apollo Server route `/api/graphql` con context JWT (Supabase Bearer token)
+  - [x] Supabase client setup (`supabase` anonimo + `supabaseAdmin`)
+  - [x] Pothos builder con Prisma 7 (`getDatamodel()` + `PrismaPg` adapter)
+---
+
+### Contesto per riprendere — Dev B (mobile)
+
+**Stack decisioni prese:**
+- Auth engine: **Supabase Auth** (Google OAuth + credentials). Il mobile NON chiama Supabase direttamente — tutto passa per il GraphQL di Next.js.
+- Flusso auth mobile: l'app si autentica con Google tramite Expo (Expo AuthSession o `expo-auth-session`), ottiene un `idToken` Google, lo manda alla mutation `loginWithGoogle(idToken)` → Next.js lo verifica con Supabase → riceve `accessToken` + `refreshToken` Supabase.
+- Per credentials: mutation `loginWithCredentials(email, password)` → Next.js → Supabase → accessToken.
+- Il token Supabase va iniettato nell'header Apollo: `Authorization: Bearer <accessToken>`.
+- L'endpoint GraphQL è `https://<dominio>/api/graphql` (in dev: `http://localhost:3000/api/graphql`).
+
+**Contratto GraphQL già pronto (web):**
+```graphql
+mutation LoginWithCredentials($email: String!, $password: String!) { loginWithCredentials(email: $email, password: $password) { accessToken refreshToken user { id username email avatarUrl language role } } }
+mutation LoginWithGoogle($idToken: String!) { loginWithGoogle(idToken: $idToken) { accessToken refreshToken user { id username email } } }
+mutation Logout { logout }
+query Me { me { id username email avatarUrl language role createdAt } }
+mutation UpdateProfile($input: UpdateProfileInput!) { updateProfile(input: $input) { id username avatarUrl language } }
+```
+
+**Cosa serve attivare in Supabase prima di testare:**
+- Dashboard → Authentication → Providers → Google: abilitare e inserire Client ID + Secret da Google Cloud Console.
+- Per credentials: funziona già, ma bisogna creare utenti con `signUp` (o abilitare "Email confirmations" off in dev).
+
+**Dev B — prossimi task:**
+
+- [x] **Dev B (mobile)**
+  - [x] Schermata login
+  - [x] Schermata onboarding (consenso email)
+  - [x] ThemeContext/NativeWind setup
+  - [x] Apollo Client setup (auth header injection)
+- [x] Blocking point comune: contratto schema GraphQL (query/mutation auth + user) da concordare prima di separarsi
+  - [x] `me: User`, `updateProfile`, `loginWithCredentials`, `loginWithGoogle`, `logout` — definiti e deployabili
 
 ### Test
 
