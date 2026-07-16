@@ -2,9 +2,9 @@ import * as Google from 'expo-auth-session/providers/google';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Animated, { Easing, FadeInDown, LinearTransition } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { useAuth } from '@/utils/useAuth';
 import { useAuthIntro } from '@/utils/useAuthIntro';
 import { Accent, AuthBackground, AuthOnBackgroundText } from '@/constants/theme';
@@ -19,13 +19,11 @@ import { AuthBackgroundView } from '@/components/molecules/auth-background';
 import { AuthCard } from '@/components/molecules/auth-card';
 import { DiceLogo } from '@/components/molecules/dice-logo';
 
-const diceLayoutTransition = LinearTransition.duration(450).easing(Easing.out(Easing.cubic));
-
 export default function LoginScreen() {
   const { t } = useTranslation('auth');
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const router = useRouter();
-  const { diceStyle, cardVisible, replay } = useAuthIntro();
+  const { diceStyle, blockStyle, onDiceLayout, onBlockLayout, replay } = useAuthIntro();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -75,74 +73,70 @@ export default function LoginScreen() {
       <StickerShape variant="dot" color={Accent.mint} size={12} style={{ position: 'absolute', bottom: 40, left: 24 }} />
 
       <KeyboardAvoidingView style={s.inner} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView
-          contentContainerStyle={s.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <Animated.View layout={diceLayoutTransition}>
+        <View style={s.diceZone}>
+          <View onLayout={onDiceLayout}>
             <Animated.View style={diceStyle}>
               <DiceLogo />
             </Animated.View>
-          </Animated.View>
+          </View>
+        </View>
 
-          {cardVisible && (
-            <Animated.View entering={FadeInDown.duration(500)}>
-              <View style={s.headerText}>
-                <Text style={s.headline}>{t('login.headline')}</Text>
-                <HighlightChip label={t('login.brand')} color={Accent.yellow} fontSize={30} />
-                <Text style={s.tagline}>{t('login.tagline')}</Text>
-              </View>
+        <View style={s.block} onLayout={onBlockLayout}>
+        <Animated.View style={blockStyle}>
+          <View style={s.headerText}>
+            <Text style={s.headline}>{t('login.headline')}</Text>
+            <HighlightChip label={t('login.brand')} color={Accent.yellow} fontSize={30} />
+            <Text style={s.tagline}>{t('login.tagline')}</Text>
+          </View>
 
-              <AuthCard colorScheme={colorScheme}>
-                <View style={s.form}>
-                  <AuthInput
-                    colorScheme={colorScheme}
-                    placeholder={t('login.emailPlaceholder')}
-                    autoCapitalize="none"
-                    keyboardType="email-address"
-                    value={email}
-                    onChangeText={setEmail}
-                  />
-                  <AuthInput
-                    colorScheme={colorScheme}
-                    placeholder={t('login.passwordPlaceholder')}
-                    secureTextEntry
-                    value={password}
-                    onChangeText={setPassword}
-                  />
+          <AuthCard colorScheme={colorScheme}>
+            <View style={s.form}>
+              <AuthInput
+                colorScheme={colorScheme}
+                placeholder={t('login.emailPlaceholder')}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                value={email}
+                onChangeText={setEmail}
+              />
+              <AuthInput
+                colorScheme={colorScheme}
+                placeholder={t('login.passwordPlaceholder')}
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
 
-                  <Pressable onPress={() => {}} style={s.forgotPassword}>
-                    <Text style={s.forgotPasswordText}>{t('login.forgotPassword')}</Text>
-                  </Pressable>
-
-                  {displayError && <Text style={s.error}>{displayError}</Text>}
-
-                  <AuthButton
-                    colorScheme={colorScheme}
-                    label={t('login.submit')}
-                    onPress={handleCredentialsLogin}
-                    loading={loading}
-                  />
-
-                  <AuthDivider label={t('login.or')} colorScheme={colorScheme} />
-
-                  <AuthButton
-                    colorScheme={colorScheme}
-                    variant="secondary"
-                    label={t('login.google')}
-                    onPress={() => promptAsync()}
-                    disabled={loading}
-                  />
-                </View>
-              </AuthCard>
-
-              <Pressable onPress={() => router.push('/(auth)/register')} style={s.registerLink}>
-                <Text style={s.registerLinkText}>{t('login.noAccount')}</Text>
+              <Pressable onPress={() => {}} style={s.forgotPassword}>
+                <Text style={s.forgotPasswordText}>{t('login.forgotPassword')}</Text>
               </Pressable>
-            </Animated.View>
-          )}
-        </ScrollView>
+
+              {displayError && <Text style={s.error}>{displayError}</Text>}
+
+              <AuthButton
+                colorScheme={colorScheme}
+                label={t('login.submit')}
+                onPress={handleCredentialsLogin}
+                loading={loading}
+              />
+
+              <AuthDivider label={t('login.or')} colorScheme={colorScheme} />
+
+              <AuthButton
+                colorScheme={colorScheme}
+                variant="secondary"
+                label={t('login.google')}
+                onPress={() => promptAsync()}
+                disabled={loading}
+              />
+            </View>
+          </AuthCard>
+
+          <Pressable onPress={() => router.push('/(auth)/register')} style={s.registerLink}>
+            <Text style={s.registerLinkText}>{t('login.noAccount')}</Text>
+          </Pressable>
+        </Animated.View>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -156,13 +150,16 @@ const styles = (onBg: typeof AuthOnBackgroundText.light | typeof AuthOnBackgroun
     inner: {
       flex: 1,
     },
-    scrollContent: {
-      flexGrow: 1,
-      paddingHorizontal: 24,
-      paddingVertical: 32,
-      justifyContent: 'center',
+    diceZone: {
+      flex: 1,
       alignItems: 'center',
-      gap: 20,
+      justifyContent: 'center',
+    },
+    block: {
+      position: 'absolute',
+      left: 24,
+      right: 24,
+      bottom: 28,
     },
     headerText: {
       alignItems: 'center',
