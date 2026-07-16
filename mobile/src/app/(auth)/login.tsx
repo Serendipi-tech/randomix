@@ -1,25 +1,31 @@
 import * as Google from 'expo-auth-session/providers/google';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { Easing, FadeInDown, LinearTransition } from 'react-native-reanimated';
 import { useAuth } from '@/utils/useAuth';
-import { Colors } from '@/constants/theme';
+import { useAuthIntro } from '@/utils/useAuthIntro';
+import { Accent, AuthBackground, AuthOnBackgroundText } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { AuthButton } from '@/components/atoms/auth-button';
+import { AuthDivider } from '@/components/atoms/auth-divider';
+import { AuthInput } from '@/components/atoms/auth-input';
+import { HighlightChip } from '@/components/atoms/highlight-chip';
+import { RefreshButton } from '@/components/atoms/refresh-button';
+import { StickerShape } from '@/components/atoms/sticker-shape';
+import { AuthBackgroundView } from '@/components/molecules/auth-background';
+import { AuthCard } from '@/components/molecules/auth-card';
+import { DiceLogo } from '@/components/molecules/dice-logo';
+
+const diceLayoutTransition = LinearTransition.duration(450).easing(Easing.out(Easing.cubic));
 
 export default function LoginScreen() {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const { t } = useTranslation('auth');
+  const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const router = useRouter();
+  const { diceStyle, cardVisible, replay } = useAuthIntro();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,7 +43,7 @@ export default function LoginScreen() {
       if (idToken) {
         loginWithGoogle(idToken).catch((e: Error) => setLocalError(e.message));
       } else {
-        setLocalError('Impossibile ottenere il token Google.');
+        setLocalError(t('login.googleTokenError'));
       }
     }
   }, [response]);
@@ -45,7 +51,7 @@ export default function LoginScreen() {
   const handleCredentialsLogin = async () => {
     setLocalError(null);
     if (!email.trim() || !password) {
-      setLocalError('Inserisci email e password.');
+      setLocalError(t('login.missingFields'));
       return;
     }
     try {
@@ -56,161 +62,152 @@ export default function LoginScreen() {
   };
 
   const displayError = localError ?? error?.message ?? null;
-
-  const s = styles(colors);
+  const onBg = AuthOnBackgroundText[colorScheme];
+  const s = styles(onBg);
 
   return (
-    <SafeAreaView style={s.safe}>
-      <KeyboardAvoidingView
-        style={s.inner}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <View style={s.header}>
-          <Text style={s.appName}>RandoMIX</Text>
-          <Text style={s.subtitle}>Accedi al tuo account</Text>
-        </View>
+    <SafeAreaView style={[s.safe, { backgroundColor: AuthBackground[colorScheme].stops[0] }]}>
+      <AuthBackgroundView colorScheme={colorScheme} />
 
-        <View style={s.form}>
-          <TextInput
-            style={s.input}
-            placeholder="Email"
-            placeholderTextColor={colors.textSecondary}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-          />
-          <TextInput
-            style={s.input}
-            placeholder="Password"
-            placeholderTextColor={colors.textSecondary}
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
+      <RefreshButton onPress={replay} colorScheme={colorScheme} style={{ position: 'absolute', top: 16, left: 16, zIndex: 10 }} />
 
-          {displayError && <Text style={s.error}>{displayError}</Text>}
+      <StickerShape variant="star" color={Accent.yellow} size={20} rotation={-12} style={{ position: 'absolute', top: 20, right: 28 }} />
+      <StickerShape variant="dot" color={Accent.mint} size={12} style={{ position: 'absolute', bottom: 40, left: 24 }} />
 
-          <Pressable
-            style={[s.button, s.buttonPrimary, loading && s.buttonDisabled]}
-            onPress={handleCredentialsLogin}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={s.buttonTextPrimary}>Accedi</Text>
-            )}
-          </Pressable>
+      <KeyboardAvoidingView style={s.inner} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView
+          contentContainerStyle={s.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Animated.View layout={diceLayoutTransition}>
+            <Animated.View style={diceStyle}>
+              <DiceLogo />
+            </Animated.View>
+          </Animated.View>
 
-          <View style={s.divider}>
-            <View style={s.dividerLine} />
-            <Text style={s.dividerText}>oppure</Text>
-            <View style={s.dividerLine} />
-          </View>
+          {cardVisible && (
+            <Animated.View entering={FadeInDown.duration(500)}>
+              <View style={s.headerText}>
+                <Text style={s.headline}>{t('login.headline')}</Text>
+                <HighlightChip label={t('login.brand')} color={Accent.yellow} fontSize={30} />
+                <Text style={s.tagline}>{t('login.tagline')}</Text>
+              </View>
 
-          <Pressable
-            style={[s.button, s.buttonGoogle, loading && s.buttonDisabled]}
-            onPress={() => promptAsync()}
-            disabled={loading}
-          >
-            <Text style={s.buttonTextGoogle}>Continua con Google</Text>
-          </Pressable>
-        </View>
+              <AuthCard colorScheme={colorScheme}>
+                <View style={s.form}>
+                  <AuthInput
+                    colorScheme={colorScheme}
+                    placeholder={t('login.emailPlaceholder')}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
+                    value={email}
+                    onChangeText={setEmail}
+                  />
+                  <AuthInput
+                    colorScheme={colorScheme}
+                    placeholder={t('login.passwordPlaceholder')}
+                    secureTextEntry
+                    value={password}
+                    onChangeText={setPassword}
+                  />
 
-        <Pressable onPress={() => router.push('/(auth)/register')} style={s.registerLink}>
-          <Text style={s.registerLinkText}>Non hai un account? Registrati</Text>
-        </Pressable>
+                  <Pressable onPress={() => {}} style={s.forgotPassword}>
+                    <Text style={s.forgotPasswordText}>{t('login.forgotPassword')}</Text>
+                  </Pressable>
+
+                  {displayError && <Text style={s.error}>{displayError}</Text>}
+
+                  <AuthButton
+                    colorScheme={colorScheme}
+                    label={t('login.submit')}
+                    onPress={handleCredentialsLogin}
+                    loading={loading}
+                  />
+
+                  <AuthDivider label={t('login.or')} colorScheme={colorScheme} />
+
+                  <AuthButton
+                    colorScheme={colorScheme}
+                    variant="secondary"
+                    label={t('login.google')}
+                    onPress={() => promptAsync()}
+                    disabled={loading}
+                  />
+                </View>
+              </AuthCard>
+
+              <Pressable onPress={() => router.push('/(auth)/register')} style={s.registerLink}>
+                <Text style={s.registerLinkText}>{t('login.noAccount')}</Text>
+              </Pressable>
+            </Animated.View>
+          )}
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-const styles = (colors: typeof Colors.light) =>
+const styles = (onBg: typeof AuthOnBackgroundText.light | typeof AuthOnBackgroundText.dark) =>
   StyleSheet.create({
     safe: {
       flex: 1,
-      backgroundColor: colors.background,
     },
     inner: {
       flex: 1,
+    },
+    scrollContent: {
+      flexGrow: 1,
       paddingHorizontal: 24,
+      paddingVertical: 32,
       justifyContent: 'center',
-      gap: 32,
-    },
-    header: {
       alignItems: 'center',
-      gap: 8,
+      gap: 20,
     },
-    appName: {
-      fontSize: 32,
-      fontWeight: '700',
-      color: colors.text,
+    headerText: {
+      alignItems: 'center',
+      gap: 6,
+      marginBottom: 20,
     },
-    subtitle: {
-      fontSize: 16,
-      color: colors.textSecondary,
+    headline: {
+      fontSize: 24,
+      textAlign: 'center',
+      color: onBg.primary,
+      fontFamily: 'Fredoka_700Bold',
+    },
+    tagline: {
+      fontSize: 15,
+      color: onBg.secondary,
+      fontFamily: 'Nunito_500Medium',
+      marginTop: 4,
+      textAlign: 'center',
+      paddingHorizontal: 12,
     },
     form: {
       gap: 12,
     },
-    input: {
-      backgroundColor: colors.backgroundElement,
-      borderRadius: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 14,
-      fontSize: 16,
-      color: colors.text,
+    forgotPassword: {
+      alignSelf: 'flex-end',
+      marginTop: -4,
+    },
+    forgotPasswordText: {
+      fontSize: 13,
+      color: Accent.primary,
+      fontFamily: 'Nunito_500Medium',
     },
     error: {
       fontSize: 14,
       color: '#E53E3E',
       textAlign: 'center',
-    },
-    button: {
-      borderRadius: 12,
-      paddingVertical: 14,
-      alignItems: 'center',
-    },
-    buttonPrimary: {
-      backgroundColor: '#208AEF',
-    },
-    buttonGoogle: {
-      backgroundColor: colors.backgroundElement,
-    },
-    buttonDisabled: {
-      opacity: 0.6,
-    },
-    buttonTextPrimary: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    buttonTextGoogle: {
-      color: colors.text,
-      fontSize: 16,
-      fontWeight: '500',
-    },
-    divider: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-      marginVertical: 4,
-    },
-    dividerLine: {
-      flex: 1,
-      height: 1,
-      backgroundColor: colors.backgroundSelected,
-    },
-    dividerText: {
-      fontSize: 14,
-      color: colors.textSecondary,
+      fontFamily: 'Nunito_500Medium',
     },
     registerLink: {
       alignItems: 'center',
+      marginTop: 20,
     },
     registerLinkText: {
       fontSize: 14,
-      color: colors.textSecondary,
+      color: onBg.secondary,
+      fontFamily: 'Nunito_500Medium',
     },
   });

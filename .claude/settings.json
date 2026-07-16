@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pkill -f \"expo start\")",
+      "Bash(npx expo *)",
+      "Bash(echo \"started pid $!\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8199/)",
+      "Bash(npx tsc *)"
+    ]
+  }
+}

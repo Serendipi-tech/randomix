@@ -1,24 +1,29 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/theme';
+import Animated, { Easing, FadeInDown, LinearTransition } from 'react-native-reanimated';
+import { Accent, AuthBackground, AuthOnBackgroundText } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useAuth } from '@/utils/useAuth';
+import { useAuthIntro } from '@/utils/useAuthIntro';
+import { AuthButton } from '@/components/atoms/auth-button';
+import { AuthInput } from '@/components/atoms/auth-input';
+import { HighlightChip } from '@/components/atoms/highlight-chip';
+import { RefreshButton } from '@/components/atoms/refresh-button';
+import { StickerShape } from '@/components/atoms/sticker-shape';
+import { AuthBackgroundView } from '@/components/molecules/auth-background';
+import { AuthCard } from '@/components/molecules/auth-card';
+import { DiceLogo } from '@/components/molecules/dice-logo';
+
+const diceLayoutTransition = LinearTransition.duration(450).easing(Easing.out(Easing.cubic));
 
 export default function RegisterScreen() {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const { t } = useTranslation('auth');
+  const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const router = useRouter();
+  const { diceStyle, cardVisible, replay } = useAuthIntro();
 
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -32,19 +37,19 @@ export default function RegisterScreen() {
     setLocalError(null);
 
     if (!email.trim() || !username.trim() || !password || !confirmPassword) {
-      setLocalError('Compila tutti i campi.');
+      setLocalError(t('register.missingFields'));
       return;
     }
     if (password !== confirmPassword) {
-      setLocalError('Le password non coincidono.');
+      setLocalError(t('register.passwordMismatch'));
       return;
     }
     if (password.length < 8) {
-      setLocalError('La password deve essere di almeno 8 caratteri.');
+      setLocalError(t('register.passwordTooShort'));
       return;
     }
     if (username.trim().length < 3) {
-      setLocalError('Lo username deve essere di almeno 3 caratteri.');
+      setLocalError(t('register.usernameTooShort'));
       return;
     }
 
@@ -56,139 +61,143 @@ export default function RegisterScreen() {
   };
 
   const displayError = localError ?? error?.message ?? null;
-  const s = styles(colors);
+  const onBg = AuthOnBackgroundText[colorScheme];
+  const s = styles(onBg);
 
   return (
-    <SafeAreaView style={s.safe}>
-      <KeyboardAvoidingView
-        style={s.inner}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <View style={s.header}>
-          <Text style={s.title}>Crea account</Text>
-          <Text style={s.subtitle}>Entra nel mondo di RandoMIX</Text>
-        </View>
+    <SafeAreaView style={[s.safe, { backgroundColor: AuthBackground[colorScheme].stops[0] }]}>
+      <AuthBackgroundView colorScheme={colorScheme} />
 
-        <View style={s.form}>
-          <TextInput
-            style={s.input}
-            placeholder="Email"
-            placeholderTextColor={colors.textSecondary}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-          />
-          <TextInput
-            style={s.input}
-            placeholder="Username"
-            placeholderTextColor={colors.textSecondary}
-            autoCapitalize="none"
-            value={username}
-            onChangeText={setUsername}
-          />
-          <TextInput
-            style={s.input}
-            placeholder="Password"
-            placeholderTextColor={colors.textSecondary}
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-          <TextInput
-            style={s.input}
-            placeholder="Conferma password"
-            placeholderTextColor={colors.textSecondary}
-            secureTextEntry
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-          />
+      <RefreshButton onPress={replay} colorScheme={colorScheme} style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }} />
 
-          {displayError && <Text style={s.error}>{displayError}</Text>}
+      <StickerShape variant="star" color={Accent.mint} size={20} rotation={10} style={{ position: 'absolute', top: 20, left: 28 }} />
+      <StickerShape variant="dot" color={Accent.yellow} size={12} style={{ position: 'absolute', bottom: 40, right: 24 }} />
 
-          <Pressable
-            style={[s.button, s.buttonPrimary, loading && s.buttonDisabled]}
-            onPress={handleRegister}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={s.buttonTextPrimary}>Registrati</Text>
-            )}
-          </Pressable>
-        </View>
+      <KeyboardAvoidingView style={s.inner} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView
+          contentContainerStyle={s.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Animated.View layout={diceLayoutTransition}>
+            <Animated.View style={diceStyle}>
+              <DiceLogo />
+            </Animated.View>
+          </Animated.View>
 
-        <Pressable onPress={() => router.back()} style={s.backLink}>
-          <Text style={s.backLinkText}>Hai già un account? Accedi</Text>
-        </Pressable>
+          {cardVisible && (
+            <Animated.View entering={FadeInDown.duration(500)}>
+              <View style={s.headerText}>
+                <Text style={s.headline}>{t('register.headline')}</Text>
+                <HighlightChip label={t('register.brand')} color={Accent.mint} fontSize={30} />
+                <Text style={s.tagline}>{t('register.tagline')}</Text>
+              </View>
+
+              <AuthCard colorScheme={colorScheme}>
+                <View style={s.form}>
+                  <AuthInput
+                    colorScheme={colorScheme}
+                    placeholder={t('register.emailPlaceholder')}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
+                    value={email}
+                    onChangeText={setEmail}
+                  />
+                  <AuthInput
+                    colorScheme={colorScheme}
+                    placeholder={t('register.usernamePlaceholder')}
+                    autoCapitalize="none"
+                    value={username}
+                    onChangeText={setUsername}
+                  />
+                  <AuthInput
+                    colorScheme={colorScheme}
+                    placeholder={t('register.passwordPlaceholder')}
+                    secureTextEntry
+                    value={password}
+                    onChangeText={setPassword}
+                  />
+                  <AuthInput
+                    colorScheme={colorScheme}
+                    placeholder={t('register.confirmPasswordPlaceholder')}
+                    secureTextEntry
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                  />
+
+                  {displayError && <Text style={s.error}>{displayError}</Text>}
+
+                  <AuthButton
+                    colorScheme={colorScheme}
+                    label={t('register.submit')}
+                    onPress={handleRegister}
+                    loading={loading}
+                  />
+                </View>
+              </AuthCard>
+
+              <Pressable onPress={() => router.back()} style={s.backLink}>
+                <Text style={s.backLinkText}>{t('register.haveAccount')}</Text>
+              </Pressable>
+            </Animated.View>
+          )}
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-const styles = (colors: typeof Colors.light) =>
+const styles = (onBg: typeof AuthOnBackgroundText.light | typeof AuthOnBackgroundText.dark) =>
   StyleSheet.create({
     safe: {
       flex: 1,
-      backgroundColor: colors.background,
     },
     inner: {
       flex: 1,
+    },
+    scrollContent: {
+      flexGrow: 1,
       paddingHorizontal: 24,
+      paddingVertical: 32,
       justifyContent: 'center',
-      gap: 32,
-    },
-    header: {
       alignItems: 'center',
-      gap: 8,
+      gap: 20,
     },
-    title: {
-      fontSize: 32,
-      fontWeight: '700',
-      color: colors.text,
+    headerText: {
+      alignItems: 'center',
+      gap: 6,
+      marginBottom: 20,
     },
-    subtitle: {
-      fontSize: 16,
-      color: colors.textSecondary,
+    headline: {
+      fontSize: 24,
+      textAlign: 'center',
+      color: onBg.primary,
+      fontFamily: 'Fredoka_700Bold',
+    },
+    tagline: {
+      fontSize: 15,
+      color: onBg.secondary,
+      fontFamily: 'Nunito_500Medium',
+      marginTop: 4,
+      textAlign: 'center',
+      paddingHorizontal: 12,
     },
     form: {
       gap: 12,
-    },
-    input: {
-      backgroundColor: colors.backgroundElement,
-      borderRadius: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 14,
-      fontSize: 16,
-      color: colors.text,
     },
     error: {
       fontSize: 14,
       color: '#E53E3E',
       textAlign: 'center',
-    },
-    button: {
-      borderRadius: 12,
-      paddingVertical: 14,
-      alignItems: 'center',
-    },
-    buttonPrimary: {
-      backgroundColor: '#208AEF',
-    },
-    buttonDisabled: {
-      opacity: 0.6,
-    },
-    buttonTextPrimary: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600',
+      fontFamily: 'Nunito_500Medium',
     },
     backLink: {
       alignItems: 'center',
+      marginTop: 20,
     },
     backLinkText: {
       fontSize: 14,
-      color: colors.textSecondary,
+      color: onBg.secondary,
+      fontFamily: 'Nunito_500Medium',
     },
   });

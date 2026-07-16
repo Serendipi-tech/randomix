@@ -24,6 +24,66 @@ export const Colors = {
   },
 } as const;
 
+/** Colori accent giocosi: usati su elementi decorativi (logo, blob, glow), non su testo/superfici standard. */
+export const Accent = {
+  primary: '#208AEF',
+  coral: '#FF6B6B',
+  yellow: '#FFD166',
+  mint: '#06D6A0',
+  violet: '#7C5CFC',
+} as const;
+
+/** Sfondo pieno delle schermate di autenticazione: gradiente multi-tono (mai un wash a un colore solo). Pastello in light, stessa famiglia della card in dark. Mai nero/bianco puro. */
+export const AuthBackground = {
+  light: { stops: ['#E4D3FF', '#FCD9EC', '#FFE7B8'] },
+  dark: { stops: ['#120A26', '#3A1C57', '#5A1E4E'] },
+} as const;
+
+/** Macchie di luce colorata sopra AuthBackground, per dare profondità senza illustrazioni. */
+export const AuthGlow = {
+  light: [
+    { color: Accent.violet, top: -60, left: -60 },
+    { color: Accent.coral, bottom: -80, right: -50 },
+  ],
+  dark: [
+    { color: Accent.violet, top: -60, left: -60 },
+    { color: Accent.mint, bottom: -80, right: -50 },
+  ],
+} as const;
+
+/** Superficie opaca della card di autenticazione: leggermente più chiara dello sfondo, stessa famiglia di colore. */
+export const AuthCardSurface = {
+  light: { fill: '#FFFBF6', text: '#241A3D' },
+  dark: { fill: '#2A2049', text: '#F3ECFF' },
+} as const;
+
+/** Pillola secondaria (es. "Continua con Google"): piena e ad alto contrasto, mai un grigio neutro. */
+export const AuthButtonSecondary = {
+  light: { fill: '#1F1B2E', text: '#FFFBF5' },
+  dark: { fill: '#F5EFFF', text: '#1F1B2E' },
+} as const;
+
+/** Campo di input sopra la AuthCard: tinta neutra derivata dal colore testo della card. */
+export const AuthInputSurface = {
+  light: { fill: 'rgba(31,27,46,0.06)', placeholder: '#8A8398' },
+  dark: { fill: 'rgba(255,255,255,0.08)', placeholder: '#B9AEDC' },
+} as const;
+
+/** Testo che poggia direttamente su AuthBackground (titolo, tagline, link) fuori dalla card. */
+export const AuthOnBackgroundText = {
+  light: { primary: '#241A3D', secondary: 'rgba(36,26,61,0.7)' },
+  dark: { primary: '#F3ECFF', secondary: 'rgba(243,236,255,0.72)' },
+} as const;
+
+/** Shading pseudo-3D del dado: bordo chiaro in alto, ombra scura in basso, per dare volume senza asset illustrati. */
+export const DiceShading = {
+  face: '#FFFBF6',
+  highlight: '#FFFFFF',
+  shadowEdge: '#D8CDEB',
+  border: '#E4D6F5',
+  pip: '#5B3FD6',
+} as const;
+
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
 export const Fonts = Platform.select({
