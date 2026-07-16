@@ -8,11 +8,13 @@ const httpLink = createHttpLink({
 // Accesso sincrono al token — tokenStorage.init() lo popola al boot prima del primo render
 const authLink = new ApolloLink((operation, forward) => {
   const token = tokenStorage.getAccessTokenSync();
-  if (token) {
-    operation.setContext(({ headers = {} }: { headers: Record<string, string> }) => ({
-      headers: { ...headers, authorization: `Bearer ${token}` },
-    }));
-  }
+  operation.setContext(({ headers = {} }: { headers: Record<string, string> }) => ({
+    headers: {
+      ...headers,
+      'x-api-key': process.env.EXPO_PUBLIC_CLIENT_API_KEY ?? '',
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    },
+  }));
   return forward(operation);
 });
 

@@ -107,7 +107,7 @@ export default function LoginScreen() {
                 onChangeText={setPassword}
               />
 
-              <Pressable onPress={() => {}} style={s.forgotPassword}>
+              <Pressable onPress={() => router.push('/(auth)/forgot-password')} style={s.forgotPassword}>
                 <Text style={s.forgotPasswordText}>{t('login.forgotPassword')}</Text>
               </Pressable>
 

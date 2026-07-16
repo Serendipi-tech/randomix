@@ -55,6 +55,18 @@ export const LOGOUT: DocumentNode = parse(`
   }
 `);
 
+export const REQUEST_PASSWORD_RESET: DocumentNode = parse(`
+  mutation RequestPasswordReset($email: String!) {
+    requestPasswordReset(email: $email)
+  }
+`);
+
+export const RESET_PASSWORD: DocumentNode = parse(`
+  mutation ResetPassword($email: String!, $otp: String!, $newPassword: String!) {
+    resetPassword(email: $email, otp: $otp, newPassword: $newPassword)
+  }
+`);
+
 export const UPDATE_PROFILE: DocumentNode = parse(`
   mutation UpdateProfile($input: UpdateProfileInput!) {
     updateProfile(input: $input) {

@@ -5,7 +5,10 @@ import { schema } from '@graphql/schema';
 import { verifyToken } from '@/lib/jwt';
 import type { Context } from '@graphql/builder';
 
-const server = new ApolloServer<Context>({ schema });
+const server = new ApolloServer<Context>({
+  schema,
+  includeStacktraceInErrorResponses: process.env.NODE_ENV === 'development',
+});
 
 const apolloHandler = startServerAndCreateNextHandler<NextRequest, Context>(server, {
   context: async (req) => {
@@ -26,17 +29,28 @@ const CORS_HEADERS = {
 
 type RouteContext = { params: Promise<Record<string, string>> };
 
+function checkApiKey(req: NextRequest): boolean {
+  const key = req.headers.get('x-api-key');
+  return key === process.env.CLIENT_API_KEY;
+}
+
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
 }
 
 export async function GET(req: NextRequest, _ctx: RouteContext) {
+  if (!checkApiKey(req)) {
+    return new NextResponse('Unauthorized', { status: 401, headers: CORS_HEADERS });
+  }
   const res = await apolloHandler(req);
   Object.entries(CORS_HEADERS).forEach(([k, v]) => res.headers.set(k, v));
   return res;
 }
 
 export async function POST(req: NextRequest, _ctx: RouteContext) {
+  if (!checkApiKey(req)) {
+    return new NextResponse('Unauthorized', { status: 401, headers: CORS_HEADERS });
+  }
   const res = await apolloHandler(req);
   Object.entries(CORS_HEADERS).forEach(([k, v]) => res.headers.set(k, v));
   return res;

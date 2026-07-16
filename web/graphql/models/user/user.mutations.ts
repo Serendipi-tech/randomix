@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
-import { randomBytes } from 'crypto';
+import { createHash, randomBytes } from 'crypto';
+import { sendPasswordResetEmail } from '../../../src/lib/email';
 import { GraphQLError } from 'graphql';
 import { Prisma, User } from '../../../prisma/generated/prisma/client';
 import { builder, prisma } from '../../builder';
@@ -95,6 +96,65 @@ builder.mutationField('loginWithGoogle', (t) =>
       });
 
       return makeAuthPayload(user);
+    },
+  }),
+);
+
+builder.mutationField('requestPasswordReset', (t) =>
+  t.field({
+    type: 'Boolean',
+    args: {
+      email: t.arg.string({ required: true }),
+    },
+    resolve: async (_root, { email }) => {
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user) return true; // nessuna info leak sull'esistenza dell'account
+
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const tokenHash = createHash('sha256').update(otp).digest('hex');
+      const expiry = new Date(Date.now() + 60 * 60 * 1000);
+
+      await prisma.user.update({
+        where: { email },
+        data: { resetPasswordToken: tokenHash, resetPasswordTokenExpiry: expiry },
+      });
+
+      await sendPasswordResetEmail(email, otp);
+      return true;
+    },
+  }),
+);
+
+builder.mutationField('resetPassword', (t) =>
+  t.field({
+    type: 'Boolean',
+    args: {
+      email: t.arg.string({ required: true }),
+      otp: t.arg.string({ required: true }),
+      newPassword: t.arg.string({ required: true }),
+    },
+    resolve: async (_root, { email, otp, newPassword }) => {
+      const user = await prisma.user.findUnique({ where: { email } });
+      const tokenHash = createHash('sha256').update(otp).digest('hex');
+
+      if (
+        !user?.resetPasswordToken ||
+        !user.resetPasswordTokenExpiry ||
+        user.resetPasswordTokenExpiry < new Date() ||
+        tokenHash !== user.resetPasswordToken
+      ) {
+        throw new GraphQLError('Codice non valido o scaduto.', {
+          extensions: { code: 'BAD_USER_INPUT' },
+        });
+      }
+
+      const passwordHash = await bcrypt.hash(newPassword, 12);
+      await prisma.user.update({
+        where: { email },
+        data: { passwordHash, resetPasswordToken: null, resetPasswordTokenExpiry: null },
+      });
+
+      return true;
     },
   }),
 );
