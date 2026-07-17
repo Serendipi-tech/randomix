@@ -21,6 +21,7 @@
     "edit": "Edit",
     "items": "Items",
     "addItem": "+ Add",
+    "draw": "🎲 Draw",
     "remove": "Remove",
     "removeConfirmTitle": "Remove item?",
     "removeConfirmMessage": "It will be removed from this list only.",

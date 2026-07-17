@@ -107,11 +107,23 @@ export default function ListDetailScreen() {
                 <Text style={[styles.sectionTitle, { color: colors.text }]}>
                   {t('detail.items')}
                 </Text>
-                <Pressable
-                  onPress={() => router.push({ pathname: '/item-form', params: { listId: id } })}
-                  style={[styles.addButton, { backgroundColor: list.color }]}>
-                  <Text style={styles.addLabel}>{t('detail.addItem')}</Text>
-                </Pressable>
+                <View style={styles.itemsActions}>
+                  <Pressable
+                    onPress={() =>
+                      router.push({
+                        pathname: '/draw',
+                        params: { listId: id, listColor: list.color },
+                      })
+                    }
+                    style={[styles.addButton, { backgroundColor: list.color }]}>
+                    <Text style={styles.addLabel}>{t('detail.draw')}</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => router.push({ pathname: '/item-form', params: { listId: id } })}
+                    style={[styles.addButton, { backgroundColor: list.color }]}>
+                    <Text style={styles.addLabel}>{t('detail.addItem')}</Text>
+                  </Pressable>
+                </View>
               </View>
             </View>
           }
@@ -185,6 +197,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontFamily: 'Fredoka_700Bold',
+  },
+  itemsActions: {
+    flexDirection: 'row',
+    gap: Spacing.two,
   },
   addButton: {
     paddingVertical: 8,

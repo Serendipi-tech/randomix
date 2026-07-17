@@ -8,3 +8,5 @@ export * as ItemMutations from './gql_crud/item/item.mutations';
 export * as TagQueries from './gql_crud/tag/tag.queries';
 export * as TagMutations from './gql_crud/tag/tag.mutations';
 export * as RatingMutations from './gql_crud/rating/rating.mutations';
+export * as RandomizerQueries from './gql_crud/randomizer/randomizer.queries';
+export * as RandomizerMutations from './gql_crud/randomizer/randomizer.mutations';

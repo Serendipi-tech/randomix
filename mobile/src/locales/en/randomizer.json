@@ -1,0 +1,24 @@
+{
+  "title": "Randomizer",
+  "back": "Back",
+  "modes": {
+    "numbers": "Numbers",
+    "letters": "Letters",
+    "colors": "Colors",
+    "dice": "Dice"
+  },
+  "minPlaceholder": "Min",
+  "maxPlaceholder": "Max",
+  "countPlaceholder": "How many",
+  "facesPlaceholder": "Faces",
+  "generate": "Generate",
+  "total": "Total",
+  "invalidInput": "Check the values and try again.",
+  "draw": {
+    "title": "Random pick",
+    "regenerate": "Regenerate",
+    "accept": "Accept",
+    "accepted": "Accepted!",
+    "backToList": "Back to list"
+  }
+}

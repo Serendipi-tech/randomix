@@ -17,6 +17,8 @@ import './models/tag/tag.queries';
 import './models/tag/tag.mutations';
 import './models/rating/index';
 import './models/rating/rating.mutations';
+import './models/randomizer/randomizer.queries';
+import './models/randomizer/randomizer.mutations';
 
 builder.queryType({});
 builder.mutationType({});

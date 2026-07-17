@@ -167,19 +167,19 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
   - [x] 2.1.2 `Item`, `User_Item`, `List_UserItem` (`addItemToList` con riuso item esistente, `updateUserItem`, `removeItemFromList`)
   - [x] 2.1.3 `Tag` (`myTags` personali + sistema, `createTag`/`deleteTag`, assegnazione via `updateUserItem.tagIds`)
   - [x] 2.1.4 `Rating` (`rateItem` upsert 1-5 + nota, `deleteRating`, `myRating` esposto su Item)
-  - [ ] 2.1.5 Randomizzatore backend
-    - [ ] 2.1.5.1 Numeri (range X-Y, N estrazioni)
-    - [ ] 2.1.5.2 Lettere alfabeto
-    - [ ] 2.1.5.3 Colori
-    - [ ] 2.1.5.4 Dadi
-    - [ ] 2.1.5.5 Tracking `count` / `skippedCount` / `acceptedCount` (skip solo su rigenerazione, non su chiusura app)
+  - [x] 2.1.5 Randomizzatore backend
+    - [x] 2.1.5.1 Numeri (range X-Y, N estrazioni senza ripetizione)
+    - [x] 2.1.5.2 Lettere alfabeto
+    - [x] 2.1.5.3 Colori
+    - [x] 2.1.5.4 Dadi
+    - [x] 2.1.5.5 Tracking `count` / `skippedCount` / `acceptedCount` (`drawFromList`/`acceptDraw`: skip solo su rigenerazione, non su chiusura app)
 - [ ] 2.2 **Dev B**: UI corrispondente
   - [x] 2.2.1 Creazione/gestione liste (nome, icona, colore, categoria, isHidden)
   - [/] 2.2.2 Creazione/gestione elementi
     - [ ] 2.2.2.1 Ricerca in API (OpenLibrary, TMDb, ecc.) con finestra "Stai cercando..."
     - [x] 2.2.2.2 Fallback creazione manuale (categoria CUSTOM)
     - [x] 2.2.2.3 Note/descrizione personale, tag custom su elemento
-  - [ ] 2.2.3 UI randomizzatore
+  - [x] 2.2.3 UI randomizzatore (schermata generatori da Home + sorteggio lista con Rigenera/Accetta dal dettaglio)
   - [x] 2.2.4 UI rating a stelline (1-5 + nota opzionale)
   - [x] 2.2.5 Profilo utente base (vista + modifica username nella tab Social)
 - [ ] 2.3 Sync point: `gql_crud/` condiviso aggiornato ad ogni nuova query/mutation
@@ -191,7 +191,7 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
 - [x] T2.3 Creazione elemento CUSTOM senza API funziona
 - [ ] T2.4 Randomizzatore numeri/lettere/colori/dadi restituisce risultati coerenti con i parametri richiesti
 - [ ] T2.5 `skippedCount` aumenta solo su rigenerazione del randomizzatore, mai su chiusura app o cambio lista
-- [ ] T2.6 Rating 1-5 con nota si salva e resta anche eliminando la join elemento↔lista
+- [x] T2.6 Rating 1-5 con nota si salva e resta anche eliminando la join elemento↔lista
 
 ---
 

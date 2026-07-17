@@ -1,6 +1,8 @@
 {
   "title": "Your lists",
   "addList": "+ New",
+  "randomizer": "🎲 Randomizer",
+  "randomizerSubtitle": "Numbers, letters, colors and dice",
   "empty": {
     "title": "No lists yet",
     "subtitle": "Create your first list and start randomizing with friends."

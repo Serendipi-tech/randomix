@@ -33,6 +33,15 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
+      <Pressable
+        onPress={() => router.push('/randomizer')}
+        style={[styles.randomizerCard, { backgroundColor: colors.backgroundElement }]}>
+        <Text style={[styles.randomizerTitle, { color: colors.text }]}>{t('randomizer')}</Text>
+        <Text style={[styles.randomizerSubtitle, { color: colors.textSecondary }]}>
+          {t('randomizerSubtitle')}
+        </Text>
+      </Pressable>
+
       {showSkeleton ? (
         <View style={styles.listContent}>
           {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
@@ -100,6 +109,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#fff',
     fontFamily: 'Fredoka_600SemiBold',
+  },
+  randomizerCard: {
+    marginHorizontal: Spacing.four,
+    marginBottom: Spacing.two,
+    borderRadius: 20,
+    padding: 16,
+    gap: 2,
+  },
+  randomizerTitle: {
+    fontSize: 17,
+    fontFamily: 'Fredoka_700Bold',
+  },
+  randomizerSubtitle: {
+    fontSize: 14,
+    fontFamily: 'Nunito_500Medium',
   },
   listContent: {
     paddingHorizontal: Spacing.four,
