@@ -1,5 +1,6 @@
 {
   "title": "Your lists",
+  "addList": "+ New",
   "empty": {
     "title": "No lists yet",
     "subtitle": "Create your first list and start randomizing with friends."

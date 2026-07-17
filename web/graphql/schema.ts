@@ -7,6 +7,11 @@ import './models/list/index';
 import './models/list/list.queries';
 import './models/friendship/index';
 import './models/friendship/friendship.queries';
+import './models/list/list.mutations';
+import './models/listCategory/index';
+import './models/listCategory/listCategory.queries';
+import './models/item/index';
+import './models/item/item.mutations';
 
 builder.queryType({});
 builder.mutationType({});

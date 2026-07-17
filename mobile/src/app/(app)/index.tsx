@@ -1,7 +1,8 @@
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
+import { Accent, BottomTabInset, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ListCard } from '@/components/molecules/list-card';
@@ -13,6 +14,7 @@ export default function HomeScreen() {
   const { t } = useTranslation('home');
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
+  const router = useRouter();
 
   const { lists, loading, error, loadMore } = useMyLists();
 
@@ -21,7 +23,15 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
-      <Text style={[styles.title, { color: colors.text }]}>{t('title')}</Text>
+      <View style={styles.titleBar}>
+        <Text style={[styles.title, { color: colors.text }]}>{t('title')}</Text>
+        <Pressable
+          onPress={() => router.push('/list-form')}
+          hitSlop={8}
+          style={styles.addButton}>
+          <Text style={styles.addLabel}>{t('addList')}</Text>
+        </Pressable>
+      </View>
 
       {showSkeleton ? (
         <View style={styles.listContent}>
@@ -43,6 +53,7 @@ export default function HomeScreen() {
               color={item.color}
               description={item.description}
               colorScheme={colorScheme}
+              onPress={() => router.push({ pathname: '/list/[id]', params: { id: item.id } })}
             />
           )}
           ListEmptyComponent={
@@ -67,12 +78,28 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
   },
-  title: {
-    fontSize: 28,
-    fontFamily: 'Fredoka_700Bold',
+  titleBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.three,
     paddingBottom: Spacing.two,
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: 'Fredoka_700Bold',
+  },
+  addButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    backgroundColor: Accent.violet,
+  },
+  addLabel: {
+    fontSize: 14,
+    color: '#fff',
+    fontFamily: 'Fredoka_600SemiBold',
   },
   listContent: {
     paddingHorizontal: Spacing.four,

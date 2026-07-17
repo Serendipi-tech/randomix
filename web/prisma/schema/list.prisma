@@ -23,8 +23,9 @@ model List {
 }
 
 model List_UserItem {
-    id String
-    
+    id String @id @default(cuid())
+
+
     listId     String
     userItemId String
 

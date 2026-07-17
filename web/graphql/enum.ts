@@ -12,7 +12,7 @@ builder.enumType('BILLING', {
   values: ['NEVER', 'MONTHLY', 'YEARLY'] as const,
 });
 
-builder.enumType('CATEGORY', {
+export const CategoryEnum = builder.enumType('CATEGORY', {
   values: [
     'APPS', 'ART', 'BOOKS', 'NOVELS', 'COMICS', 'MANGA', 'SUBJECTS',
     'MOVIES', 'TV_SHOWS', 'MUSIC', 'OTHER_GAMES', 'VIDEOGAMES', 'BOARDGAMES',
@@ -38,7 +38,7 @@ builder.enumType('REPORT_TYPE', {
   values: ['BUG', 'FEEDBACK', 'REPORT'] as const,
 });
 
-builder.enumType('STATUS_COMPLETION', {
+export const StatusCompletionEnum = builder.enumType('STATUS_COMPLETION', {
   values: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED'] as const,
 });
 

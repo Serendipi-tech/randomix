@@ -4,6 +4,20 @@ import { MyListsPayloadRef } from './index';
 
 const DEFAULT_PAGE_SIZE = 20;
 
+builder.queryField('list', (t) =>
+  t.prismaField({
+    type: 'List',
+    nullable: true,
+    args: { id: t.arg.id({ required: true }) },
+    resolve: async (query, _root, { id }, ctx) => {
+      if (!ctx.userId) {
+        throw new GraphQLError('Non autenticato.', { extensions: { code: 'UNAUTHENTICATED' } });
+      }
+      return prisma.list.findFirst({ ...query, where: { id: String(id), userId: ctx.userId } });
+    },
+  }),
+);
+
 builder.queryField('myLists', (t) =>
   t.field({
     type: MyListsPayloadRef,

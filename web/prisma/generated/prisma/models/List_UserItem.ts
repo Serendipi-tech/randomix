@@ -248,11 +248,11 @@ export type List_UserItemOrderByWithRelationInput = {
 }
 
 export type List_UserItemWhereUniqueInput = Prisma.AtLeast<{
+  id?: string
   listId_userItemId?: Prisma.List_UserItemListIdUserItemIdCompoundUniqueInput
   AND?: Prisma.List_UserItemWhereInput | Prisma.List_UserItemWhereInput[]
   OR?: Prisma.List_UserItemWhereInput[]
   NOT?: Prisma.List_UserItemWhereInput | Prisma.List_UserItemWhereInput[]
-  id?: Prisma.StringFilter<"List_UserItem"> | string
   listId?: Prisma.StringFilter<"List_UserItem"> | string
   userItemId?: Prisma.StringFilter<"List_UserItem"> | string
   count?: Prisma.IntFilter<"List_UserItem"> | number
@@ -260,7 +260,7 @@ export type List_UserItemWhereUniqueInput = Prisma.AtLeast<{
   acceptedCount?: Prisma.IntFilter<"List_UserItem"> | number
   list?: Prisma.XOR<Prisma.ListScalarRelationFilter, Prisma.ListWhereInput>
   userItem?: Prisma.XOR<Prisma.User_ItemScalarRelationFilter, Prisma.User_ItemWhereInput>
-}, "listId_userItemId">
+}, "id" | "listId_userItemId">
 
 export type List_UserItemOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -289,7 +289,7 @@ export type List_UserItemScalarWhereWithAggregatesInput = {
 }
 
 export type List_UserItemCreateInput = {
-  id: string
+  id?: string
   count?: number
   skippedCount?: number
   acceptedCount?: number
@@ -298,7 +298,7 @@ export type List_UserItemCreateInput = {
 }
 
 export type List_UserItemUncheckedCreateInput = {
-  id: string
+  id?: string
   listId: string
   userItemId: string
   count?: number
@@ -325,7 +325,7 @@ export type List_UserItemUncheckedUpdateInput = {
 }
 
 export type List_UserItemCreateManyInput = {
-  id: string
+  id?: string
   listId: string
   userItemId: string
   count?: number
@@ -488,7 +488,7 @@ export type List_UserItemUncheckedUpdateManyWithoutListNestedInput = {
 }
 
 export type List_UserItemCreateWithoutUserItemInput = {
-  id: string
+  id?: string
   count?: number
   skippedCount?: number
   acceptedCount?: number
@@ -496,7 +496,7 @@ export type List_UserItemCreateWithoutUserItemInput = {
 }
 
 export type List_UserItemUncheckedCreateWithoutUserItemInput = {
-  id: string
+  id?: string
   listId: string
   count?: number
   skippedCount?: number
@@ -542,7 +542,7 @@ export type List_UserItemScalarWhereInput = {
 }
 
 export type List_UserItemCreateWithoutListInput = {
-  id: string
+  id?: string
   count?: number
   skippedCount?: number
   acceptedCount?: number
@@ -550,7 +550,7 @@ export type List_UserItemCreateWithoutListInput = {
 }
 
 export type List_UserItemUncheckedCreateWithoutListInput = {
-  id: string
+  id?: string
   userItemId: string
   count?: number
   skippedCount?: number
@@ -584,7 +584,7 @@ export type List_UserItemUpdateManyWithWhereWithoutListInput = {
 }
 
 export type List_UserItemCreateManyUserItemInput = {
-  id: string
+  id?: string
   listId: string
   count?: number
   skippedCount?: number
@@ -616,7 +616,7 @@ export type List_UserItemUncheckedUpdateManyWithoutUserItemInput = {
 }
 
 export type List_UserItemCreateManyListInput = {
-  id: string
+  id?: string
   userItemId: string
   count?: number
   skippedCount?: number
