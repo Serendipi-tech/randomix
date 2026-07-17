@@ -5,13 +5,14 @@ import home from '@/locales/en/home.json';
 import social from '@/locales/en/social.json';
 import settings from '@/locales/en/settings.json';
 import lists from '@/locales/en/lists.json';
+import errors from '@/locales/en/errors.json';
 
 i18n.use(initReactI18next).init({
   lng: 'en',
   fallbackLng: 'en',
   compatibilityJSON: 'v4',
   resources: {
-    en: { auth, home, social, settings, lists },
+    en: { auth, home, social, settings, lists, errors },
   },
   interpolation: { escapeValue: false },
 });

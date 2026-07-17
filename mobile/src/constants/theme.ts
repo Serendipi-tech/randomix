@@ -47,20 +47,31 @@ export const AuthGlow = {
   ],
   dark: [
     { color: Accent.violet, top: -60, left: -60 },
-    { color: Accent.mint, bottom: -80, right: -50 },
+    { color: Accent.coral, bottom: -80, right: -50 },
   ],
 } as const;
 
-/** Superficie opaca della card di autenticazione: leggermente più chiara dello sfondo, stessa famiglia di colore. */
+/** Superficie glass della card di autenticazione: tinta semi-trasparente sopra il blur, bordo sottile per il bordo "vetro". */
 export const AuthCardSurface = {
-  light: { fill: '#FFFBF6', text: '#241A3D' },
-  dark: { fill: '#2A2049', text: '#F3ECFF' },
+  light: { fill: 'rgba(124,92,252,0.30)', border: 'rgba(255,255,255,0.5)', text: '#241A3D' },
+  dark: { fill: 'rgba(58,28,87,0.58)', border: 'rgba(255,255,255,0.16)', text: '#F3ECFF' },
 } as const;
 
-/** Pillola secondaria (es. "Continua con Google"): piena e ad alto contrasto, mai un grigio neutro. */
+/** Bottone primario: pillola piena a colore unico. Il secondario è un outline sullo stesso colore, non un altro blocco pieno. */
+export const AuthButtonPrimary = {
+  fill: Accent.violet,
+  text: '#FFFFFF',
+} as const;
+
 export const AuthButtonSecondary = {
-  light: { fill: '#1F1B2E', text: '#FFFBF5' },
-  dark: { fill: '#F5EFFF', text: '#1F1B2E' },
+  light: { border: '#241A3D', text: '#241A3D' },
+  dark: { border: '#F3ECFF', text: '#F3ECFF' },
+} as const;
+
+/** Badge icona colorato nelle tile della faccia standard: un solo tocco di colore per tile, non l'intera superficie. */
+export const AuthTileSurface = {
+  light: { fill: 'rgba(31,27,46,0.05)' },
+  dark: { fill: 'rgba(255,255,255,0.07)' },
 } as const;
 
 /** Campo di input sopra la AuthCard: tinta neutra derivata dal colore testo della card. */
