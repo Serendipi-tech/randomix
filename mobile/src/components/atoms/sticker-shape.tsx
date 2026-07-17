@@ -50,6 +50,7 @@ export function StickerShape({
 
   return (
     <Animated.View
+      pointerEvents="none"
       style={[
         styles.base,
         {

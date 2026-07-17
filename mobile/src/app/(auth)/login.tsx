@@ -1,35 +1,34 @@
 import * as Google from 'expo-auth-session/providers/google';
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect } from 'react';
+import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated from 'react-native-reanimated';
-import { useAuth } from '@/utils/useAuth';
+import { AuthBackground } from '@/constants/theme';
+import { useAppTheme } from '@/utils/useAppTheme';
+import { useAuthIntroReplay } from '@/utils/useAuthIntroReplay';
+import { useAuthForms } from '@/utils/useAuthForms';
+import { usePasswordRecoveryForm, type RecoveryStep } from '@/utils/usePasswordRecoveryForm';
 import { useAuthIntro } from '@/utils/useAuthIntro';
-import { Accent, AuthBackground, AuthOnBackgroundText } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { AuthButton } from '@/components/atoms/auth-button';
-import { AuthDivider } from '@/components/atoms/auth-divider';
-import { AuthInput } from '@/components/atoms/auth-input';
-import { HighlightChip } from '@/components/atoms/highlight-chip';
-import { RefreshButton } from '@/components/atoms/refresh-button';
-import { StickerShape } from '@/components/atoms/sticker-shape';
+import { useCardFlip, type AuthCardFace } from '@/utils/useCardFlip';
 import { AuthBackgroundView } from '@/components/molecules/auth-background';
-import { AuthCard } from '@/components/molecules/auth-card';
 import { DiceLogo } from '@/components/molecules/dice-logo';
+import { FlippableAuthCard } from '@/components/molecules/flippable-auth-card';
+import { AuthStandardFace } from '@/components/organisms/auth-standard-face';
+import { AuthLoginFace } from '@/components/organisms/auth-login-face';
+import { AuthRegisterFace } from '@/components/organisms/auth-register-face';
+import { AuthRecoverFace } from '@/components/organisms/auth-recover-face';
 
-export default function LoginScreen() {
-  const { t } = useTranslation('auth');
-  const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
-  const router = useRouter();
+// Altezza fissa della card: deve bastare per la faccia più alta (register, 4 campi) anche con testi tradotti più lunghi.
+const AUTH_CARD_MIN_HEIGHT = 480;
+
+export default function AuthScreen() {
+  const { colorScheme } = useAppTheme();
   const { diceStyle, blockStyle, onDiceLayout, onBlockLayout, replay } = useAuthIntro();
+  const { face, flipTo, flipStyle } = useCardFlip();
+  const introReplay = useAuthIntroReplay();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [localError, setLocalError] = useState<string | null>(null);
-
-  const { loginWithCredentials, loginWithGoogle, loading, error } = useAuth();
+  const forms = useAuthForms();
+  const recovery = usePasswordRecoveryForm();
 
   const [_request, response, promptAsync] = Google.useAuthRequest({
     clientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
@@ -38,42 +37,98 @@ export default function LoginScreen() {
   useEffect(() => {
     if (response?.type === 'success') {
       const idToken = response.authentication?.idToken;
-      if (idToken) {
-        loginWithGoogle(idToken).catch((e: Error) => setLocalError(e.message));
-      } else {
-        setLocalError(t('login.googleTokenError'));
-      }
+      if (idToken) forms.submitGoogleLogin(idToken);
     }
   }, [response]);
 
-  const handleCredentialsLogin = async () => {
-    setLocalError(null);
-    if (!email.trim() || !password) {
-      setLocalError(t('login.missingFields'));
-      return;
-    }
-    try {
-      await loginWithCredentials(email.trim(), password);
-    } catch (e) {
-      setLocalError((e as Error).message);
+  useEffect(() => {
+    // Registra il replay dell'animazione d'ingresso nel bottone globale (root layout).
+    introReplay.register(replay);
+    return () => introReplay.register(null);
+  }, [replay]);
+
+  const goToStandard = () => {
+    recovery.reset();
+    flipTo('standard');
+  };
+
+  const handleConfirmReset = async () => {
+    const success = await recovery.submitConfirm();
+    if (success) {
+      recovery.reset();
+      flipTo('login');
     }
   };
 
-  const displayError = localError ?? error?.message ?? null;
-  const onBg = AuthOnBackgroundText[colorScheme];
-  const s = styles(onBg);
+  const renderFace = (targetFace: AuthCardFace, recoverStep?: RecoveryStep) => {
+    switch (targetFace) {
+      case 'standard':
+        return <AuthStandardFace colorScheme={colorScheme} onSignIn={() => flipTo('login')} />;
+      case 'login':
+        return (
+          <AuthLoginFace
+            colorScheme={colorScheme}
+            email={forms.loginEmail}
+            onEmailChange={forms.setLoginEmail}
+            password={forms.loginPassword}
+            onPasswordChange={forms.setLoginPassword}
+            error={forms.loginError}
+            loading={forms.loading}
+            onSubmit={forms.submitLogin}
+            onGoogle={() => promptAsync()}
+            onGoToRegister={() => flipTo('register')}
+            onGoToRecover={() => flipTo('recover')}
+            onBack={goToStandard}
+          />
+        );
+      case 'register':
+        return (
+          <AuthRegisterFace
+            colorScheme={colorScheme}
+            email={forms.registerEmail}
+            onEmailChange={forms.setRegisterEmail}
+            username={forms.registerUsername}
+            onUsernameChange={forms.setRegisterUsername}
+            password={forms.registerPassword}
+            onPasswordChange={forms.setRegisterPassword}
+            confirmPassword={forms.registerConfirmPassword}
+            onConfirmPasswordChange={forms.setRegisterConfirmPassword}
+            error={forms.registerError}
+            loading={forms.loading}
+            onSubmit={forms.submitRegister}
+            onGoToLogin={() => flipTo('login')}
+            onBack={goToStandard}
+          />
+        );
+      case 'recover':
+        return (
+          <AuthRecoverFace
+            colorScheme={colorScheme}
+            step={recoverStep ?? recovery.step}
+            email={recovery.email}
+            onEmailChange={recovery.setEmail}
+            otp={recovery.otp}
+            onOtpChange={recovery.setOtp}
+            newPassword={recovery.newPassword}
+            onNewPasswordChange={recovery.setNewPassword}
+            confirmPassword={recovery.confirmPassword}
+            onConfirmPasswordChange={recovery.setConfirmPassword}
+            error={recovery.error}
+            loading={recovery.loading}
+            onSubmitRequest={recovery.submitRequest}
+            onSubmitConfirm={handleConfirmReset}
+            onBack={goToStandard}
+          />
+        );
+    }
+  };
 
   return (
-    <SafeAreaView style={[s.safe, { backgroundColor: AuthBackground[colorScheme].stops[0] }]}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: AuthBackground[colorScheme].stops[0] }]}>
       <AuthBackgroundView colorScheme={colorScheme} />
 
-      <RefreshButton onPress={replay} colorScheme={colorScheme} style={{ position: 'absolute', top: 16, left: 16, zIndex: 10 }} />
-
-      <StickerShape variant="star" color={Accent.yellow} size={20} rotation={-12} style={{ position: 'absolute', top: 20, right: 28 }} />
-      <StickerShape variant="dot" color={Accent.mint} size={12} style={{ position: 'absolute', bottom: 40, left: 24 }} />
-
-      <KeyboardAvoidingView style={s.inner} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={s.diceZone}>
+      <KeyboardAvoidingView style={styles.inner} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <View style={styles.diceZone}>
           <View onLayout={onDiceLayout}>
             <Animated.View style={diceStyle}>
               <DiceLogo />
@@ -81,130 +136,21 @@ export default function LoginScreen() {
           </View>
         </View>
 
-        <View style={s.block} onLayout={onBlockLayout}>
-        <Animated.View style={blockStyle}>
-          <View style={s.headerText}>
-            <Text style={s.headline}>{t('login.headline')}</Text>
-            <HighlightChip label={t('login.brand')} color={Accent.yellow} fontSize={30} />
-            <Text style={s.tagline}>{t('login.tagline')}</Text>
-          </View>
-
-          <AuthCard colorScheme={colorScheme}>
-            <View style={s.form}>
-              <AuthInput
-                colorScheme={colorScheme}
-                placeholder={t('login.emailPlaceholder')}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                value={email}
-                onChangeText={setEmail}
-              />
-              <AuthInput
-                colorScheme={colorScheme}
-                placeholder={t('login.passwordPlaceholder')}
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-              />
-
-              <Pressable onPress={() => router.push('/(auth)/forgot-password')} style={s.forgotPassword}>
-                <Text style={s.forgotPasswordText}>{t('login.forgotPassword')}</Text>
-              </Pressable>
-
-              {displayError && <Text style={s.error}>{displayError}</Text>}
-
-              <AuthButton
-                colorScheme={colorScheme}
-                label={t('login.submit')}
-                onPress={handleCredentialsLogin}
-                loading={loading}
-              />
-
-              <AuthDivider label={t('login.or')} colorScheme={colorScheme} />
-
-              <AuthButton
-                colorScheme={colorScheme}
-                variant="secondary"
-                label={t('login.google')}
-                onPress={() => promptAsync()}
-                disabled={loading}
-              />
-            </View>
-          </AuthCard>
-
-          <Pressable onPress={() => router.push('/(auth)/register')} style={s.registerLink}>
-            <Text style={s.registerLinkText}>{t('login.noAccount')}</Text>
-          </Pressable>
-        </Animated.View>
+        <View style={styles.block} onLayout={onBlockLayout}>
+          <Animated.View style={blockStyle}>
+            <FlippableAuthCard colorScheme={colorScheme} style={flipStyle} minHeight={AUTH_CARD_MIN_HEIGHT}>
+              {renderFace(face)}
+            </FlippableAuthCard>
+          </Animated.View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-const styles = (onBg: typeof AuthOnBackgroundText.light | typeof AuthOnBackgroundText.dark) =>
-  StyleSheet.create({
-    safe: {
-      flex: 1,
-    },
-    inner: {
-      flex: 1,
-    },
-    diceZone: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    block: {
-      position: 'absolute',
-      left: 24,
-      right: 24,
-      bottom: 28,
-    },
-    headerText: {
-      alignItems: 'center',
-      gap: 6,
-      marginBottom: 20,
-    },
-    headline: {
-      fontSize: 24,
-      textAlign: 'center',
-      color: onBg.primary,
-      fontFamily: 'Fredoka_700Bold',
-    },
-    tagline: {
-      fontSize: 15,
-      color: onBg.secondary,
-      fontFamily: 'Nunito_500Medium',
-      marginTop: 4,
-      textAlign: 'center',
-      paddingHorizontal: 12,
-    },
-    form: {
-      gap: 12,
-    },
-    forgotPassword: {
-      alignSelf: 'flex-end',
-      marginTop: -4,
-    },
-    forgotPasswordText: {
-      fontSize: 13,
-      color: Accent.primary,
-      fontFamily: 'Nunito_500Medium',
-    },
-    error: {
-      fontSize: 14,
-      color: '#E53E3E',
-      textAlign: 'center',
-      fontFamily: 'Nunito_500Medium',
-    },
-    registerLink: {
-      alignItems: 'center',
-      marginTop: 20,
-    },
-    registerLinkText: {
-      fontSize: 14,
-      color: onBg.secondary,
-      fontFamily: 'Nunito_500Medium',
-    },
-  });
+const styles = StyleSheet.create({
+  safe: { flex: 1 },
+  inner: { flex: 1 },
+  diceZone: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  block: { position: 'absolute', left: 24, right: 24, bottom: 28 },
+});

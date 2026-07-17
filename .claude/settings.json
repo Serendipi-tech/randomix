@@ -5,7 +5,11 @@
       "Bash(npx expo *)",
       "Bash(echo \"started pid $!\")",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8199/)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(tee /tmp/expo_web.log)",
+      "Bash(curl -s -o /tmp/expo_page.html -w \"HTTP_STATUS:%{http_code}\\\\n\" http://localhost:8082/)",
+      "Read(//tmp/**)",
+      "Bash(pkill -f \"metro\")"
     ]
   }
 }

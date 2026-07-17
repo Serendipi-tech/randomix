@@ -33,8 +33,8 @@ builder.mutationField('registerWithCredentials', (t) =>
         return makeAuthPayload(user);
       } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
-          throw new GraphQLError('Email o username già in uso.', {
-            extensions: { code: 'BAD_USER_INPUT' },
+          throw new GraphQLError('Email or username already in use.', {
+            extensions: { code: 'EMAIL_OR_USERNAME_TAKEN' },
           });
         }
         throw e;
@@ -53,11 +53,11 @@ builder.mutationField('loginWithCredentials', (t) =>
     resolve: async (_root, { email, password }) => {
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user?.passwordHash) {
-        throw new GraphQLError('Credenziali non valide.', { extensions: { code: 'UNAUTHORIZED' } });
+        throw new GraphQLError('Invalid credentials.', { extensions: { code: 'INVALID_CREDENTIALS' } });
       }
       const valid = await bcrypt.compare(password, user.passwordHash);
       if (!valid) {
-        throw new GraphQLError('Credenziali non valide.', { extensions: { code: 'UNAUTHORIZED' } });
+        throw new GraphQLError('Invalid credentials.', { extensions: { code: 'INVALID_CREDENTIALS' } });
       }
       return makeAuthPayload(user);
     },
@@ -77,7 +77,7 @@ builder.mutationField('loginWithGoogle', (t) =>
         });
         payload = result.payload as Record<string, unknown>;
       } catch {
-        throw new GraphQLError('Token Google non valido.', { extensions: { code: 'UNAUTHORIZED' } });
+        throw new GraphQLError('Invalid Google token.', { extensions: { code: 'INVALID_GOOGLE_TOKEN' } });
       }
 
       const email = payload.email as string;
@@ -119,7 +119,7 @@ builder.mutationField('requestPasswordReset', (t) =>
         data: { resetPasswordToken: tokenHash, resetPasswordTokenExpiry: expiry },
       });
 
-      await sendPasswordResetEmail(email, otp);
+      await sendPasswordResetEmail(email, otp, user.language);
       return true;
     },
   }),
@@ -143,8 +143,8 @@ builder.mutationField('resetPassword', (t) =>
         user.resetPasswordTokenExpiry < new Date() ||
         tokenHash !== user.resetPasswordToken
       ) {
-        throw new GraphQLError('Codice non valido o scaduto.', {
-          extensions: { code: 'BAD_USER_INPUT' },
+        throw new GraphQLError('Invalid or expired code.', {
+          extensions: { code: 'INVALID_OTP' },
         });
       }
 

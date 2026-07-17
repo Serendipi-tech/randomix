@@ -4,13 +4,14 @@ import auth from '@/locales/en/auth.json';
 import home from '@/locales/en/home.json';
 import social from '@/locales/en/social.json';
 import settings from '@/locales/en/settings.json';
+import errors from '@/locales/en/errors.json';
 
 i18n.use(initReactI18next).init({
   lng: 'en',
   fallbackLng: 'en',
   compatibilityJSON: 'v4',
   resources: {
-    en: { auth, home, social, settings },
+    en: { auth, home, social, settings, errors },
   },
   interpolation: { escapeValue: false },
 });

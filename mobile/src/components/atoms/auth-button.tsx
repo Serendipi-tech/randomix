@@ -1,7 +1,6 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-import { Accent, AuthButtonSecondary } from '@/constants/theme';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { AuthButtonPrimary, AuthButtonSecondary } from '@/constants/theme';
 
 type AuthButtonProps = {
   label: string;
@@ -12,7 +11,7 @@ type AuthButtonProps = {
   colorScheme: 'light' | 'dark';
 };
 
-/** Bottone per azioni di autenticazione (accedi, registrati, continua con Google), con "press" elastico. */
+/** Bottone piatto a un colore: pieno per l'azione primaria, outline sullo stesso colore per la secondaria. */
 export function AuthButton({
   label,
   onPress,
@@ -21,45 +20,48 @@ export function AuthButton({
   disabled = false,
   colorScheme,
 }: AuthButtonProps) {
-  const secondary = AuthButtonSecondary[colorScheme];
   const isDisabled = disabled || loading;
-  const scale = useSharedValue(1);
+  const pressed = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+    opacity: 1 - pressed.value * 0.15,
+    transform: [{ scale: 1 - pressed.value * 0.03 }],
   }));
 
-  const textColor = variant === 'primary' ? '#fff' : secondary.text;
+  if (variant === 'secondary') {
+    const outline = AuthButtonSecondary[colorScheme];
+    return (
+      <Animated.View style={animatedStyle}>
+        <Pressable
+          style={[styles.button, styles.outline, { borderColor: outline.border }, isDisabled && styles.disabled]}
+          onPress={onPress}
+          onPressIn={() => (pressed.value = withTiming(1, { duration: 100 }))}
+          onPressOut={() => (pressed.value = withTiming(0, { duration: 150 }))}
+          disabled={isDisabled}
+        >
+          {loading ? (
+            <ActivityIndicator color={outline.text} />
+          ) : (
+            <Text style={[styles.label, { color: outline.text }]}>{label}</Text>
+          )}
+        </Pressable>
+      </Animated.View>
+    );
+  }
 
   return (
     <Animated.View style={animatedStyle}>
       <Pressable
-        style={[
-          styles.button,
-          variant === 'primary' ? styles.primaryShadow : { backgroundColor: secondary.fill },
-          isDisabled && styles.disabled,
-        ]}
+        style={[styles.button, styles.filled, { backgroundColor: AuthButtonPrimary.fill }, isDisabled && styles.disabled]}
         onPress={onPress}
-        onPressIn={() => {
-          scale.value = withSpring(0.96, { damping: 12, stiffness: 220 });
-        }}
-        onPressOut={() => {
-          scale.value = withSpring(1, { damping: 10, stiffness: 200 });
-        }}
+        onPressIn={() => (pressed.value = withTiming(1, { duration: 100 }))}
+        onPressOut={() => (pressed.value = withTiming(0, { duration: 150 }))}
         disabled={isDisabled}
       >
-        {variant === 'primary' && (
-          <LinearGradient
-            colors={[Accent.primary, Accent.violet]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={StyleSheet.absoluteFill}
-          />
-        )}
         {loading ? (
-          <ActivityIndicator color={textColor} />
+          <ActivityIndicator color={AuthButtonPrimary.text} />
         ) : (
-          <Text style={[styles.label, { color: textColor }]}>{label}</Text>
+          <Text style={[styles.label, { color: AuthButtonPrimary.text }]}>{label}</Text>
         )}
       </Pressable>
     </Animated.View>
@@ -68,20 +70,19 @@ export function AuthButton({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 18,
-    paddingVertical: 16,
+    borderRadius: 16,
+    paddingVertical: 15,
     alignItems: 'center',
-    overflow: 'hidden',
   },
-  primaryShadow: {
-    shadowColor: Accent.violet,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 16,
-    elevation: 6,
+  filled: {
+    boxShadow: '0px 6px 16px rgba(124,92,252,0.35)',
+  },
+  outline: {
+    borderWidth: 1.5,
+    backgroundColor: 'transparent',
   },
   disabled: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
   label: {
     fontSize: 16,

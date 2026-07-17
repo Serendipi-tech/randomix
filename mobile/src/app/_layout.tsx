@@ -6,8 +6,11 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { GlobalDevOverlay } from '@/components/organisms/global-dev-overlay';
 import { apolloClient } from '@/lib/apollo';
 import '@/lib/i18n';
+import { AppThemeProvider } from '@/utils/useAppTheme';
+import { AuthIntroReplayProvider } from '@/utils/useAuthIntroReplay';
 import { tokenStorage } from '@/utils/tokenStorage';
 import '../global.css';
 
@@ -50,11 +53,16 @@ export default function RootLayout() {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(onboarding)" />
-        <Stack.Screen name="(app)" />
-      </Stack>
+      <AppThemeProvider>
+        <AuthIntroReplayProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(onboarding)" />
+            <Stack.Screen name="(app)" />
+          </Stack>
+          <GlobalDevOverlay />
+        </AuthIntroReplayProvider>
+      </AppThemeProvider>
       <AnimatedSplashOverlay />
     </ApolloProvider>
   );
