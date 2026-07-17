@@ -163,8 +163,8 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
 ## Fase 2 — Core MVP (parallelo)
 
 - [ ] 2.1 **Dev A**: resolver base
-  - [/] 2.1.1 `List`, `ListCategory` (fatta solo query `myLists` paginata — manca il CRUD completo)
-  - [ ] 2.1.2 `Item`, `User_Item`, `List_UserItem`
+  - [x] 2.1.1 `List`, `ListCategory` (CRUD List + query `list`/`myLists`; ListCategory predefinite, solo lettura `listCategories`)
+  - [x] 2.1.2 `Item`, `User_Item`, `List_UserItem` (`addItemToList` con riuso item esistente, `updateUserItem`, `removeItemFromList`)
   - [ ] 2.1.3 `Tag`
   - [ ] 2.1.4 `Rating`
   - [ ] 2.1.5 Randomizzatore backend
@@ -174,11 +174,11 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
     - [ ] 2.1.5.4 Dadi
     - [ ] 2.1.5.5 Tracking `count` / `skippedCount` / `acceptedCount` (skip solo su rigenerazione, non su chiusura app)
 - [ ] 2.2 **Dev B**: UI corrispondente
-  - [ ] 2.2.1 Creazione/gestione liste (nome, icona, colore, categoria, isHidden)
-  - [ ] 2.2.2 Creazione/gestione elementi
+  - [x] 2.2.1 Creazione/gestione liste (nome, icona, colore, categoria, isHidden)
+  - [/] 2.2.2 Creazione/gestione elementi
     - [ ] 2.2.2.1 Ricerca in API (OpenLibrary, TMDb, ecc.) con finestra "Stai cercando..."
-    - [ ] 2.2.2.2 Fallback creazione manuale (categoria CUSTOM)
-    - [ ] 2.2.2.3 Note/descrizione personale, tag custom su elemento
+    - [x] 2.2.2.2 Fallback creazione manuale (categoria CUSTOM)
+    - [/] 2.2.2.3 Note/descrizione personale, tag custom su elemento — fatti note/descrizione/status; tag rimandati al 2.1.3
   - [ ] 2.2.3 UI randomizzatore
   - [ ] 2.2.4 UI rating a stelline (1-5 + nota opzionale)
   - [x] 2.2.5 Profilo utente base (vista + modifica username nella tab Social)
