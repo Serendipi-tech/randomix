@@ -16,13 +16,13 @@
 
 ## Sezione 3 - Features mancanti
 
-- [ ] **Recupero password.**
-      _Manca proprio l'intera sezione, ma va inserita._
+- [/] [testare] **Recupero password.**
+  _Manca proprio l'intera sezione, ma va inserita._
 
 ## Sezione 4 - Solo se c'è tempo
 
 - [ ] **Creazione sezioni interne vuote.**
-      _Nello specifico_: - **Home** con elenco liste. - **Social** con sezione profilo e amici all'interno. - **Settings** autoesplicativo.
+      _Nello specifico_: - [ ] **Home** con elenco liste. - [ ] **Social** con sezione profilo e amici all'interno. - [ ] **Settings** autoesplicativo.
       In basso c'è la navbar per muoversi in giro.
       Non c'è bisogno di inserire nulla all'interno delle pagine, per ora.
 - [ ] **Creazione objects per task di domani:**

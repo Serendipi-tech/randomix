@@ -1,0 +1,8 @@
+{
+  "title": "Your lists",
+  "empty": {
+    "title": "No lists yet",
+    "subtitle": "Create your first list and start randomizing with friends."
+  },
+  "error": "Couldn't load your lists. Please try again."
+}

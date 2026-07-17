@@ -1,6 +1,6 @@
 {
   "name": "randomix",
-  "private": true,
+  "private": false,
   "workspaces": [
     "web",
     "mobile",
