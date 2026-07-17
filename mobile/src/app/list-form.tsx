@@ -1,7 +1,7 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Accent, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -9,6 +9,7 @@ import { AuthButton } from '@/components/atoms/auth-button';
 import { AuthInput } from '@/components/atoms/auth-input';
 import { ColorPickerRow } from '@/components/atoms/color-picker-row';
 import { SelectableChip } from '@/components/atoms/selectable-chip';
+import { confirmDialog } from '@/utils/confirmDialog';
 import { useListCategories } from '@/utils/useListCategories';
 import { useListDetail } from '@/utils/useListDetail';
 import { useListMutations } from '@/utils/useListMutations';
@@ -80,18 +81,17 @@ export default function ListFormScreen() {
   };
 
   const confirmDelete = () => {
-    Alert.alert(t('form.deleteConfirmTitle'), t('form.deleteConfirmMessage'), [
-      { text: t('form.cancel'), style: 'cancel' },
-      {
-        text: t('form.delete'),
-        style: 'destructive',
-        onPress: async () => {
-          if (!id) return;
-          await deleteList(id);
-          router.replace('/(app)');
-        },
+    confirmDialog({
+      title: t('form.deleteConfirmTitle'),
+      message: t('form.deleteConfirmMessage'),
+      confirmLabel: t('form.delete'),
+      cancelLabel: t('form.cancel'),
+      onConfirm: async () => {
+        if (!id) return;
+        await deleteList(id);
+        router.replace('/(app)');
       },
-    ]);
+    });
   };
 
   const displayError = localError ?? error?.message ?? null;

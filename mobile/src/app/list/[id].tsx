@@ -1,11 +1,12 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ItemRow } from '@/components/molecules/item-row';
+import { confirmDialog } from '@/utils/confirmDialog';
 import { useItemMutations } from '@/utils/useItemMutations';
 import { useListDetail, type ListItemEntry } from '@/utils/useListDetail';
 
@@ -42,14 +43,13 @@ export default function ListDetailScreen() {
   };
 
   const confirmRemove = (entry: ListItemEntry) => {
-    Alert.alert(t('detail.removeConfirmTitle'), t('detail.removeConfirmMessage'), [
-      { text: t('form.cancel'), style: 'cancel' },
-      {
-        text: t('detail.remove'),
-        style: 'destructive',
-        onPress: () => removeItemFromList(entry.id),
-      },
-    ]);
+    confirmDialog({
+      title: t('detail.removeConfirmTitle'),
+      message: t('detail.removeConfirmMessage'),
+      confirmLabel: t('detail.remove'),
+      cancelLabel: t('form.cancel'),
+      onConfirm: () => removeItemFromList(entry.id),
+    });
   };
 
   return (
