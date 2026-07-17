@@ -86,6 +86,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
+    // il container copre tutta la larghezza: i click fuori dalla pillola devono passare sotto
+    pointerEvents: 'box-none',
   },
   innerContainer: {
     paddingVertical: Spacing.two,
