@@ -1,5 +1,5 @@
 /* eslint-disable */
-import type { Prisma, Group, Group_User, GroupList, GroupList_AcceptedItemHistory, GroupChallenge, GroupUser_Challenge, Item, User_Item, List, List_UserItem, ListCategory, Membership, Notification, Payment, Rating, Report, Subscription, Tag, User, Friendship } from "C:\\Personal\\Doc\\Lorenzo\\Codec\\Project\\Serendipitech\\randomix\\web\\prisma\\generated\\prisma/client.js";
+import type { Prisma, Group, Group_User, GroupList, GroupList_AcceptedItemHistory, GroupChallenge, GroupUser_Challenge, Item, User_Item, List, List_UserItem, ListCategory, Membership, Notification, Payment, Rating, Report, Subscription, Tag, User, Friendship } from "../../prisma/generated/prisma/client.js";
 import type { PothosPrismaDatamodel } from "@pothos/plugin-prisma";
 export default interface PrismaTypes {
     Group: {
