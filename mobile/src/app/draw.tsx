@@ -1,12 +1,14 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { ZoomIn } from 'react-native-reanimated';
 import { Accent, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthButton } from '@/components/atoms/auth-button';
-import { StarRating } from '@/components/atoms/star-rating';
+import { StickerShape } from '@/components/atoms/sticker-shape';
 import { useListDraw } from '@/utils/useListDraw';
 import type { ListItemEntry } from '@/utils/useListDetail';
 
@@ -60,40 +62,44 @@ export default function DrawScreen() {
       </View>
 
       <View style={styles.center}>
+        <StickerShape variant="star" color={Accent.yellow} size={22} rotation={-12} style={styles.stickerStar} />
+        <StickerShape variant="dot" color={Accent.mint} size={14} style={styles.stickerDot} />
+
         {drawError ? (
           <Text style={[styles.errorTitle, { color: colors.text }]}>{drawError}</Text>
         ) : entry ? (
-          <View style={[styles.card, { backgroundColor: colors.backgroundElement }]}>
-            <View style={[styles.categoryBadge, { backgroundColor: accentColor }]}>
-              <Text style={styles.categoryLabel}>
-                {t(`categories.${entry.userItem.item.category}`, { ns: 'lists' })}
-              </Text>
-            </View>
-            <Text style={[styles.itemName, { color: colors.text }]}>
-              {entry.userItem.item.name}
-            </Text>
-            {entry.userItem.item.myRating && (
-              <StarRating
-                value={entry.userItem.item.myRating.value}
-                size={20}
-                colorScheme={colorScheme}
+          <Animated.View key={entry.id} entering={ZoomIn.springify().damping(14)}>
+            <View style={styles.card}>
+              <LinearGradient
+                colors={[accentColor, Accent.violet]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFill}
               />
-            )}
-            {entry.userItem.tags.length > 0 && (
-              <View style={styles.tagRow}>
-                {entry.userItem.tags.map((tag) => (
-                  <View key={tag.id} style={[styles.tagPill, { backgroundColor: tag.color }]}>
-                    <Text style={styles.tagLabel}>{tag.name}</Text>
-                  </View>
-                ))}
+              <View style={styles.categoryBadge}>
+                <Text style={styles.categoryLabel}>
+                  {t(`categories.${entry.userItem.item.category}`, { ns: 'lists' })}
+                </Text>
               </View>
-            )}
-            {accepted && (
-              <Text style={[styles.acceptedText, { color: Accent.mint }]}>
-                {t('draw.accepted')}
-              </Text>
-            )}
-          </View>
+              <Text style={styles.itemName}>{entry.userItem.item.name}</Text>
+              {entry.userItem.item.myRating && (
+                <Text style={styles.ratingText}>
+                  {'★'.repeat(entry.userItem.item.myRating.value)}
+                  {'☆'.repeat(5 - entry.userItem.item.myRating.value)}
+                </Text>
+              )}
+              {entry.userItem.tags.length > 0 && (
+                <View style={styles.tagRow}>
+                  {entry.userItem.tags.map((tag) => (
+                    <View key={tag.id} style={[styles.tagPill, { backgroundColor: tag.color }]}>
+                      <Text style={styles.tagLabel}>{tag.name}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+              {accepted && <Text style={styles.acceptedText}>{t('draw.accepted')}</Text>}
+            </View>
+          </Animated.View>
         ) : null}
       </View>
 
@@ -150,16 +156,33 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: Spacing.four,
   },
+  stickerStar: {
+    position: 'absolute',
+    top: 30,
+    right: 32,
+  },
+  stickerDot: {
+    position: 'absolute',
+    bottom: 40,
+    left: 28,
+  },
   card: {
     alignItems: 'center',
     borderRadius: 28,
     padding: Spacing.five,
     gap: Spacing.three,
+    overflow: 'hidden',
+    shadowColor: Accent.violet,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.35,
+    shadowRadius: 20,
+    elevation: 8,
   },
   categoryBadge: {
     paddingVertical: 4,
     paddingHorizontal: 14,
     borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.25)',
   },
   // 12px consentito solo per i badge
   categoryLabel: {
@@ -169,8 +192,14 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: 28,
+    color: '#fff',
     textAlign: 'center',
     fontFamily: 'Fredoka_700Bold',
+  },
+  ratingText: {
+    fontSize: 20,
+    color: '#fff',
+    letterSpacing: 4,
   },
   tagRow: {
     flexDirection: 'row',
@@ -190,6 +219,7 @@ const styles = StyleSheet.create({
   },
   acceptedText: {
     fontSize: 16,
+    color: '#fff',
     fontFamily: 'Fredoka_600SemiBold',
   },
   errorTitle: {

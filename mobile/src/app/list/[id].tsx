@@ -84,6 +84,7 @@ export default function ListDetailScreen() {
             <ItemRow
               name={entry.userItem.item.name}
               categoryLabel={t(`categories.${entry.userItem.item.category}`)}
+              status={entry.userItem.status}
               statusLabel={t(`status.${entry.userItem.status}`)}
               ratingValue={entry.userItem.item.myRating?.value}
               tags={entry.userItem.tags}

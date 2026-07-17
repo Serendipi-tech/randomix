@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Colors } from '@/constants/theme';
+import { Accent, Colors } from '@/constants/theme';
 
 interface ItemRowTag {
   id: string;
@@ -7,9 +7,12 @@ interface ItemRowTag {
   color: string;
 }
 
+type ItemRowStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
+
 interface ItemRowProps {
   name: string;
   categoryLabel: string;
+  status: ItemRowStatus;
   statusLabel: string;
   ratingValue?: number | null;
   tags?: ItemRowTag[];
@@ -21,10 +24,18 @@ interface ItemRowProps {
 
 const MAX_VISIBLE_TAGS = 2;
 
-/** Riga di un elemento della lista: nome, categoria, status e rimozione. */
+// colore presentazionale dello stato, dai token del tema
+const STATUS_COLORS: Record<ItemRowStatus, string> = {
+  NOT_STARTED: 'transparent',
+  IN_PROGRESS: Accent.yellow,
+  COMPLETED: Accent.mint,
+};
+
+/** Riga di un elemento della lista: nome, categoria, stato, rating, tag e rimozione. */
 export function ItemRow({
   name,
   categoryLabel,
+  status,
   statusLabel,
   ratingValue,
   tags = [],
@@ -36,19 +47,34 @@ export function ItemRow({
   const colors = Colors[colorScheme];
   const visibleTags = tags.slice(0, MAX_VISIBLE_TAGS);
   const hiddenCount = tags.length - visibleTags.length;
+  const statusColor = STATUS_COLORS[status];
 
   return (
     <Pressable
       onPress={onPress}
-      style={[styles.row, { backgroundColor: colors.backgroundElement }]}>
+      style={({ pressed }) => [
+        styles.row,
+        { backgroundColor: colors.backgroundElement },
+        pressed && styles.pressed,
+      ]}>
       <View style={styles.textZone}>
         <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
           {name}
         </Text>
-        <Text style={[styles.meta, { color: colors.textSecondary }]} numberOfLines={1}>
-          {categoryLabel} · {statusLabel}
-          {ratingValue ? ` · ★ ${ratingValue}` : ''}
-        </Text>
+        <View style={styles.metaRow}>
+          <Text style={[styles.meta, { color: colors.textSecondary }]} numberOfLines={1}>
+            {categoryLabel}
+          </Text>
+          {statusColor !== 'transparent' && (
+            <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+          )}
+          <Text style={[styles.meta, { color: colors.textSecondary }]} numberOfLines={1}>
+            {statusLabel}
+          </Text>
+          {ratingValue ? (
+            <Text style={[styles.rating, { color: Accent.yellow }]}>★ {ratingValue}</Text>
+          ) : null}
+        </View>
         {visibleTags.length > 0 && (
           <View style={styles.tagRow}>
             {visibleTags.map((tag) => (
@@ -68,8 +94,12 @@ export function ItemRow({
           </View>
         )}
       </View>
-      <Pressable onPress={onRemove} hitSlop={8} style={styles.removeButton}>
-        <Text style={[styles.removeLabel, { color: colors.textSecondary }]}>{removeLabel}</Text>
+      <Pressable
+        onPress={onRemove}
+        hitSlop={8}
+        accessibilityLabel={removeLabel}
+        style={[styles.removeButton, { backgroundColor: colors.backgroundSelected }]}>
+        <Text style={[styles.removeLabel, { color: colors.textSecondary }]}>✕</Text>
       </Pressable>
     </Pressable>
   );
@@ -80,25 +110,48 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    borderRadius: 16,
+    borderRadius: 18,
     padding: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  pressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
   },
   textZone: {
     flex: 1,
-    gap: 2,
+    gap: 3,
   },
   name: {
     fontSize: 16,
     fontFamily: 'Fredoka_600SemiBold',
   },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   meta: {
     fontSize: 14,
     fontFamily: 'Nunito_500Medium',
   },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  rating: {
+    fontSize: 14,
+    fontFamily: 'Nunito_700Bold',
+  },
   tagRow: {
     flexDirection: 'row',
     gap: 6,
-    marginTop: 4,
+    marginTop: 3,
   },
   tagPill: {
     paddingVertical: 2,
@@ -113,8 +166,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito_700Bold',
   },
   removeButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   removeLabel: {
     fontSize: 14,

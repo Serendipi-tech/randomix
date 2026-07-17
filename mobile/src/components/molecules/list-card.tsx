@@ -10,14 +10,18 @@ interface ListCardProps {
   onPress?: () => void;
 }
 
-/** Card di una lista personale: chip colorato con icona, nome e descrizione opzionale. */
+/** Card di una lista personale: barra accent del colore lista, chip icona e testi. */
 export function ListCard({ name, icon, color, description, colorScheme, onPress }: ListCardProps) {
   const colors = Colors[colorScheme];
 
   return (
     <Pressable
       onPress={onPress}
-      style={[styles.card, { backgroundColor: colors.backgroundElement }]}>
+      style={({ pressed }) => [
+        styles.card,
+        { backgroundColor: colors.backgroundElement, borderLeftColor: color },
+        pressed && styles.pressed,
+      ]}>
       <View style={[styles.iconChip, { backgroundColor: color }]}>
         <Text style={styles.icon}>{icon}</Text>
       </View>
@@ -31,6 +35,7 @@ export function ListCard({ name, icon, color, description, colorScheme, onPress 
           </Text>
         ) : null}
       </View>
+      <Text style={[styles.chevron, { color: colors.textSecondary }]}>›</Text>
     </Pressable>
   );
 }
@@ -40,29 +45,43 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    borderRadius: 20,
+    borderRadius: 22,
+    borderLeftWidth: 5,
     padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+  pressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
   },
   iconChip: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
+    width: 52,
+    height: 52,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
   icon: {
-    fontSize: 22,
+    fontSize: 24,
   },
   textZone: {
     flex: 1,
     gap: 2,
   },
   name: {
-    fontSize: 16,
+    fontSize: 17,
     fontFamily: 'Fredoka_700Bold',
   },
   description: {
     fontSize: 14,
     fontFamily: 'Nunito_500Medium',
+  },
+  chevron: {
+    fontSize: 24,
+    fontFamily: 'Fredoka_600SemiBold',
   },
 });

@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -35,11 +36,18 @@ export default function HomeScreen() {
 
       <Pressable
         onPress={() => router.push('/randomizer')}
-        style={[styles.randomizerCard, { backgroundColor: colors.backgroundElement }]}>
-        <Text style={[styles.randomizerTitle, { color: colors.text }]}>{t('randomizer')}</Text>
-        <Text style={[styles.randomizerSubtitle, { color: colors.textSecondary }]}>
-          {t('randomizerSubtitle')}
-        </Text>
+        style={({ pressed }) => [styles.randomizerCard, pressed && styles.pressed]}>
+        <LinearGradient
+          colors={[Accent.primary, Accent.violet]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
+        <View style={styles.randomizerText}>
+          <Text style={styles.randomizerTitle}>{t('randomizer')}</Text>
+          <Text style={styles.randomizerSubtitle}>{t('randomizerSubtitle')}</Text>
+        </View>
+        <Text style={styles.randomizerArrow}>›</Text>
       </Pressable>
 
       {showSkeleton ? (
@@ -113,17 +121,39 @@ const styles = StyleSheet.create({
   randomizerCard: {
     marginHorizontal: Spacing.four,
     marginBottom: Spacing.two,
-    borderRadius: 20,
-    padding: 16,
+    borderRadius: 22,
+    padding: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
+    shadowColor: Accent.violet,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 14,
+    elevation: 5,
+  },
+  pressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.98 }],
+  },
+  randomizerText: {
+    flex: 1,
     gap: 2,
   },
   randomizerTitle: {
-    fontSize: 17,
+    fontSize: 18,
+    color: '#fff',
     fontFamily: 'Fredoka_700Bold',
   },
   randomizerSubtitle: {
     fontSize: 14,
+    color: 'rgba(255,255,255,0.85)',
     fontFamily: 'Nunito_500Medium',
+  },
+  randomizerArrow: {
+    fontSize: 26,
+    color: '#fff',
+    fontFamily: 'Fredoka_600SemiBold',
   },
   listContent: {
     paddingHorizontal: Spacing.four,

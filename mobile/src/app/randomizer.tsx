@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Spacing } from '@/constants/theme';
+import { Accent, Colors, DiceShading, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthButton } from '@/components/atoms/auth-button';
 import { AuthInput } from '@/components/atoms/auth-input';
@@ -12,6 +12,9 @@ import { useRandomizer } from '@/utils/useRandomizer';
 
 const MODES = ['numbers', 'letters', 'colors', 'dice'] as const;
 type Mode = (typeof MODES)[number];
+
+// rotazione dei colori accent per i risultati
+const ACCENT_CYCLE = [Accent.primary, Accent.coral, Accent.yellow, Accent.mint, Accent.violet];
 
 export default function RandomizerScreen() {
   const { t } = useTranslation('randomizer');
@@ -146,20 +149,33 @@ export default function RandomizerScreen() {
 
         {results.length > 0 && (
           <View style={styles.resultWrap}>
-            {results.map((value, i) =>
-              mode === 'colors' ? (
-                <View key={`${value}-${i}`} style={styles.colorResult}>
-                  <View style={[styles.colorSwatch, { backgroundColor: value }]} />
-                  <Text style={[styles.colorHex, { color: colors.textSecondary }]}>{value}</Text>
-                </View>
-              ) : (
+            {results.map((value, i) => {
+              if (mode === 'colors') {
+                return (
+                  <View key={`${value}-${i}`} style={styles.colorResult}>
+                    <View style={[styles.colorSwatch, { backgroundColor: value }]} />
+                    <Text style={[styles.colorHex, { color: colors.textSecondary }]}>{value}</Text>
+                  </View>
+                );
+              }
+              if (mode === 'dice') {
+                return (
+                  <View key={`${value}-${i}`} style={styles.diceFace}>
+                    <Text style={styles.diceText}>{value}</Text>
+                  </View>
+                );
+              }
+              return (
                 <View
                   key={`${value}-${i}`}
-                  style={[styles.resultChip, { backgroundColor: colors.backgroundElement }]}>
-                  <Text style={[styles.resultText, { color: colors.text }]}>{value}</Text>
+                  style={[
+                    styles.resultChip,
+                    { backgroundColor: ACCENT_CYCLE[i % ACCENT_CYCLE.length] },
+                  ]}>
+                  <Text style={styles.resultText}>{value}</Text>
                 </View>
-              ),
-            )}
+              );
+            })}
           </View>
         )}
 
@@ -203,6 +219,8 @@ const styles = StyleSheet.create({
   },
   inputFlex: {
     flex: 1,
+    // senza minWidth gli input non si restringono e sfondano la riga
+    minWidth: 0,
   },
   error: {
     fontSize: 14,
@@ -222,9 +240,36 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 12,
     paddingHorizontal: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
   resultText: {
     fontSize: 24,
+    color: '#fff',
+    fontFamily: 'Fredoka_700Bold',
+  },
+  // faccia di dado: stessi token pseudo-3D del logo
+  diceFace: {
+    width: 60,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+    backgroundColor: DiceShading.face,
+    borderWidth: 2,
+    borderColor: DiceShading.border,
+    shadowColor: DiceShading.shadowEdge,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  diceText: {
+    fontSize: 24,
+    color: DiceShading.pip,
     fontFamily: 'Fredoka_700Bold',
   },
   colorResult: {
@@ -235,6 +280,11 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
   colorHex: {
     fontSize: 14,
