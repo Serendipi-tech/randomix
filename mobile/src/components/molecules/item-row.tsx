@@ -1,16 +1,25 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '@/constants/theme';
 
+interface ItemRowTag {
+  id: string;
+  name: string;
+  color: string;
+}
+
 interface ItemRowProps {
   name: string;
   categoryLabel: string;
   statusLabel: string;
   ratingValue?: number | null;
+  tags?: ItemRowTag[];
   colorScheme: 'light' | 'dark';
   onPress: () => void;
   onRemove: () => void;
   removeLabel: string;
 }
+
+const MAX_VISIBLE_TAGS = 2;
 
 /** Riga di un elemento della lista: nome, categoria, status e rimozione. */
 export function ItemRow({
@@ -18,12 +27,15 @@ export function ItemRow({
   categoryLabel,
   statusLabel,
   ratingValue,
+  tags = [],
   colorScheme,
   onPress,
   onRemove,
   removeLabel,
 }: ItemRowProps) {
   const colors = Colors[colorScheme];
+  const visibleTags = tags.slice(0, MAX_VISIBLE_TAGS);
+  const hiddenCount = tags.length - visibleTags.length;
 
   return (
     <Pressable
@@ -37,6 +49,24 @@ export function ItemRow({
           {categoryLabel} · {statusLabel}
           {ratingValue ? ` · ★ ${ratingValue}` : ''}
         </Text>
+        {visibleTags.length > 0 && (
+          <View style={styles.tagRow}>
+            {visibleTags.map((tag) => (
+              <View key={tag.id} style={[styles.tagPill, { backgroundColor: tag.color }]}>
+                <Text style={styles.tagLabel} numberOfLines={1}>
+                  {tag.name}
+                </Text>
+              </View>
+            ))}
+            {hiddenCount > 0 && (
+              <View style={[styles.tagPill, { backgroundColor: colors.backgroundSelected }]}>
+                <Text style={[styles.tagLabel, { color: colors.textSecondary }]}>
+                  +{hiddenCount}
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
       </View>
       <Pressable onPress={onRemove} hitSlop={8} style={styles.removeButton}>
         <Text style={[styles.removeLabel, { color: colors.textSecondary }]}>{removeLabel}</Text>
@@ -64,6 +94,23 @@ const styles = StyleSheet.create({
   meta: {
     fontSize: 14,
     fontFamily: 'Nunito_500Medium',
+  },
+  tagRow: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 4,
+  },
+  tagPill: {
+    paddingVertical: 2,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    maxWidth: 110,
+  },
+  // 12px consentito solo per i badge, come da regole tipografiche
+  tagLabel: {
+    fontSize: 12,
+    color: '#fff',
+    fontFamily: 'Nunito_700Bold',
   },
   removeButton: {
     paddingVertical: 6,

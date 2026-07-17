@@ -86,6 +86,7 @@ export default function ListDetailScreen() {
               categoryLabel={t(`categories.${entry.userItem.item.category}`)}
               statusLabel={t(`status.${entry.userItem.status}`)}
               ratingValue={entry.userItem.item.myRating?.value}
+              tags={entry.userItem.tags}
               colorScheme={colorScheme}
               onPress={() => openItem(entry)}
               onRemove={() => setEntryToRemove(entry)}
