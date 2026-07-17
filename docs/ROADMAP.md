@@ -33,12 +33,19 @@ Agile, no server dedicato. 2 persone in parallelo — dove possibile, split web/
 - [x] `web/` e `mobile/` importano correttamente `packages/graphql-schema` (verificato con `npm ls`)
 
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
 
 ## Fase 1 — Fondamenta (parallelo)
@@ -50,11 +57,13 @@ Agile, no server dedicato. 2 persone in parallelo — dove possibile, split web/
   - [x] Apollo Server route `/api/graphql` con context JWT (Supabase Bearer token)
   - [x] Supabase client setup (`supabase` anonimo + `supabaseAdmin`)
   - [x] Pothos builder con Prisma 7 (`getDatamodel()` + `PrismaPg` adapter)
+
 ---
 
 ### Contesto per riprendere — Dev B (mobile)
 
 **Stack decisioni prese:**
+
 - Auth engine: **Supabase Auth** (Google OAuth + credentials). Il mobile NON chiama Supabase direttamente — tutto passa per il GraphQL di Next.js.
 - Flusso auth mobile: l'app si autentica con Google tramite Expo (Expo AuthSession o `expo-auth-session`), ottiene un `idToken` Google, lo manda alla mutation `loginWithGoogle(idToken)` → Next.js lo verifica con Supabase → riceve `accessToken` + `refreshToken` Supabase.
 - Per credentials: mutation `loginWithCredentials(email, password)` → Next.js → Supabase → accessToken.
@@ -62,15 +71,59 @@ Agile, no server dedicato. 2 persone in parallelo — dove possibile, split web/
 - L'endpoint GraphQL è `https://<dominio>/api/graphql` (in dev: `http://localhost:3000/api/graphql`).
 
 **Contratto GraphQL già pronto (web):**
+
 ```graphql
-mutation LoginWithCredentials($email: String!, $password: String!) { loginWithCredentials(email: $email, password: $password) { accessToken refreshToken user { id username email avatarUrl language role } } }
-mutation LoginWithGoogle($idToken: String!) { loginWithGoogle(idToken: $idToken) { accessToken refreshToken user { id username email } } }
-mutation Logout { logout }
-query Me { me { id username email avatarUrl language role createdAt } }
-mutation UpdateProfile($input: UpdateProfileInput!) { updateProfile(input: $input) { id username avatarUrl language } }
+mutation LoginWithCredentials($email: String!, $password: String!) {
+  loginWithCredentials(email: $email, password: $password) {
+    accessToken
+    refreshToken
+    user {
+      id
+      username
+      email
+      avatarUrl
+      language
+      role
+    }
+  }
+}
+mutation LoginWithGoogle($idToken: String!) {
+  loginWithGoogle(idToken: $idToken) {
+    accessToken
+    refreshToken
+    user {
+      id
+      username
+      email
+    }
+  }
+}
+mutation Logout {
+  logout
+}
+query Me {
+  me {
+    id
+    username
+    email
+    avatarUrl
+    language
+    role
+    createdAt
+  }
+}
+mutation UpdateProfile($input: UpdateProfileInput!) {
+  updateProfile(input: $input) {
+    id
+    username
+    avatarUrl
+    language
+  }
+}
 ```
 
 **Cosa serve attivare in Supabase prima di testare:**
+
 - Dashboard → Authentication → Providers → Google: abilitare e inserire Client ID + Secret da Google Cloud Console.
 - Per credentials: funziona già, ma bisogna creare utenti con `signUp` (o abilitare "Email confirmations" off in dev).
 
@@ -87,23 +140,30 @@ mutation UpdateProfile($input: UpdateProfileInput!) { updateProfile(input: $inpu
 ### Test
 
 - [ ] Login Google funziona end-to-end (mobile → Next.js → sessione valida)
-- [ ] Login credentials funziona end-to-end
+- [x] Login credentials funziona end-to-end
 - [ ] Onboarding blocca l'accesso finché non si dà consenso email
 - [ ] Query `me` ritorna l'utente autenticato corretto da mobile
 
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
 
 ## Fase 2 — Core MVP (parallelo)
 
 - [ ] **Dev A**: resolver base
-  - [ ] `List`, `ListCategory`
+  - [/] `List`, `ListCategory` (fatta solo query `myLists` paginata — manca il CRUD completo)
   - [ ] `Item`, `User_Item`, `List_UserItem`
   - [ ] `Tag`
   - [ ] `Rating`
@@ -121,7 +181,7 @@ mutation UpdateProfile($input: UpdateProfileInput!) { updateProfile(input: $inpu
     - [ ] Note/descrizione personale, tag custom su elemento
   - [ ] UI randomizzatore
   - [ ] UI rating a stelline (1-5 + nota opzionale)
-  - [ ] Profilo utente base
+  - [x] Profilo utente base (vista + modifica username nella tab Social)
 - [ ] Sync point: `gql_crud/` condiviso aggiornato ad ogni nuova query/mutation
 
 ### Test
@@ -134,20 +194,27 @@ mutation UpdateProfile($input: UpdateProfileInput!) { updateProfile(input: $inpu
 - [ ] Rating 1-5 con nota si salva e resta anche eliminando la join elemento↔lista
 
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
 
 ## Fase 3 — Sociale
 
 ### Sotto-fase 3.1 — Amici
 
-- [ ] **Dev A**: resolver `Friendship` (invio/accetta/rifiuta/rimuovi)
-- [ ] **Dev B**: UI lista amici, ricerca per username/email, vista progressi/liste condivise dell'amico
+- [/] **Dev A**: resolver `Friendship` (invio/accetta/rifiuta/rimuovi) — fatta solo lettura `myFriends` (amici ACCEPTED)
+- [/] **Dev B**: UI lista amici, ricerca per username/email, vista progressi/liste condivise dell'amico — fatta solo la lista amici nella tab Social
 
 #### Test
 
@@ -190,12 +257,19 @@ mutation UpdateProfile($input: UpdateProfileInput!) { updateProfile(input: $inpu
 - [ ] Pagina matching mostra correttamente rating/elementi in comune tra due amici
 
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
 
 ## Fase 4 — Monetizzazione
@@ -216,12 +290,19 @@ mutation UpdateProfile($input: UpdateProfileInput!) { updateProfile(input: $inpu
 - [ ] Ads visibili solo su piano Free
 
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
+
 ---
 
 ## Fase 5 — Rifinitura & Lancio

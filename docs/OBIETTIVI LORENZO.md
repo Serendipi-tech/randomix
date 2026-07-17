@@ -7,22 +7,22 @@
 
 ## Sezione 2 - Setup mancanti
 
-- [ ] **Upload dell'app Next su Vercel.**
+- [x] **Upload dell'app Next su Vercel.**
       _Nello specifico_: l'app Next, standalone, dev'essere messa su Vercel in modo da ottenere un indirizzo web specifico al quale poter fare le chiamate da mobile. Al momento si riferisce sempre al localhost, ma non va bene perché ogni volta siamo costretti a fare il run dev sul backend.
       Con il backend sempre attivo su Vercel, invece, questo step si risolve da solo. Bisognerà poi ricordarci di fare sempre il push del backend sul main così l'app online sarà sempre disponibile e aggiornata.
 
-- [ ] **Aggiornamento link d'indirizzo sull'env Mobile.**
+- [x] **Aggiornamento link d'indirizzo sull'env Mobile.**
       _Nello specifico_: al momento nell'env c'è l'indirizzo del localhost. Una volta connesso Next a Vercel, quell'indirizzo andrà cambiato.
 
 ## Sezione 3 - Features mancanti
 
-- [/] [testare] **Recupero password.**
-  _Manca proprio l'intera sezione, ma va inserita._
+- [x] **Recupero password.**
+      _Manca proprio l'intera sezione, ma va inserita._
 
 ## Sezione 4 - Solo se c'è tempo
 
-- [ ] **Creazione sezioni interne vuote.**
-      _Nello specifico_: - [ ] **Home** con elenco liste. - [ ] **Social** con sezione profilo e amici all'interno. - [ ] **Settings** autoesplicativo.
+- [x] **Creazione sezioni interne vuote.**
+      _Nello specifico_: - [x] **Home** con elenco liste. - [x] **Social** con sezione profilo e amici all'interno. - [x] **Settings** autoesplicativo.
       In basso c'è la navbar per muoversi in giro.
       Non c'è bisogno di inserire nulla all'interno delle pagine, per ora.
 - [ ] **Creazione objects per task di domani:**

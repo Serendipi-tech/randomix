@@ -1,0 +1,18 @@
+{
+  "title": "Social",
+  "profile": {
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "usernamePlaceholder": "Username",
+    "usernameTooShort": "Username must be at least 3 characters."
+  },
+  "friends": {
+    "title": "Friends",
+    "empty": {
+      "title": "No friends yet",
+      "subtitle": "Add friends to share lists and draw together."
+    },
+    "error": "Couldn't load your friends. Please try again."
+  }
+}
