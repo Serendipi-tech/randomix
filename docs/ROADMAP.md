@@ -6,31 +6,31 @@ Agile, no server dedicato. 2 persone in parallelo — dove possibile, split web/
 
 `web/` e `mobile/` sono vuote (nessun package.json, nessuna dipendenza) — si parte da zero.
 
-- [x] Init workspace root (npm workspaces: `web`, `mobile`, `packages/graphql-schema` — pnpm scartato, non installato sulla macchina, npm basta)
-- [x] Init `web/` (Next.js)
-  - [x] Scaffold Next.js (TypeScript, Tailwind, App Router, `src/`, alias `@/*`)
-  - [x] Install Prisma + `@prisma/client` + `@prisma/extension-accelerate`
-  - [x] Install Pothos/builder GraphQL (`@pothos/core`, `@pothos/plugin-prisma`) + Apollo Server (`@apollo/server`, `@as-integrations/next`)
-- [x] Init `mobile/` (Expo 57 / React Native 0.86 — versione aggiornata rispetto al piano iniziale)
-  - [x] Scaffold Expo (TypeScript, Expo Router incluso di default)
-  - [x] Install Apollo Client
-  - [x] Install NativeWind (+ Tailwind 3, compatibile con NativeWind 4)
-- [x] Init `packages/graphql-schema` (package condiviso `@randomix/graphql-schema`, linkato come dipendenza di web/mobile via workspace)
-- [x] Scaffolding cartelle interne come da `docs/architecture.md` (graphql/, gql_crud/, prisma/schema/, ecc. — solo i package.json/tool di base sono pronti)
-- [x] Import schema Prisma completo (già pronto in `docs/prismaSTRUCTURE/schema/`) in `web/prisma/schema/` + `prisma db push`
-  - [x] Schema copiato in `web/prisma/schema/`
-  - [x] `web/prisma.config.ts` creato (Prisma 7: url del datasource si configura qui, non più nello `.prisma`)
-  - [x] `web/.env.example` creato (`DATABASE_URL` diretto + placeholder Accelerate)
-  - [x] Collegamento DB reale → `prisma db push` completato
-- [x] GraphQL builder/schema base (Next.js)
-- [x] Expo Router skeleton + NativeWind config condiviso
+- [x] 0.1 Init workspace root (npm workspaces: `web`, `mobile`, `packages/graphql-schema` — pnpm scartato, non installato sulla macchina, npm basta)
+- [x] 0.2 Init `web/` (Next.js)
+  - [x] 0.2.1 Scaffold Next.js (TypeScript, Tailwind, App Router, `src/`, alias `@/*`)
+  - [x] 0.2.2 Install Prisma + `@prisma/client` + `@prisma/extension-accelerate`
+  - [x] 0.2.3 Install Pothos/builder GraphQL (`@pothos/core`, `@pothos/plugin-prisma`) + Apollo Server (`@apollo/server`, `@as-integrations/next`)
+- [x] 0.3 Init `mobile/` (Expo 57 / React Native 0.86 — versione aggiornata rispetto al piano iniziale)
+  - [x] 0.3.1 Scaffold Expo (TypeScript, Expo Router incluso di default)
+  - [x] 0.3.2 Install Apollo Client
+  - [x] 0.3.3 Install NativeWind (+ Tailwind 3, compatibile con NativeWind 4)
+- [x] 0.4 Init `packages/graphql-schema` (package condiviso `@randomix/graphql-schema`, linkato come dipendenza di web/mobile via workspace)
+- [x] 0.5 Scaffolding cartelle interne come da `docs/architecture.md` (graphql/, gql_crud/, prisma/schema/, ecc. — solo i package.json/tool di base sono pronti)
+- [x] 0.6 Import schema Prisma completo (già pronto in `docs/prismaSTRUCTURE/schema/`) in `web/prisma/schema/` + `prisma db push`
+  - [x] 0.6.1 Schema copiato in `web/prisma/schema/`
+  - [x] 0.6.2 `web/prisma.config.ts` creato (Prisma 7: url del datasource si configura qui, non più nello `.prisma`)
+  - [x] 0.6.3 `web/.env.example` creato (`DATABASE_URL` diretto + placeholder Accelerate)
+  - [x] 0.6.4 Collegamento DB reale → `prisma db push` completato
+- [x] 0.7 GraphQL builder/schema base (Next.js)
+- [x] 0.8 Expo Router skeleton + NativeWind config condiviso
 
 ### Test
 
-- [x] `prisma db push` esegue senza errori, tabelle visibili sul DB
-- [x] `next build` (`web/`) completa senza errori
-- [x] `expo-doctor` (`mobile/`) 20/20 check passati, nessuna dipendenza duplicata
-- [x] `web/` e `mobile/` importano correttamente `packages/graphql-schema` (verificato con `npm ls`)
+- [x] T0.1 `prisma db push` esegue senza errori, tabelle visibili sul DB
+- [x] T0.2 `next build` (`web/`) completa senza errori
+- [x] T0.3 `expo-doctor` (`mobile/`) 20/20 check passati, nessuna dipendenza duplicata
+- [x] T0.4 `web/` e `mobile/` importano correttamente `packages/graphql-schema` (verificato con `npm ls`)
 
 ---
 
@@ -50,13 +50,13 @@ Agile, no server dedicato. 2 persone in parallelo — dove possibile, split web/
 
 ## Fase 1 — Fondamenta (parallelo)
 
-- [x] **Dev A (web)**
-  - [x] Login Google OAuth (`loginWithGoogle` mutation via Supabase signInWithIdToken)
-  - [x] Login credentials (`loginWithCredentials` mutation via Supabase signInWithPassword)
-  - [x] Resolver `User` (query/mutation base: `me`, `updateProfile`, `logout`)
-  - [x] Apollo Server route `/api/graphql` con context JWT (Supabase Bearer token)
-  - [x] Supabase client setup (`supabase` anonimo + `supabaseAdmin`)
-  - [x] Pothos builder con Prisma 7 (`getDatamodel()` + `PrismaPg` adapter)
+- [x] 1.1 **Dev A (web)**
+  - [x] 1.1.1 Login Google OAuth (`loginWithGoogle` mutation via Supabase signInWithIdToken)
+  - [x] 1.1.2 Login credentials (`loginWithCredentials` mutation via Supabase signInWithPassword)
+  - [x] 1.1.3 Resolver `User` (query/mutation base: `me`, `updateProfile`, `logout`)
+  - [x] 1.1.4 Apollo Server route `/api/graphql` con context JWT (Supabase Bearer token)
+  - [x] 1.1.5 Supabase client setup (`supabase` anonimo + `supabaseAdmin`)
+  - [x] 1.1.6 Pothos builder con Prisma 7 (`getDatamodel()` + `PrismaPg` adapter)
 
 ---
 
@@ -129,20 +129,20 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
 
 **Dev B — prossimi task:**
 
-- [x] **Dev B (mobile)**
-  - [x] Schermata login
-  - [x] Schermata onboarding (consenso email)
-  - [x] ThemeContext/NativeWind setup
-  - [x] Apollo Client setup (auth header injection)
-- [x] Blocking point comune: contratto schema GraphQL (query/mutation auth + user) da concordare prima di separarsi
-  - [x] `me: User`, `updateProfile`, `loginWithCredentials`, `loginWithGoogle`, `logout` — definiti e deployabili
+- [x] 1.2 **Dev B (mobile)**
+  - [x] 1.2.1 Schermata login
+  - [x] 1.2.2 Schermata onboarding (consenso email)
+  - [x] 1.2.3 ThemeContext/NativeWind setup
+  - [x] 1.2.4 Apollo Client setup (auth header injection)
+- [x] 1.3 Blocking point comune: contratto schema GraphQL (query/mutation auth + user) da concordare prima di separarsi
+  - [x] 1.3.1 `me: User`, `updateProfile`, `loginWithCredentials`, `loginWithGoogle`, `logout` — definiti e deployabili
 
 ### Test
 
-- [ ] Login Google funziona end-to-end (mobile → Next.js → sessione valida)
-- [x] Login credentials funziona end-to-end
-- [ ] Onboarding blocca l'accesso finché non si dà consenso email
-- [ ] Query `me` ritorna l'utente autenticato corretto da mobile
+- [ ] T1.1 Login Google funziona end-to-end (mobile → Next.js → sessione valida)
+- [x] T1.2 Login credentials funziona end-to-end
+- [ ] T1.3 Onboarding blocca l'accesso finché non si dà consenso email
+- [ ] T1.4 Query `me` ritorna l'utente autenticato corretto da mobile
 
 ---
 
@@ -162,36 +162,36 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
 
 ## Fase 2 — Core MVP (parallelo)
 
-- [ ] **Dev A**: resolver base
-  - [/] `List`, `ListCategory` (fatta solo query `myLists` paginata — manca il CRUD completo)
-  - [ ] `Item`, `User_Item`, `List_UserItem`
-  - [ ] `Tag`
-  - [ ] `Rating`
-  - [ ] Randomizzatore backend
-    - [ ] Numeri (range X-Y, N estrazioni)
-    - [ ] Lettere alfabeto
-    - [ ] Colori
-    - [ ] Dadi
-    - [ ] Tracking `count` / `skippedCount` / `acceptedCount` (skip solo su rigenerazione, non su chiusura app)
-- [ ] **Dev B**: UI corrispondente
-  - [ ] Creazione/gestione liste (nome, icona, colore, categoria, isHidden)
-  - [ ] Creazione/gestione elementi
-    - [ ] Ricerca in API (OpenLibrary, TMDb, ecc.) con finestra "Stai cercando..."
-    - [ ] Fallback creazione manuale (categoria CUSTOM)
-    - [ ] Note/descrizione personale, tag custom su elemento
-  - [ ] UI randomizzatore
-  - [ ] UI rating a stelline (1-5 + nota opzionale)
-  - [x] Profilo utente base (vista + modifica username nella tab Social)
-- [ ] Sync point: `gql_crud/` condiviso aggiornato ad ogni nuova query/mutation
+- [ ] 2.1 **Dev A**: resolver base
+  - [/] 2.1.1 `List`, `ListCategory` (fatta solo query `myLists` paginata — manca il CRUD completo)
+  - [ ] 2.1.2 `Item`, `User_Item`, `List_UserItem`
+  - [ ] 2.1.3 `Tag`
+  - [ ] 2.1.4 `Rating`
+  - [ ] 2.1.5 Randomizzatore backend
+    - [ ] 2.1.5.1 Numeri (range X-Y, N estrazioni)
+    - [ ] 2.1.5.2 Lettere alfabeto
+    - [ ] 2.1.5.3 Colori
+    - [ ] 2.1.5.4 Dadi
+    - [ ] 2.1.5.5 Tracking `count` / `skippedCount` / `acceptedCount` (skip solo su rigenerazione, non su chiusura app)
+- [ ] 2.2 **Dev B**: UI corrispondente
+  - [ ] 2.2.1 Creazione/gestione liste (nome, icona, colore, categoria, isHidden)
+  - [ ] 2.2.2 Creazione/gestione elementi
+    - [ ] 2.2.2.1 Ricerca in API (OpenLibrary, TMDb, ecc.) con finestra "Stai cercando..."
+    - [ ] 2.2.2.2 Fallback creazione manuale (categoria CUSTOM)
+    - [ ] 2.2.2.3 Note/descrizione personale, tag custom su elemento
+  - [ ] 2.2.3 UI randomizzatore
+  - [ ] 2.2.4 UI rating a stelline (1-5 + nota opzionale)
+  - [x] 2.2.5 Profilo utente base (vista + modifica username nella tab Social)
+- [ ] 2.3 Sync point: `gql_crud/` condiviso aggiornato ad ogni nuova query/mutation
 
 ### Test
 
-- [ ] Creazione lista con categoria + icona + colore va a buon fine
-- [ ] Creazione elemento da ricerca API salva correttamente record + join (o riusa il record se già presente)
-- [ ] Creazione elemento CUSTOM senza API funziona
-- [ ] Randomizzatore numeri/lettere/colori/dadi restituisce risultati coerenti con i parametri richiesti
-- [ ] `skippedCount` aumenta solo su rigenerazione del randomizzatore, mai su chiusura app o cambio lista
-- [ ] Rating 1-5 con nota si salva e resta anche eliminando la join elemento↔lista
+- [ ] T2.1 Creazione lista con categoria + icona + colore va a buon fine
+- [ ] T2.2 Creazione elemento da ricerca API salva correttamente record + join (o riusa il record se già presente)
+- [ ] T2.3 Creazione elemento CUSTOM senza API funziona
+- [ ] T2.4 Randomizzatore numeri/lettere/colori/dadi restituisce risultati coerenti con i parametri richiesti
+- [ ] T2.5 `skippedCount` aumenta solo su rigenerazione del randomizzatore, mai su chiusura app o cambio lista
+- [ ] T2.6 Rating 1-5 con nota si salva e resta anche eliminando la join elemento↔lista
 
 ---
 
@@ -213,48 +213,48 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
 
 ### Sotto-fase 3.1 — Amici
 
-- [/] **Dev A**: resolver `Friendship` (invio/accetta/rifiuta/rimuovi) — fatta solo lettura `myFriends` (amici ACCEPTED)
-- [/] **Dev B**: UI lista amici, ricerca per username/email, vista progressi/liste condivise dell'amico — fatta solo la lista amici nella tab Social
+- [/] 3.1.1 **Dev A**: resolver `Friendship` (invio/accetta/rifiuta/rimuovi) — fatta solo lettura `myFriends` (amici ACCEPTED)
+- [/] 3.1.2 **Dev B**: UI lista amici, ricerca per username/email, vista progressi/liste condivise dell'amico — fatta solo la lista amici nella tab Social
 
 #### Test
 
-- [ ] Invio, accettazione e rifiuto richiesta amicizia funzionano
-- [ ] Ricerca per username/email trova l'utente corretto
-- [ ] Rimozione amico funziona e sparisce da entrambe le liste
+- [ ] T3.1.1 Invio, accettazione e rifiuto richiesta amicizia funzionano
+- [ ] T3.1.2 Ricerca per username/email trova l'utente corretto
+- [ ] T3.1.3 Rimozione amico funziona e sparisce da entrambe le liste
 
 ### Sotto-fase 3.2 — Gruppi base
 
-- [ ] **Dev A**: resolver `Group`, `Group_User`, `GroupList`, `GroupList_AcceptedItemHistory`
-- [ ] **Dev B**: UI creazione/gestione gruppo, inviti, scelta liste condivise, lista fittizia unione (front-end only)
+- [ ] 3.2.1 **Dev A**: resolver `Group`, `Group_User`, `GroupList`, `GroupList_AcceptedItemHistory`
+- [ ] 3.2.2 **Dev B**: UI creazione/gestione gruppo, inviti, scelta liste condivise, lista fittizia unione (front-end only)
 
 #### Test
 
-- [ ] Creazione gruppo, invito, accettazione/rifiuto invito funzionano
-- [ ] Uscita dal gruppo e rimozione membro funzionano
-- [ ] Unione liste condivise per categoria elimina i duplicati correttamente
-- [ ] Import lista di gruppo nel proprio elenco funziona
+- [ ] T3.2.1 Creazione gruppo, invito, accettazione/rifiuto invito funzionano
+- [ ] T3.2.2 Uscita dal gruppo e rimozione membro funzionano
+- [ ] T3.2.3 Unione liste condivise per categoria elimina i duplicati correttamente
+- [ ] T3.2.4 Import lista di gruppo nel proprio elenco funziona
 
 ### Sotto-fase 3.3 — Obiettivi/sfide di gruppo
 
-- [ ] **Dev A**: resolver `GroupChallenge`, `GroupUser_Challenge`
-- [ ] **Dev B**: UI creazione obiettivo, avanzamento manuale/automatico, conferma utente su autocompilazione
+- [ ] 3.3.1 **Dev A**: resolver `GroupChallenge`, `GroupUser_Challenge`
+- [ ] 3.3.2 **Dev B**: UI creazione obiettivo, avanzamento manuale/automatico, conferma utente su autocompilazione
 
 #### Test
 
-- [ ] Obiettivo senza elemento numerico/categoria richiede spunta manuale
-- [ ] Obiettivo con elemento numerico + categoria autocompila ma chiede conferma prima di aggiungere al progresso
-- [ ] Stato sfida (DRAFT → IN_PROGRESS → COMPLETED/FAILED) transita correttamente a scadenza
+- [ ] T3.3.1 Obiettivo senza elemento numerico/categoria richiede spunta manuale
+- [ ] T3.3.2 Obiettivo con elemento numerico + categoria autocompila ma chiede conferma prima di aggiungere al progresso
+- [ ] T3.3.3 Stato sfida (DRAFT → IN_PROGRESS → COMPLETED/FAILED) transita correttamente a scadenza
 
 ### Sotto-fase 3.4 — Notifiche & matching
 
-- [ ] **Dev A**: resolver `Notification`
-- [ ] **Dev B**: UI notifiche, push (Expo), pagina matching statistiche amici
+- [ ] 3.4.1 **Dev A**: resolver `Notification`
+- [ ] 3.4.2 **Dev B**: UI notifiche, push (Expo), pagina matching statistiche amici
 
 #### Test
 
-- [ ] Notifica push arriva su invito gruppo/sfida/richiesta amicizia
-- [ ] Segna come letta funziona e persiste
-- [ ] Pagina matching mostra correttamente rating/elementi in comune tra due amici
+- [ ] T3.4.1 Notifica push arriva su invito gruppo/sfida/richiesta amicizia
+- [ ] T3.4.2 Segna come letta funziona e persiste
+- [ ] T3.4.3 Pagina matching mostra correttamente rating/elementi in comune tra due amici
 
 ---
 
@@ -274,20 +274,20 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
 
 ## Fase 4 — Monetizzazione
 
-- [ ] **Dev A**: resolver `Membership`, `Subscription`, `Payment`
-  - [ ] Enforcement limiti piano lato resolver
-    - [ ] Free: 3 liste, 20 elementi/lista, 1 gruppo creato, max 3 partecipazioni, max 15 membri
-    - [ ] Plus: 15 liste, 100 elementi/lista, 10 gruppi, max 30 partecipazioni
-    - [ ] Unlimited: illimitato, max 100 membri gruppo proprio
-  - [ ] Logica "congelamento" liste oltre il limite (downgrade/mancato rinnovo)
-- [ ] **Dev B**: UI upgrade/paywall, integrazione pagamenti in-app (store), ads (Free)
+- [ ] 4.1 **Dev A**: resolver `Membership`, `Subscription`, `Payment`
+  - [ ] 4.1.1 Enforcement limiti piano lato resolver
+    - [ ] 4.1.1.1 Free: 3 liste, 20 elementi/lista, 1 gruppo creato, max 3 partecipazioni, max 15 membri
+    - [ ] 4.1.1.2 Plus: 15 liste, 100 elementi/lista, 10 gruppi, max 30 partecipazioni
+    - [ ] 4.1.1.3 Unlimited: illimitato, max 100 membri gruppo proprio
+  - [ ] 4.1.2 Logica "congelamento" liste oltre il limite (downgrade/mancato rinnovo)
+- [ ] 4.2 **Dev B**: UI upgrade/paywall, integrazione pagamenti in-app (store), ads (Free)
 
 ### Test
 
-- [ ] Superato il limite Free, creazione nuova lista richiede congelamento di una esistente
-- [ ] Downgrade da Plus a Free congela le liste in eccesso senza eliminarle
-- [ ] Acquisto in-app aggiorna correttamente `Subscription`/`Membership` dell'utente
-- [ ] Ads visibili solo su piano Free
+- [ ] T4.1 Superato il limite Free, creazione nuova lista richiede congelamento di una esistente
+- [ ] T4.2 Downgrade da Plus a Free congela le liste in eccesso senza eliminarle
+- [ ] T4.3 Acquisto in-app aggiorna correttamente `Subscription`/`Membership` dell'utente
+- [ ] T4.4 Ads visibili solo su piano Free
 
 ---
 
@@ -307,25 +307,25 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
 
 ## Fase 5 — Rifinitura & Lancio
 
-- [ ] `Report` (moderazione/bug/feedback): resolver + UI invio segnalazione
-- [ ] Sorteggio live/realtime (canale dedicato, non GraphQL subscription)
-- [ ] Admin dashboard (web) per gestione contenuti/utenti/report
-- [ ] Testing end-to-end, bug fix
-- [ ] Submission store (Play Store / App Store review)
+- [ ] 5.1 `Report` (moderazione/bug/feedback): resolver + UI invio segnalazione
+- [ ] 5.2 Sorteggio live/realtime (canale dedicato, non GraphQL subscription)
+- [ ] 5.3 Admin dashboard (web) per gestione contenuti/utenti/report
+- [ ] 5.4 Testing end-to-end, bug fix
+- [ ] 5.5 Submission store (Play Store / App Store review)
 
 ### Test
 
-- [ ] Invio report (bug/feedback/segnalazione utente) arriva in admin dashboard
-- [ ] Sorteggio live visibile in tempo reale a tutti i membri collegati del gruppo
-- [ ] Admin può gestire utenti/contenuti/report da dashboard
-- [ ] Build store (Android/iOS) passa la review
+- [ ] T5.1 Invio report (bug/feedback/segnalazione utente) arriva in admin dashboard
+- [ ] T5.2 Sorteggio live visibile in tempo reale a tutti i membri collegati del gruppo
+- [ ] T5.3 Admin può gestire utenti/contenuti/report da dashboard
+- [ ] T5.4 Build store (Android/iOS) passa la review
 
 ## Extra (post-lancio)
 
-- [ ] Extra App #1 (film/serie TV) collegata
-- [ ] Estrazione programmata/countdown
+- [ ] E.1 Extra App #1 (film/serie TV) collegata
+- [ ] E.2 Estrazione programmata/countdown
 
 ### Test
 
-- [ ] Collegamento tra le due app scambia dati correttamente
-- [ ] Countdown/estrazione programmata parte e notifica all'orario previsto
+- [ ] TE.1 Collegamento tra le due app scambia dati correttamente
+- [ ] TE.2 Countdown/estrazione programmata parte e notifica all'orario previsto
