@@ -37,6 +37,11 @@
     "descriptionPlaceholder": "Personal description (optional)",
     "notePlaceholder": "Note (optional)",
     "status": "Status",
+    "rating": "Your rating",
+    "ratingNotePlaceholder": "Rating note (optional)",
+    "tags": "Tags",
+    "newTagPlaceholder": "New tag",
+    "addTag": "Add",
     "add": "Add",
     "save": "Save",
     "missingFields": "Name and category are required."

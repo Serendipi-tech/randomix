@@ -6,12 +6,25 @@ const { LIST_DETAIL } = ListQueries;
 
 export type CompletionStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
 
+export interface RatingInfo {
+  id: string;
+  value: number;
+  note: string | null;
+}
+
+export interface TagInfo {
+  id: string;
+  name: string;
+  color: string;
+}
+
 export interface ItemInfo {
   id: string;
   name: string;
   description: string | null;
   imageUrl: string | null;
   category: Category;
+  myRating: RatingInfo | null;
 }
 
 export interface UserItem {
@@ -20,6 +33,7 @@ export interface UserItem {
   note: string | null;
   status: CompletionStatus;
   isHidden: boolean;
+  tags: TagInfo[];
   item: ItemInfo;
 }
 

@@ -5,3 +5,6 @@ export * as FriendshipQueries from './gql_crud/friendship/friendship.queries';
 export * as ListMutations from './gql_crud/list/list.mutations';
 export * as ListCategoryQueries from './gql_crud/listCategory/listCategory.queries';
 export * as ItemMutations from './gql_crud/item/item.mutations';
+export * as TagQueries from './gql_crud/tag/tag.queries';
+export * as TagMutations from './gql_crud/tag/tag.mutations';
+export * as RatingMutations from './gql_crud/rating/rating.mutations';

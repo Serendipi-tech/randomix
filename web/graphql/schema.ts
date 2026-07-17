@@ -12,6 +12,11 @@ import './models/listCategory/index';
 import './models/listCategory/listCategory.queries';
 import './models/item/index';
 import './models/item/item.mutations';
+import './models/tag/index';
+import './models/tag/tag.queries';
+import './models/tag/tag.mutations';
+import './models/rating/index';
+import './models/rating/rating.mutations';
 
 builder.queryType({});
 builder.mutationType({});

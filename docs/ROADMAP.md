@@ -165,8 +165,8 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
 - [ ] 2.1 **Dev A**: resolver base
   - [x] 2.1.1 `List`, `ListCategory` (CRUD List + query `list`/`myLists`; ListCategory predefinite, solo lettura `listCategories`)
   - [x] 2.1.2 `Item`, `User_Item`, `List_UserItem` (`addItemToList` con riuso item esistente, `updateUserItem`, `removeItemFromList`)
-  - [ ] 2.1.3 `Tag`
-  - [ ] 2.1.4 `Rating`
+  - [x] 2.1.3 `Tag` (`myTags` personali + sistema, `createTag`/`deleteTag`, assegnazione via `updateUserItem.tagIds`)
+  - [x] 2.1.4 `Rating` (`rateItem` upsert 1-5 + nota, `deleteRating`, `myRating` esposto su Item)
   - [ ] 2.1.5 Randomizzatore backend
     - [ ] 2.1.5.1 Numeri (range X-Y, N estrazioni)
     - [ ] 2.1.5.2 Lettere alfabeto
@@ -178,17 +178,17 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
   - [/] 2.2.2 Creazione/gestione elementi
     - [ ] 2.2.2.1 Ricerca in API (OpenLibrary, TMDb, ecc.) con finestra "Stai cercando..."
     - [x] 2.2.2.2 Fallback creazione manuale (categoria CUSTOM)
-    - [/] 2.2.2.3 Note/descrizione personale, tag custom su elemento — fatti note/descrizione/status; tag rimandati al 2.1.3
+    - [x] 2.2.2.3 Note/descrizione personale, tag custom su elemento
   - [ ] 2.2.3 UI randomizzatore
-  - [ ] 2.2.4 UI rating a stelline (1-5 + nota opzionale)
+  - [x] 2.2.4 UI rating a stelline (1-5 + nota opzionale)
   - [x] 2.2.5 Profilo utente base (vista + modifica username nella tab Social)
 - [ ] 2.3 Sync point: `gql_crud/` condiviso aggiornato ad ogni nuova query/mutation
 
 ### Test
 
-- [ ] T2.1 Creazione lista con categoria + icona + colore va a buon fine
+- [/] T2.1 Creazione lista con categoria + icona + colore va a buon fine — testata senza categoria (tabella ListCategory ancora vuota, serve seed)
 - [ ] T2.2 Creazione elemento da ricerca API salva correttamente record + join (o riusa il record se già presente)
-- [ ] T2.3 Creazione elemento CUSTOM senza API funziona
+- [x] T2.3 Creazione elemento CUSTOM senza API funziona
 - [ ] T2.4 Randomizzatore numeri/lettere/colori/dadi restituisce risultati coerenti con i parametri richiesti
 - [ ] T2.5 `skippedCount` aumenta solo su rigenerazione del randomizzatore, mai su chiusura app o cambio lista
 - [ ] T2.6 Rating 1-5 con nota si salva e resta anche eliminando la join elemento↔lista

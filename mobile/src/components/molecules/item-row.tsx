@@ -5,6 +5,7 @@ interface ItemRowProps {
   name: string;
   categoryLabel: string;
   statusLabel: string;
+  ratingValue?: number | null;
   colorScheme: 'light' | 'dark';
   onPress: () => void;
   onRemove: () => void;
@@ -16,6 +17,7 @@ export function ItemRow({
   name,
   categoryLabel,
   statusLabel,
+  ratingValue,
   colorScheme,
   onPress,
   onRemove,
@@ -33,6 +35,7 @@ export function ItemRow({
         </Text>
         <Text style={[styles.meta, { color: colors.textSecondary }]} numberOfLines={1}>
           {categoryLabel} · {statusLabel}
+          {ratingValue ? ` · ★ ${ratingValue}` : ''}
         </Text>
       </View>
       <Pressable onPress={onRemove} hitSlop={8} style={styles.removeButton}>

@@ -3,25 +3,32 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Spacing } from '@/constants/theme';
+import { Accent, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthButton } from '@/components/atoms/auth-button';
 import { AuthInput } from '@/components/atoms/auth-input';
 import { SelectableChip } from '@/components/atoms/selectable-chip';
+import { StarRating } from '@/components/atoms/star-rating';
 import { useItemMutations } from '@/utils/useItemMutations';
 import { ITEM_CATEGORIES, type Category } from '@/utils/useListCategories';
+import { useTags } from '@/utils/useTags';
 import type { CompletionStatus } from '@/utils/useListDetail';
 
 const STATUSES: CompletionStatus[] = ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED'];
+const TAG_COLORS = [Accent.primary, Accent.coral, Accent.yellow, Accent.mint, Accent.violet];
 
 type ItemFormParams = {
   listId?: string;
   userItemId?: string;
+  itemId?: string;
   name?: string;
   category?: string;
   description?: string;
   note?: string;
   status?: string;
+  rating?: string;
+  ratingNote?: string;
+  tagIds?: string;
 };
 
 export default function ItemFormScreen() {
@@ -33,7 +40,8 @@ export default function ItemFormScreen() {
   const params = useLocalSearchParams<ItemFormParams>();
   const isEdit = Boolean(params.userItemId);
 
-  const { addItemToList, updateUserItem, saving, error } = useItemMutations();
+  const { addItemToList, updateUserItem, rateItem, saving, error } = useItemMutations();
+  const { tags, createTag, creating } = useTags();
 
   const [name, setName] = useState(params.name ?? '');
   const [category, setCategory] = useState<Category | null>(
@@ -44,7 +52,31 @@ export default function ItemFormScreen() {
   const [status, setStatus] = useState<CompletionStatus>(
     (params.status as CompletionStatus | undefined) ?? 'NOT_STARTED',
   );
+  const [ratingValue, setRatingValue] = useState(Number(params.rating ?? 0));
+  const [ratingNote, setRatingNote] = useState(params.ratingNote ?? '');
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
+    params.tagIds ? params.tagIds.split(',') : [],
+  );
+  const [newTagName, setNewTagName] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
+
+  const toggleTag = (tagId: string) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId],
+    );
+  };
+
+  const handleCreateTag = async () => {
+    if (!newTagName.trim()) return;
+    setLocalError(null);
+    try {
+      const tag = await createTag(newTagName.trim(), TAG_COLORS[tags.length % TAG_COLORS.length]);
+      if (tag) setSelectedTagIds((prev) => [...prev, tag.id]);
+      setNewTagName('');
+    } catch (e) {
+      setLocalError((e as Error).message);
+    }
+  };
 
   const save = async () => {
     setLocalError(null);
@@ -54,7 +86,11 @@ export default function ItemFormScreen() {
           description: description.trim() || null,
           note: note.trim() || null,
           status,
+          tagIds: selectedTagIds,
         });
+        if (ratingValue > 0 && params.itemId) {
+          await rateItem(params.itemId, ratingValue, ratingNote.trim() || null);
+        }
       } else {
         if (!name.trim() || !category || !params.listId) {
           setLocalError(t('itemForm.missingFields'));
@@ -149,6 +185,52 @@ export default function ItemFormScreen() {
                 />
               ))}
             </View>
+
+            <Text style={[styles.sectionLabel, { color: colors.text }]}>
+              {t('itemForm.rating')}
+            </Text>
+            <StarRating value={ratingValue} onChange={setRatingValue} colorScheme={colorScheme} />
+            {ratingValue > 0 && (
+              <AuthInput
+                colorScheme={colorScheme}
+                placeholder={t('itemForm.ratingNotePlaceholder')}
+                value={ratingNote}
+                onChangeText={setRatingNote}
+                multiline
+              />
+            )}
+
+            <Text style={[styles.sectionLabel, { color: colors.text }]}>
+              {t('itemForm.tags')}
+            </Text>
+            {tags.length > 0 && (
+              <View style={styles.chipWrap}>
+                {tags.map((tag) => (
+                  <SelectableChip
+                    key={tag.id}
+                    label={tag.name}
+                    selected={selectedTagIds.includes(tag.id)}
+                    onPress={() => toggleTag(tag.id)}
+                    colorScheme={colorScheme}
+                  />
+                ))}
+              </View>
+            )}
+            <View style={styles.newTagRow}>
+              <AuthInput
+                colorScheme={colorScheme}
+                placeholder={t('itemForm.newTagPlaceholder')}
+                value={newTagName}
+                onChangeText={setNewTagName}
+                style={styles.newTagInput}
+              />
+              <Pressable
+                onPress={handleCreateTag}
+                disabled={creating || !newTagName.trim()}
+                style={[styles.addTagButton, (creating || !newTagName.trim()) && styles.disabled]}>
+                <Text style={styles.addTagLabel}>{t('itemForm.addTag')}</Text>
+              </Pressable>
+            </View>
           </>
         )}
 
@@ -196,6 +278,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: Spacing.two,
+  },
+  newTagRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
+  newTagInput: {
+    flex: 1,
+  },
+  addTagButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderRadius: 14,
+    backgroundColor: Accent.violet,
+  },
+  addTagLabel: {
+    fontSize: 14,
+    color: '#fff',
+    fontFamily: 'Fredoka_600SemiBold',
+  },
+  disabled: {
+    opacity: 0.5,
   },
   error: {
     fontSize: 14,

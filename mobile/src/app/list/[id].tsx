@@ -28,11 +28,15 @@ export default function ListDetailScreen() {
       pathname: '/item-form',
       params: {
         userItemId: entry.userItem.id,
+        itemId: entry.userItem.item.id,
         name: entry.userItem.item.name,
         category: entry.userItem.item.category,
         description: entry.userItem.description ?? '',
         note: entry.userItem.note ?? '',
         status: entry.userItem.status,
+        rating: String(entry.userItem.item.myRating?.value ?? 0),
+        ratingNote: entry.userItem.item.myRating?.note ?? '',
+        tagIds: entry.userItem.tags.map((tag) => tag.id).join(','),
       },
     });
   };
@@ -83,6 +87,7 @@ export default function ListDetailScreen() {
               name={entry.userItem.item.name}
               categoryLabel={t(`categories.${entry.userItem.item.category}`)}
               statusLabel={t(`status.${entry.userItem.status}`)}
+              ratingValue={entry.userItem.item.myRating?.value}
               colorScheme={colorScheme}
               onPress={() => openItem(entry)}
               onRemove={() => confirmRemove(entry)}

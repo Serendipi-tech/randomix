@@ -26,12 +26,22 @@ export const LIST_DETAIL: DocumentNode = parse(`
           note
           status
           isHidden
+          tags {
+            id
+            name
+            color
+          }
           item {
             id
             name
             description
             imageUrl
             category
+            myRating {
+              id
+              value
+              note
+            }
           }
         }
       }

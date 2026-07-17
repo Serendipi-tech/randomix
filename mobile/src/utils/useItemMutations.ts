@@ -1,9 +1,10 @@
 import { useMutation } from '@apollo/client';
-import { ItemMutations } from '@randomix/graphql-schema';
+import { ItemMutations, RatingMutations } from '@randomix/graphql-schema';
 import type { Category } from './useListCategories';
 import type { CompletionStatus } from './useListDetail';
 
 const { ADD_ITEM_TO_LIST, UPDATE_USER_ITEM, REMOVE_ITEM_FROM_LIST } = ItemMutations;
+const { RATE_ITEM } = RatingMutations;
 
 export interface AddItemInput {
   listId: string;
@@ -18,6 +19,7 @@ export interface UpdateUserItemInput {
   note?: string | null;
   status?: CompletionStatus;
   isHidden?: boolean;
+  tagIds?: string[];
 }
 
 export function useItemMutations() {
@@ -36,6 +38,10 @@ export function useItemMutations() {
     { refetchQueries: ['ListDetail'] },
   );
 
+  const [rateMutation, { loading: rating, error: rateError }] = useMutation(RATE_ITEM, {
+    refetchQueries: ['ListDetail'],
+  });
+
   const addItemToList = async (input: AddItemInput) => {
     await addMutation({ variables: { input } });
   };
@@ -48,12 +54,17 @@ export function useItemMutations() {
     await removeMutation({ variables: { id } });
   };
 
+  const rateItem = async (itemId: string, value: number, note?: string | null) => {
+    await rateMutation({ variables: { itemId, value, note } });
+  };
+
   return {
     addItemToList,
     updateUserItem,
     removeItemFromList,
-    saving: adding || updating,
+    rateItem,
+    saving: adding || updating || rating,
     removing,
-    error: addError ?? updateError ?? removeError ?? null,
+    error: addError ?? updateError ?? removeError ?? rateError ?? null,
   };
 }

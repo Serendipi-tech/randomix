@@ -19,6 +19,7 @@ const UpdateUserItemInput = builder.inputType('UpdateUserItemInput', {
     note: t.string({ required: false }),
     status: t.field({ type: StatusCompletionEnum, required: false }),
     isHidden: t.boolean({ required: false }),
+    tagIds: t.idList({ required: false }),
   }),
 });
 
@@ -84,6 +85,18 @@ builder.mutationField('updateUserItem', (t) =>
       if (!userItem) {
         throw new GraphQLError('Elemento non trovato.', { extensions: { code: 'NOT_FOUND' } });
       }
+      // accetto solo tag dell'utente o di sistema
+      let validTagIds: string[] | null = null;
+      if (input.tagIds) {
+        const tags = await prisma.tag.findMany({
+          where: {
+            id: { in: input.tagIds.map(String) },
+            OR: [{ userId: ctx.userId }, { userId: null }],
+          },
+          select: { id: true },
+        });
+        validTagIds = tags.map((tag) => tag.id);
+      }
       return prisma.user_Item.update({
         ...query,
         where: { id: String(id) },
@@ -92,6 +105,7 @@ builder.mutationField('updateUserItem', (t) =>
           ...(input.note !== undefined && { note: input.note }),
           ...(input.status != null && { status: input.status }),
           ...(input.isHidden != null && { isHidden: input.isHidden }),
+          ...(validTagIds && { tags: { set: validTagIds.map((tagId) => ({ id: tagId })) } }),
         },
       });
     },
