@@ -1,12 +1,13 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
+import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { ItemRow } from '@/components/molecules/item-row';
-import { confirmDialog } from '@/utils/confirmDialog';
 import { useItemMutations } from '@/utils/useItemMutations';
 import { useListDetail, type ListItemEntry } from '@/utils/useListDetail';
 
@@ -21,6 +22,8 @@ export default function ListDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { list, loading, error } = useListDetail(id);
   const { removeItemFromList } = useItemMutations();
+
+  const [entryToRemove, setEntryToRemove] = useState<ListItemEntry | null>(null);
 
   const showSkeleton = loading && !list;
 
@@ -42,14 +45,9 @@ export default function ListDetailScreen() {
     });
   };
 
-  const confirmRemove = (entry: ListItemEntry) => {
-    confirmDialog({
-      title: t('detail.removeConfirmTitle'),
-      message: t('detail.removeConfirmMessage'),
-      confirmLabel: t('detail.remove'),
-      cancelLabel: t('form.cancel'),
-      onConfirm: () => removeItemFromList(entry.id),
-    });
+  const handleRemoveConfirmed = () => {
+    if (entryToRemove) removeItemFromList(entryToRemove.id);
+    setEntryToRemove(null);
   };
 
   return (
@@ -90,7 +88,7 @@ export default function ListDetailScreen() {
               ratingValue={entry.userItem.item.myRating?.value}
               colorScheme={colorScheme}
               onPress={() => openItem(entry)}
-              onRemove={() => confirmRemove(entry)}
+              onRemove={() => setEntryToRemove(entry)}
               removeLabel={t('detail.remove')}
             />
           )}
@@ -128,6 +126,17 @@ export default function ListDetailScreen() {
           }
         />
       )}
+
+      <ConfirmSheet
+        visible={entryToRemove != null}
+        title={t('detail.removeConfirmTitle')}
+        message={t('detail.removeConfirmMessage')}
+        confirmLabel={t('detail.remove')}
+        cancelLabel={t('form.cancel')}
+        colorScheme={colorScheme}
+        onConfirm={handleRemoveConfirmed}
+        onCancel={() => setEntryToRemove(null)}
+      />
     </SafeAreaView>
   );
 }

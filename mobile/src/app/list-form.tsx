@@ -9,7 +9,7 @@ import { AuthButton } from '@/components/atoms/auth-button';
 import { AuthInput } from '@/components/atoms/auth-input';
 import { ColorPickerRow } from '@/components/atoms/color-picker-row';
 import { SelectableChip } from '@/components/atoms/selectable-chip';
-import { confirmDialog } from '@/utils/confirmDialog';
+import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { useListCategories } from '@/utils/useListCategories';
 import { useListDetail } from '@/utils/useListDetail';
 import { useListMutations } from '@/utils/useListMutations';
@@ -35,6 +35,7 @@ export default function ListFormScreen() {
   const [color, setColor] = useState<string>(LIST_COLORS[0]);
   const [isHidden, setIsHidden] = useState(false);
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
   // precompilo il form quando arrivano i dati della lista in modifica
@@ -80,18 +81,11 @@ export default function ListFormScreen() {
     }
   };
 
-  const confirmDelete = () => {
-    confirmDialog({
-      title: t('form.deleteConfirmTitle'),
-      message: t('form.deleteConfirmMessage'),
-      confirmLabel: t('form.delete'),
-      cancelLabel: t('form.cancel'),
-      onConfirm: async () => {
-        if (!id) return;
-        await deleteList(id);
-        router.replace('/(app)');
-      },
-    });
+  const handleDeleteConfirmed = async () => {
+    setShowDeleteConfirm(false);
+    if (!id) return;
+    await deleteList(id);
+    router.replace('/(app)');
   };
 
   const displayError = localError ?? error?.message ?? null;
@@ -174,11 +168,22 @@ export default function ListFormScreen() {
             colorScheme={colorScheme}
             variant="secondary"
             label={t('form.delete')}
-            onPress={confirmDelete}
+            onPress={() => setShowDeleteConfirm(true)}
             loading={deleting}
           />
         )}
       </ScrollView>
+
+      <ConfirmSheet
+        visible={showDeleteConfirm}
+        title={t('form.deleteConfirmTitle')}
+        message={t('form.deleteConfirmMessage')}
+        confirmLabel={t('form.delete')}
+        cancelLabel={t('form.cancel')}
+        colorScheme={colorScheme}
+        onConfirm={handleDeleteConfirmed}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </SafeAreaView>
   );
 }
