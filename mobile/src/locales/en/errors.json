@@ -1,0 +1,7 @@
+{
+  "emailOrUsernameTaken": "Email or username already in use.",
+  "invalidCredentials": "Invalid email or password.",
+  "invalidGoogleToken": "Couldn't sign in with Google.",
+  "invalidOtp": "Invalid or expired code.",
+  "generic": "Something went wrong. Please try again."
+}
