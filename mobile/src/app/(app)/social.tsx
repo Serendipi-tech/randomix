@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
@@ -7,10 +8,15 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthButton } from '@/components/atoms/auth-button';
 import { AuthInput } from '@/components/atoms/auth-input';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
+import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
+import { FriendRequestRow } from '@/components/molecules/friend-request-row';
 import { FriendRow } from '@/components/molecules/friend-row';
 import { ProfileHeader } from '@/components/molecules/profile-header';
-import { useMyFriends } from '@/utils/useFriends';
+import { UserSearchRow } from '@/components/molecules/user-search-row';
+import { useMyFriends, useRemoveFriend, type Friend } from '@/utils/useFriends';
+import { useFriendRequests } from '@/utils/useFriendRequests';
 import { useProfile } from '@/utils/useProfile';
+import { useUserSearch, type FriendRelation } from '@/utils/useUserSearch';
 
 const SKELETON_COUNT = 4;
 const USERNAME_MIN_LENGTH = 3;
@@ -19,13 +25,18 @@ export default function SocialScreen() {
   const { t } = useTranslation('social');
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
+  const router = useRouter();
 
   const { profile, loading: loadingProfile, updateProfile, saving, saveError } = useProfile();
   const { friends, loading: loadingFriends, error: friendsError } = useMyFriends();
+  const { requests, acceptRequest, rejectRequest, answering } = useFriendRequests();
+  const search = useUserSearch();
+  const { removeFriend } = useRemoveFriend();
 
   const [editing, setEditing] = useState(false);
   const [username, setUsername] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
+  const [friendToRemove, setFriendToRemove] = useState<Friend | null>(null);
 
   const startEditing = () => {
     setUsername(profile?.username ?? '');
@@ -47,6 +58,15 @@ export default function SocialScreen() {
     }
   };
 
+  const handleRemoveConfirmed = () => {
+    if (friendToRemove) removeFriend(friendToRemove.id);
+    setFriendToRemove(null);
+  };
+
+  // etichetta di stato per i risultati di ricerca già in relazione con me
+  const relationLabel = (relation: FriendRelation): string | null =>
+    relation === 'NONE' ? null : t(`search.relation.${relation}`);
+
   const editError = localError ?? saveError?.message ?? null;
   const showFriendsSkeleton = loadingFriends && friends.length === 0;
 
@@ -57,7 +77,14 @@ export default function SocialScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={[styles.content, { paddingBottom: BottomTabInset + Spacing.four }]}
         renderItem={({ item }) => (
-          <FriendRow username={item.username} avatarUrl={item.avatarUrl} colorScheme={colorScheme} />
+          <FriendRow
+            username={item.username}
+            avatarUrl={item.avatarUrl}
+            colorScheme={colorScheme}
+            onPress={() => router.push({ pathname: '/friend/[id]', params: { id: item.id } })}
+            onRemove={() => setFriendToRemove(item)}
+            removeLabel={t('friends.remove')}
+          />
         )}
         ListHeaderComponent={
           <View style={styles.header}>
@@ -100,6 +127,54 @@ export default function SocialScreen() {
               </View>
             ) : null}
 
+            {requests.length > 0 && (
+              <>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                  {t('requests.title')}
+                </Text>
+                {requests.map((request) => (
+                  <FriendRequestRow
+                    key={request.id}
+                    username={request.sender.username}
+                    avatarUrl={request.sender.avatarUrl}
+                    colorScheme={colorScheme}
+                    acceptLabel={t('requests.accept')}
+                    rejectLabel={t('requests.reject')}
+                    onAccept={() => acceptRequest(request.id)}
+                    onReject={() => rejectRequest(request.id)}
+                    disabled={answering}
+                  />
+                ))}
+              </>
+            )}
+
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('search.title')}</Text>
+            <AuthInput
+              colorScheme={colorScheme}
+              placeholder={t('search.placeholder')}
+              autoCapitalize="none"
+              value={search.query}
+              onChangeText={search.setQuery}
+            />
+            {search.error && <Text style={styles.error}>{t('search.error')}</Text>}
+            {search.results.map((result) => (
+              <UserSearchRow
+                key={result.user.id}
+                username={result.user.username}
+                avatarUrl={result.user.avatarUrl}
+                colorScheme={colorScheme}
+                statusLabel={relationLabel(result.relation)}
+                addLabel={t('search.add')}
+                onAdd={() => search.sendRequest(result.user.id)}
+                disabled={search.sending}
+              />
+            ))}
+            {search.active && !search.searching && !search.error && search.results.length === 0 && (
+              <Text style={[styles.searchEmpty, { color: colors.textSecondary }]}>
+                {t('search.empty')}
+              </Text>
+            )}
+
             <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('friends.title')}</Text>
             {showFriendsSkeleton &&
               Array.from({ length: SKELETON_COUNT }).map((_, i) => (
@@ -121,6 +196,17 @@ export default function SocialScreen() {
             </View>
           )
         }
+      />
+
+      <ConfirmSheet
+        visible={friendToRemove != null}
+        title={t('friends.removeConfirmTitle')}
+        message={t('friends.removeConfirmMessage')}
+        confirmLabel={t('friends.remove')}
+        cancelLabel={t('profile.cancel')}
+        colorScheme={colorScheme}
+        onConfirm={handleRemoveConfirmed}
+        onCancel={() => setFriendToRemove(null)}
       />
     </SafeAreaView>
   );
@@ -158,6 +244,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: 'Fredoka_700Bold',
     paddingTop: Spacing.three,
+  },
+  searchEmpty: {
+    fontSize: 14,
+    textAlign: 'center',
+    fontFamily: 'Nunito_500Medium',
   },
   empty: {
     alignItems: 'center',

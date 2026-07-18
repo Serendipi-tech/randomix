@@ -7,12 +7,41 @@
     "usernamePlaceholder": "Username",
     "usernameTooShort": "Username must be at least 3 characters."
   },
+  "requests": {
+    "title": "Requests",
+    "accept": "Accept",
+    "reject": "Reject"
+  },
+  "search": {
+    "title": "Add friends",
+    "placeholder": "Search by username or email",
+    "add": "Add",
+    "empty": "No users found",
+    "error": "Search failed. Please try again.",
+    "relation": {
+      "FRIEND": "Already friends",
+      "REQUEST_SENT": "Pending",
+      "REQUEST_RECEIVED": "In your requests"
+    }
+  },
   "friends": {
     "title": "Friends",
+    "remove": "Remove",
+    "removeConfirmTitle": "Remove friend?",
+    "removeConfirmMessage": "You can send a new friend request later.",
     "empty": {
       "title": "No friends yet",
       "subtitle": "Add friends to share lists and draw together."
     },
     "error": "Couldn't load your friends. Please try again."
+  },
+  "friend": {
+    "back": "Back",
+    "listsTitle": "Lists",
+    "listsEmpty": "No visible lists yet",
+    "itemCount_one": "{{count}} item",
+    "itemCount_other": "{{count}} items",
+    "notFound": "Profile not found.",
+    "error": "Couldn't load this profile. Please try again."
   }
 }

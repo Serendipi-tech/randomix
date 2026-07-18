@@ -213,8 +213,8 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
 
 ### Sotto-fase 3.1 — Amici
 
-- [/] 3.1.1 **Dev A**: resolver `Friendship` (invio/accetta/rifiuta/rimuovi) — fatta solo lettura `myFriends` (amici ACCEPTED)
-- [/] 3.1.2 **Dev B**: UI lista amici, ricerca per username/email, vista progressi/liste condivise dell'amico — fatta solo la lista amici nella tab Social
+- [x] 3.1.1 **Dev A**: resolver `Friendship` (invio/accetta/rifiuta/rimuovi) + `searchUsers`, `friendRequests`, `friendProfile`
+- [x] 3.1.2 **Dev B**: UI lista amici, ricerca per username/email, vista base profilo amico (liste non nascoste con conteggio item)
 
 #### Test
 

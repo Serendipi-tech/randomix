@@ -7,6 +7,7 @@ import './models/list/index';
 import './models/list/list.queries';
 import './models/friendship/index';
 import './models/friendship/friendship.queries';
+import './models/friendship/friendship.mutations';
 import './models/list/list.mutations';
 import './models/listCategory/index';
 import './models/listCategory/listCategory.queries';

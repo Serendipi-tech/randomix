@@ -1,7 +1,8 @@
-import { useQuery } from '@apollo/client';
-import { FriendshipQueries } from '@randomix/graphql-schema';
+import { useMutation, useQuery } from '@apollo/client';
+import { FriendshipMutations, FriendshipQueries } from '@randomix/graphql-schema';
 
 const { MY_FRIENDS } = FriendshipQueries;
+const { REMOVE_FRIEND } = FriendshipMutations;
 
 export interface Friend {
   id: string;
@@ -24,4 +25,14 @@ export function useMyFriends() {
     error: error ?? null,
     refetch,
   };
+}
+
+export function useRemoveFriend() {
+  const [mutate, { loading, error }] = useMutation(REMOVE_FRIEND, {
+    refetchQueries: ['MyFriends'],
+  });
+
+  const removeFriend = (userId: string) => mutate({ variables: { userId } });
+
+  return { removeFriend, removing: loading, error: error ?? null };
 }
