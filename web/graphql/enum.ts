@@ -4,7 +4,7 @@ export const RolesEnum = builder.enumType('ROLES', {
   values: ['ADMIN', 'USER'] as const,
 });
 
-builder.enumType('ROLES_GROUP', {
+export const RolesGroupEnum = builder.enumType('ROLES_GROUP', {
   values: ['OWNER', 'ADMIN', 'AUTO_CONTRIBUTOR', 'CONTRIBUTOR', 'MEMBER'] as const,
 });
 

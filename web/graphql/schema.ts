@@ -20,6 +20,9 @@ import './models/rating/index';
 import './models/rating/rating.mutations';
 import './models/randomizer/randomizer.queries';
 import './models/randomizer/randomizer.mutations';
+import './models/group/index';
+import './models/group/group.queries';
+import './models/group/group.mutations';
 
 builder.queryType({});
 builder.mutationType({});

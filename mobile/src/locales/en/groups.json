@@ -1,0 +1,62 @@
+{
+  "title": "Groups",
+  "empty": {
+    "title": "No groups yet",
+    "subtitle": "Create a group or wait for a friend to invite you"
+  },
+  "error": "Failed to load groups",
+  "create": "New group",
+  "createModal": {
+    "title": "New group",
+    "namePlaceholder": "Group name",
+    "descriptionPlaceholder": "Description (optional)",
+    "submit": "Create",
+    "cancel": "Cancel",
+    "nameRequired": "Group name is required"
+  },
+  "invites": {
+    "title": "Pending invites",
+    "from": "from {{sender}}",
+    "accept": "Accept",
+    "reject": "Reject"
+  },
+  "detail": {
+    "members": "Members",
+    "lists": "Group lists",
+    "invite": "Invite",
+    "createList": "New list",
+    "leave": "Leave group",
+    "leaveConfirmTitle": "Leave group",
+    "leaveConfirmMessage": "Are you sure you want to leave this group?",
+    "delete": "Delete group",
+    "deleteConfirmTitle": "Delete group",
+    "deleteConfirmMessage": "This action is irreversible. The group and all its data will be deleted.",
+    "error": "Failed to load group",
+    "inviteTitle": "Invite a friend",
+    "noFriends": "No friends to invite"
+  },
+  "member": {
+    "roles": {
+      "OWNER": "Owner",
+      "ADMIN": "Admin",
+      "CONTRIBUTOR": "Contributor",
+      "AUTO_CONTRIBUTOR": "Auto-contributor",
+      "MEMBER": "Member"
+    },
+    "remove": "Remove",
+    "removeConfirmTitle": "Remove member",
+    "removeConfirmMessage": "Remove this member from the group?"
+  },
+  "groupList": {
+    "memberListCount_one": "{{count}} shared list",
+    "memberListCount_other": "{{count}} shared lists",
+    "addMyList": "Share my list",
+    "removeMyList": "Unshare my list",
+    "empty": "No shared lists in this group list",
+    "mergedItems": "Combined items ({{count}})",
+    "draw": "Draw",
+    "regenerate": "Again",
+    "accept": "Accept",
+    "emptyItems": "No items available to draw"
+  }
+}
