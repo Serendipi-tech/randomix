@@ -19,8 +19,8 @@ export const REGISTER_WITH_CREDENTIALS: DocumentNode = parse(`
 `);
 
 export const LOGIN_WITH_CREDENTIALS: DocumentNode = parse(`
-  mutation LoginWithCredentials($email: String!, $password: String!) {
-    loginWithCredentials(email: $email, password: $password) {
+  mutation LoginWithCredentials($identifier: String!, $password: String!) {
+    loginWithCredentials(identifier: $identifier, password: $password) {
       accessToken
       refreshToken
       user {

@@ -5,6 +5,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Accent, BottomTabInset, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { AuthBackgroundView } from '@/components/molecules/auth-background';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ListCard } from '@/components/molecules/list-card';
 import { useMyLists } from '@/utils/useLists';
@@ -23,7 +24,8 @@ export default function HomeScreen() {
   const showSkeleton = loading && lists.length === 0;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <AuthBackgroundView colorScheme={colorScheme} />
       <View style={styles.titleBar}>
         <Text style={[styles.title, { color: colors.text }]}>{t('title')}</Text>
         <Pressable

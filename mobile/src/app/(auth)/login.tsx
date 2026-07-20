@@ -68,8 +68,8 @@ export default function AuthScreen() {
         return (
           <AuthLoginFace
             colorScheme={colorScheme}
-            email={forms.loginEmail}
-            onEmailChange={forms.setLoginEmail}
+            identifier={forms.loginIdentifier}
+            onIdentifierChange={forms.setLoginIdentifier}
             password={forms.loginPassword}
             onPasswordChange={forms.setLoginPassword}
             error={forms.loginError}

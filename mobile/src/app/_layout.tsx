@@ -34,12 +34,6 @@ export default function RootLayout() {
           return;
         }
 
-        const hasConsent = await tokenStorage.hasEmailConsent();
-        if (!hasConsent) {
-          router.replace('/(onboarding)/consent');
-          return;
-        }
-
         router.replace('/(app)');
       } finally {
         SplashScreen.hideAsync();
@@ -57,7 +51,6 @@ export default function RootLayout() {
         <AuthIntroReplayProvider>
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(onboarding)" />
             <Stack.Screen name="(app)" />
           </Stack>
           <GlobalDevOverlay />

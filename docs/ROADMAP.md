@@ -2,6 +2,11 @@
 
 Agile, no server dedicato. 2 persone in parallelo — dove possibile, split web/backend vs mobile/UI per non bloccarsi a vicenda.
 
+
+# EXTRA TEST DA FARE
+- [ ] Login con username.
+
+
 ## Fase 0 — Setup (insieme)
 
 `web/` e `mobile/` sono vuote (nessun package.json, nessuna dipendenza) — si parte da zero.

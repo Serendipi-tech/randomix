@@ -4,7 +4,6 @@ import { Platform } from 'react-native';
 const KEYS = {
   ACCESS_TOKEN: 'randomix_access_token',
   REFRESH_TOKEN: 'randomix_refresh_token',
-  EMAIL_CONSENT: 'randomix_email_consent',
 } as const;
 
 const isWeb = Platform.OS === 'web';
@@ -47,12 +46,5 @@ export const tokenStorage = {
   clearTokens: async () => {
     _cachedToken = null;
     await Promise.all([store.delete(KEYS.ACCESS_TOKEN), store.delete(KEYS.REFRESH_TOKEN)]);
-  },
-
-  setEmailConsent: (value: boolean) => store.set(KEYS.EMAIL_CONSENT, String(value)),
-
-  hasEmailConsent: async (): Promise<boolean> => {
-    const value = await store.get(KEYS.EMAIL_CONSENT);
-    return value !== null;
   },
 };

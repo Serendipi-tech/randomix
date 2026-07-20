@@ -47,11 +47,13 @@ builder.mutationField('loginWithCredentials', (t) =>
   t.field({
     type: AuthPayloadRef,
     args: {
-      email: t.arg.string({ required: true }),
+      identifier: t.arg.string({ required: true }),
       password: t.arg.string({ required: true }),
     },
-    resolve: async (_root, { email, password }) => {
-      const user = await prisma.user.findUnique({ where: { email } });
+    resolve: async (_root, { identifier, password }) => {
+      const user = await prisma.user.findFirst({
+        where: { OR: [{ email: identifier }, { username: identifier }] },
+      });
       if (!user?.passwordHash) {
         throw new GraphQLError('Invalid credentials.', { extensions: { code: 'INVALID_CREDENTIALS' } });
       }

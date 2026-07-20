@@ -49,12 +49,11 @@ export function useAuth() {
 
   const afterAuth = async (accessToken: string, refreshToken: string) => {
     await tokenStorage.saveTokens(accessToken, refreshToken);
-    const hasConsent = await tokenStorage.hasEmailConsent();
-    router.replace(hasConsent ? '/(app)' : '/(onboarding)/consent');
+    router.replace('/(app)');
   };
 
-  const loginWithCredentials = async (email: string, password: string) => {
-    const { data } = await loginCredentialsMutation({ variables: { email, password } });
+  const loginWithCredentials = async (identifier: string, password: string) => {
+    const { data } = await loginCredentialsMutation({ variables: { identifier, password } });
     if (!data?.loginWithCredentials) return;
     await afterAuth(data.loginWithCredentials.accessToken, data.loginWithCredentials.refreshToken);
   };

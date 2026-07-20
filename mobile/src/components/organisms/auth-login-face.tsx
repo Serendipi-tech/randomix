@@ -8,8 +8,8 @@ import { Accent, AuthCardSurface } from '@/constants/theme';
 
 type AuthLoginFaceProps = {
   colorScheme: 'light' | 'dark';
-  email: string;
-  onEmailChange: (value: string) => void;
+  identifier: string;
+  onIdentifierChange: (value: string) => void;
   password: string;
   onPasswordChange: (value: string) => void;
   error: string | null;
@@ -24,8 +24,8 @@ type AuthLoginFaceProps = {
 /** Faccia "login" della card: credenziali + accesso Google. */
 export function AuthLoginFace({
   colorScheme,
-  email,
-  onEmailChange,
+  identifier,
+  onIdentifierChange,
   password,
   onPasswordChange,
   error,
@@ -43,11 +43,10 @@ export function AuthLoginFace({
     <View style={styles.form}>
       <AuthInput
         colorScheme={colorScheme}
-        placeholder={t('login.emailPlaceholder')}
+        placeholder={t('login.identifierPlaceholder')}
         autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={onEmailChange}
+        value={identifier}
+        onChangeText={onIdentifierChange}
       />
       <AuthInput
         colorScheme={colorScheme}

@@ -7,7 +7,7 @@ export function useAuthForms() {
   const { t } = useTranslation('auth');
   const { loginWithCredentials, loginWithGoogle, registerWithCredentials, loading } = useAuth();
 
-  const [loginEmail, setLoginEmail] = useState('');
+  const [loginIdentifier, setLoginIdentifier] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
 
@@ -19,12 +19,12 @@ export function useAuthForms() {
 
   const submitLogin = async () => {
     setLoginError(null);
-    if (!loginEmail.trim() || !loginPassword) {
+    if (!loginIdentifier.trim() || !loginPassword) {
       setLoginError(t('login.missingFields'));
       return;
     }
     try {
-      await loginWithCredentials(loginEmail.trim(), loginPassword);
+      await loginWithCredentials(loginIdentifier.trim(), loginPassword);
     } catch (e) {
       setLoginError(getAuthErrorMessage(e, t));
     }
@@ -70,8 +70,8 @@ export function useAuthForms() {
   };
 
   return {
-    loginEmail,
-    setLoginEmail,
+    loginIdentifier,
+    setLoginIdentifier,
     loginPassword,
     setLoginPassword,
     loginError,

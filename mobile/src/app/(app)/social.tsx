@@ -5,6 +5,7 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { AuthBackgroundView } from '@/components/molecules/auth-background';
 import { AuthButton } from '@/components/atoms/auth-button';
 import { AuthInput } from '@/components/atoms/auth-input';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
@@ -71,7 +72,8 @@ export default function SocialScreen() {
   const showFriendsSkeleton = loadingFriends && friends.length === 0;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <AuthBackgroundView colorScheme={colorScheme} />
       <FlatList
         data={showFriendsSkeleton ? [] : friends}
         keyExtractor={(item) => item.id}
