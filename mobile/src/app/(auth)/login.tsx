@@ -3,14 +3,14 @@ import { useEffect } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated from 'react-native-reanimated';
-import { AuthBackground } from '@/constants/theme';
+import { GradientBackground } from '@/constants/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { useAuthIntroReplay } from '@/utils/useAuthIntroReplay';
 import { useAuthForms } from '@/utils/useAuthForms';
 import { usePasswordRecoveryForm, type RecoveryStep } from '@/utils/usePasswordRecoveryForm';
 import { useAuthIntro } from '@/utils/useAuthIntro';
 import { useCardFlip, type AuthCardFace } from '@/utils/useCardFlip';
-import { AuthBackgroundView } from '@/components/molecules/auth-background';
+import { GradientBackgroundView } from '@/components/molecules/gradient-background';
 import { DiceLogo } from '@/components/molecules/dice-logo';
 import { FlippableAuthCard } from '@/components/molecules/flippable-auth-card';
 import { AuthStandardFace } from '@/components/organisms/auth-standard-face';
@@ -124,8 +124,8 @@ export default function AuthScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: AuthBackground[colorScheme].stops[0] }]}>
-      <AuthBackgroundView colorScheme={colorScheme} />
+    <SafeAreaView style={[styles.safe, { backgroundColor: GradientBackground[colorScheme].stops[0] }]}>
+      <GradientBackgroundView colorScheme={colorScheme} />
 
       <KeyboardAvoidingView style={styles.inner} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={styles.diceZone}>

@@ -62,11 +62,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontFamily: 'Fredoka_700Bold',
   },
   message: {
     fontSize: 15,
-    fontFamily: 'Nunito_500Medium',
     marginBottom: 8,
   },
   confirmButton: {
@@ -78,7 +76,6 @@ const styles = StyleSheet.create({
   confirmLabel: {
     fontSize: 16,
     color: '#fff',
-    fontFamily: 'Fredoka_600SemiBold',
   },
   cancelButton: {
     borderRadius: 18,
@@ -87,6 +84,5 @@ const styles = StyleSheet.create({
   },
   cancelLabel: {
     fontSize: 16,
-    fontFamily: 'Fredoka_600SemiBold',
   },
 });

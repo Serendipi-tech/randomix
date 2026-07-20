@@ -1,20 +1,21 @@
 import type { PropsWithChildren } from 'react';
 import { StyleSheet, View, type ViewStyle } from 'react-native';
-import { AuthCardSurface } from '@/constants/theme';
+import { CardSurface } from '@/constants/theme';
 
-type AuthCardProps = PropsWithChildren<{
+type CardProps = PropsWithChildren<{
   colorScheme: 'light' | 'dark';
   style?: ViewStyle;
 }>;
 
 /** Variante web: backdrop-filter CSS puro, senza il wash bianco/nero che expo-blur applica di suo sul web
- *  (schiarirebbe qualunque tinta ci mettessimo sopra). Il colore è interamente quello di AuthCardSurface. */
-export function AuthCard({ colorScheme, style, children }: AuthCardProps) {
-  const surface = AuthCardSurface[colorScheme];
+ *  (schiarirebbe qualunque tinta ci mettessimo sopra). Il colore è interamente quello di CardSurface. */
+export function Card({ colorScheme, style, children }: CardProps) {
+  const surface = CardSurface[colorScheme];
 
   return (
     <View style={[styles.shadowWrapper, style]}>
-      <View style={[styles.clip, { backgroundColor: surface.fill, borderColor: surface.border }, glassStyle]}>
+      <View style={[styles.clip, { borderColor: surface.border }]}>
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: surface.fill }, glassStyle]} />
         {children}
       </View>
     </View>

@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { AuthButton } from '@/components/atoms/auth-button';
-import { AuthDivider } from '@/components/atoms/auth-divider';
-import { AuthInput } from '@/components/atoms/auth-input';
+import { Button } from '@/components/atoms/button';
+import { Divider } from '@/components/atoms/divider';
+import { Input } from '@/components/atoms/input';
 import { Pressable } from 'react-native';
-import { Accent, AuthCardSurface } from '@/constants/theme';
+import { Accent, CardSurface } from '@/constants/theme';
 
 type AuthLoginFaceProps = {
   colorScheme: 'light' | 'dark';
@@ -37,18 +37,18 @@ export function AuthLoginFace({
   onBack,
 }: AuthLoginFaceProps) {
   const { t } = useTranslation('auth');
-  const textColor = AuthCardSurface[colorScheme].text;
+  const textColor = CardSurface[colorScheme].text;
 
   return (
     <View style={styles.form}>
-      <AuthInput
+      <Input
         colorScheme={colorScheme}
         placeholder={t('login.identifierPlaceholder')}
         autoCapitalize="none"
         value={identifier}
         onChangeText={onIdentifierChange}
       />
-      <AuthInput
+      <Input
         colorScheme={colorScheme}
         placeholder={t('login.passwordPlaceholder')}
         secureTextEntry
@@ -62,11 +62,11 @@ export function AuthLoginFace({
 
       {error && <Text style={styles.error}>{error}</Text>}
 
-      <AuthButton colorScheme={colorScheme} label={t('login.submit')} onPress={onSubmit} loading={loading} />
+      <Button colorScheme={colorScheme} label={t('login.submit')} onPress={onSubmit} loading={loading} />
 
-      <AuthDivider label={t('login.or')} colorScheme={colorScheme} />
+      <Divider label={t('login.or')} colorScheme={colorScheme} />
 
-      <AuthButton
+      <Button
         colorScheme={colorScheme}
         variant="secondary"
         label={t('login.google')}
@@ -88,9 +88,9 @@ export function AuthLoginFace({
 const styles = StyleSheet.create({
   form: { gap: 12 },
   forgotPassword: { alignSelf: 'flex-end', marginTop: -4 },
-  forgotPasswordText: { fontSize: 13, color: Accent.primary, fontFamily: 'Nunito_500Medium' },
-  error: { fontSize: 14, color: '#E53E3E', textAlign: 'center', fontFamily: 'Nunito_500Medium' },
+  forgotPasswordText: { fontSize: 13, color: Accent.primary },
+  error: { fontSize: 14, color: '#E53E3E', textAlign: 'center' },
   link: { alignItems: 'center', marginTop: 8 },
-  linkText: { fontSize: 14, color: Accent.primary, fontFamily: 'Nunito_500Medium' },
-  backText: { fontSize: 13, opacity: 0.6, fontFamily: 'Nunito_500Medium' },
+  linkText: { fontSize: 14, color: Accent.primary },
+  backText: { fontSize: 13, opacity: 0.6 },
 });

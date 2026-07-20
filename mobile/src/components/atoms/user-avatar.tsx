@@ -36,6 +36,5 @@ const styles = StyleSheet.create({
   },
   initial: {
     color: '#fff',
-    fontFamily: 'Fredoka_700Bold',
   },
 });

@@ -1,18 +1,18 @@
 import { BlurView } from 'expo-blur';
 import type { PropsWithChildren } from 'react';
 import { StyleSheet, View, type ViewStyle } from 'react-native';
-import { AuthCardSurface } from '@/constants/theme';
+import { CardSurface } from '@/constants/theme';
 
-type AuthCardProps = PropsWithChildren<{
+type CardProps = PropsWithChildren<{
   colorScheme: 'light' | 'dark';
   style?: ViewStyle;
 }>;
 
-/** Card glass sopra l'AuthBackground: blur + tinta semi-trasparente, con ombra sul contenitore esterno.
+/** Card glass riusabile: blur + tinta semi-trasparente, con ombra sul contenitore esterno.
  *  Il wrapper esterno resta trasparente apposta: un backgroundColor lì dietro verrebbe sfocato dal
  *  BlurView al posto dello sfondo vero, e il vetro sparirebbe in una tinta piatta. */
-export function AuthCard({ colorScheme, style, children }: AuthCardProps) {
-  const surface = AuthCardSurface[colorScheme];
+export function Card({ colorScheme, style, children }: CardProps) {
+  const surface = CardSurface[colorScheme];
 
   return (
     <View style={[styles.shadowWrapper, style]}>

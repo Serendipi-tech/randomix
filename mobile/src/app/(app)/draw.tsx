@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 import { Accent, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { AuthButton } from '@/components/atoms/auth-button';
+import { Button } from '@/components/atoms/button';
 import { StickerShape } from '@/components/atoms/sticker-shape';
 import { useListDraw } from '@/utils/useListDraw';
 import type { ListItemEntry } from '@/utils/useListDetail';
@@ -105,21 +105,21 @@ export default function DrawScreen() {
 
       <View style={styles.actions}>
         {accepted ? (
-          <AuthButton
+          <Button
             colorScheme={colorScheme}
             label={t('draw.backToList')}
             onPress={() => router.back()}
           />
         ) : (
           <>
-            <AuthButton
+            <Button
               colorScheme={colorScheme}
               label={t('draw.accept')}
               onPress={handleAccept}
               loading={accepting}
               disabled={!entry || drawing}
             />
-            <AuthButton
+            <Button
               colorScheme={colorScheme}
               variant="secondary"
               label={t('draw.regenerate')}
@@ -145,11 +145,9 @@ const styles = StyleSheet.create({
   },
   back: {
     fontSize: 15,
-    fontFamily: 'Nunito_500Medium',
   },
   title: {
     fontSize: 26,
-    fontFamily: 'Fredoka_700Bold',
   },
   center: {
     flex: 1,
@@ -188,13 +186,11 @@ const styles = StyleSheet.create({
   categoryLabel: {
     fontSize: 12,
     color: '#fff',
-    fontFamily: 'Nunito_700Bold',
   },
   itemName: {
     fontSize: 28,
     color: '#fff',
     textAlign: 'center',
-    fontFamily: 'Fredoka_700Bold',
   },
   ratingText: {
     fontSize: 20,
@@ -215,17 +211,14 @@ const styles = StyleSheet.create({
   tagLabel: {
     fontSize: 12,
     color: '#fff',
-    fontFamily: 'Nunito_700Bold',
   },
   acceptedText: {
     fontSize: 16,
     color: '#fff',
-    fontFamily: 'Fredoka_600SemiBold',
   },
   errorTitle: {
     fontSize: 16,
     textAlign: 'center',
-    fontFamily: 'Nunito_500Medium',
   },
   actions: {
     padding: Spacing.four,

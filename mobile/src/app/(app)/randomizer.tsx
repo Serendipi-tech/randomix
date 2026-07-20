@@ -5,8 +5,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Accent, Colors, DiceShading, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { AuthButton } from '@/components/atoms/auth-button';
-import { AuthInput } from '@/components/atoms/auth-input';
+import { Button } from '@/components/atoms/button';
+import { Input } from '@/components/atoms/input';
 import { SelectableChip } from '@/components/atoms/selectable-chip';
 import { useRandomizer } from '@/utils/useRandomizer';
 
@@ -100,7 +100,7 @@ export default function RandomizerScreen() {
         <View style={styles.inputRow}>
           {mode === 'numbers' && (
             <>
-              <AuthInput
+              <Input
                 colorScheme={colorScheme}
                 placeholder={t('minPlaceholder')}
                 keyboardType="number-pad"
@@ -108,7 +108,7 @@ export default function RandomizerScreen() {
                 onChangeText={setMin}
                 style={styles.inputFlex}
               />
-              <AuthInput
+              <Input
                 colorScheme={colorScheme}
                 placeholder={t('maxPlaceholder')}
                 keyboardType="number-pad"
@@ -119,7 +119,7 @@ export default function RandomizerScreen() {
             </>
           )}
           {mode === 'dice' && (
-            <AuthInput
+            <Input
               colorScheme={colorScheme}
               placeholder={t('facesPlaceholder')}
               keyboardType="number-pad"
@@ -128,7 +128,7 @@ export default function RandomizerScreen() {
               style={styles.inputFlex}
             />
           )}
-          <AuthInput
+          <Input
             colorScheme={colorScheme}
             placeholder={t('countPlaceholder')}
             keyboardType="number-pad"
@@ -140,7 +140,7 @@ export default function RandomizerScreen() {
 
         {displayError && <Text style={styles.error}>{displayError}</Text>}
 
-        <AuthButton
+        <Button
           colorScheme={colorScheme}
           label={t('generate')}
           onPress={generate}
@@ -202,11 +202,9 @@ const styles = StyleSheet.create({
   },
   back: {
     fontSize: 15,
-    fontFamily: 'Nunito_500Medium',
   },
   title: {
     fontSize: 26,
-    fontFamily: 'Fredoka_700Bold',
   },
   chipWrap: {
     flexDirection: 'row',
@@ -226,7 +224,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#E53E3E',
     textAlign: 'center',
-    fontFamily: 'Nunito_500Medium',
   },
   resultWrap: {
     flexDirection: 'row',
@@ -249,7 +246,6 @@ const styles = StyleSheet.create({
   resultText: {
     fontSize: 24,
     color: '#fff',
-    fontFamily: 'Fredoka_700Bold',
   },
   // faccia di dado: stessi token pseudo-3D del logo
   diceFace: {
@@ -270,7 +266,6 @@ const styles = StyleSheet.create({
   diceText: {
     fontSize: 24,
     color: DiceShading.pip,
-    fontFamily: 'Fredoka_700Bold',
   },
   colorResult: {
     alignItems: 'center',
@@ -288,11 +283,9 @@ const styles = StyleSheet.create({
   },
   colorHex: {
     fontSize: 14,
-    fontFamily: 'Nunito_500Medium',
   },
   total: {
     fontSize: 16,
     textAlign: 'center',
-    fontFamily: 'Nunito_700Bold',
   },
 });

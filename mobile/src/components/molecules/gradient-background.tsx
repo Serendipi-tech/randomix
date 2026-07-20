@@ -1,17 +1,17 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, View } from 'react-native';
-import { AuthBackground, AuthGlow } from '@/constants/theme';
+import { GradientBackground, GradientGlow } from '@/constants/theme';
 
-type AuthBackgroundProps = {
+type GradientBackgroundViewProps = {
   colorScheme: 'light' | 'dark';
 };
 
 const GLOW_SIZE = 260;
 
-/** Sfondo pieno a gradiente multi-tono con macchie di luce, per dare profondità senza illustrazioni. */
-export function AuthBackgroundView({ colorScheme }: AuthBackgroundProps) {
-  const { stops } = AuthBackground[colorScheme];
-  const glows = AuthGlow[colorScheme];
+/** Sfondo pieno a gradiente multi-tono con macchie di luce, riusato su più schermate per dare profondità senza illustrazioni. */
+export function GradientBackgroundView({ colorScheme }: GradientBackgroundViewProps) {
+  const { stops } = GradientBackground[colorScheme];
+  const glows = GradientGlow[colorScheme];
 
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>

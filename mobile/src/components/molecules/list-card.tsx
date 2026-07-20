@@ -74,14 +74,11 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 17,
-    fontFamily: 'Fredoka_700Bold',
   },
   description: {
     fontSize: 14,
-    fontFamily: 'Nunito_500Medium',
   },
   chevron: {
     fontSize: 24,
-    fontFamily: 'Fredoka_600SemiBold',
   },
 });

@@ -1,8 +1,8 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { AuthButtonPrimary, AuthButtonSecondary } from '@/constants/theme';
+import { ButtonPrimary, ButtonSecondary } from '@/constants/theme';
 
-type AuthButtonProps = {
+type ButtonProps = {
   label: string;
   onPress: () => void;
   variant?: 'primary' | 'secondary';
@@ -12,24 +12,25 @@ type AuthButtonProps = {
 };
 
 /** Bottone piatto a un colore: pieno per l'azione primaria, outline sullo stesso colore per la secondaria. */
-export function AuthButton({
+export function Button({
   label,
   onPress,
   variant = 'primary',
   loading = false,
   disabled = false,
   colorScheme,
-}: AuthButtonProps) {
+}: ButtonProps) {
   const isDisabled = disabled || loading;
   const pressed = useSharedValue(0);
 
+  // Nessun transform a riposo: altrimenti il layer composito sfoca il testo su web (stesso motivo di useCardFlip).
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: 1 - pressed.value * 0.15,
-    transform: [{ scale: 1 - pressed.value * 0.03 }],
+    transform: pressed.value === 0 ? [] : [{ scale: 1 - pressed.value * 0.03 }],
   }));
 
   if (variant === 'secondary') {
-    const outline = AuthButtonSecondary[colorScheme];
+    const outline = ButtonSecondary[colorScheme];
     return (
       <Animated.View style={animatedStyle}>
         <Pressable
@@ -52,16 +53,16 @@ export function AuthButton({
   return (
     <Animated.View style={animatedStyle}>
       <Pressable
-        style={[styles.button, styles.filled, { backgroundColor: AuthButtonPrimary.fill }, isDisabled && styles.disabled]}
+        style={[styles.button, styles.filled, isDisabled && styles.disabled]}
         onPress={onPress}
         onPressIn={() => (pressed.value = withTiming(1, { duration: 100 }))}
         onPressOut={() => (pressed.value = withTiming(0, { duration: 150 }))}
         disabled={isDisabled}
       >
         {loading ? (
-          <ActivityIndicator color={AuthButtonPrimary.text} />
+          <ActivityIndicator color={ButtonPrimary.text} />
         ) : (
-          <Text style={[styles.label, { color: AuthButtonPrimary.text }]}>{label}</Text>
+          <Text style={[styles.label, { color: ButtonPrimary.text }]}>{label}</Text>
         )}
       </Pressable>
     </Animated.View>
@@ -75,7 +76,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filled: {
-    boxShadow: '0px 6px 16px rgba(124,92,252,0.35)',
+    backgroundColor: ButtonPrimary.fill,
+    // niente gradiente/overflow: un layer semi-trasparente/tagliato in meno dentro la card con backdrop-filter
+    boxShadow: '0px 8px 14px rgba(124,92,252,0.3)',
   },
   outline: {
     borderWidth: 1.5,
@@ -86,6 +89,5 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontFamily: 'Fredoka_600SemiBold',
   },
 });

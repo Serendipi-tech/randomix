@@ -5,8 +5,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Accent, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { AuthButton } from '@/components/atoms/auth-button';
-import { AuthInput } from '@/components/atoms/auth-input';
+import { Button } from '@/components/atoms/button';
+import { Input } from '@/components/atoms/input';
 import { SelectableChip } from '@/components/atoms/selectable-chip';
 import { StarRating } from '@/components/atoms/star-rating';
 import { useItemMutations } from '@/utils/useItemMutations';
@@ -127,7 +127,7 @@ export default function ItemFormScreen() {
         {isEdit ? (
           <Text style={[styles.itemName, { color: colors.text }]}>{name}</Text>
         ) : (
-          <AuthInput
+          <Input
             colorScheme={colorScheme}
             placeholder={t('itemForm.namePlaceholder')}
             value={name}
@@ -154,14 +154,14 @@ export default function ItemFormScreen() {
           </>
         )}
 
-        <AuthInput
+        <Input
           colorScheme={colorScheme}
           placeholder={t('itemForm.descriptionPlaceholder')}
           value={description}
           onChangeText={setDescription}
           multiline
         />
-        <AuthInput
+        <Input
           colorScheme={colorScheme}
           placeholder={t('itemForm.notePlaceholder')}
           value={note}
@@ -191,7 +191,7 @@ export default function ItemFormScreen() {
             </Text>
             <StarRating value={ratingValue} onChange={setRatingValue} colorScheme={colorScheme} />
             {ratingValue > 0 && (
-              <AuthInput
+              <Input
                 colorScheme={colorScheme}
                 placeholder={t('itemForm.ratingNotePlaceholder')}
                 value={ratingNote}
@@ -217,7 +217,7 @@ export default function ItemFormScreen() {
               </View>
             )}
             <View style={styles.newTagRow}>
-              <AuthInput
+              <Input
                 colorScheme={colorScheme}
                 placeholder={t('itemForm.newTagPlaceholder')}
                 value={newTagName}
@@ -236,7 +236,7 @@ export default function ItemFormScreen() {
 
         {displayError && <Text style={styles.error}>{displayError}</Text>}
 
-        <AuthButton
+        <Button
           colorScheme={colorScheme}
           label={isEdit ? t('itemForm.save') : t('itemForm.add')}
           onPress={save}
@@ -260,19 +260,15 @@ const styles = StyleSheet.create({
   },
   back: {
     fontSize: 15,
-    fontFamily: 'Nunito_500Medium',
   },
   title: {
     fontSize: 26,
-    fontFamily: 'Fredoka_700Bold',
   },
   itemName: {
     fontSize: 20,
-    fontFamily: 'Fredoka_600SemiBold',
   },
   sectionLabel: {
     fontSize: 16,
-    fontFamily: 'Fredoka_600SemiBold',
   },
   chipWrap: {
     flexDirection: 'row',
@@ -296,7 +292,6 @@ const styles = StyleSheet.create({
   addTagLabel: {
     fontSize: 14,
     color: '#fff',
-    fontFamily: 'Fredoka_600SemiBold',
   },
   disabled: {
     opacity: 0.5,
@@ -305,6 +300,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#E53E3E',
     textAlign: 'center',
-    fontFamily: 'Nunito_500Medium',
   },
 });

@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { AuthButton } from '@/components/atoms/auth-button';
-import { AuthInput } from '@/components/atoms/auth-input';
-import { AuthCardSurface } from '@/constants/theme';
+import { Button } from '@/components/atoms/button';
+import { Input } from '@/components/atoms/input';
+import { CardSurface } from '@/constants/theme';
 import type { RecoveryStep } from '@/utils/usePasswordRecoveryForm';
 
 type AuthRecoverFaceProps = {
@@ -42,13 +42,13 @@ export function AuthRecoverFace({
   onBack,
 }: AuthRecoverFaceProps) {
   const { t } = useTranslation('auth');
-  const textColor = AuthCardSurface[colorScheme].text;
+  const textColor = CardSurface[colorScheme].text;
 
   if (step === 'request') {
     return (
       <View style={styles.form}>
         <Text style={[styles.tagline, { color: textColor }]}>{t('forgotPassword.tagline')}</Text>
-        <AuthInput
+        <Input
           colorScheme={colorScheme}
           placeholder={t('forgotPassword.emailPlaceholder')}
           autoCapitalize="none"
@@ -59,7 +59,7 @@ export function AuthRecoverFace({
 
         {error && <Text style={styles.error}>{error}</Text>}
 
-        <AuthButton
+        <Button
           colorScheme={colorScheme}
           label={t('forgotPassword.submit')}
           onPress={onSubmitRequest}
@@ -76,7 +76,7 @@ export function AuthRecoverFace({
   return (
     <View style={styles.form}>
       <Text style={[styles.tagline, { color: textColor }]}>{t('resetPassword.tagline')}</Text>
-      <AuthInput
+      <Input
         colorScheme={colorScheme}
         placeholder={t('resetPassword.otpPlaceholder')}
         keyboardType="number-pad"
@@ -84,14 +84,14 @@ export function AuthRecoverFace({
         value={otp}
         onChangeText={onOtpChange}
       />
-      <AuthInput
+      <Input
         colorScheme={colorScheme}
         placeholder={t('resetPassword.newPasswordPlaceholder')}
         secureTextEntry
         value={newPassword}
         onChangeText={onNewPasswordChange}
       />
-      <AuthInput
+      <Input
         colorScheme={colorScheme}
         placeholder={t('resetPassword.confirmPasswordPlaceholder')}
         secureTextEntry
@@ -101,7 +101,7 @@ export function AuthRecoverFace({
 
       {error && <Text style={styles.error}>{error}</Text>}
 
-      <AuthButton
+      <Button
         colorScheme={colorScheme}
         label={t('resetPassword.submit')}
         onPress={onSubmitConfirm}
@@ -117,8 +117,8 @@ export function AuthRecoverFace({
 
 const styles = StyleSheet.create({
   form: { gap: 12 },
-  tagline: { fontSize: 14, textAlign: 'center', fontFamily: 'Nunito_500Medium', opacity: 0.75 },
-  error: { fontSize: 14, color: '#E53E3E', textAlign: 'center', fontFamily: 'Nunito_500Medium' },
+  tagline: { fontSize: 14, textAlign: 'center', opacity: 0.75 },
+  error: { fontSize: 14, color: '#E53E3E', textAlign: 'center' },
   link: { alignItems: 'center', marginTop: 8 },
-  backText: { fontSize: 13, opacity: 0.6, fontFamily: 'Nunito_500Medium' },
+  backText: { fontSize: 13, opacity: 0.6 },
 });

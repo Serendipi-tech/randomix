@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
     borderColor: Accent.violet,
   },
   label: {
-    fontSize: 14,
-    fontFamily: 'Nunito_500Medium',
+    fontSize: 14,
   },
 });

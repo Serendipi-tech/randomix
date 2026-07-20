@@ -62,8 +62,7 @@ const styles = StyleSheet.create({
   },
   username: {
     flex: 1,
-    fontSize: 16,
-    fontFamily: 'Nunito_500Medium',
+    fontSize: 16,
   },
   actionButton: {
     width: 34,
@@ -74,11 +73,9 @@ const styles = StyleSheet.create({
   },
   acceptGlyph: {
     fontSize: 16,
-    color: '#fff',
-    fontFamily: 'Nunito_700Bold',
+    color: '#fff',
   },
   rejectGlyph: {
-    fontSize: 14,
-    fontFamily: 'Nunito_700Bold',
+    fontSize: 14,
   },
 });

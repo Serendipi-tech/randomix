@@ -5,7 +5,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Accent, BottomTabInset, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { AuthBackgroundView } from '@/components/molecules/auth-background';
+import { GradientBackgroundView } from '@/components/molecules/gradient-background';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ListCard } from '@/components/molecules/list-card';
 import { useMyLists } from '@/utils/useLists';
@@ -25,7 +25,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <AuthBackgroundView colorScheme={colorScheme} />
+      <GradientBackgroundView colorScheme={colorScheme} />
       <View style={styles.titleBar}>
         <Text style={[styles.title, { color: colors.text }]}>{t('title')}</Text>
         <Pressable
@@ -107,7 +107,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: 'Fredoka_700Bold',
   },
   addButton: {
     paddingVertical: 8,
@@ -118,7 +117,6 @@ const styles = StyleSheet.create({
   addLabel: {
     fontSize: 14,
     color: '#fff',
-    fontFamily: 'Fredoka_600SemiBold',
   },
   randomizerCard: {
     marginHorizontal: Spacing.four,
@@ -145,17 +143,14 @@ const styles = StyleSheet.create({
   randomizerTitle: {
     fontSize: 18,
     color: '#fff',
-    fontFamily: 'Fredoka_700Bold',
   },
   randomizerSubtitle: {
     fontSize: 14,
     color: 'rgba(255,255,255,0.85)',
-    fontFamily: 'Nunito_500Medium',
   },
   randomizerArrow: {
     fontSize: 26,
     color: '#fff',
-    fontFamily: 'Fredoka_600SemiBold',
   },
   listContent: {
     paddingHorizontal: Spacing.four,
@@ -170,12 +165,10 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 18,
-    fontFamily: 'Fredoka_700Bold',
     textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 14,
-    fontFamily: 'Nunito_500Medium',
     textAlign: 'center',
   },
 });

@@ -5,8 +5,8 @@ import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-nat
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Accent, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { AuthButton } from '@/components/atoms/auth-button';
-import { AuthInput } from '@/components/atoms/auth-input';
+import { Button } from '@/components/atoms/button';
+import { Input } from '@/components/atoms/input';
 import { ColorPickerRow } from '@/components/atoms/color-picker-row';
 import { SelectableChip } from '@/components/atoms/selectable-chip';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
@@ -102,19 +102,19 @@ export default function ListFormScreen() {
           </Text>
         </View>
 
-        <AuthInput
+        <Input
           colorScheme={colorScheme}
           placeholder={t('form.namePlaceholder')}
           value={name}
           onChangeText={setName}
         />
-        <AuthInput
+        <Input
           colorScheme={colorScheme}
           placeholder={t('form.iconPlaceholder')}
           value={icon}
           onChangeText={setIcon}
         />
-        <AuthInput
+        <Input
           colorScheme={colorScheme}
           placeholder={t('form.descriptionPlaceholder')}
           value={description}
@@ -156,7 +156,7 @@ export default function ListFormScreen() {
 
         {displayError && <Text style={styles.error}>{displayError}</Text>}
 
-        <AuthButton
+        <Button
           colorScheme={colorScheme}
           label={isEdit ? t('form.save') : t('form.create')}
           onPress={save}
@@ -164,7 +164,7 @@ export default function ListFormScreen() {
         />
 
         {isEdit && (
-          <AuthButton
+          <Button
             colorScheme={colorScheme}
             variant="secondary"
             label={t('form.delete')}
@@ -201,15 +201,12 @@ const styles = StyleSheet.create({
   },
   back: {
     fontSize: 15,
-    fontFamily: 'Nunito_500Medium',
   },
   title: {
     fontSize: 26,
-    fontFamily: 'Fredoka_700Bold',
   },
   sectionLabel: {
     fontSize: 16,
-    fontFamily: 'Fredoka_600SemiBold',
   },
   chipWrap: {
     flexDirection: 'row',
@@ -223,12 +220,10 @@ const styles = StyleSheet.create({
   },
   switchLabel: {
     fontSize: 16,
-    fontFamily: 'Nunito_500Medium',
   },
   error: {
     fontSize: 14,
     color: '#E53E3E',
     textAlign: 'center',
-    fontFamily: 'Nunito_500Medium',
   },
 });

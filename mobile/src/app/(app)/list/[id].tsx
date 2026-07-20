@@ -168,11 +168,9 @@ const styles = StyleSheet.create({
   },
   back: {
     fontSize: 15,
-    fontFamily: 'Nunito_500Medium',
   },
   edit: {
     fontSize: 15,
-    fontFamily: 'Fredoka_600SemiBold',
   },
   content: {
     padding: Spacing.four,
@@ -183,11 +181,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontFamily: 'Fredoka_700Bold',
   },
   description: {
     fontSize: 15,
-    fontFamily: 'Nunito_500Medium',
   },
   itemsBar: {
     flexDirection: 'row',
@@ -197,7 +193,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontFamily: 'Fredoka_700Bold',
   },
   itemsActions: {
     flexDirection: 'row',
@@ -211,7 +206,6 @@ const styles = StyleSheet.create({
   addLabel: {
     fontSize: 14,
     color: '#fff',
-    fontFamily: 'Fredoka_600SemiBold',
   },
   empty: {
     alignItems: 'center',
@@ -221,12 +215,10 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 18,
-    fontFamily: 'Fredoka_700Bold',
     textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 14,
-    fontFamily: 'Nunito_500Medium',
     textAlign: 'center',
   },
 });

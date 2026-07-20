@@ -96,7 +96,6 @@ const styles = StyleSheet.create({
   },
   back: {
     fontSize: 15,
-    fontFamily: 'Nunito_500Medium',
   },
   content: {
     padding: Spacing.four,
@@ -113,11 +112,9 @@ const styles = StyleSheet.create({
   username: {
     flex: 1,
     fontSize: 26,
-    fontFamily: 'Fredoka_700Bold',
   },
   sectionTitle: {
     fontSize: 20,
-    fontFamily: 'Fredoka_700Bold',
     paddingTop: Spacing.three,
   },
   empty: {
@@ -128,7 +125,6 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 18,
-    fontFamily: 'Fredoka_700Bold',
     textAlign: 'center',
   },
 });

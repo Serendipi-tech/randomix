@@ -107,6 +107,5 @@ const styles = StyleSheet.create({
   },
   label: {
     color: '#fff',
-    fontFamily: 'Fredoka_700Bold',
   },
 });

@@ -33,14 +33,14 @@ export const Accent = {
   violet: '#7C5CFC',
 } as const;
 
-/** Sfondo pieno delle schermate di autenticazione: gradiente multi-tono (mai un wash a un colore solo). Pastello in light, stessa famiglia della card in dark. Mai nero/bianco puro. */
-export const AuthBackground = {
+/** Sfondo pieno a gradiente multi-tono (mai un wash a un colore solo), riusato su più schermate dell'app. Pastello in light, stessa famiglia della card in dark. Mai nero/bianco puro. */
+export const GradientBackground = {
   light: { stops: ['#E4D3FF', '#FCD9EC', '#FFE7B8'] },
   dark: { stops: ['#120A26', '#3A1C57', '#5A1E4E'] },
 } as const;
 
-/** Macchie di luce colorata sopra AuthBackground, per dare profondità senza illustrazioni. */
-export const AuthGlow = {
+/** Macchie di luce colorata sopra il GradientBackground, per dare profondità senza illustrazioni. */
+export const GradientGlow = {
   light: [
     { color: Accent.violet, top: -60, left: -60 },
     { color: Accent.coral, bottom: -80, right: -50 },
@@ -51,19 +51,19 @@ export const AuthGlow = {
   ],
 } as const;
 
-/** Superficie glass della card di autenticazione: tinta semi-trasparente sopra il blur, bordo sottile per il bordo "vetro". */
-export const AuthCardSurface = {
+/** Superficie glass della card dell'app: tinta semi-trasparente sopra il blur, bordo sottile per il bordo "vetro". */
+export const CardSurface = {
   light: { fill: 'rgba(124,92,252,0.30)', border: 'rgba(255,255,255,0.5)', text: '#241A3D' },
   dark: { fill: 'rgba(58,28,87,0.58)', border: 'rgba(255,255,255,0.16)', text: '#F3ECFF' },
 } as const;
 
-/** Bottone primario: pillola piena a colore unico. Il secondario è un outline sullo stesso colore, non un altro blocco pieno. */
-export const AuthButtonPrimary = {
+/** Bottone primario dell'app: pillola piena a colore unico. Il secondario è un outline sullo stesso colore, non un altro blocco pieno. */
+export const ButtonPrimary = {
   fill: Accent.violet,
   text: '#FFFFFF',
 } as const;
 
-export const AuthButtonSecondary = {
+export const ButtonSecondary = {
   light: { border: '#241A3D', text: '#241A3D' },
   dark: { border: '#F3ECFF', text: '#F3ECFF' },
 } as const;
@@ -74,8 +74,8 @@ export const AuthTileSurface = {
   dark: { fill: 'rgba(255,255,255,0.07)' },
 } as const;
 
-/** Campo di input sopra la AuthCard: tinta neutra derivata dal colore testo della card. */
-export const AuthInputSurface = {
+/** Campo di input dell'app: tinta neutra derivata dal colore testo della card glass. */
+export const InputSurface = {
   light: { fill: 'rgba(31,27,46,0.06)', placeholder: '#8A8398' },
   dark: { fill: 'rgba(255,255,255,0.08)', placeholder: '#B9AEDC' },
 } as const;

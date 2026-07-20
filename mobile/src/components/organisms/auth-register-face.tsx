@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { AuthButton } from '@/components/atoms/auth-button';
-import { AuthInput } from '@/components/atoms/auth-input';
-import { Accent, AuthCardSurface } from '@/constants/theme';
+import { Button } from '@/components/atoms/button';
+import { Input } from '@/components/atoms/input';
+import { Accent, CardSurface } from '@/constants/theme';
 
 type AuthRegisterFaceProps = {
   colorScheme: 'light' | 'dark';
@@ -39,11 +39,11 @@ export function AuthRegisterFace({
   onBack,
 }: AuthRegisterFaceProps) {
   const { t } = useTranslation('auth');
-  const textColor = AuthCardSurface[colorScheme].text;
+  const textColor = CardSurface[colorScheme].text;
 
   return (
     <View style={styles.form}>
-      <AuthInput
+      <Input
         colorScheme={colorScheme}
         placeholder={t('register.emailPlaceholder')}
         autoCapitalize="none"
@@ -51,21 +51,21 @@ export function AuthRegisterFace({
         value={email}
         onChangeText={onEmailChange}
       />
-      <AuthInput
+      <Input
         colorScheme={colorScheme}
         placeholder={t('register.usernamePlaceholder')}
         autoCapitalize="none"
         value={username}
         onChangeText={onUsernameChange}
       />
-      <AuthInput
+      <Input
         colorScheme={colorScheme}
         placeholder={t('register.passwordPlaceholder')}
         secureTextEntry
         value={password}
         onChangeText={onPasswordChange}
       />
-      <AuthInput
+      <Input
         colorScheme={colorScheme}
         placeholder={t('register.confirmPasswordPlaceholder')}
         secureTextEntry
@@ -75,7 +75,7 @@ export function AuthRegisterFace({
 
       {error && <Text style={styles.error}>{error}</Text>}
 
-      <AuthButton colorScheme={colorScheme} label={t('register.submit')} onPress={onSubmit} loading={loading} />
+      <Button colorScheme={colorScheme} label={t('register.submit')} onPress={onSubmit} loading={loading} />
 
       <Pressable onPress={onGoToLogin} style={styles.link}>
         <Text style={styles.linkText}>{t('register.haveAccount')}</Text>
@@ -90,8 +90,8 @@ export function AuthRegisterFace({
 
 const styles = StyleSheet.create({
   form: { gap: 12 },
-  error: { fontSize: 14, color: '#E53E3E', textAlign: 'center', fontFamily: 'Nunito_500Medium' },
+  error: { fontSize: 14, color: '#E53E3E', textAlign: 'center' },
   link: { alignItems: 'center', marginTop: 8 },
-  linkText: { fontSize: 14, color: Accent.primary, fontFamily: 'Nunito_500Medium' },
-  backText: { fontSize: 13, opacity: 0.6, fontFamily: 'Nunito_500Medium' },
+  linkText: { fontSize: 14, color: Accent.primary },
+  backText: { fontSize: 13, opacity: 0.6 },
 });

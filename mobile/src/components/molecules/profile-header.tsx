@@ -54,11 +54,9 @@ const styles = StyleSheet.create({
   },
   username: {
     fontSize: 18,
-    fontFamily: 'Fredoka_700Bold',
   },
   email: {
     fontSize: 14,
-    fontFamily: 'Nunito_500Medium',
   },
   editButton: {
     paddingVertical: 8,
@@ -69,6 +67,5 @@ const styles = StyleSheet.create({
   editLabel: {
     fontSize: 14,
     color: Accent.violet,
-    fontFamily: 'Fredoka_600SemiBold',
   },
 });

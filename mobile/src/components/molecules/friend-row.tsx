@@ -64,7 +64,6 @@ const styles = StyleSheet.create({
   username: {
     flex: 1,
     fontSize: 16,
-    fontFamily: 'Nunito_500Medium',
   },
   removeButton: {
     width: 30,
@@ -75,10 +74,8 @@ const styles = StyleSheet.create({
   },
   removeLabel: {
     fontSize: 14,
-    fontFamily: 'Nunito_700Bold',
   },
   chevron: {
     fontSize: 22,
-    fontFamily: 'Fredoka_600SemiBold',
   },
 });

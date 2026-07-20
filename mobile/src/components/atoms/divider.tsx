@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { AuthInputSurface } from '@/constants/theme';
+import { InputSurface } from '@/constants/theme';
 
-type AuthDividerProps = {
+type DividerProps = {
   label: string;
   colorScheme: 'light' | 'dark';
 };
 
-/** Separatore orizzontale con etichetta centrale (es. "oppure") tra due gruppi di azioni. */
-export function AuthDivider({ label, colorScheme }: AuthDividerProps) {
-  const surface = AuthInputSurface[colorScheme];
+/** Separatore orizzontale riusabile con etichetta centrale (es. "oppure") tra due gruppi di azioni. */
+export function Divider({ label, colorScheme }: DividerProps) {
+  const surface = InputSurface[colorScheme];
 
   return (
     <View style={styles.divider}>
@@ -32,6 +32,5 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontFamily: 'Nunito_500Medium',
   },
 });

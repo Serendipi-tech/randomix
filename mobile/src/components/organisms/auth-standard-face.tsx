@@ -1,111 +1,72 @@
-import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
-import { Accent, AuthCardSurface, AuthTileSurface } from '@/constants/theme';
-import { AuthButton } from '@/components/atoms/auth-button';
-import { HighlightChip } from '@/components/atoms/highlight-chip';
+import { ClipboardList, Shuffle, Star, Users } from 'lucide-react-native';
+import { Accent, CardSurface } from '@/constants/theme';
+import { Button } from '@/components/atoms/button';
+import { FeatureRow } from '@/components/molecules/feature-row';
 
 type AuthStandardFaceProps = {
   colorScheme: 'light' | 'dark';
   onSignIn: () => void;
 };
 
-/** Griglia uniforme: la tile è sempre neutra, solo il badge dell'icona porta colore. */
-const TILES = [
-  { icon: '📋', badge: Accent.coral },
-  { icon: '⭐', badge: Accent.yellow },
-  { icon: '👥', badge: Accent.primary },
-  { icon: '🎯', badge: Accent.violet },
+type Feature = { title: string; subtitle: string };
+
+/** Gradiente "X → violet": stessa coppia di colori già usata per la card CTA in Home e il draw. */
+const FEATURE_ROWS = [
+  { Icon: ClipboardList, tint: Accent.coral, gradient: [Accent.coral, Accent.violet] as const },
+  { Icon: Star, tint: Accent.yellow, gradient: [Accent.yellow, Accent.violet] as const },
+  { Icon: Users, tint: Accent.primary, gradient: [Accent.primary, Accent.violet] as const },
+  { Icon: Shuffle, tint: Accent.violet, gradient: [Accent.violet, Accent.primary] as const },
 ];
 
-/** Faccia "standard" della card: griglia 2x2 con le funzioni principali + accesso al login. */
 export function AuthStandardFace({ colorScheme, onSignIn }: AuthStandardFaceProps) {
   const { t } = useTranslation('auth');
-  const textColor = AuthCardSurface[colorScheme].text;
-  const labels = t('standard.banners', { returnObjects: true }) as string[];
+  const textColor = CardSurface[colorScheme].text;
+  const features = t('standard.features', { returnObjects: true }) as Feature[];
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerText}>
-        <Text style={[styles.headline, { color: textColor }]}>{t('standard.headline')}</Text>
-        <HighlightChip label={t('standard.brand')} color={Accent.mint} fontSize={26} />
-      </View>
+      <Text style={styles.motto}>
+        <Text style={[styles.mottoLead, { color: textColor }]}>{t('standard.motto')}{'\n'}</Text>
+        <Text style={styles.mottoAccent}>{t('standard.mottoAccent')}</Text>
+      </Text>
 
-      <View style={styles.grid}>
-        {TILES.map((tile, i) => (
-          <Tile key={i} icon={tile.icon} badge={tile.badge} label={labels[i]} colorScheme={colorScheme} delay={i * 60} />
+      <View style={styles.rows}>
+        {FEATURE_ROWS.map((row, i) => (
+          <FeatureRow
+            key={i}
+            Icon={row.Icon}
+            tint={row.tint}
+            gradient={row.gradient}
+            title={features[i].title}
+            subtitle={features[i].subtitle}
+            colorScheme={colorScheme}
+          />
         ))}
       </View>
 
-      <AuthButton colorScheme={colorScheme} label={t('standard.cta')} onPress={onSignIn} />
+      <Button colorScheme={colorScheme} label={t('standard.cta')} onPress={onSignIn} />
     </View>
   );
 }
 
-type TileProps = {
-  icon: string;
-  badge: string;
-  label: string;
-  colorScheme: 'light' | 'dark';
-  delay: number;
-};
-
-function Tile({ icon, badge, label, colorScheme, delay }: TileProps) {
-  const textColor = AuthCardSurface[colorScheme].text;
-  const progress = useSharedValue(0);
-
-  useEffect(() => {
-    progress.value = withDelay(delay, withTiming(1, { duration: 320, easing: Easing.out(Easing.cubic) }));
-  }, [progress, delay]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
-    transform: [{ translateY: (1 - progress.value) * 10 }],
-  }));
-
-  return (
-    <Animated.View style={[styles.tile, { backgroundColor: AuthTileSurface[colorScheme].fill }, animatedStyle]}>
-      <View style={[styles.badge, { backgroundColor: badge }]}>
-        <Text style={styles.badgeIcon}>{icon}</Text>
-      </View>
-      <Text style={[styles.tileLabel, { color: textColor }]}>{label}</Text>
-    </Animated.View>
-  );
-}
-
 const styles = StyleSheet.create({
-  container: { gap: 16 },
-  headerText: { alignItems: 'center', gap: 6 },
-  headline: {
-    fontSize: 22,
+  container: { gap: 22 },
+  motto: {
     textAlign: 'center',
-    fontFamily: 'Fredoka_700Bold',
+    textTransform: 'uppercase',
+    letterSpacing: -0.3,
+    fontWeight: 'bold',
   },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
+  mottoLead: {
+    fontSize: 17,
+    lineHeight: 12,
   },
-  tile: {
-    width: '47%',
-    borderRadius: 16,
-    padding: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+  mottoAccent: {
+    fontSize: 26,
+    lineHeight: 20,
+    color: Accent.coral,
   },
-  badge: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badgeIcon: { fontSize: 16 },
-  tileLabel: {
-    flex: 1,
-    fontSize: 13,
-    fontFamily: 'Nunito_500Medium',
-  },
+  rows: { gap: 10 },
 });

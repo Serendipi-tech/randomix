@@ -128,7 +128,6 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 16,
-    fontFamily: 'Fredoka_600SemiBold',
   },
   metaRow: {
     flexDirection: 'row',
@@ -137,7 +136,6 @@ const styles = StyleSheet.create({
   },
   meta: {
     fontSize: 14,
-    fontFamily: 'Nunito_500Medium',
   },
   statusDot: {
     width: 8,
@@ -146,7 +144,6 @@ const styles = StyleSheet.create({
   },
   rating: {
     fontSize: 14,
-    fontFamily: 'Nunito_700Bold',
   },
   tagRow: {
     flexDirection: 'row',
@@ -163,7 +160,6 @@ const styles = StyleSheet.create({
   tagLabel: {
     fontSize: 12,
     color: '#fff',
-    fontFamily: 'Nunito_700Bold',
   },
   removeButton: {
     width: 30,
@@ -174,6 +170,5 @@ const styles = StyleSheet.create({
   },
   removeLabel: {
     fontSize: 14,
-    fontFamily: 'Nunito_700Bold',
   },
 });

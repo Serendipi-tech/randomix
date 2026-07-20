@@ -57,11 +57,9 @@ const styles = StyleSheet.create({
   username: {
     flex: 1,
     fontSize: 16,
-    fontFamily: 'Nunito_500Medium',
   },
   status: {
     fontSize: 14,
-    fontFamily: 'Nunito_500Medium',
   },
   addButton: {
     paddingVertical: 6,
@@ -75,6 +73,5 @@ const styles = StyleSheet.create({
   addLabel: {
     fontSize: 14,
     color: '#fff',
-    fontFamily: 'Fredoka_600SemiBold',
   },
 });

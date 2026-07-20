@@ -5,9 +5,9 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { AuthBackgroundView } from '@/components/molecules/auth-background';
-import { AuthButton } from '@/components/atoms/auth-button';
-import { AuthInput } from '@/components/atoms/auth-input';
+import { GradientBackgroundView } from '@/components/molecules/gradient-background';
+import { Button } from '@/components/atoms/button';
+import { Input } from '@/components/atoms/input';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { FriendRequestRow } from '@/components/molecules/friend-request-row';
@@ -73,7 +73,7 @@ export default function SocialScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <AuthBackgroundView colorScheme={colorScheme} />
+      <GradientBackgroundView colorScheme={colorScheme} />
       <FlatList
         data={showFriendsSkeleton ? [] : friends}
         keyExtractor={(item) => item.id}
@@ -105,7 +105,7 @@ export default function SocialScreen() {
               />
             ) : profile ? (
               <View style={[styles.editCard, { backgroundColor: colors.backgroundElement }]}>
-                <AuthInput
+                <Input
                   colorScheme={colorScheme}
                   placeholder={t('profile.usernamePlaceholder')}
                   autoCapitalize="none"
@@ -113,13 +113,13 @@ export default function SocialScreen() {
                   onChangeText={setUsername}
                 />
                 {editError && <Text style={styles.error}>{editError}</Text>}
-                <AuthButton
+                <Button
                   colorScheme={colorScheme}
                   label={t('profile.save')}
                   onPress={saveProfile}
                   loading={saving}
                 />
-                <AuthButton
+                <Button
                   colorScheme={colorScheme}
                   variant="secondary"
                   label={t('profile.cancel')}
@@ -151,7 +151,7 @@ export default function SocialScreen() {
             )}
 
             <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('search.title')}</Text>
-            <AuthInput
+            <Input
               colorScheme={colorScheme}
               placeholder={t('search.placeholder')}
               autoCapitalize="none"
@@ -227,7 +227,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: 'Fredoka_700Bold',
     paddingTop: Spacing.three,
     paddingBottom: Spacing.one,
   },
@@ -240,17 +239,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#E53E3E',
     textAlign: 'center',
-    fontFamily: 'Nunito_500Medium',
   },
   sectionTitle: {
     fontSize: 20,
-    fontFamily: 'Fredoka_700Bold',
     paddingTop: Spacing.three,
   },
   searchEmpty: {
     fontSize: 14,
     textAlign: 'center',
-    fontFamily: 'Nunito_500Medium',
   },
   empty: {
     alignItems: 'center',
@@ -260,12 +256,10 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 18,
-    fontFamily: 'Fredoka_700Bold',
     textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 14,
-    fontFamily: 'Nunito_500Medium',
     textAlign: 'center',
   },
 });
