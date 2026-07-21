@@ -18,8 +18,9 @@ import { AuthLoginFace } from '@/components/organisms/auth-login-face';
 import { AuthRegisterFace } from '@/components/organisms/auth-register-face';
 import { AuthRecoverFace } from '@/components/organisms/auth-recover-face';
 
-// Altezza fissa della card: deve bastare per la faccia più alta (register, 4 campi) anche con testi tradotti più lunghi.
-const AUTH_CARD_MIN_HEIGHT = 480;
+// Altezza fissa della card, uguale per tutte le facce (quella della landing/standard face): non deve mai
+// crescere o restringersi al cambio faccia. Le facce con più contenuto (es. register) scrollano internamente.
+const AUTH_CARD_HEIGHT = 480;
 
 export default function AuthScreen() {
   const { colorScheme } = useAppTheme();
@@ -138,7 +139,7 @@ export default function AuthScreen() {
 
         <View style={styles.block} onLayout={onBlockLayout}>
           <Animated.View style={blockStyle}>
-            <FlippableAuthCard colorScheme={colorScheme} style={flipStyle} minHeight={AUTH_CARD_MIN_HEIGHT}>
+            <FlippableAuthCard colorScheme={colorScheme} style={flipStyle} height={AUTH_CARD_HEIGHT}>
               {renderFace(face)}
             </FlippableAuthCard>
           </Animated.View>

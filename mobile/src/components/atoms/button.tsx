@@ -1,6 +1,8 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { ButtonPrimary, ButtonSecondary } from '@/constants/theme';
+import { Accent, ButtonPrimary, ButtonSecondary } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 
 type ButtonProps = {
   label: string;
@@ -11,7 +13,8 @@ type ButtonProps = {
   colorScheme: 'light' | 'dark';
 };
 
-/** Bottone piatto a un colore: pieno per l'azione primaria, outline sullo stesso colore per la secondaria. */
+/** Bottone: pieno a gradiente coral→violet per l'azione primaria (stesso linguaggio delle card CTA
+ *  in Home/draw), outline sullo stesso colore per la secondaria. */
 export function Button({
   label,
   onPress,
@@ -53,12 +56,18 @@ export function Button({
   return (
     <Animated.View style={animatedStyle}>
       <Pressable
-        style={[styles.button, styles.filled, isDisabled && styles.disabled]}
+        style={[styles.button, isDisabled && styles.disabled]}
         onPress={onPress}
         onPressIn={() => (pressed.value = withTiming(1, { duration: 100 }))}
         onPressOut={() => (pressed.value = withTiming(0, { duration: 150 }))}
         disabled={isDisabled}
       >
+        <LinearGradient
+          colors={[Accent.coral, Accent.violet]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
         {loading ? (
           <ActivityIndicator color={ButtonPrimary.text} />
         ) : (
@@ -71,14 +80,11 @@ export function Button({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 16,
+    borderRadius: 14,
     paddingVertical: 15,
     alignItems: 'center',
-  },
-  filled: {
-    backgroundColor: ButtonPrimary.fill,
-    // niente gradiente/overflow: un layer semi-trasparente/tagliato in meno dentro la card con backdrop-filter
-    boxShadow: '0px 8px 14px rgba(124,92,252,0.3)',
+    overflow: 'hidden',
+    boxShadow: `0px 8px 14px ${hexToRgba(Accent.violet, 0.3)}`,
   },
   outline: {
     borderWidth: 1.5,
@@ -89,5 +95,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
 });

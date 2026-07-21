@@ -1,9 +1,12 @@
-import { StyleSheet, TextInput, type TextInputProps } from 'react-native';
+import { StyleSheet, TextInput, type TextInputProps, type TextStyle } from 'react-native';
 import { CardSurface, InputSurface } from '@/constants/theme';
 
 type InputProps = TextInputProps & {
   colorScheme: 'light' | 'dark';
 };
+
+// "none" è valido per outlineStyle su RN Web ma manca dal type TextStyle (limitato a solid/dotted/dashed): cast mirato.
+const noWebOutline = { outlineStyle: 'none', outlineWidth: 0, outlineColor: 'transparent' } as unknown as TextStyle;
 
 /** Campo di testo dell'app: nessuna evidenziazione al focus, di proposito. */
 export function Input({ colorScheme, style, ...props }: InputProps) {
@@ -18,6 +21,7 @@ export function Input({ colorScheme, style, ...props }: InputProps) {
           backgroundColor: surface.fill,
           color: textColor,
         },
+        noWebOutline,
         style,
       ]}
       placeholderTextColor={surface.placeholder}
@@ -28,11 +32,10 @@ export function Input({ colorScheme, style, ...props }: InputProps) {
 
 const styles = StyleSheet.create({
   input: {
-    borderRadius: 18,
+    borderRadius: 14,
     paddingHorizontal: 18,
     paddingVertical: 14,
     fontSize: 16,
-    // rimuove l'outline nativo del browser su web (RN Web-only)
-    outlineWidth: 0,
+    borderWidth: 0,
   },
 });

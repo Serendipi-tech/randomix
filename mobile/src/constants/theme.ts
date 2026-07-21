@@ -33,6 +33,16 @@ export const Accent = {
   violet: '#7C5CFC',
 } as const;
 
+/** Colore di icone/testo sopra un fondo pieno o gradiente a tinta forte (icon chip, badge colorato): bianco fisso, indipendente dal tema. */
+export const OnAccent = '#FFFFFF';
+
+/** Colori di stato (errori, feedback), non decorativi come Accent. Warning/success riusano Accent per restare in famiglia. */
+export const StatusColor = {
+  danger: '#E53E3E',
+  warning: Accent.yellow,
+  success: Accent.mint,
+} as const;
+
 /** Sfondo pieno a gradiente multi-tono (mai un wash a un colore solo), riusato su più schermate dell'app. Pastello in light, stessa famiglia della card in dark. Mai nero/bianco puro. */
 export const GradientBackground = {
   light: { stops: ['#E4D3FF', '#FCD9EC', '#FFE7B8'] },
@@ -72,6 +82,20 @@ export const ButtonSecondary = {
 export const AuthTileSurface = {
   light: { fill: 'rgba(31,27,46,0.05)' },
   dark: { fill: 'rgba(255,255,255,0.07)' },
+} as const;
+
+/** Colore dei link testuali sulla card auth (es. "forgot password"): viola scuro in light, viola chiaro in dark per restare leggibile su entrambe le superfici. */
+export const AuthLinkColor = {
+  light: '#6A46E0',
+  dark: '#C9B8FF',
+} as const;
+
+/** Superficie della tooltip flottante: solida (non vetro semi-trasparente) e sempre in tinta violet-brand,
+ *  indipendente dal tema, per restare leggibile sopra qualunque sfondo. */
+export const TooltipSurface = {
+  fill: '#2A1B47',
+  border: 'rgba(255,255,255,0.14)',
+  text: '#FFFFFF',
 } as const;
 
 /** Campo di input dell'app: tinta neutra derivata dal colore testo della card glass. */

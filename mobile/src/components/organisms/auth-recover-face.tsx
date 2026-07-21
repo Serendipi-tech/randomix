@@ -2,7 +2,10 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
+import { PasswordInput } from '@/components/atoms/password-input';
 import { CardSurface } from '@/constants/theme';
+import { Title } from '@/components/molecules/title';
+import { FormError } from '@/components/molecules/form-error';
 import type { RecoveryStep } from '@/utils/usePasswordRecoveryForm';
 
 type AuthRecoverFaceProps = {
@@ -47,6 +50,7 @@ export function AuthRecoverFace({
   if (step === 'request') {
     return (
       <View style={styles.form}>
+        <Title variant="lead-accent" lead={t('forgotPassword.headline')} accent={t('forgotPassword.brand')} colorScheme={colorScheme} />
         <Text style={[styles.tagline, { color: textColor }]}>{t('forgotPassword.tagline')}</Text>
         <Input
           colorScheme={colorScheme}
@@ -57,7 +61,7 @@ export function AuthRecoverFace({
           onChangeText={onEmailChange}
         />
 
-        {error && <Text style={styles.error}>{error}</Text>}
+        {error && <FormError message={error} />}
 
         <Button
           colorScheme={colorScheme}
@@ -65,6 +69,8 @@ export function AuthRecoverFace({
           onPress={onSubmitRequest}
           loading={loading}
         />
+
+        <View style={styles.spacer} />
 
         <Pressable onPress={onBack} style={styles.link}>
           <Text style={[styles.backText, { color: textColor }]}>{t('forgotPassword.back')}</Text>
@@ -75,6 +81,7 @@ export function AuthRecoverFace({
 
   return (
     <View style={styles.form}>
+      <Title variant="lead-accent" lead={t('resetPassword.headline')} accent={t('resetPassword.brand')} colorScheme={colorScheme} />
       <Text style={[styles.tagline, { color: textColor }]}>{t('resetPassword.tagline')}</Text>
       <Input
         colorScheme={colorScheme}
@@ -84,22 +91,21 @@ export function AuthRecoverFace({
         value={otp}
         onChangeText={onOtpChange}
       />
-      <Input
+      <PasswordInput
         colorScheme={colorScheme}
         placeholder={t('resetPassword.newPasswordPlaceholder')}
-        secureTextEntry
         value={newPassword}
         onChangeText={onNewPasswordChange}
+        showStrength
       />
-      <Input
+      <PasswordInput
         colorScheme={colorScheme}
         placeholder={t('resetPassword.confirmPasswordPlaceholder')}
-        secureTextEntry
         value={confirmPassword}
         onChangeText={onConfirmPasswordChange}
       />
 
-      {error && <Text style={styles.error}>{error}</Text>}
+      {error && <FormError message={error} />}
 
       <Button
         colorScheme={colorScheme}
@@ -107,6 +113,8 @@ export function AuthRecoverFace({
         onPress={onSubmitConfirm}
         loading={loading}
       />
+
+      <View style={styles.spacer} />
 
       <Pressable onPress={onBack} style={styles.link}>
         <Text style={[styles.backText, { color: textColor }]}>{t('resetPassword.back')}</Text>
@@ -116,9 +124,11 @@ export function AuthRecoverFace({
 }
 
 const styles = StyleSheet.create({
-  form: { gap: 12 },
+  // flex:1 + spacer sotto: il bottone "back" resta ancorato in fondo alla card a prescindere dal contenuto sopra.
+  // stesso gap ridotto delle altre facce, per coerenza di spaziatura tra tutte le visuali.
+  form: { gap: 6, flex: 1 },
+  spacer: { flex: 1 },
   tagline: { fontSize: 14, textAlign: 'center', opacity: 0.75 },
-  error: { fontSize: 14, color: '#E53E3E', textAlign: 'center' },
   link: { alignItems: 'center', marginTop: 8 },
-  backText: { fontSize: 13, opacity: 0.6 },
+  backText: { fontSize: 15, opacity: 0.75 },
 });

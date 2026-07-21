@@ -3,8 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/atoms/button';
 import { Divider } from '@/components/atoms/divider';
 import { Input } from '@/components/atoms/input';
+import { PasswordInput } from '@/components/atoms/password-input';
 import { Pressable } from 'react-native';
-import { Accent, CardSurface } from '@/constants/theme';
+import { AuthLinkColor, CardSurface } from '@/constants/theme';
+import { Title } from '@/components/molecules/title';
+import { FormError } from '@/components/molecules/form-error';
 
 type AuthLoginFaceProps = {
   colorScheme: 'light' | 'dark';
@@ -38,9 +41,12 @@ export function AuthLoginFace({
 }: AuthLoginFaceProps) {
   const { t } = useTranslation('auth');
   const textColor = CardSurface[colorScheme].text;
+  const linkColor = AuthLinkColor[colorScheme];
 
   return (
     <View style={styles.form}>
+      <Title variant="lead-accent" lead={t('login.headline')} accent={t('login.brand')} colorScheme={colorScheme} />
+
       <Input
         colorScheme={colorScheme}
         placeholder={t('login.identifierPlaceholder')}
@@ -48,19 +54,18 @@ export function AuthLoginFace({
         value={identifier}
         onChangeText={onIdentifierChange}
       />
-      <Input
+      <PasswordInput
         colorScheme={colorScheme}
         placeholder={t('login.passwordPlaceholder')}
-        secureTextEntry
         value={password}
         onChangeText={onPasswordChange}
       />
 
       <Pressable onPress={onGoToRecover} style={styles.forgotPassword}>
-        <Text style={styles.forgotPasswordText}>{t('login.forgotPassword')}</Text>
+        <Text style={[styles.forgotPasswordText, { color: linkColor }]}>{t('login.forgotPassword')}</Text>
       </Pressable>
 
-      {error && <Text style={styles.error}>{error}</Text>}
+      {error && <FormError message={error} />}
 
       <Button colorScheme={colorScheme} label={t('login.submit')} onPress={onSubmit} loading={loading} />
 
@@ -75,8 +80,10 @@ export function AuthLoginFace({
       />
 
       <Pressable onPress={onGoToRegister} style={styles.link}>
-        <Text style={styles.linkText}>{t('login.noAccount')}</Text>
+        <Text style={[styles.linkText, { color: linkColor }]}>{t('login.noAccount')}</Text>
       </Pressable>
+
+      <View style={styles.spacer} />
 
       <Pressable onPress={onBack} style={styles.link}>
         <Text style={[styles.backText, { color: textColor }]}>{t('login.back')}</Text>
@@ -86,11 +93,13 @@ export function AuthLoginFace({
 }
 
 const styles = StyleSheet.create({
-  form: { gap: 12 },
+  // flex:1 + spacer sotto: il bottone "back" resta ancorato in fondo alla card a prescindere dal contenuto sopra.
+  // gap ridotto: questa faccia ha più contenuto (Google + divider) e deve rientrare nell'altezza fissa della card senza andare in scroll.
+  form: { gap: 6, flex: 1 },
+  spacer: { flex: 1 },
   forgotPassword: { alignSelf: 'flex-end', marginTop: -4 },
-  forgotPasswordText: { fontSize: 13, color: Accent.primary },
-  error: { fontSize: 14, color: '#E53E3E', textAlign: 'center' },
+  forgotPasswordText: { fontSize: 15, fontWeight: '600' },
   link: { alignItems: 'center', marginTop: 8 },
-  linkText: { fontSize: 14, color: Accent.primary },
-  backText: { fontSize: 13, opacity: 0.6 },
+  linkText: { fontSize: 15, fontWeight: '600' },
+  backText: { fontSize: 15, opacity: 0.75 },
 });

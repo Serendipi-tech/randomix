@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './useAuth';
 import { getAuthErrorMessage } from './getAuthErrorMessage';
+import { getPasswordStrength } from './passwordStrength';
 
 export function useAuthForms() {
   const { t } = useTranslation('auth');
@@ -54,7 +55,8 @@ export function useAuthForms() {
       setRegisterError(t('register.passwordMismatch'));
       return;
     }
-    if (registerPassword.length < 8) {
+    const { rules } = getPasswordStrength(registerPassword);
+    if (!rules.length || !rules.letter || !rules.number || !rules.special) {
       setRegisterError(t('register.passwordTooShort'));
       return;
     }

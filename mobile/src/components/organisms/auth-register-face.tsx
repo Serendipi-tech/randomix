@@ -2,7 +2,10 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
-import { Accent, CardSurface } from '@/constants/theme';
+import { PasswordInput } from '@/components/atoms/password-input';
+import { AuthLinkColor, CardSurface } from '@/constants/theme';
+import { Title } from '@/components/molecules/title';
+import { FormError } from '@/components/molecules/form-error';
 
 type AuthRegisterFaceProps = {
   colorScheme: 'light' | 'dark';
@@ -40,9 +43,12 @@ export function AuthRegisterFace({
 }: AuthRegisterFaceProps) {
   const { t } = useTranslation('auth');
   const textColor = CardSurface[colorScheme].text;
+  const linkColor = AuthLinkColor[colorScheme];
 
   return (
     <View style={styles.form}>
+      <Title variant="lead-accent" lead={t('register.headline')} accent={t('register.brand')} colorScheme={colorScheme} />
+
       <Input
         colorScheme={colorScheme}
         placeholder={t('register.emailPlaceholder')}
@@ -58,28 +64,29 @@ export function AuthRegisterFace({
         value={username}
         onChangeText={onUsernameChange}
       />
-      <Input
+      <PasswordInput
         colorScheme={colorScheme}
         placeholder={t('register.passwordPlaceholder')}
-        secureTextEntry
         value={password}
         onChangeText={onPasswordChange}
+        showStrength
       />
-      <Input
+      <PasswordInput
         colorScheme={colorScheme}
         placeholder={t('register.confirmPasswordPlaceholder')}
-        secureTextEntry
         value={confirmPassword}
         onChangeText={onConfirmPasswordChange}
       />
 
-      {error && <Text style={styles.error}>{error}</Text>}
+      {error && <FormError message={error} />}
 
       <Button colorScheme={colorScheme} label={t('register.submit')} onPress={onSubmit} loading={loading} />
 
       <Pressable onPress={onGoToLogin} style={styles.link}>
-        <Text style={styles.linkText}>{t('register.haveAccount')}</Text>
+        <Text style={[styles.linkText, { color: linkColor }]}>{t('register.haveAccount')}</Text>
       </Pressable>
+
+      <View style={styles.spacer} />
 
       <Pressable onPress={onBack} style={styles.link}>
         <Text style={[styles.backText, { color: textColor }]}>{t('register.back')}</Text>
@@ -89,9 +96,11 @@ export function AuthRegisterFace({
 }
 
 const styles = StyleSheet.create({
-  form: { gap: 12 },
-  error: { fontSize: 14, color: '#E53E3E', textAlign: 'center' },
+  // flex:1 + spacer sotto: il bottone "back" resta ancorato in fondo alla card a prescindere dal contenuto sopra.
+  // gap ridotto: 4 campi devono rientrare nell'altezza fissa della card senza andare in scroll.
+  form: { gap: 6, flex: 1 },
+  spacer: { flex: 1 },
   link: { alignItems: 'center', marginTop: 8 },
-  linkText: { fontSize: 14, color: Accent.primary },
-  backText: { fontSize: 13, opacity: 0.6 },
+  linkText: { fontSize: 15, fontWeight: '600' },
+  backText: { fontSize: 15, opacity: 0.75 },
 });

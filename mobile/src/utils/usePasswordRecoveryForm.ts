@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePasswordReset } from './usePasswordReset';
 import { getAuthErrorMessage } from './getAuthErrorMessage';
+import { getPasswordStrength } from './passwordStrength';
 
 export type RecoveryStep = 'request' | 'confirm';
 
@@ -40,7 +41,8 @@ export function usePasswordRecoveryForm() {
       setError(t('resetPassword.passwordMismatch'));
       return false;
     }
-    if (newPassword.length < 8) {
+    const { rules } = getPasswordStrength(newPassword);
+    if (!rules.length || !rules.letter || !rules.number || !rules.special) {
       setError(t('resetPassword.passwordTooShort'));
       return false;
     }

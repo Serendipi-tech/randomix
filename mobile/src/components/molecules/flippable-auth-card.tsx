@@ -6,14 +6,15 @@ import { Card } from './card';
 type FlippableAuthCardProps = PropsWithChildren<{
   colorScheme: 'light' | 'dark';
   style: AnimatedStyle<StyleProp<ViewStyle>>;
-  minHeight?: number;
+  height?: number;
 }>;
 
-/** Involucro animato della Card: applica la rotazione 3D del flip e mantiene l'altezza stabile tra le facce. */
-export function FlippableAuthCard({ colorScheme, style, minHeight, children }: FlippableAuthCardProps) {
+/** Involucro animato della Card: applica la rotazione 3D del flip. Altezza fissa (non minima): la card
+ *  non deve mai crescere o restringersi in base alla faccia mostrata, il contenuto in eccesso scrolla dentro. */
+export function FlippableAuthCard({ colorScheme, style, height, children }: FlippableAuthCardProps) {
   return (
     <Animated.View style={style}>
-      <Card colorScheme={colorScheme} style={minHeight ? { minHeight } : undefined}>
+      <Card colorScheme={colorScheme} style={height ? { height } : undefined}>
         {children}
       </Card>
     </Animated.View>

@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { LucideIcon } from 'lucide-react-native';
-import { CardSurface } from '@/constants/theme';
+import { CardSurface, OnAccent } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 
 type FeatureRowProps = {
   Icon: LucideIcon;
@@ -15,7 +16,7 @@ type FeatureRowProps = {
 /** Riga riusabile icona-a-sx/testo-a-dx: icon-chip con gradiente soft + titolo/sottotitolo, superficie tinta leggera. */
 export function FeatureRow({ Icon, tint, gradient, title, subtitle, colorScheme }: FeatureRowProps) {
   const textColor = CardSurface[colorScheme].text;
-  const subtitleColor = colorScheme === 'light' ? 'rgba(36,26,61,0.68)' : 'rgba(243,236,255,0.7)';
+  const subtitleColor = hexToRgba(textColor, colorScheme === 'light' ? 0.68 : 0.7);
 
   return (
     <View style={[styles.row, { backgroundColor: `${tint}1F` }]}>
@@ -26,7 +27,7 @@ export function FeatureRow({ Icon, tint, gradient, title, subtitle, colorScheme 
           {/* l'SVG dell'icona non è "positioned" come le View su web: senza questo, il gradiente
               assoluto dipinge sempre sopra di lui a prescindere dall'ordine nel JSX */}
           <View style={styles.iconStack}>
-            <Icon size={22} color="#fff" strokeWidth={2.5} />
+            <Icon size={22} color={OnAccent} strokeWidth={2.5} />
           </View>
         </View>
       </View>
