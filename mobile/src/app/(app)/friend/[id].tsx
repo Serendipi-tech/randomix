@@ -12,7 +12,7 @@ import { useFriendProfile } from '@/utils/useFriendProfile';
 const SKELETON_COUNT = 3;
 
 export default function FriendProfileScreen() {
-  const { t } = useTranslation('social');
+  const { t } = useTranslation('friends');
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
   const router = useRouter();

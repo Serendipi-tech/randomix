@@ -1,7 +1,8 @@
 import { Stack } from 'expo-router';
 
-/** Perimetro protetto dell'app: le tab (index/social/settings) più le schermate di dettaglio/form
- *  impilate sopra di esse. Stare tutti dentro (app) è ciò che le tiene fuori dalla portata di chi non è loggato. */
+/** Perimetro protetto dell'app: le tab (profile/notifications/index/friends/groups) più le schermate di
+ *  dettaglio/form impilate sopra di esse. Stare tutti dentro (app) è ciò che le tiene fuori dalla portata
+ *  di chi non è loggato. */
 export default function AppLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>

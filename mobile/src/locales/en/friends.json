@@ -1,12 +1,5 @@
 {
-  "title": "Social",
-  "profile": {
-    "edit": "Edit",
-    "save": "Save",
-    "cancel": "Cancel",
-    "usernamePlaceholder": "Username",
-    "usernameTooShort": "Username must be at least 3 characters."
-  },
+  "title": "Friends",
   "requests": {
     "title": "Requests",
     "accept": "Accept",

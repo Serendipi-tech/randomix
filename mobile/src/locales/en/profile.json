@@ -1,0 +1,9 @@
+{
+  "title": "Profile",
+  "edit": "Edit",
+  "save": "Save",
+  "cancel": "Cancel",
+  "usernamePlaceholder": "Username",
+  "usernameTooShort": "Username must be at least 3 characters.",
+  "logout": "Log out"
+}

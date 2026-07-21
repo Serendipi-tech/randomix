@@ -6,58 +6,30 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { GradientBackgroundView } from '@/components/molecules/gradient-background';
-import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { FriendRequestRow } from '@/components/molecules/friend-request-row';
 import { FriendRow } from '@/components/molecules/friend-row';
-import { ProfileHeader } from '@/components/molecules/profile-header';
 import { UserSearchRow } from '@/components/molecules/user-search-row';
 import { useMyFriends, useRemoveFriend, type Friend } from '@/utils/useFriends';
 import { useFriendRequests } from '@/utils/useFriendRequests';
-import { useProfile } from '@/utils/useProfile';
 import { useUserSearch, type FriendRelation } from '@/utils/useUserSearch';
 
 const SKELETON_COUNT = 4;
-const USERNAME_MIN_LENGTH = 3;
 
-export default function SocialScreen() {
-  const { t } = useTranslation('social');
+export default function FriendsScreen() {
+  const { t } = useTranslation('friends');
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
   const router = useRouter();
 
-  const { profile, loading: loadingProfile, updateProfile, saving, saveError } = useProfile();
   const { friends, loading: loadingFriends, error: friendsError } = useMyFriends();
   const { requests, acceptRequest, rejectRequest, answering } = useFriendRequests();
   const search = useUserSearch();
   const { removeFriend } = useRemoveFriend();
 
-  const [editing, setEditing] = useState(false);
-  const [username, setUsername] = useState('');
-  const [localError, setLocalError] = useState<string | null>(null);
   const [friendToRemove, setFriendToRemove] = useState<Friend | null>(null);
-
-  const startEditing = () => {
-    setUsername(profile?.username ?? '');
-    setLocalError(null);
-    setEditing(true);
-  };
-
-  const saveProfile = async () => {
-    setLocalError(null);
-    if (username.trim().length < USERNAME_MIN_LENGTH) {
-      setLocalError(t('profile.usernameTooShort'));
-      return;
-    }
-    try {
-      await updateProfile({ username: username.trim() });
-      setEditing(false);
-    } catch (e) {
-      setLocalError((e as Error).message);
-    }
-  };
 
   const handleRemoveConfirmed = () => {
     if (friendToRemove) removeFriend(friendToRemove.id);
@@ -68,7 +40,6 @@ export default function SocialScreen() {
   const relationLabel = (relation: FriendRelation): string | null =>
     relation === 'NONE' ? null : t(`search.relation.${relation}`);
 
-  const editError = localError ?? saveError?.message ?? null;
   const showFriendsSkeleton = loadingFriends && friends.length === 0;
 
   return (
@@ -92,48 +63,9 @@ export default function SocialScreen() {
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.text }]}>{t('title')}</Text>
 
-            {loadingProfile && !profile ? (
-              <ListCardSkeleton colorScheme={colorScheme} />
-            ) : profile && !editing ? (
-              <ProfileHeader
-                username={profile.username}
-                email={profile.email}
-                avatarUrl={profile.avatarUrl}
-                colorScheme={colorScheme}
-                editLabel={t('profile.edit')}
-                onEditPress={startEditing}
-              />
-            ) : profile ? (
-              <View style={[styles.editCard, { backgroundColor: colors.backgroundElement }]}>
-                <Input
-                  colorScheme={colorScheme}
-                  placeholder={t('profile.usernamePlaceholder')}
-                  autoCapitalize="none"
-                  value={username}
-                  onChangeText={setUsername}
-                />
-                {editError && <Text style={styles.error}>{editError}</Text>}
-                <Button
-                  colorScheme={colorScheme}
-                  label={t('profile.save')}
-                  onPress={saveProfile}
-                  loading={saving}
-                />
-                <Button
-                  colorScheme={colorScheme}
-                  variant="secondary"
-                  label={t('profile.cancel')}
-                  onPress={() => setEditing(false)}
-                  disabled={saving}
-                />
-              </View>
-            ) : null}
-
             {requests.length > 0 && (
               <>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                  {t('requests.title')}
-                </Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('requests.title')}</Text>
                 {requests.map((request) => (
                   <FriendRequestRow
                     key={request.id}
@@ -172,9 +104,7 @@ export default function SocialScreen() {
               />
             ))}
             {search.active && !search.searching && !search.error && search.results.length === 0 && (
-              <Text style={[styles.searchEmpty, { color: colors.textSecondary }]}>
-                {t('search.empty')}
-              </Text>
+              <Text style={[styles.searchEmpty, { color: colors.textSecondary }]}>{t('search.empty')}</Text>
             )}
 
             <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('friends.title')}</Text>
@@ -205,7 +135,7 @@ export default function SocialScreen() {
         title={t('friends.removeConfirmTitle')}
         message={t('friends.removeConfirmMessage')}
         confirmLabel={t('friends.remove')}
-        cancelLabel={t('profile.cancel')}
+        cancelLabel={t('cancel', { defaultValue: 'Cancel' })}
         colorScheme={colorScheme}
         onConfirm={handleRemoveConfirmed}
         onCancel={() => setFriendToRemove(null)}
@@ -229,11 +159,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     paddingTop: Spacing.three,
     paddingBottom: Spacing.one,
-  },
-  editCard: {
-    borderRadius: 20,
-    padding: 16,
-    gap: 12,
   },
   error: {
     fontSize: 14,
