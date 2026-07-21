@@ -3,8 +3,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Spacing } from '@/constants/theme';
+import { Accent, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Button } from '@/components/atoms/button';
+import { Input } from '@/components/atoms/input';
+import { ColorPickerRow } from '@/components/atoms/color-picker-row';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { GroupMemberRow } from '@/components/group/group-member-row';
@@ -15,6 +18,7 @@ import { useMyFriends, type Friend } from '@/utils/useFriends';
 import { useProfile } from '@/utils/useProfile';
 
 const SKELETON_COUNT = 3;
+const LIST_COLORS = [Accent.primary, Accent.coral, Accent.yellow, Accent.mint, Accent.violet];
 
 export default function GroupDetailScreen() {
   const { t } = useTranslation('groups');
@@ -24,8 +28,18 @@ export default function GroupDetailScreen() {
 
   const { id } = useLocalSearchParams<{ id: string }>();
   const { profile } = useProfile();
-  const { group, loading, error, leaveGroup, leaving, removeGroupMember, inviteToGroup, revokeInvite } =
-    useGroupDetail(id);
+  const {
+    group,
+    loading,
+    error,
+    leaveGroup,
+    leaving,
+    removeGroupMember,
+    inviteToGroup,
+    revokeInvite,
+    createGroupList,
+    creatingList,
+  } = useGroupDetail(id);
   const { deleteGroup, deleting } = useDeleteGroup();
   const { friends } = useMyFriends();
 
@@ -34,6 +48,11 @@ export default function GroupDetailScreen() {
   const [memberToRemove, setMemberToRemove] = useState<GroupMember | null>(null);
   const [showInvite, setShowInvite] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [showCreateList, setShowCreateList] = useState(false);
+  const [listName, setListName] = useState('');
+  const [listIcon, setListIcon] = useState('');
+  const [listColor, setListColor] = useState<string>(LIST_COLORS[0]);
+  const [listError, setListError] = useState<string | null>(null);
 
   const myUserId = profile?.id;
   const isOwner = group?.ownerId === myUserId;
@@ -91,6 +110,23 @@ export default function GroupDetailScreen() {
     } catch (_) {
     } finally {
       setProcessingId(null);
+    }
+  };
+
+  const handleCreateList = async () => {
+    setListError(null);
+    if (!listName.trim() || !listIcon.trim()) {
+      setListError(t('detail.newList.missing'));
+      return;
+    }
+    try {
+      await createGroupList({ name: listName.trim(), icon: listIcon.trim(), color: listColor });
+      setListName('');
+      setListIcon('');
+      setListColor(LIST_COLORS[0]);
+      setShowCreateList(false);
+    } catch (e) {
+      setListError((e as Error).message);
     }
   };
 
@@ -161,6 +197,63 @@ export default function GroupDetailScreen() {
                 }
               />
             ))
+          )}
+
+          {/* Crea lista di gruppo (solo OWNER/ADMIN) */}
+          {canManage && (
+            <>
+              {showCreateList ? (
+                <View style={[styles.createCard, { backgroundColor: colors.backgroundElement }]}>
+                  <Input
+                    colorScheme={colorScheme}
+                    placeholder={t('detail.newList.namePlaceholder')}
+                    value={listName}
+                    onChangeText={setListName}
+                    autoCapitalize="words"
+                  />
+                  <Input
+                    colorScheme={colorScheme}
+                    placeholder={t('detail.newList.iconPlaceholder')}
+                    value={listIcon}
+                    onChangeText={setListIcon}
+                  />
+                  <Text style={[styles.pickerLabel, { color: colors.textSecondary }]}>
+                    {t('detail.newList.color')}
+                  </Text>
+                  <ColorPickerRow
+                    colors={LIST_COLORS}
+                    selected={listColor}
+                    onSelect={setListColor}
+                    colorScheme={colorScheme}
+                  />
+                  {listError && <Text style={styles.listError}>{listError}</Text>}
+                  <Button
+                    colorScheme={colorScheme}
+                    label={t('detail.newList.submit')}
+                    onPress={handleCreateList}
+                    loading={creatingList}
+                  />
+                  <Button
+                    colorScheme={colorScheme}
+                    variant="secondary"
+                    label={t('detail.newList.cancel')}
+                    onPress={() => {
+                      setShowCreateList(false);
+                      setListError(null);
+                    }}
+                    disabled={creatingList}
+                  />
+                </View>
+              ) : (
+                <Pressable
+                  onPress={() => setShowCreateList(true)}
+                  style={[styles.secondaryBtn, { backgroundColor: colors.backgroundElement }]}>
+                  <Text style={[styles.secondaryBtnText, { color: colors.text }]}>
+                    {t('detail.createList')}
+                  </Text>
+                </Pressable>
+              )}
+            </>
           )}
 
           {/* Membri */}
@@ -322,6 +415,21 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito_400Regular',
     textAlign: 'center',
     paddingVertical: Spacing.two,
+  },
+  createCard: {
+    borderRadius: 20,
+    padding: 16,
+    gap: 12,
+  },
+  pickerLabel: {
+    fontSize: 14,
+    fontFamily: 'Nunito_600SemiBold',
+  },
+  listError: {
+    fontSize: 14,
+    color: '#E53E3E',
+    textAlign: 'center',
+    fontFamily: 'Nunito_500Medium',
   },
   secondaryBtn: {
     borderRadius: 14,

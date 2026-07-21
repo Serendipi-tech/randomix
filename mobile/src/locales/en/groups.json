@@ -35,7 +35,15 @@
     "inviteTitle": "Invite a friend",
     "noFriends": "No friends to invite",
     "invited": "Invited",
-    "revoke": "Cancel"
+    "revoke": "Cancel",
+    "newList": {
+      "namePlaceholder": "List name",
+      "iconPlaceholder": "Icon (emoji)",
+      "color": "Color",
+      "submit": "Create list",
+      "cancel": "Cancel",
+      "missing": "Name and icon are required"
+    }
   },
   "member": {
     "roles": {
@@ -52,8 +60,10 @@
   "groupList": {
     "memberListCount_one": "{{count}} shared list",
     "memberListCount_other": "{{count}} shared lists",
-    "addMyList": "Share my list",
-    "removeMyList": "Unshare my list",
+    "addMyList": "Share",
+    "removeMyList": "Remove",
+    "myLists": "My lists",
+    "noLists": "You have no lists to share",
     "empty": "No shared lists in this group list",
     "mergedItems": "Combined items ({{count}})",
     "draw": "Draw",

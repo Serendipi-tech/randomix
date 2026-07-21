@@ -143,3 +143,33 @@ builder.queryField('groupListMergedItems', (t) =>
     },
   }),
 );
+
+// ID delle liste dell'utente corrente già condivise in questa GroupList (per i toggle condividi/rimuovi)
+builder.queryField('groupListSharedListIds', (t) =>
+  t.field({
+    type: ['ID'],
+    args: { groupListId: t.arg.id({ required: true }) },
+    resolve: async (_root, { groupListId }, ctx) => {
+      requireAuth(ctx.userId);
+      const glId = String(groupListId);
+      const groupList = await prisma.groupList.findUnique({
+        where: { id: glId },
+        select: { groupId: true },
+      });
+      if (!groupList) {
+        throw new GraphQLError('Lista gruppo non trovata.', { extensions: { code: 'NOT_FOUND' } });
+      }
+      const membership = await prisma.group_User.findUnique({
+        where: { groupId_userId: { groupId: groupList.groupId, userId: ctx.userId } },
+      });
+      if (!membership) {
+        throw new GraphQLError('Non sei membro di questo gruppo.', { extensions: { code: 'FORBIDDEN' } });
+      }
+      const lists = await prisma.list.findMany({
+        where: { userId: ctx.userId, groupLists: { some: { id: glId } } },
+        select: { id: true },
+      });
+      return lists.map((l) => l.id);
+    },
+  }),
+);

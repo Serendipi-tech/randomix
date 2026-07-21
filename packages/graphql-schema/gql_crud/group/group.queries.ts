@@ -81,3 +81,9 @@ export const GROUP_LIST_MERGED_ITEMS: DocumentNode = parse(`
     }
   }
 `);
+
+export const GROUP_LIST_SHARED_LIST_IDS: DocumentNode = parse(`
+  query GroupListSharedListIds($groupListId: ID!) {
+    groupListSharedListIds(groupListId: $groupListId)
+  }
+`);
