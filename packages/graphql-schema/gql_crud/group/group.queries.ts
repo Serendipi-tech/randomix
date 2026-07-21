@@ -46,6 +46,10 @@ export const GROUP_DETAIL: DocumentNode = parse(`
         createdAt
         updatedAt
       }
+      pendingInvites {
+        userId
+        username
+      }
     }
   }
 `);

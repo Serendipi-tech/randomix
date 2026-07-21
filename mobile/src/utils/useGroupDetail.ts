@@ -4,6 +4,7 @@ import { GroupMutations, GroupQueries } from '@randomix/graphql-schema';
 const { GROUP_DETAIL } = GroupQueries;
 const {
   INVITE_TO_GROUP,
+  REVOKE_GROUP_INVITE,
   LEAVE_GROUP,
   REMOVE_GROUP_MEMBER,
   UPDATE_GROUP_MEMBER_ROLE,
@@ -31,6 +32,11 @@ export interface GroupListSummary {
   updatedAt: string;
 }
 
+export interface GroupPendingInvite {
+  userId: string;
+  username: string;
+}
+
 export interface GroupDetail {
   id: string;
   name: string;
@@ -38,6 +44,7 @@ export interface GroupDetail {
   ownerId: string;
   members: GroupMember[];
   groupLists: GroupListSummary[];
+  pendingInvites: GroupPendingInvite[];
   createdAt: string;
   updatedAt: string;
 }
@@ -53,6 +60,10 @@ export function useGroupDetail(groupId: string) {
   });
 
   const [inviteMutate, { loading: inviting }] = useMutation(INVITE_TO_GROUP, {
+    refetchQueries: ['GroupDetail'],
+  });
+
+  const [revokeInviteMutate, { loading: revoking }] = useMutation(REVOKE_GROUP_INVITE, {
     refetchQueries: ['GroupDetail'],
   });
 
@@ -81,6 +92,7 @@ export function useGroupDetail(groupId: string) {
   });
 
   const inviteToGroup = (userId: string) => inviteMutate({ variables: { groupId, userId } });
+  const revokeInvite = (userId: string) => revokeInviteMutate({ variables: { groupId, userId } });
   const leaveGroup = () => leaveMutate({ variables: { groupId } });
   const removeGroupMember = (userId: string) =>
     removeMemberMutate({ variables: { groupId, userId } });
@@ -104,6 +116,8 @@ export function useGroupDetail(groupId: string) {
     refetch,
     inviteToGroup,
     inviting,
+    revokeInvite,
+    revoking,
     leaveGroup,
     leaving,
     removeGroupMember,

@@ -9,10 +9,16 @@ const config = getDefaultConfig(__dirname);
 const defaultResolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (moduleName === 'lucide-react-native') {
-    return {
-      type: 'sourceFile',
-      filePath: require.resolve('lucide-react-native/dist/esm/lucide-react-native.js'),
-    };
+    try {
+      return {
+        type: 'sourceFile',
+        filePath: require.resolve('lucide-react-native/dist/esm/lucide-react-native.js', {
+          paths: [__dirname, require('path').join(__dirname, '..')],
+        }),
+      };
+    } catch {
+      // fallback: Metro risolve normalmente
+    }
   }
   if (defaultResolveRequest) return defaultResolveRequest(context, moduleName, platform);
   return context.resolveRequest(context, moduleName, platform);

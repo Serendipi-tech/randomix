@@ -24,7 +24,7 @@ export default function GroupDetailScreen() {
 
   const { id } = useLocalSearchParams<{ id: string }>();
   const { profile } = useProfile();
-  const { group, loading, error, leaveGroup, leaving, removeGroupMember, inviteToGroup, inviting } =
+  const { group, loading, error, leaveGroup, leaving, removeGroupMember, inviteToGroup, revokeInvite } =
     useGroupDetail(id);
   const { deleteGroup, deleting } = useDeleteGroup();
   const { friends } = useMyFriends();
@@ -33,6 +33,7 @@ export default function GroupDetailScreen() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<GroupMember | null>(null);
   const [showInvite, setShowInvite] = useState(false);
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
   const myUserId = profile?.id;
   const isOwner = group?.ownerId === myUserId;
@@ -42,6 +43,20 @@ export default function GroupDetailScreen() {
   // amici non ancora nel gruppo
   const memberIds = new Set(group?.members.map((m) => m.userId) ?? []);
   const invitableFriends = friends.filter((f: Friend) => !memberIds.has(f.id));
+
+  // righe della sezione invito: amici invitabili (con stato pending) + inviti pendenti verso ex-amici
+  const pendingIds = new Set(group?.pendingInvites.map((p) => p.userId) ?? []);
+  const friendIds = new Set(friends.map((f: Friend) => f.id));
+  const inviteRows = [
+    ...invitableFriends.map((f: Friend) => ({
+      userId: f.id,
+      username: f.username,
+      pending: pendingIds.has(f.id),
+    })),
+    ...(group?.pendingInvites ?? [])
+      .filter((p) => !friendIds.has(p.userId))
+      .map((p) => ({ userId: p.userId, username: p.username, pending: true })),
+  ];
 
   const handleLeaveConfirmed = async () => {
     setConfirmLeave(false);
@@ -57,6 +72,26 @@ export default function GroupDetailScreen() {
       await deleteGroup(id);
       router.back();
     } catch (_) {}
+  };
+
+  const handleInvite = async (userId: string) => {
+    setProcessingId(userId);
+    try {
+      await inviteToGroup(userId);
+    } catch (_) {
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleRevoke = async (userId: string) => {
+    setProcessingId(userId);
+    try {
+      await revokeInvite(userId);
+    } catch (_) {
+    } finally {
+      setProcessingId(null);
+    }
   };
 
   const handleRemoveConfirmed = async () => {
@@ -154,25 +189,41 @@ export default function GroupDetailScreen() {
               </Pressable>
               {showInvite && (
                 <View style={styles.inviteList}>
-                  {invitableFriends.length === 0 ? (
+                  {inviteRows.length === 0 ? (
                     <Text style={[styles.emptySection, { color: colors.textSecondary }]}>
                       {t('detail.noFriends')}
                     </Text>
                   ) : (
-                    invitableFriends.map((friend: Friend) => (
-                      <Pressable
-                        key={friend.id}
-                        onPress={() => inviteToGroup(friend.id)}
-                        disabled={inviting}
-                        style={[styles.friendRow, { backgroundColor: colors.backgroundElement }]}>
-                        <Text style={[styles.friendName, { color: colors.text }]}>
-                          {friend.username}
-                        </Text>
-                        <Text style={[styles.inviteAction, { color: colors.textSecondary }]}>
-                          {t('detail.invite')}
-                        </Text>
-                      </Pressable>
-                    ))
+                    inviteRows.map((row) => {
+                      const isProcessing = processingId === row.userId;
+                      return (
+                        <Pressable
+                          key={row.userId}
+                          onPress={() =>
+                            row.pending ? handleRevoke(row.userId) : handleInvite(row.userId)
+                          }
+                          disabled={isProcessing}
+                          style={[styles.friendRow, { backgroundColor: colors.backgroundElement }]}>
+                          <View style={styles.friendInfo}>
+                            <Text style={[styles.friendName, { color: colors.text }]}>
+                              {row.username}
+                            </Text>
+                            {row.pending && (
+                              <Text style={[styles.invitedBadge, { color: colors.textSecondary }]}>
+                                {t('detail.invited')}
+                              </Text>
+                            )}
+                          </View>
+                          <Text style={[styles.inviteAction, { color: colors.textSecondary }]}>
+                            {isProcessing
+                              ? '…'
+                              : row.pending
+                                ? t('detail.revoke')
+                                : t('detail.invite')}
+                          </Text>
+                        </Pressable>
+                      );
+                    })
                   )}
                 </View>
               )}
@@ -289,8 +340,17 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: Spacing.three,
   },
+  friendInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
   friendName: {
     fontSize: 15,
+    fontFamily: 'Nunito_600SemiBold',
+  },
+  invitedBadge: {
+    fontSize: 12,
     fontFamily: 'Nunito_600SemiBold',
   },
   inviteAction: {

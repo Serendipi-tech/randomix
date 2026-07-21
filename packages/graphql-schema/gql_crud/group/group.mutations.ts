@@ -64,6 +64,12 @@ export const REJECT_GROUP_INVITE: DocumentNode = parse(`
   }
 `);
 
+export const REVOKE_GROUP_INVITE: DocumentNode = parse(`
+  mutation RevokeGroupInvite($groupId: ID!, $userId: ID!) {
+    revokeGroupInvite(groupId: $groupId, userId: $userId)
+  }
+`);
+
 export const LEAVE_GROUP: DocumentNode = parse(`
   mutation LeaveGroup($groupId: ID!) {
     leaveGroup(groupId: $groupId)

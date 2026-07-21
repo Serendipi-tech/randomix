@@ -57,6 +57,20 @@ GroupSummaryRef.implement({
   }),
 });
 
+// Invito pendente verso un utente non ancora membro (mostrato solmente a chi gestisce il gruppo)
+export interface GroupPendingInviteShape {
+  userId: string;
+  username: string;
+}
+
+export const GroupPendingInviteRef = builder.objectRef<GroupPendingInviteShape>('GroupPendingInvite');
+GroupPendingInviteRef.implement({
+  fields: (t) => ({
+    userId: t.exposeID('userId'),
+    username: t.exposeString('username'),
+  }),
+});
+
 export interface GroupDetailShape {
   id: string;
   name: string;
@@ -64,6 +78,7 @@ export interface GroupDetailShape {
   ownerId: string;
   members: GroupMemberShape[];
   groupLists: GroupListShape[];
+  pendingInvites: GroupPendingInviteShape[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -77,6 +92,7 @@ GroupDetailRef.implement({
     ownerId: t.exposeID('ownerId'),
     members: t.field({ type: [GroupMemberRef], resolve: (g) => g.members }),
     groupLists: t.field({ type: [GroupListRef], resolve: (g) => g.groupLists }),
+    pendingInvites: t.field({ type: [GroupPendingInviteRef], resolve: (g) => g.pendingInvites }),
     createdAt: t.expose('createdAt', { type: 'DateTime' }),
     updatedAt: t.expose('updatedAt', { type: 'DateTime' }),
   }),

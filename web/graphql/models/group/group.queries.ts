@@ -59,7 +59,21 @@ builder.queryField('groupDetail', (t) =>
       if (!group) {
         throw new GraphQLError('Gruppo non trovato.', { extensions: { code: 'NOT_FOUND' } });
       }
-      return group;
+
+      // inviti pendenti (non letti) verso utenti non ancora membri, deduplicati per destinatario
+      const memberIds = new Set(group.members.map((m) => m.userId));
+      const pendingNotifs = await prisma.notification.findMany({
+        where: { groupId: id, notificationType: 'GROUP_INVITE', markedAsRead: false },
+        include: { receiver: { select: { id: true, username: true } } },
+        orderBy: { createdAt: 'desc' },
+      });
+      const pendingMap = new Map<string, { userId: string; username: string }>();
+      for (const n of pendingNotifs) {
+        if (memberIds.has(n.receiver.id) || pendingMap.has(n.receiver.id)) continue;
+        pendingMap.set(n.receiver.id, { userId: n.receiver.id, username: n.receiver.username });
+      }
+
+      return { ...group, pendingInvites: [...pendingMap.values()] };
     },
   }),
 );

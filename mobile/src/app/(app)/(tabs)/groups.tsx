@@ -5,9 +5,9 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { AuthBackgroundView } from '@/components/molecules/auth-background';
-import { AuthButton } from '@/components/atoms/auth-button';
-import { AuthInput } from '@/components/atoms/auth-input';
+import { GradientBackgroundView } from '@/components/molecules/gradient-background';
+import { Button } from '@/components/atoms/button';
+import { Input } from '@/components/atoms/input';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { GroupCard } from '@/components/group/group-card';
 import { GroupInviteRow } from '@/components/group/group-invite-row';
@@ -23,13 +23,14 @@ export default function GroupsScreen() {
   const router = useRouter();
 
   const { groups, loading: loadingGroups, error: groupsError, refetch } = useMyGroups();
-  const { invites, answering, acceptInvite, rejectInvite } = useGroupInvites();
+  const { invites, acceptInvite, rejectInvite } = useGroupInvites();
   const { createGroup, creating } = useCreateGroup();
 
   const [showCreate, setShowCreate] = useState(false);
   const [groupName, setGroupName] = useState('');
   const [groupDescription, setGroupDescription] = useState('');
   const [createError, setCreateError] = useState<string | null>(null);
+  const [answeringId, setAnsweringId] = useState<string | null>(null);
 
   const showSkeleton = loadingGroups && groups.length === 0;
 
@@ -49,12 +50,22 @@ export default function GroupsScreen() {
     }
   };
 
+  const handleAnswer = async (inviteId: string, answer: (id: string) => Promise<unknown>) => {
+    setAnsweringId(inviteId);
+    try {
+      await answer(inviteId);
+    } catch (_) {
+    } finally {
+      setAnsweringId(null);
+    }
+  };
+
   const roleLabel = (role: string) =>
     t(`member.roles.${role}`, { defaultValue: role });
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <AuthBackgroundView colorScheme={colorScheme} />
+      <GradientBackgroundView colorScheme={colorScheme} />
       <FlatList
         data={showSkeleton ? [] : groups}
         keyExtractor={(g: GroupSummary) => g.id}
@@ -81,14 +92,14 @@ export default function GroupsScreen() {
 
             {showCreate && (
               <View style={[styles.createCard, { backgroundColor: colors.backgroundElement }]}>
-                <AuthInput
+                <Input
                   colorScheme={colorScheme}
                   placeholder={t('createModal.namePlaceholder')}
                   value={groupName}
                   onChangeText={setGroupName}
                   autoCapitalize="words"
                 />
-                <AuthInput
+                <Input
                   colorScheme={colorScheme}
                   placeholder={t('createModal.descriptionPlaceholder')}
                   value={groupDescription}
@@ -97,13 +108,13 @@ export default function GroupsScreen() {
                 {createError && (
                   <Text style={styles.errorText}>{createError}</Text>
                 )}
-                <AuthButton
+                <Button
                   colorScheme={colorScheme}
                   label={t('createModal.submit')}
                   onPress={handleCreate}
                   loading={creating}
                 />
-                <AuthButton
+                <Button
                   colorScheme={colorScheme}
                   variant="secondary"
                   label={t('createModal.cancel')}
@@ -117,7 +128,7 @@ export default function GroupsScreen() {
             )}
 
             {!showCreate && (
-              <AuthButton
+              <Button
                 colorScheme={colorScheme}
                 label={t('create')}
                 onPress={() => setShowCreate(true)}
@@ -138,9 +149,9 @@ export default function GroupsScreen() {
                     acceptLabel={t('invites.accept')}
                     rejectLabel={t('invites.reject')}
                     colorScheme={colorScheme}
-                    disabled={answering}
-                    onAccept={() => acceptInvite(invite.id)}
-                    onReject={() => rejectInvite(invite.id)}
+                    disabled={answeringId === invite.id}
+                    onAccept={() => handleAnswer(invite.id, acceptInvite)}
+                    onReject={() => handleAnswer(invite.id, rejectInvite)}
                   />
                 ))}
               </>

@@ -33,7 +33,9 @@
     "deleteConfirmMessage": "This action is irreversible. The group and all its data will be deleted.",
     "error": "Failed to load group",
     "inviteTitle": "Invite a friend",
-    "noFriends": "No friends to invite"
+    "noFriends": "No friends to invite",
+    "invited": "Invited",
+    "revoke": "Cancel"
   },
   "member": {
     "roles": {

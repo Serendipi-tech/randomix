@@ -12,6 +12,8 @@ export default function AppLayout() {
       <Stack.Screen name="randomizer" />
       <Stack.Screen name="friend/[id]" />
       <Stack.Screen name="list/[id]" />
+      <Stack.Screen name="group/[id]" />
+      <Stack.Screen name="group-list/[groupListId]" />
     </Stack>
   );
 }

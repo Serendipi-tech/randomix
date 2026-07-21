@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 import { Accent, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { AuthButton } from '@/components/atoms/auth-button';
+import { Button } from '@/components/atoms/button';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { useGroupListDraw, useGroupListMergedItems, type GroupListItem } from '@/utils/useGroupList';
 
@@ -95,13 +95,13 @@ export default function GroupListScreen() {
 
           {!accepted ? (
             <View style={styles.drawActions}>
-              <AuthButton
+              <Button
                 colorScheme={colorScheme}
                 label={t('groupList.accept')}
                 onPress={handleAccept}
                 loading={accepting}
               />
-              <AuthButton
+              <Button
                 colorScheme={colorScheme}
                 variant="secondary"
                 label={t('groupList.regenerate')}
@@ -109,7 +109,7 @@ export default function GroupListScreen() {
                 loading={drawing}
                 disabled={accepting}
               />
-              <AuthButton
+              <Button
                 colorScheme={colorScheme}
                 variant="secondary"
                 label="↩"
@@ -118,7 +118,7 @@ export default function GroupListScreen() {
               />
             </View>
           ) : (
-            <AuthButton
+            <Button
               colorScheme={colorScheme}
               label="↩"
               onPress={handleReset}
@@ -131,7 +131,7 @@ export default function GroupListScreen() {
             <Text style={[styles.mergedTitle, { color: colors.textSecondary }]}>
               {t('groupList.mergedItems', { count: items.length })}
             </Text>
-            <AuthButton
+            <Button
               colorScheme={colorScheme}
               label={t('groupList.draw')}
               onPress={() => runDraw()}

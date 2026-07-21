@@ -29,7 +29,7 @@ builder.mutationField('createGroup', (t) =>
     },
     resolve: async (_root, { name, description }, ctx) => {
       requireAuth(ctx.userId);
-      return prisma.group.create({
+      const group = await prisma.group.create({
         data: {
           name: name.trim(),
           description: description?.trim() ?? null,
@@ -41,6 +41,7 @@ builder.mutationField('createGroup', (t) =>
           groupLists: { include: { _count: { select: { memberLists: true } } } },
         },
       });
+      return { ...group, pendingInvites: [] };
     },
   }),
 );
@@ -61,7 +62,7 @@ builder.mutationField('updateGroup', (t) =>
       });
       if (!membership) throw new GraphQLError('Gruppo non trovato.', { extensions: { code: 'NOT_FOUND' } });
       requireRole(membership.role, ['OWNER', 'ADMIN']);
-      return prisma.group.update({
+      const group = await prisma.group.update({
         where: { id },
         data: {
           ...(name != null ? { name: name.trim() } : {}),
@@ -72,6 +73,7 @@ builder.mutationField('updateGroup', (t) =>
           groupLists: { include: { _count: { select: { memberLists: true } } } },
         },
       });
+      return { ...group, pendingInvites: [] };
     },
   }),
 );
@@ -179,6 +181,35 @@ builder.mutationField('rejectGroupInvite', (t) =>
       });
       if (!notif) throw new GraphQLError('Invito non trovato.', { extensions: { code: 'NOT_FOUND' } });
       await prisma.notification.delete({ where: { id: notif.id } });
+      return true;
+    },
+  }),
+);
+
+builder.mutationField('revokeGroupInvite', (t) =>
+  t.boolean({
+    args: {
+      groupId: t.arg.id({ required: true }),
+      userId: t.arg.id({ required: true }),
+    },
+    resolve: async (_root, { groupId, userId }, ctx) => {
+      requireAuth(ctx.userId);
+      const gId = String(groupId);
+      const targetId = String(userId);
+      const membership = await prisma.group_User.findUnique({
+        where: { groupId_userId: { groupId: gId, userId: ctx.userId } },
+      });
+      if (!membership) throw new GraphQLError('Gruppo non trovato.', { extensions: { code: 'NOT_FOUND' } });
+      requireRole(membership.role, ['OWNER', 'ADMIN']);
+      // revoca ogni invito pendente verso l'utente per questo gruppo, da qualsiasi mittente
+      await prisma.notification.deleteMany({
+        where: {
+          groupId: gId,
+          receiverId: targetId,
+          notificationType: 'GROUP_INVITE',
+          markedAsRead: false,
+        },
+      });
       return true;
     },
   }),
