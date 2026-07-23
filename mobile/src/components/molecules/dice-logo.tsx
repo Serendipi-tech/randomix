@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, View } from 'react-native';
-import { Accent, DiceShading } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 
 const DICE_SIZE = 108;
 const PIP_SIZE = 17;
@@ -20,7 +21,7 @@ export function DiceLogo() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[Accent.violet, `${Accent.violet}00`]}
+        colors={[Colors.light.primary, `${Colors.light.primary}00`]}
         start={{ x: 0.5, y: 0.5 }}
         end={{ x: 1, y: 1 }}
         style={styles.glow}
@@ -28,13 +29,13 @@ export function DiceLogo() {
 
       <View style={styles.body}>
         <LinearGradient
-          colors={[DiceShading.highlight, 'transparent']}
+          colors={[Colors.light.border, 'transparent']}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 0.6 }}
           style={styles.bevelHighlight}
         />
         <LinearGradient
-          colors={['transparent', DiceShading.shadowEdge]}
+          colors={['transparent', Colors.light.extraColors.two]}
           start={{ x: 0.5, y: 0.55 }}
           end={{ x: 0.5, y: 1 }}
           style={styles.bevelShadow}
@@ -81,11 +82,11 @@ const styles = StyleSheet.create({
     width: DICE_SIZE,
     height: DICE_SIZE,
     borderRadius: 24,
-    backgroundColor: DiceShading.face,
+    backgroundColor: Colors.light.extraColors.one,
     borderWidth: 2,
-    borderColor: DiceShading.border,
+    borderColor: Colors.light.extraColors.three,
     overflow: 'hidden',
-    shadowColor: '#000',
+    shadowColor: Colors.light.shadow,
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.25,
     shadowRadius: 18,
@@ -111,10 +112,10 @@ const styles = StyleSheet.create({
     width: PIP_SIZE,
     height: PIP_SIZE,
     borderRadius: PIP_SIZE / 2,
-    backgroundColor: DiceShading.pip,
+    backgroundColor: Colors.light.extraColors.four,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: Colors.light.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
     width: PIP_SIZE * 0.35,
     height: PIP_SIZE * 0.35,
     borderRadius: PIP_SIZE * 0.2,
-    backgroundColor: 'rgba(255,255,255,0.55)',
+    backgroundColor: hexToRgba(Colors.light.border, 0.55),
     transform: [{ translateX: -2 }, { translateY: -2 }],
   },
 });

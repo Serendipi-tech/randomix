@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import { ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
-import { CardSurface } from '@/constants/theme';
+import { Colors, GradientBackground } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 
 type CardProps = PropsWithChildren<{
   colorScheme: 'light' | 'dark';
@@ -8,15 +9,20 @@ type CardProps = PropsWithChildren<{
 }>;
 
 /** Variante web: backdrop-filter CSS puro, senza il wash bianco/nero che expo-blur applica di suo sul web
- *  (schiarirebbe qualunque tinta ci mettessimo sopra). Il colore è interamente quello di CardSurface.
+ *  (schiarirebbe qualunque tinta ci mettessimo sopra). Il colore deriva da Colors, come card.tsx.
  *  Il contenuto scrolla internamente: la dimensione della card (impostata da fuori via `style`) non cambia mai in base alla faccia mostrata. */
 export function Card({ colorScheme, style, children }: CardProps) {
-  const surface = CardSurface[colorScheme];
+  const colors = Colors[colorScheme];
+  const fill =
+    colorScheme === 'light'
+      ? hexToRgba(colors.primary, 0.3)
+      : hexToRgba(GradientBackground.dark.stops[1], 0.58);
+  const border = hexToRgba(colors.border, colorScheme === 'light' ? 0.5 : 0.16);
 
   return (
     <View style={[styles.shadowWrapper, style]}>
-      <View style={[styles.clip, { borderColor: surface.border }]}>
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: surface.fill }, glassStyle]} />
+      <View style={[styles.clip, { borderColor: border }]}>
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: fill }, glassStyle]} />
         <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {children}
         </ScrollView>
@@ -33,7 +39,7 @@ const glassStyle = {
 const styles = StyleSheet.create({
   shadowWrapper: {
     borderRadius: 32,
-    boxShadow: '0px 16px 28px rgba(0,0,0,0.35)',
+    boxShadow: `0px 16px 28px ${hexToRgba(Colors.light.shadow, 0.35)}`,
   },
   clip: {
     flex: 1,

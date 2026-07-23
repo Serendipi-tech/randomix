@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors, Spacing } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 
 interface GroupMemberRowProps {
   username: string;
@@ -61,11 +62,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.one,
     borderRadius: 20,
-    backgroundColor: '#E53E3E22',
+    backgroundColor: hexToRgba(Colors.light.error, 0.13),
   },
   removeLabel: {
     fontSize: 13,
     fontFamily: 'Nunito_600SemiBold',
-    color: '#E53E3E',
+    color: Colors.light.error,
   },
 });

@@ -1,5 +1,5 @@
 import { StyleSheet, Text } from 'react-native';
-import { Accent, CardSurface } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 type TitleProps = { colorScheme: 'light' | 'dark' } & (
   | { variant?: 'plain'; text: string }
@@ -8,7 +8,7 @@ type TitleProps = { colorScheme: 'light' | 'dark' } & (
 
 /** Titolo riusabile: variante "plain" (una riga) o "lead-accent" (due righe, con parola finale in evidenza). */
 export function Title(props: TitleProps) {
-  const textColor = CardSurface[props.colorScheme].text;
+  const textColor = Colors[props.colorScheme].titleColor;
 
   if (props.variant === 'lead-accent') {
     return (
@@ -42,6 +42,6 @@ const styles = StyleSheet.create({
   accent: {
     fontSize: 26,
     lineHeight: 20,
-    color: Accent.coral,
+    color: Colors.light.secondary,
   },
 });

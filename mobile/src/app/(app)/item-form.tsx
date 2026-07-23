@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Accent, Colors, Spacing } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
@@ -15,7 +15,13 @@ import { useTags } from '@/utils/useTags';
 import type { CompletionStatus } from '@/utils/useListDetail';
 
 const STATUSES: CompletionStatus[] = ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED'];
-const TAG_COLORS = [Accent.primary, Accent.coral, Accent.yellow, Accent.mint, Accent.violet];
+const TAG_COLORS = [
+  Colors.light.accent,
+  Colors.light.secondary,
+  Colors.light.warning,
+  Colors.light.success,
+  Colors.light.primary,
+];
 
 type ItemFormParams = {
   listId?: string;
@@ -287,18 +293,18 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 18,
     borderRadius: 14,
-    backgroundColor: Accent.violet,
+    backgroundColor: Colors.light.primary,
   },
   addTagLabel: {
     fontSize: 14,
-    color: '#fff',
+    color: Colors.light.border,
   },
   disabled: {
     opacity: 0.5,
   },
   error: {
     fontSize: 14,
-    color: '#E53E3E',
+    color: Colors.light.error,
     textAlign: 'center',
   },
 });

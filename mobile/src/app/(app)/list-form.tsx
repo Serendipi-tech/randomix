@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Accent, Colors, Spacing } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
@@ -14,7 +14,13 @@ import { useListCategories } from '@/utils/useListCategories';
 import { useListDetail } from '@/utils/useListDetail';
 import { useListMutations } from '@/utils/useListMutations';
 
-const LIST_COLORS = [Accent.primary, Accent.coral, Accent.yellow, Accent.mint, Accent.violet];
+const LIST_COLORS = [
+  Colors.light.accent,
+  Colors.light.secondary,
+  Colors.light.warning,
+  Colors.light.success,
+  Colors.light.primary,
+];
 
 export default function ListFormScreen() {
   const { t } = useTranslation('lists');
@@ -223,7 +229,7 @@ const styles = StyleSheet.create({
   },
   error: {
     fontSize: 14,
-    color: '#E53E3E',
+    color: Colors.light.error,
     textAlign: 'center',
   },
 });

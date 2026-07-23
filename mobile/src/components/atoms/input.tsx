@@ -1,5 +1,6 @@
 import { StyleSheet, TextInput, type TextInputProps, type TextStyle } from 'react-native';
-import { CardSurface, InputSurface } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 
 type InputProps = TextInputProps & {
   colorScheme: 'light' | 'dark';
@@ -10,21 +11,21 @@ const noWebOutline = { outlineStyle: 'none', outlineWidth: 0, outlineColor: 'tra
 
 /** Campo di testo dell'app: nessuna evidenziazione al focus, di proposito. */
 export function Input({ colorScheme, style, ...props }: InputProps) {
-  const surface = InputSurface[colorScheme];
-  const textColor = CardSurface[colorScheme].text;
+  const colors = Colors[colorScheme];
+  const fill = hexToRgba(colorScheme === 'light' ? colors.titleColor : colors.border, colorScheme === 'light' ? 0.06 : 0.08);
 
   return (
     <TextInput
       style={[
         styles.input,
         {
-          backgroundColor: surface.fill,
-          color: textColor,
+          backgroundColor: fill,
+          color: colors.titleColor,
         },
         noWebOutline,
         style,
       ]}
-      placeholderTextColor={surface.placeholder}
+      placeholderTextColor={colors.placeholder}
       {...props}
     />
   );

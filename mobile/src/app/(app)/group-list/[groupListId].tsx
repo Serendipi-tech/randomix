@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { ZoomIn } from 'react-native-reanimated';
-import { Accent, Colors, Spacing } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Button } from '@/components/atoms/button';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
@@ -85,7 +86,7 @@ export default function GroupListScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <LinearGradient
-        colors={[Accent.primary + '22', colors.background]}
+        colors={[hexToRgba(colors.accent, 0.13), colors.background]}
         style={StyleSheet.absoluteFill}
       />
       <View style={styles.topBar}>
@@ -197,7 +198,7 @@ export default function GroupListScreen() {
                         <Text
                           style={[
                             styles.manageRowAction,
-                            { color: shared ? Accent.coral : Accent.primary },
+                            { color: shared ? colors.secondary : colors.accent },
                           ]}>
                           {busy ? '…' : shared ? t('groupList.removeMyList') : t('groupList.addMyList')}
                         </Text>
@@ -376,7 +377,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: '#E53E3E',
+    color: Colors.light.error,
     textAlign: 'center',
     fontFamily: 'Nunito_500Medium',
   },

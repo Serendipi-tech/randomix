@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   },
   error: {
     fontSize: 14,
-    color: '#E53E3E',
+    color: Colors.light.error,
     textAlign: 'center',
   },
   sectionTitle: {

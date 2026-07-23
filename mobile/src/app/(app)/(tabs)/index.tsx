@@ -3,7 +3,8 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Accent, BottomTabInset, Colors, Spacing } from '@/constants/theme';
+import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { GradientBackgroundView } from '@/components/molecules/gradient-background';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
@@ -40,7 +41,7 @@ export default function HomeScreen() {
         onPress={() => router.push('/randomizer')}
         style={({ pressed }) => [styles.randomizerCard, pressed && styles.pressed]}>
         <LinearGradient
-          colors={[Accent.primary, Accent.violet]}
+          colors={[colors.accent, colors.primary]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFill}
@@ -112,11 +113,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 14,
-    backgroundColor: Accent.violet,
+    backgroundColor: Colors.light.primary,
   },
   addLabel: {
     fontSize: 14,
-    color: '#fff',
+    color: Colors.light.border,
   },
   randomizerCard: {
     marginHorizontal: Spacing.four,
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     overflow: 'hidden',
-    shadowColor: Accent.violet,
+    shadowColor: Colors.light.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 14,
@@ -142,15 +143,15 @@ const styles = StyleSheet.create({
   },
   randomizerTitle: {
     fontSize: 18,
-    color: '#fff',
+    color: Colors.light.border,
   },
   randomizerSubtitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.85)',
+    color: hexToRgba(Colors.light.border, 0.85),
   },
   randomizerArrow: {
     fontSize: 26,
-    color: '#fff',
+    color: Colors.light.border,
   },
   listContent: {
     paddingHorizontal: Spacing.four,

@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { InputSurface } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 
 type DividerProps = {
   label: string;
@@ -8,13 +9,14 @@ type DividerProps = {
 
 /** Separatore orizzontale riusabile con etichetta centrale (es. "oppure") tra due gruppi di azioni. */
 export function Divider({ label, colorScheme }: DividerProps) {
-  const surface = InputSurface[colorScheme];
+  const colors = Colors[colorScheme];
+  const fill = hexToRgba(colorScheme === 'light' ? colors.titleColor : colors.border, colorScheme === 'light' ? 0.06 : 0.08);
 
   return (
     <View style={styles.divider}>
-      <View style={[styles.line, { backgroundColor: surface.fill }]} />
-      <Text style={[styles.label, { color: surface.placeholder }]}>{label}</Text>
-      <View style={[styles.line, { backgroundColor: surface.fill }]} />
+      <View style={[styles.line, { backgroundColor: fill }]} />
+      <Text style={[styles.label, { color: colors.placeholder }]}>{label}</Text>
+      <View style={[styles.line, { backgroundColor: fill }]} />
     </View>
   );
 }

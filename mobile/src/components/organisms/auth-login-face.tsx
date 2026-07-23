@@ -5,7 +5,7 @@ import { Divider } from '@/components/atoms/divider';
 import { Input } from '@/components/atoms/input';
 import { PasswordInput } from '@/components/atoms/password-input';
 import { Pressable } from 'react-native';
-import { AuthLinkColor, CardSurface } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { Title } from '@/components/molecules/title';
 import { FormError } from '@/components/molecules/form-error';
 
@@ -40,8 +40,8 @@ export function AuthLoginFace({
   onBack,
 }: AuthLoginFaceProps) {
   const { t } = useTranslation('auth');
-  const textColor = CardSurface[colorScheme].text;
-  const linkColor = AuthLinkColor[colorScheme];
+  const textColor = Colors[colorScheme].titleColor;
+  const linkColor = Colors[colorScheme].linkColor;
 
   return (
     <View style={styles.form}>

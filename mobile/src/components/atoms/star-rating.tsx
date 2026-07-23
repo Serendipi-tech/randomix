@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Accent, Colors } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 interface StarRatingProps {
   value: number;
@@ -10,7 +10,8 @@ interface StarRatingProps {
 
 /** Fila di 5 stelle: interattiva se onChange è presente, altrimenti solo display. */
 export function StarRating({ value, onChange, size = 28, colorScheme }: StarRatingProps) {
-  const emptyColor = Colors[colorScheme].textSecondary;
+  const colors = Colors[colorScheme];
+  const emptyColor = colors.textSecondary;
 
   return (
     <View style={styles.row}>
@@ -20,7 +21,7 @@ export function StarRating({ value, onChange, size = 28, colorScheme }: StarRati
           onPress={onChange ? () => onChange(star) : undefined}
           disabled={!onChange}
           hitSlop={4}>
-          <Text style={{ fontSize: size, color: star <= value ? Accent.yellow : emptyColor }}>
+          <Text style={{ fontSize: size, color: star <= value ? colors.warning : emptyColor }}>
             {star <= value ? '★' : '☆'}
           </Text>
         </Pressable>

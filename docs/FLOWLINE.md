@@ -61,11 +61,14 @@ Questo file spiega il funzionamento previsto, non definitivo, dei flussi interni
             - statistiche singole dell'amico
         - statistiche generali condivise con amici
       - gruppi
-        - elenco membri
-        - impostazioni gruppo (se si è admin o amministratori)
-          - area gestione dei membri
-        - elenco liste condivise
-          - tasto "partecipa alla lista"
-          - randomizzatore della lista
-        - elenco challenge
-          - ogni challenge ha il suo progresso singolo per utente che partecipa
+        - nuovo gruppo
+        - lista gruppi
+        - gruppo/
+          - elenco membri
+          - impostazioni gruppo (se si è admin o amministratori)
+            - area gestione dei membri
+          - elenco liste condivise
+            - tasto "partecipa alla lista"
+            - randomizzatore della lista
+          - elenco challenge
+            - ogni challenge ha il suo progresso singolo per utente che partecipa

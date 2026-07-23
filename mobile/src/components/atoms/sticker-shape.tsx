@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import { StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { Colors } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
   base: {
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: Colors.light.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.18,
     shadowRadius: 6,
@@ -100,12 +102,12 @@ const styles = StyleSheet.create({
   },
   pip: {
     position: 'absolute',
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: hexToRgba(Colors.light.border, 0.9),
   },
   glyph: {
-    color: '#fff',
+    color: Colors.light.border,
   },
   label: {
-    color: '#fff',
+    color: Colors.light.border,
   },
 });

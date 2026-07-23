@@ -1,7 +1,7 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { Accent, ButtonPrimary, ButtonSecondary } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 
 type ButtonProps = {
@@ -25,6 +25,7 @@ export function Button({
 }: ButtonProps) {
   const isDisabled = disabled || loading;
   const pressed = useSharedValue(0);
+  const colors = Colors[colorScheme];
 
   // Nessun transform a riposo: altrimenti il layer composito sfoca il testo su web (stesso motivo di useCardFlip).
   const animatedStyle = useAnimatedStyle(() => ({
@@ -33,20 +34,20 @@ export function Button({
   }));
 
   if (variant === 'secondary') {
-    const outline = ButtonSecondary[colorScheme];
+    const outline = colors.titleColor;
     return (
       <Animated.View style={animatedStyle}>
         <Pressable
-          style={[styles.button, styles.outline, { borderColor: outline.border }, isDisabled && styles.disabled]}
+          style={[styles.button, styles.outline, { borderColor: outline }, isDisabled && styles.disabled]}
           onPress={onPress}
           onPressIn={() => (pressed.value = withTiming(1, { duration: 100 }))}
           onPressOut={() => (pressed.value = withTiming(0, { duration: 150 }))}
           disabled={isDisabled}
         >
           {loading ? (
-            <ActivityIndicator color={outline.text} />
+            <ActivityIndicator color={outline} />
           ) : (
-            <Text style={[styles.label, { color: outline.text }]}>{label}</Text>
+            <Text style={[styles.label, { color: outline }]}>{label}</Text>
           )}
         </Pressable>
       </Animated.View>
@@ -63,15 +64,15 @@ export function Button({
         disabled={isDisabled}
       >
         <LinearGradient
-          colors={[Accent.coral, Accent.violet]}
+          colors={[colors.secondary, colors.primary]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFill}
         />
         {loading ? (
-          <ActivityIndicator color={ButtonPrimary.text} />
+          <ActivityIndicator color={colors.border} />
         ) : (
-          <Text style={[styles.label, { color: ButtonPrimary.text }]}>{label}</Text>
+          <Text style={[styles.label, { color: colors.border }]}>{label}</Text>
         )}
       </Pressable>
     </Animated.View>
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     alignItems: 'center',
     overflow: 'hidden',
-    boxShadow: `0px 8px 14px ${hexToRgba(Accent.violet, 0.3)}`,
+    boxShadow: `0px 8px 14px ${hexToRgba(Colors.light.primary, 0.3)}`,
   },
   outline: {
     borderWidth: 1.5,

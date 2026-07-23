@@ -1,5 +1,5 @@
 import { StyleSheet, Text } from 'react-native';
-import { StatusColor } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 type FormErrorProps = {
   message: string;
@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 15,
     fontWeight: '700',
-    color: StatusColor.danger,
+    color: Colors.light.error,
     textAlign: 'center',
   },
 });

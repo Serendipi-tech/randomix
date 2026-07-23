@@ -1,4 +1,6 @@
 import { Pressable, StyleSheet, Text, type ViewStyle } from 'react-native';
+import { Colors } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 
 type RefreshButtonProps = {
   onPress: () => void;
@@ -16,11 +18,11 @@ export function RefreshButton({ onPress, colorScheme, style }: RefreshButtonProp
       hitSlop={10}
       style={[
         styles.button,
-        { backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(31,27,46,0.08)' },
+        { backgroundColor: isDark ? hexToRgba(Colors.dark.border, 0.12) : hexToRgba(Colors.light.titleColor, 0.08) },
         style,
       ]}
     >
-      <Text style={[styles.glyph, { color: isDark ? '#F3ECFF' : '#241A3D' }]}>↻</Text>
+      <Text style={[styles.glyph, { color: isDark ? Colors.dark.titleColor : Colors.light.titleColor }]}>↻</Text>
     </Pressable>
   );
 }

@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
-import { Accent } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 interface UserAvatarProps {
   username: string;
@@ -30,11 +30,11 @@ export function UserAvatar({ username, avatarUrl, size = 48 }: UserAvatarProps) 
 
 const styles = StyleSheet.create({
   fallback: {
-    backgroundColor: Accent.violet,
+    backgroundColor: Colors.light.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   initial: {
-    color: '#fff',
+    color: Colors.light.border,
   },
 });

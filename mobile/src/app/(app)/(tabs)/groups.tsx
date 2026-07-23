@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: '#E53E3E',
+    color: Colors.light.error,
     textAlign: 'center',
     fontFamily: 'Nunito_500Medium',
   },

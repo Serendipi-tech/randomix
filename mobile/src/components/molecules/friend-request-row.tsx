@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Accent, Colors } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { UserAvatar } from '@/components/atoms/user-avatar';
 
 interface FriendRequestRowProps {
@@ -37,7 +37,7 @@ export function FriendRequestRow({
         disabled={disabled}
         hitSlop={8}
         accessibilityLabel={acceptLabel}
-        style={[styles.actionButton, { backgroundColor: Accent.mint }]}>
+        style={[styles.actionButton, { backgroundColor: colors.success }]}>
         <Text style={styles.acceptGlyph}>✓</Text>
       </Pressable>
       <Pressable
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   },
   username: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 16,
   },
   actionButton: {
     width: 34,
@@ -73,9 +73,9 @@ const styles = StyleSheet.create({
   },
   acceptGlyph: {
     fontSize: 16,
-    color: '#fff',
+    color: Colors.light.border,
   },
   rejectGlyph: {
-    fontSize: 14,
+    fontSize: 14,
   },
 });

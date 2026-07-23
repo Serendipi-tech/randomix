@@ -93,10 +93,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   acceptBtn: {
-    backgroundColor: '#6C63FF',
+    backgroundColor: Colors.light.success,
   },
   acceptLabel: {
-    color: '#fff',
+    color: Colors.light.border,
     fontSize: 13,
     fontFamily: 'Nunito_700Bold',
   },

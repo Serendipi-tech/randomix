@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { TooltipSurface } from '@/constants/theme';
+import { Colors, GradientBackground } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 
 type TooltipProps = PropsWithChildren<{
   visible: boolean;
@@ -22,11 +23,11 @@ const styles = StyleSheet.create({
     width: 220,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: TooltipSurface.border,
-    backgroundColor: TooltipSurface.fill,
+    borderColor: hexToRgba(Colors.light.border, 0.14),
+    backgroundColor: GradientBackground.dark.stops[1],
     padding: 14,
     gap: 8,
-    boxShadow: '0px 8px 20px rgba(0,0,0,0.35)',
+    boxShadow: `0px 8px 20px ${hexToRgba(Colors.light.shadow, 0.35)}`,
     zIndex: 20,
     elevation: 8,
   },

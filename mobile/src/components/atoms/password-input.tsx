@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View, type TextInputProps } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { Input } from '@/components/atoms/input';
-import { InputSurface } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { PasswordStrengthIndicator } from '@/components/molecules/password-strength';
 
 type PasswordInputProps = Omit<TextInputProps, 'secureTextEntry'> & {
@@ -14,7 +14,7 @@ type PasswordInputProps = Omit<TextInputProps, 'secureTextEntry'> & {
 /** Campo password: come Input ma con occhio per mostrare/nascondere il testo digitato. */
 export function PasswordInput({ colorScheme, style, showStrength, value, ...props }: PasswordInputProps) {
   const [visible, setVisible] = useState(false);
-  const iconColor = InputSurface[colorScheme].placeholder;
+  const iconColor = Colors[colorScheme].placeholder;
 
   return (
     <View style={styles.wrap}>

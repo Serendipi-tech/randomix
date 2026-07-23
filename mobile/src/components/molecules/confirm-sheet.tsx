@@ -1,5 +1,6 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Accent, Colors } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 
 interface ConfirmSheetProps {
   visible: boolean;
@@ -48,7 +49,7 @@ export function ConfirmSheet({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: hexToRgba(Colors.light.shadow, 0.45),
   },
   sheet: {
     width: '100%',
@@ -71,11 +72,11 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     paddingVertical: 15,
     alignItems: 'center',
-    backgroundColor: Accent.coral,
+    backgroundColor: Colors.light.error,
   },
   confirmLabel: {
     fontSize: 16,
-    color: '#fff',
+    color: Colors.light.border,
   },
   cancelButton: {
     borderRadius: 18,

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Check, ShieldAlert, X } from 'lucide-react-native';
-import { StatusColor, TooltipSurface } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { Tooltip } from '@/components/molecules/tooltip';
 import { getPasswordStrength, type PasswordRules } from '@/utils/passwordStrength';
 
@@ -12,9 +12,9 @@ type PasswordStrengthIndicatorProps = {
 };
 
 const LEVEL_COLOR = {
-  weak: StatusColor.danger,
-  medium: StatusColor.warning,
-  strong: StatusColor.success,
+  weak: Colors.light.error,
+  medium: Colors.light.warning,
+  strong: Colors.light.success,
 } as const;
 
 const RULE_KEYS: (keyof PasswordRules)[] = ['length', 'letter', 'number', 'special'];
@@ -52,7 +52,7 @@ export function PasswordStrengthIndicator({ password, colorScheme }: PasswordStr
 
 const styles = StyleSheet.create({
   wrap: { justifyContent: 'center' },
-  title: { fontSize: 15, fontWeight: '700', color: TooltipSurface.text },
+  title: { fontSize: 15, fontWeight: '700', color: Colors.light.border },
   ruleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  ruleText: { fontSize: 14, color: TooltipSurface.text },
+  ruleText: { fontSize: 14, color: Colors.light.border },
 });

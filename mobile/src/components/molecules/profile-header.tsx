@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Accent, Colors } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 import { UserAvatar } from '@/components/atoms/user-avatar';
 
 interface ProfileHeaderProps {
@@ -62,10 +63,10 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 14,
-    backgroundColor: 'rgba(124,92,252,0.14)',
+    backgroundColor: hexToRgba(Colors.light.primary, 0.14),
   },
   editLabel: {
     fontSize: 14,
-    color: Accent.violet,
+    color: Colors.light.primary,
   },
 });

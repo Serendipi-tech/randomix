@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Accent, Colors } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { UserAvatar } from '@/components/atoms/user-avatar';
 
 interface UserSearchRowProps {
@@ -65,13 +65,13 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 16,
     borderRadius: 14,
-    backgroundColor: Accent.primary,
+    backgroundColor: Colors.light.accent,
   },
   addDisabled: {
     opacity: 0.6,
   },
   addLabel: {
     fontSize: 14,
-    color: '#fff',
+    color: Colors.light.border,
   },
 });

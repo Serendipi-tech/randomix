@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
 import { PasswordInput } from '@/components/atoms/password-input';
-import { CardSurface } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { Title } from '@/components/molecules/title';
 import { FormError } from '@/components/molecules/form-error';
 import type { RecoveryStep } from '@/utils/usePasswordRecoveryForm';
@@ -45,7 +45,7 @@ export function AuthRecoverFace({
   onBack,
 }: AuthRecoverFaceProps) {
   const { t } = useTranslation('auth');
-  const textColor = CardSurface[colorScheme].text;
+  const textColor = Colors[colorScheme].titleColor;
 
   if (step === 'request') {
     return (

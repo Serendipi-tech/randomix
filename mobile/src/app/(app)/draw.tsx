@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { ZoomIn } from 'react-native-reanimated';
-import { Accent, Colors, Spacing } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Button } from '@/components/atoms/button';
 import { StickerShape } from '@/components/atoms/sticker-shape';
@@ -50,7 +51,7 @@ export default function DrawScreen() {
     }
   };
 
-  const accentColor = listColor || Accent.violet;
+  const accentColor = listColor || colors.primary;
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
@@ -62,8 +63,8 @@ export default function DrawScreen() {
       </View>
 
       <View style={styles.center}>
-        <StickerShape variant="star" color={Accent.yellow} size={22} rotation={-12} style={styles.stickerStar} />
-        <StickerShape variant="dot" color={Accent.mint} size={14} style={styles.stickerDot} />
+        <StickerShape variant="star" color={colors.warning} size={22} rotation={-12} style={styles.stickerStar} />
+        <StickerShape variant="dot" color={colors.success} size={14} style={styles.stickerDot} />
 
         {drawError ? (
           <Text style={[styles.errorTitle, { color: colors.text }]}>{drawError}</Text>
@@ -71,7 +72,7 @@ export default function DrawScreen() {
           <Animated.View key={entry.id} entering={ZoomIn.springify().damping(14)}>
             <View style={styles.card}>
               <LinearGradient
-                colors={[accentColor, Accent.violet]}
+                colors={[accentColor, colors.primary]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     padding: Spacing.five,
     gap: Spacing.three,
     overflow: 'hidden',
-    shadowColor: Accent.violet,
+    shadowColor: Colors.light.primary,
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.35,
     shadowRadius: 20,
@@ -180,21 +181,21 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 14,
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.25)',
+    backgroundColor: hexToRgba(Colors.light.border, 0.25),
   },
   // 12px consentito solo per i badge
   categoryLabel: {
     fontSize: 12,
-    color: '#fff',
+    color: Colors.light.border,
   },
   itemName: {
     fontSize: 28,
-    color: '#fff',
+    color: Colors.light.border,
     textAlign: 'center',
   },
   ratingText: {
     fontSize: 20,
-    color: '#fff',
+    color: Colors.light.border,
     letterSpacing: 4,
   },
   tagRow: {
@@ -210,11 +211,11 @@ const styles = StyleSheet.create({
   },
   tagLabel: {
     fontSize: 12,
-    color: '#fff',
+    color: Colors.light.border,
   },
   acceptedText: {
     fontSize: 16,
-    color: '#fff',
+    color: Colors.light.border,
   },
   errorTitle: {
     fontSize: 16,

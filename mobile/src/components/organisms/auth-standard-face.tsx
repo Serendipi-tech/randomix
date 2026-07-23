@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ClipboardList, Shuffle, Star, Users } from 'lucide-react-native';
-import { Accent } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { Button } from '@/components/atoms/button';
 import { FeatureRow } from '@/components/molecules/feature-row';
 import { Title } from '@/components/molecules/title';
@@ -16,10 +16,10 @@ type Feature = { title: string; subtitle: string };
 
 /** Gradiente mono-tono (colore base → stessa tinta più scura), un accent diverso per riga. */
 const FEATURE_ROWS = [
-  { Icon: ClipboardList, tint: Accent.coral, gradient: [Accent.coral, darkenColor(Accent.coral, 0.25)] as const },
-  { Icon: Star, tint: Accent.yellow, gradient: [Accent.yellow, darkenColor(Accent.yellow, 0.25)] as const },
-  { Icon: Users, tint: Accent.primary, gradient: [Accent.primary, darkenColor(Accent.primary, 0.25)] as const },
-  { Icon: Shuffle, tint: Accent.mint, gradient: [Accent.mint, darkenColor(Accent.mint, 0.25)] as const },
+  { Icon: ClipboardList, tint: Colors.light.secondary, gradient: [Colors.light.secondary, darkenColor(Colors.light.secondary, 0.25)] as const },
+  { Icon: Star, tint: Colors.light.warning, gradient: [Colors.light.warning, darkenColor(Colors.light.warning, 0.25)] as const },
+  { Icon: Users, tint: Colors.light.accent, gradient: [Colors.light.accent, darkenColor(Colors.light.accent, 0.25)] as const },
+  { Icon: Shuffle, tint: Colors.light.success, gradient: [Colors.light.success, darkenColor(Colors.light.success, 0.25)] as const },
 ];
 
 export function AuthStandardFace({ colorScheme, onSignIn }: AuthStandardFaceProps) {

@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
-import { Accent, Colors } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 
 interface SelectableChipProps {
   label: string;
@@ -17,10 +18,10 @@ export function SelectableChip({ label, selected, onPress, colorScheme }: Select
       onPress={onPress}
       style={[
         styles.chip,
-        { backgroundColor: selected ? 'rgba(124,92,252,0.18)' : colors.backgroundElement },
+        { backgroundColor: selected ? hexToRgba(colors.primary, 0.18) : colors.backgroundElement },
         selected && styles.selected,
       ]}>
-      <Text style={[styles.label, { color: selected ? Accent.violet : colors.textSecondary }]}>
+      <Text style={[styles.label, { color: selected ? colors.primary : colors.textSecondary }]}>
         {label}
       </Text>
     </Pressable>
@@ -36,9 +37,9 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   selected: {
-    borderColor: Accent.violet,
+    borderColor: Colors.light.primary,
   },
   label: {
-    fontSize: 14,
+    fontSize: 14,
   },
 });

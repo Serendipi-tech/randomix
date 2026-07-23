@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Accent, Colors } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 interface ItemRowTag {
   id: string;
@@ -27,8 +27,8 @@ const MAX_VISIBLE_TAGS = 2;
 // colore presentazionale dello stato, dai token del tema
 const STATUS_COLORS: Record<ItemRowStatus, string> = {
   NOT_STARTED: 'transparent',
-  IN_PROGRESS: Accent.yellow,
-  COMPLETED: Accent.mint,
+  IN_PROGRESS: Colors.light.warning,
+  COMPLETED: Colors.light.success,
 };
 
 /** Riga di un elemento della lista: nome, categoria, stato, rating, tag e rimozione. */
@@ -72,7 +72,7 @@ export function ItemRow({
             {statusLabel}
           </Text>
           {ratingValue ? (
-            <Text style={[styles.rating, { color: Accent.yellow }]}>★ {ratingValue}</Text>
+            <Text style={[styles.rating, { color: colors.warning }]}>★ {ratingValue}</Text>
           ) : null}
         </View>
         {visibleTags.length > 0 && (
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     gap: 12,
     borderRadius: 18,
     padding: 14,
-    shadowColor: '#000',
+    shadowColor: Colors.light.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   // 12px consentito solo per i badge, come da regole tipografiche
   tagLabel: {
     fontSize: 12,
-    color: '#fff',
+    color: Colors.light.border,
   },
   removeButton: {
     width: 30,

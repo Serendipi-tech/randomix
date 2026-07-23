@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   },
   addLabel: {
     fontSize: 14,
-    color: '#fff',
+    color: Colors.light.border,
   },
   empty: {
     alignItems: 'center',

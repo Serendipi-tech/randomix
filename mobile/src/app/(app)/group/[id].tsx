@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Accent, Colors, Spacing } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
@@ -18,7 +18,13 @@ import { useMyFriends, type Friend } from '@/utils/useFriends';
 import { useProfile } from '@/utils/useProfile';
 
 const SKELETON_COUNT = 3;
-const LIST_COLORS = [Accent.primary, Accent.coral, Accent.yellow, Accent.mint, Accent.violet];
+const LIST_COLORS = [
+  Colors.light.accent,
+  Colors.light.secondary,
+  Colors.light.warning,
+  Colors.light.success,
+  Colors.light.primary,
+];
 
 export default function GroupDetailScreen() {
   const { t } = useTranslation('groups');
@@ -427,7 +433,7 @@ const styles = StyleSheet.create({
   },
   listError: {
     fontSize: 14,
-    color: '#E53E3E',
+    color: Colors.light.error,
     textAlign: 'center',
     fontFamily: 'Nunito_500Medium',
   },
@@ -477,7 +483,7 @@ const styles = StyleSheet.create({
   dangerText: {
     fontSize: 15,
     fontFamily: 'Nunito_600SemiBold',
-    color: '#E53E3E',
+    color: Colors.light.error,
   },
   empty: {
     flex: 1,

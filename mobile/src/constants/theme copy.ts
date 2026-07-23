@@ -1,0 +1,160 @@
+/**
+ * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
+ * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ */
+
+import '@/global.css';
+
+import { Platform } from 'react-native';
+
+export const Colors = {
+  light: {
+    text: '#000000',
+    background: '#ffffff',
+    backgroundElement: '#F0F0F3',
+    backgroundSelected: '#E0E1E6',
+    textSecondary: '#60646C',
+  },
+  dark: {
+    text: '#ffffff',
+    background: '#000000',
+    backgroundElement: '#212225',
+    backgroundSelected: '#2E3135',
+    textSecondary: '#B0B4BA',
+  },
+} as const;
+
+/** Colori accent giocosi: usati su elementi decorativi (logo, blob, glow), non su testo/superfici standard. */
+export const Accent = {
+  primary: '#208AEF',
+  coral: '#FF6B6B',
+  yellow: '#FFD166',
+  mint: '#06D6A0',
+  violet: '#7C5CFC',
+} as const;
+
+/** Colore di icone/testo sopra un fondo pieno o gradiente a tinta forte (icon chip, badge colorato): bianco fisso, indipendente dal tema. */
+export const OnAccent = '#FFFFFF';
+
+/** Colori di stato (errori, feedback), non decorativi come Accent. Warning/success riusano Accent per restare in famiglia. */
+export const StatusColor = {
+  danger: '#E53E3E',
+  warning: Accent.yellow,
+  success: Accent.mint,
+} as const;
+
+/** Sfondo pieno a gradiente multi-tono (mai un wash a un colore solo), riusato su più schermate dell'app. Pastello in light, stessa famiglia della card in dark. Mai nero/bianco puro. */
+export const GradientBackground = {
+  light: { stops: ['#E4D3FF', '#FCD9EC', '#FFE7B8'] },
+  dark: { stops: ['#120A26', '#3A1C57', '#5A1E4E'] },
+} as const;
+
+/** Macchie di luce colorata sopra il GradientBackground, per dare profondità senza illustrazioni. */
+export const GradientGlow = {
+  light: [
+    { color: Accent.violet, top: -60, left: -60 },
+    { color: Accent.coral, bottom: -80, right: -50 },
+  ],
+  dark: [
+    { color: Accent.violet, top: -60, left: -60 },
+    { color: Accent.coral, bottom: -80, right: -50 },
+  ],
+} as const;
+
+/** Superficie glass della card dell'app: tinta semi-trasparente sopra il blur, bordo sottile per il bordo "vetro". */
+export const CardSurface = {
+  light: { fill: 'rgba(124,92,252,0.30)', border: 'rgba(255,255,255,0.5)', text: '#241A3D' },
+  dark: { fill: 'rgba(58,28,87,0.58)', border: 'rgba(255,255,255,0.16)', text: '#F3ECFF' },
+} as const;
+
+/** Bottone primario dell'app: pillola piena a colore unico. Il secondario è un outline sullo stesso colore, non un altro blocco pieno. */
+export const ButtonPrimary = {
+  fill: Accent.violet,
+  text: '#FFFFFF',
+} as const;
+
+export const ButtonSecondary = {
+  light: { border: '#241A3D', text: '#241A3D' },
+  dark: { border: '#F3ECFF', text: '#F3ECFF' },
+} as const;
+
+/** Badge icona colorato nelle tile della faccia standard: un solo tocco di colore per tile, non l'intera superficie. */
+export const AuthTileSurface = {
+  light: { fill: 'rgba(31,27,46,0.05)' },
+  dark: { fill: 'rgba(255,255,255,0.07)' },
+} as const;
+
+/** Colore dei link testuali sulla card auth (es. "forgot password"): viola scuro in light, viola chiaro in dark per restare leggibile su entrambe le superfici. */
+export const AuthLinkColor = {
+  light: '#6A46E0',
+  dark: '#C9B8FF',
+} as const;
+
+/** Superficie della tooltip flottante: solida (non vetro semi-trasparente) e sempre in tinta violet-brand,
+ *  indipendente dal tema, per restare leggibile sopra qualunque sfondo. */
+export const TooltipSurface = {
+  fill: '#2A1B47',
+  border: 'rgba(255,255,255,0.14)',
+  text: '#FFFFFF',
+} as const;
+
+/** Campo di input dell'app: tinta neutra derivata dal colore testo della card glass. */
+export const InputSurface = {
+  light: { fill: 'rgba(31,27,46,0.06)', placeholder: '#8A8398' },
+  dark: { fill: 'rgba(255,255,255,0.08)', placeholder: '#B9AEDC' },
+} as const;
+
+/** Testo che poggia direttamente su AuthBackground (titolo, tagline, link) fuori dalla card. */
+export const AuthOnBackgroundText = {
+  light: { primary: '#241A3D', secondary: 'rgba(36,26,61,0.7)' },
+  dark: { primary: '#F3ECFF', secondary: 'rgba(243,236,255,0.72)' },
+} as const;
+
+/** Shading pseudo-3D del dado: bordo chiaro in alto, ombra scura in basso, per dare volume senza asset illustrati. */
+export const DiceShading = {
+  face: '#FFFBF6',
+  highlight: '#FFFFFF',
+  shadowEdge: '#D8CDEB',
+  border: '#E4D6F5',
+  pip: '#5B3FD6',
+} as const;
+
+export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+
+export const Fonts = Platform.select({
+  ios: {
+    /** iOS `UIFontDescriptorSystemDesignDefault` */
+    sans: 'system-ui',
+    /** iOS `UIFontDescriptorSystemDesignSerif` */
+    serif: 'ui-serif',
+    /** iOS `UIFontDescriptorSystemDesignRounded` */
+    rounded: 'ui-rounded',
+    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
+    mono: 'ui-monospace',
+  },
+  default: {
+    sans: 'normal',
+    serif: 'serif',
+    rounded: 'normal',
+    mono: 'monospace',
+  },
+  web: {
+    sans: 'var(--font-display)',
+    serif: 'var(--font-serif)',
+    rounded: 'var(--font-rounded)',
+    mono: 'var(--font-mono)',
+  },
+});
+
+export const Spacing = {
+  half: 2,
+  one: 4,
+  two: 8,
+  three: 16,
+  four: 24,
+  five: 32,
+  six: 64,
+} as const;
+
+export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
+export const MaxContentWidth = 800;

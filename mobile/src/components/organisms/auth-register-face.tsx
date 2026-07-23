@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/atoms/button';
 import { Input } from '@/components/atoms/input';
 import { PasswordInput } from '@/components/atoms/password-input';
-import { AuthLinkColor, CardSurface } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { Title } from '@/components/molecules/title';
 import { FormError } from '@/components/molecules/form-error';
 
@@ -42,8 +42,8 @@ export function AuthRegisterFace({
   onBack,
 }: AuthRegisterFaceProps) {
   const { t } = useTranslation('auth');
-  const textColor = CardSurface[colorScheme].text;
-  const linkColor = AuthLinkColor[colorScheme];
+  const textColor = Colors[colorScheme].titleColor;
+  const linkColor = Colors[colorScheme].linkColor;
 
   return (
     <View style={styles.form}>

@@ -5,7 +5,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Platform, Pressable, StyleSheet, View, type LayoutChangeEvent, type ViewStyle } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Bell, Home, LayoutGrid, User, Users } from 'lucide-react-native';
-import { Accent, BottomTabInset, CardSurface, InputSurface, OnAccent } from '@/constants/theme';
+import { BottomTabInset, Colors, GradientBackground } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
 
 // expo-blur applica un wash bianco/nero suo sul web (schiarisce qualunque tinta ci mettessimo sopra):
@@ -93,8 +94,8 @@ type SideTabButtonProps = TabTriggerSlotProps & { name: SideTabName };
 function SideTabButton({ name, isFocused, ...props }: SideTabButtonProps) {
   const { colorScheme } = useAppTheme();
   const Icon = SIDE_TAB_ICONS[name];
-  const mutedColor = InputSurface[colorScheme].placeholder;
-  const activeColor = CardSurface[colorScheme].text;
+  const mutedColor = Colors[colorScheme].placeholder;
+  const activeColor = Colors[colorScheme].titleColor;
   const color = isFocused ? activeColor : mutedColor;
 
   return (
@@ -110,13 +111,13 @@ function HomeButton(props: TabTriggerSlotProps) {
   return (
     <Pressable {...props} style={styles.homeButton} hitSlop={6}>
       <LinearGradient
-        colors={[Accent.coral, Accent.violet]}
+        colors={[Colors.light.secondary, Colors.light.primary]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
       <View style={styles.homeIconStack}>
-        <Home size={24} color={OnAccent} strokeWidth={2.5} />
+        <Home size={24} color={Colors.light.border} strokeWidth={2.5} />
       </View>
     </Pressable>
   );
@@ -124,7 +125,12 @@ function HomeButton(props: TabTriggerSlotProps) {
 
 function TabBar(props: TabListProps) {
   const { colorScheme } = useAppTheme();
-  const surface = CardSurface[colorScheme];
+  const colors = Colors[colorScheme];
+  const fill =
+    colorScheme === 'light'
+      ? hexToRgba(colors.primary, 0.3)
+      : hexToRgba(GradientBackground.dark.stops[1], 0.58);
+  const border = hexToRgba(colors.border, colorScheme === 'light' ? 0.5 : 0.16);
   const [width, setWidth] = useState(0);
 
   const onLayout = (e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width);
@@ -141,7 +147,7 @@ function TabBar(props: TabListProps) {
               <View style={[StyleSheet.absoluteFill, webGlassStyle]} />
             )}
             <Svg width={width} height={BAR_HEIGHT} style={StyleSheet.absoluteFill}>
-              <Path d={buildWavePath(width)} fill={surface.fill} stroke={surface.border} strokeWidth={1} />
+              <Path d={buildWavePath(width)} fill={fill} stroke={border} strokeWidth={1} />
             </Svg>
             <View {...props} style={styles.row}>
               {props.children}
@@ -196,7 +202,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
     marginTop: -HOME_LIFT,
-    boxShadow: '0px 6px 14px rgba(124,92,252,0.45)',
+    boxShadow: `0px 6px 14px ${hexToRgba(Colors.light.primary, 0.45)}`,
   },
   homeIconStack: {
     position: 'relative',

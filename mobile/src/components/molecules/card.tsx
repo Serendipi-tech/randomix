@@ -1,7 +1,8 @@
 import { BlurView } from 'expo-blur';
 import type { PropsWithChildren } from 'react';
 import { ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
-import { CardSurface } from '@/constants/theme';
+import { Colors, GradientBackground } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 
 type CardProps = PropsWithChildren<{
   colorScheme: 'light' | 'dark';
@@ -13,14 +14,19 @@ type CardProps = PropsWithChildren<{
  *  BlurView al posto dello sfondo vero, e il vetro sparirebbe in una tinta piatta.
  *  Il contenuto scrolla internamente: la dimensione della card (impostata da fuori via `style`) non cambia mai in base alla faccia mostrata. */
 export function Card({ colorScheme, style, children }: CardProps) {
-  const surface = CardSurface[colorScheme];
+  const colors = Colors[colorScheme];
+  const fill =
+    colorScheme === 'light'
+      ? hexToRgba(colors.primary, 0.3)
+      : hexToRgba(GradientBackground.dark.stops[1], 0.58);
+  const border = hexToRgba(colors.border, colorScheme === 'light' ? 0.5 : 0.16);
 
   return (
     <View style={[styles.shadowWrapper, style]}>
-      <View style={[styles.clip, { borderColor: surface.border }]}>
+      <View style={[styles.clip, { borderColor: border }]}>
         {/* tint "default" invece di light/dark: quei due applicano un wash quasi opaco che desatura il colore sotto */}
         <BlurView intensity={60} tint="default" style={StyleSheet.absoluteFill} />
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: surface.fill }]} />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: fill }]} />
         <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {children}
         </ScrollView>
@@ -33,7 +39,7 @@ const styles = StyleSheet.create({
   shadowWrapper: {
     borderRadius: 32,
     // shadow* è deprecato e non renderizza più: la nuova proprietà unificata è boxShadow.
-    boxShadow: '0px 16px 28px rgba(0,0,0,0.35)',
+    boxShadow: `0px 16px 28px ${hexToRgba(Colors.light.shadow, 0.35)}`,
     elevation: 16,
   },
   clip: {
