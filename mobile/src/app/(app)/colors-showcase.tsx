@@ -44,7 +44,7 @@ const ShowcaseColors = {
     backgroundRadial: '#7b2a86',
     foreground: '#261b3b', // vecchio, più freddo: "#1f1b3b";
 
-    primary: '#',
+    primary: '#7154e7',
     secondary: '#f7c041',
     secondaryGradient: '#FF6B6B',
 
