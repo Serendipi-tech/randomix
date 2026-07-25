@@ -5,10 +5,11 @@ import { Platform, ScrollView, StyleSheet, Text, View, Pressable, type LayoutCha
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Stop, Circle, Path } from 'react-native-svg';
 import MaskedView from '@react-native-masked-view/masked-view';
-import { Bell, Home, LayoutGrid, Moon, Sun, Users, Zap } from 'lucide-react-native';
+import { Bell, ChevronLeft, Home, LayoutGrid, Moon, Sun, Users, Zap } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { styles } from './colors-showcase.styles';
 
 const ShowcaseColors = {
   light: {
@@ -81,8 +82,6 @@ const BAR_HEIGHT = 68;
 const CORNER = 12;
 const NOTCH_HALF_WIDTH = 76;
 const NOTCH_DEPTH = 64;
-const HOME_SIZE = 52;
-const HOME_LIFT = (BAR_HEIGHT - HOME_SIZE) / 2;
 
 const SIDE_TAB_ICONS = {
   profile: Users,
@@ -115,6 +114,49 @@ function buildWavePath(width: number): string {
   ].join(' ');
 }
 
+function ShowColorPalette({
+  title,
+  items,
+  colors,
+  gradient,
+}: {
+  title: string;
+  items: Array<{ name: string; color: string }>;
+  colors: typeof ShowcaseColors.light | typeof ShowcaseColors.dark;
+  gradient?: { colors: [string, string]; name: string };
+}) {
+  return (
+    <View style={styles.section}>
+      <Text style={[styles.sectionTitle, { color: colors.textColor }]}>{title}</Text>
+      <View style={[styles.swatchGrid, { width: '100%' }]}>
+        {items.map((item) => (
+          <View key={item.name} style={styles.swatchItem}>
+            <View style={[styles.swatchBox, { backgroundColor: item.color }]}>
+              <Text style={{ fontSize: 11, fontWeight: '600', color: colors.border }}>
+                {item.name.toUpperCase()}
+              </Text>
+            </View>
+          </View>
+        ))}
+        {gradient && (
+          <View style={styles.swatchItem}>
+            <LinearGradient
+              colors={gradient.colors}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.gradientBox, { width: '100%' }]}
+            >
+              <Text style={{ fontSize: 11, fontWeight: '600', color: colors.border }}>
+                {gradient.name.toUpperCase()}
+              </Text>
+            </LinearGradient>
+          </View>
+        )}
+      </View>
+    </View>
+  );
+}
+
 function SideTabButton({ name, isActive, onPress, mutedColor, activeColor }: { name: SideTabName; isActive: boolean; onPress: () => void; mutedColor: string; activeColor: string }) {
   const Icon = SIDE_TAB_ICONS[name];
   const color = isActive ? activeColor : mutedColor;
@@ -132,6 +174,44 @@ function HomeButtonComp() {
         <Home size={24} color={Colors.light.border} strokeWidth={2.5} />
       </View>
     </Pressable>
+  );
+}
+
+function PageHeader({
+  icon,
+  title,
+  subtitle,
+  colors,
+  onBack,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle?: string;
+  colors: typeof ShowcaseColors.light | typeof ShowcaseColors.dark;
+  onBack?: () => void;
+}) {
+  return (
+    <View style={styles.pageHeaderWrapper}>
+      <View style={styles.pageHeaderTopRow}>
+        <View style={styles.pageHeaderContent}>
+          <LinearGradient
+            colors={[colors.secondary, colors.secondaryGradient]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.pageHeaderIcon}
+          >
+            {icon}
+          </LinearGradient>
+          <Text style={styles.pageHeaderTitle}>{title}</Text>
+        </View>
+        {onBack && (
+          <Pressable onPress={onBack} hitSlop={8}>
+            <ChevronLeft size={24} color="#ffffff" />
+          </Pressable>
+        )}
+      </View>
+      {subtitle && <Text style={styles.pageHeaderSubtitle}>{subtitle}</Text>}
+    </View>
   );
 }
 
@@ -216,6 +296,15 @@ function NavBar({ colorScheme, isDark, setIsDark, activeTab, toggleTab }: { colo
 export default function ColorsShowcase() {
   const [isDark, setIsDark] = useState(true);
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'friends' | null>(null);
+  const [chipState, setChipState] = useState<Record<string, boolean>>({ Active: true, Inactive: false, Disabled: false });
+  const [checkboxState, setCheckboxState] = useState<Record<string, boolean>>({ Unchecked: false, Checked: true, Indeterminate: false });
+  const [radioState, setRadioState] = useState('Option A');
+  const [toggleState, setToggleState] = useState<Record<string, boolean>>({ 'true': true, 'false': false });
+  const [selectedTags, setSelectedTags] = useState<Record<string, boolean>>({ Design: false, Development: false, 'UI/UX': false, Mobile: false, Web: false });
+  const [currentPage, setCurrentPage] = useState(3);
+  const [rating, setRating] = useState(4);
+  const [currentTabIdx, setCurrentTabIdx] = useState(0);
+
   const colorScheme = isDark ? 'dark' : 'light';
   const colors = ShowcaseColors[colorScheme];
 
@@ -240,145 +329,58 @@ export default function ColorsShowcase() {
         <Circle cx="200" cy="200" r="200" fill="url(#radialGlow)" />
       </Svg>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Header Section */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.secondary }]}>Design System</Text>
-          <Text style={[styles.sectionSubtitle, { color: colors.textColor }]}>
-            Complete showcase of available colors and components
-          </Text>
-        </View>
-
-        {/* Hero Card */}
-        <View
-          style={[
-            styles.heroCard,
-            { backgroundColor: colors.primary, borderColor: colors.border, borderWidth: 1 },
-          ]}
-        >
-          <Text style={[styles.heroTitle, { color: colors.textColor }]}>Welcome</Text>
-          <Text style={[styles.heroSubtitle, { color: colors.textColor }]}>
-            Explore every color in the system
-          </Text>
-        </View>
+        <PageHeader
+          icon={<Zap size={24} color="#ffffff" />}
+          title="Design System"
+          colors={colors}
+          onBack={() => {}}
+        />
 
         {/* Color Swatches */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Primary Colors</Text>
-          <View style={styles.swatchGrid}>
-            {[
-              { name: 'Primary', color: colors.primary },
-              { name: 'Secondary', color: colors.secondary },
-              { name: 'Accent', color: colors.accent },
-              { name: 'Foreground', color: colors.foreground },
-            ].map((swatch) => (
-              <View key={swatch.name} style={styles.swatchItem}>
-                <View style={[styles.swatchBox, { backgroundColor: swatch.color }]} />
-                <Text style={[styles.swatchLabel, { color: colors.textColor }]}>{swatch.name}</Text>
-              </View>
-            ))}
-          </View>
-          <LinearGradient
-            colors={[colors.secondary, colors.secondaryGradient || colors.secondary]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.gradientBox}
-          />
-        </View>
+        <ShowColorPalette
+          title="Primary Colors"
+          items={[
+            { name: 'Primary', color: colors.primary },
+            { name: 'Secondary', color: colors.secondary },
+            { name: 'Accent', color: colors.accent },
+            { name: 'Foreground', color: colors.foreground },
+          ]}
+          colors={colors}
+          gradient={{
+            colors: [colors.secondary, colors.secondaryGradient || colors.secondary],
+            name: 'Gradient',
+          }}
+        />
 
         {/* Semantic Colors */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Semantic Colors</Text>
-          <View style={styles.semanticList}>
-            {[
-              { name: 'Success', color: colors.success, icon: '✓' },
-              { name: 'Warning', color: colors.warning, icon: '!' },
-              { name: 'Error', color: colors.error, icon: '✕' },
-              { name: 'Info', color: colors.info, icon: 'ℹ' },
-            ].map((item) => (
-              <View key={item.name} style={[styles.semanticItem, { backgroundColor: colors.foreground }]}>
-                <View
-                  style={[
-                    styles.semanticDot,
-                    { backgroundColor: item.color, borderColor: item.color },
-                  ]}
-                >
-                  <Text style={[styles.semanticIcon, { color: colors.foreground }]}>{item.icon}</Text>
-                </View>
-                <Text style={[styles.semanticName, { color: colors.textColor }]}>{item.name}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Bento Grid */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Components</Text>
-          <View style={styles.bentoGrid}>
-            {/* Large Featured Card */}
-            <View
-              style={[
-                styles.bentoCard,
-                styles.bentoLarge,
-                { backgroundColor: colors.secondary, borderColor: colors.border },
-              ]}
-            >
-              <Zap size={32} color={colors.foreground} />
-              <Text style={[styles.bentoCardTitle, { color: colors.foreground }]}>Featured</Text>
-              <Text style={[styles.bentoCardSubtitle, { color: colors.textColor }]}>
-                Large card
-              </Text>
-            </View>
-
-            {/* Small Cards */}
-            <View
-              style={[
-                styles.bentoCard,
-                { backgroundColor: colors.accent, borderColor: colors.border },
-              ]}
-            >
-              <Users size={24} color={colors.foreground} />
-              <Text style={[styles.bentoCardSmallTitle, { color: colors.foreground }]}>Users</Text>
-            </View>
-
-            <View
-              style={[
-                styles.bentoCard,
-                { backgroundColor: colors.primary, borderColor: colors.border },
-              ]}
-            >
-              <Bell size={24} color={colors.foreground} />
-              <Text style={[styles.bentoCardSmallTitle, { color: colors.foreground }]}>Alerts</Text>
-            </View>
-
-            <View
-              style={[
-                styles.bentoCard,
-                { backgroundColor: colors.success, borderColor: colors.border },
-              ]}
-            >
-              <Text style={[styles.bentoCardSmallTitle, { color: colors.foreground }]}>Done</Text>
-            </View>
-          </View>
-        </View>
+        <ShowColorPalette
+          title="Semantic Colors"
+          items={[
+            { name: 'Success', color: colors.success },
+            { name: 'Warning', color: colors.warning },
+            { name: 'Error', color: colors.error },
+            { name: 'Info', color: colors.info },
+            { name: 'Text', color: colors.textColor },
+            { name: 'Border', color: colors.border },
+          ]}
+          colors={colors}
+        />
 
         {/* Extra Colors */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Extra Palette</Text>
-          <View style={styles.extraGrid}>
-            {Object.entries(colors.extraColors).map(([key, color]) => (
-              <View key={key} style={styles.extraItem}>
-                <View style={[styles.extraBox, { backgroundColor: color }]} />
-                <Text style={[styles.extraLabel, { color: colors.textColor }]}>Color {key}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
+        <ShowColorPalette
+          title="Extra Palette"
+          items={Object.entries(colors.extraColors).map(([key, color]) => ({
+            name: key,
+            color,
+          }))}
+          colors={colors}
+        />
 
-        {/* Button Examples */}
+{/* Button Examples */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Buttons</Text>
           <View style={styles.buttonStack}>
-            <Pressable style={[styles.button, { backgroundColor: colors.primary }]}>
+            <Pressable style={[styles.button, { backgroundColor: colors.primary }]} onPress={() => {}} android_ripple={{ color: colors.foreground, radius: 8 }}>
               <Text style={[styles.buttonText, { color: colors.foreground }]}>Primary</Text>
             </Pressable>
             <Pressable
@@ -386,10 +388,12 @@ export default function ColorsShowcase() {
                 styles.button,
                 { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border },
               ]}
+              onPress={() => {}}
+              android_ripple={{ color: colors.primary, radius: 8 }}
             >
               <Text style={[styles.buttonText, { color: colors.primary }]}>Secondary</Text>
             </Pressable>
-            <Pressable style={[styles.button, { backgroundColor: colors.error }]}>
+            <Pressable style={[styles.button, { backgroundColor: colors.error }]} onPress={() => {}} android_ripple={{ color: colors.foreground, radius: 8 }}>
               <Text style={[styles.buttonText, { color: colors.foreground }]}>Destructive</Text>
             </Pressable>
           </View>
@@ -430,28 +434,34 @@ export default function ColorsShowcase() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Chips</Text>
           <View style={styles.chipStack}>
-            {['Active', 'Inactive', 'Disabled'].map((chip) => (
-              <View
-                key={chip}
-                style={[
-                  styles.chip,
-                  {
-                    backgroundColor: chip === 'Active' ? colors.primary : colors.foreground,
-                    borderColor: colors.border,
-                  },
-                ]}
-              >
-                <Text
-                  style={{
-                    color: chip === 'Active' ? colors.foreground : colors.textColor,
-                    fontSize: 14,
-                    fontWeight: '500',
-                  }}
+            {['Active', 'Inactive', 'Disabled'].map((chip) => {
+              const isActive = chipState[chip];
+              return (
+                <Pressable
+                  key={chip}
+                  disabled={chip === 'Disabled'}
+                  onPress={() => setChipState({ ...chipState, [chip]: !isActive })}
+                  style={[
+                    styles.chip,
+                    {
+                      backgroundColor: isActive ? colors.primary : colors.foreground,
+                      borderColor: colors.border,
+                      opacity: chip === 'Disabled' ? 0.5 : 1,
+                    },
+                  ]}
                 >
-                  {chip}
-                </Text>
-              </View>
-            ))}
+                  <Text
+                    style={{
+                      color: isActive ? colors.foreground : colors.textColor,
+                      fontSize: 14,
+                      fontWeight: '500',
+                    }}
+                  >
+                    {chip}
+                  </Text>
+                </Pressable>
+              );
+            })}
           </View>
         </View>
 
@@ -485,13 +495,13 @@ export default function ColorsShowcase() {
         {/* Status Indicators */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Status</Text>
-          <View style={styles.statusStack}>
+          <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
             {[
               { label: 'Online', color: colors.success },
               { label: 'Away', color: colors.warning },
               { label: 'Offline', color: colors.border },
             ].map((status) => (
-              <View key={status.label} style={styles.statusItem}>
+              <View key={status.label} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <View
                   style={[
                     styles.statusDot,
@@ -541,7 +551,7 @@ export default function ColorsShowcase() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Accent</Text>
           <View style={styles.accentStack}>
-            <Pressable style={[styles.accentButton, { backgroundColor: colors.accent }]}>
+            <Pressable style={[styles.accentButton, { backgroundColor: colors.accent }]} onPress={() => {}} android_ripple={{ color: colors.foreground, radius: 8 }}>
               <Text style={{ color: colors.foreground, fontWeight: '600', fontSize: 14 }}>Tertiary Action</Text>
             </Pressable>
             <View style={[styles.accentBadge, { backgroundColor: hexToRgba(colors.accent, 0.15), borderColor: colors.accent }]}>
@@ -571,51 +581,62 @@ export default function ColorsShowcase() {
           </View>
         </View>
 
-        {/* Checkboxes */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Checkboxes</Text>
-          <View style={styles.checkboxStack}>
-            {['Unchecked', 'Checked', 'Indeterminate'].map((state) => (
-              <View key={state} style={styles.checkboxItem}>
-                <View
-                  style={[
-                    styles.checkbox,
-                    {
-                      backgroundColor:
-                        state === 'Unchecked' ? colors.foreground : colors.primary,
-                      borderColor: colors.border,
-                    },
-                  ]}
-                >
-                  {state !== 'Unchecked' && (
-                    <Text style={{ color: colors.foreground, fontWeight: 'bold' }}>✓</Text>
-                  )}
-                </View>
-                <Text style={{ color: colors.textColor, fontSize: 14 }}>{state}</Text>
-              </View>
-            ))}
+        {/* Checkboxes & Radio Buttons */}
+        <View style={[styles.section, { flexDirection: 'row', gap: 32 }]}>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Checkboxes</Text>
+            <View style={styles.checkboxStack}>
+              {['Unchecked', 'Checked', 'Indeterminate'].map((state) => {
+                const isChecked = checkboxState[state];
+                return (
+                  <Pressable
+                    key={state}
+                    onPress={() => setCheckboxState({ ...checkboxState, [state]: !isChecked })}
+                    style={styles.checkboxItem}
+                  >
+                    <View
+                      style={[
+                        styles.checkbox,
+                        {
+                          backgroundColor: isChecked ? colors.primary : colors.foreground,
+                          borderColor: colors.border,
+                        },
+                      ]}
+                    >
+                      {isChecked && (
+                        <Text style={{ color: colors.foreground, fontWeight: 'bold' }}>✓</Text>
+                      )}
+                    </View>
+                    <Text style={{ color: colors.textColor, fontSize: 14 }}>{state}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
           </View>
-        </View>
 
-        {/* Radio Buttons */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Radio Buttons</Text>
-          <View style={styles.radioStack}>
-            {['Option A', 'Option B', 'Option C'].map((option) => (
-              <View key={option} style={styles.radioItem}>
-                <View
-                  style={[
-                    styles.radioOuter,
-                    { borderColor: colors.primary },
-                  ]}
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Radio Buttons</Text>
+            <View style={styles.radioStack}>
+              {['Option A', 'Option B', 'Option C'].map((option) => (
+                <Pressable
+                  key={option}
+                  onPress={() => setRadioState(option)}
+                  style={styles.radioItem}
                 >
-                  {option === 'Option A' && (
-                    <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
-                  )}
-                </View>
-                <Text style={{ color: colors.textColor, fontSize: 14 }}>{option}</Text>
-              </View>
-            ))}
+                  <View
+                    style={[
+                      styles.radioOuter,
+                      { borderColor: colors.primary },
+                    ]}
+                  >
+                    {radioState === option && (
+                      <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
+                    )}
+                  </View>
+                  <Text style={{ color: colors.textColor, fontSize: 14 }}>{option}</Text>
+                </Pressable>
+              ))}
+            </View>
           </View>
         </View>
 
@@ -623,25 +644,29 @@ export default function ColorsShowcase() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Switches</Text>
           <View style={styles.toggleStack}>
-            {[true, false].map((active) => (
-              <View
-                key={String(active)}
-                style={[
-                  styles.toggle,
-                  {
-                    backgroundColor: active ? colors.primary : colors.foreground,
-                    borderColor: colors.border,
-                  },
-                ]}
-              >
-                <View
+            {['true', 'false'].map((key) => {
+              const isActive = toggleState[key];
+              return (
+                <Pressable
+                  key={key}
+                  onPress={() => setToggleState({ ...toggleState, [key]: !isActive })}
                   style={[
-                    styles.toggleThumb,
-                    { left: active ? 20 : 2, backgroundColor: colors.foreground },
+                    styles.toggle,
+                    {
+                      backgroundColor: isActive ? colors.primary : colors.foreground,
+                      borderColor: colors.border,
+                    },
                   ]}
-                />
-              </View>
-            ))}
+                >
+                  <View
+                    style={[
+                      styles.toggleThumb,
+                      { left: isActive ? 20 : 2, backgroundColor: colors.foreground },
+                    ]}
+                  />
+                </Pressable>
+              );
+            })}
           </View>
         </View>
 
@@ -649,27 +674,46 @@ export default function ColorsShowcase() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Tags</Text>
           <View style={styles.tagStack}>
-            {['Design', 'Development', 'UI/UX', 'Mobile', 'Web'].map((tag) => (
-              <View key={tag} style={[styles.tag, { backgroundColor: hexToRgba(colors.primary, 0.2), borderColor: colors.primary }]}>
-                <Text style={{ color: colors.primary, fontSize: 13, fontWeight: '500' }}>#{tag}</Text>
-              </View>
-            ))}
+            {['Design', 'Development', 'UI/UX', 'Mobile', 'Web'].map((tag) => {
+              const isSelected = selectedTags[tag];
+              return (
+                <Pressable
+                  key={tag}
+                  onPress={() => setSelectedTags({ ...selectedTags, [tag]: !isSelected })}
+                  style={[
+                    styles.tag,
+                    {
+                      backgroundColor: isSelected ? colors.primary : hexToRgba(colors.primary, 0.2),
+                      borderColor: colors.primary,
+                    },
+                  ]}
+                >
+                  <Text style={{ color: isSelected ? colors.foreground : colors.primary, fontSize: 13, fontWeight: '500' }}>#{tag}</Text>
+                </Pressable>
+              );
+            })}
           </View>
         </View>
 
         {/* Links */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Links</Text>
-          <View style={styles.linkStack}>
-            <Text style={{ color: colors.primary, fontSize: 14, fontWeight: '500', textDecorationLine: 'underline' }}>
-              Primary Link
-            </Text>
-            <Text style={{ color: colors.secondary, fontSize: 14, fontWeight: '500', textDecorationLine: 'underline' }}>
-              Secondary Link
-            </Text>
-            <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '500', textDecorationLine: 'underline' }}>
-              Accent Link
-            </Text>
+          <View style={{ flexDirection: 'row', gap: 16 }}>
+            <Pressable onPress={() => {}}>
+              <Text style={{ color: colors.primary, fontSize: 14, fontWeight: '500', textDecorationLine: 'underline', opacity: 1 }}>
+                Primary Link
+              </Text>
+            </Pressable>
+            <Pressable onPress={() => {}}>
+              <Text style={{ color: colors.secondary, fontSize: 14, fontWeight: '500', textDecorationLine: 'underline', opacity: 1 }}>
+                Secondary Link
+              </Text>
+            </Pressable>
+            <Pressable onPress={() => {}}>
+              <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '500', textDecorationLine: 'underline', opacity: 1 }}>
+                Accent Link
+              </Text>
+            </Pressable>
           </View>
         </View>
 
@@ -703,44 +747,32 @@ export default function ColorsShowcase() {
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
         </View>
 
-        {/* Breadcrumbs */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Breadcrumbs</Text>
-          <View style={styles.breadcrumbStack}>
-            {['Home', 'Products', 'Electronics', 'Phone'].map((item, idx) => (
-              <View key={item} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ color: colors.textColor, fontSize: 13 }}>{item}</Text>
-                {idx < 3 && <Text style={{ color: colors.textColor, marginHorizontal: 6 }}>/</Text>}
-              </View>
-            ))}
-          </View>
-        </View>
-
         {/* Tabs */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Tabs</Text>
           <View style={[styles.tabsContainer, { borderBottomColor: colors.border }]}>
             {['Tab 1', 'Tab 2', 'Tab 3'].map((tab, idx) => (
-              <View
+              <Pressable
                 key={tab}
+                onPress={() => setCurrentTabIdx(idx)}
                 style={[
                   styles.tabItem,
                   {
-                    borderBottomColor: idx === 0 ? colors.primary : 'transparent',
+                    borderBottomColor: currentTabIdx === idx ? colors.primary : 'transparent',
                     borderBottomWidth: 2,
                   },
                 ]}
               >
                 <Text
                   style={{
-                    color: idx === 0 ? colors.primary : colors.border,
+                    color: currentTabIdx === idx ? colors.primary : colors.border,
                     fontSize: 14,
                     fontWeight: '500',
                   }}
                 >
                   {tab}
                 </Text>
-              </View>
+              </Pressable>
             ))}
           </View>
         </View>
@@ -760,20 +792,21 @@ export default function ColorsShowcase() {
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Pagination</Text>
           <View style={styles.paginationStack}>
             {[1, 2, 3, 4, 5].map((page) => (
-              <View
+              <Pressable
                 key={page}
+                onPress={() => setCurrentPage(page)}
                 style={[
                   styles.paginationItem,
                   {
-                    backgroundColor: page === 3 ? colors.primary : colors.foreground,
+                    backgroundColor: currentPage === page ? colors.primary : colors.foreground,
                     borderColor: colors.border,
                   },
                 ]}
               >
-                <Text style={{ color: page === 3 ? colors.foreground : colors.textColor, fontWeight: '600' }}>
+                <Text style={{ color: currentPage === page ? colors.foreground : colors.textColor, fontWeight: '600' }}>
                   {page}
                 </Text>
-              </View>
+              </Pressable>
             ))}
           </View>
         </View>
@@ -783,9 +816,11 @@ export default function ColorsShowcase() {
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Rating</Text>
           <View style={styles.ratingStack}>
             {[1, 2, 3, 4, 5].map((star) => (
-              <Text key={star} style={{ color: colors.warning, fontSize: 20 }}>
-                ★
-              </Text>
+              <Pressable key={star} onPress={() => setRating(star)}>
+                <Text style={{ color: star <= rating ? colors.warning : colors.border, fontSize: 20 }}>
+                  ★
+                </Text>
+              </Pressable>
             ))}
           </View>
         </View>
@@ -835,430 +870,3 @@ export default function ColorsShowcase() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: { flex: 1 },
-  scroll: { flex: 1 },
-  content: { paddingHorizontal: 8, paddingTop: 16, paddingBottom: 40 },
-
-  // Navbar
-  navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-  },
-  navTitle: { fontSize: 20, fontWeight: '700' },
-  navActions: { flexDirection: 'row', gap: 16 },
-
-  // Sections
-  section: { paddingHorizontal: 16, marginBottom: 32 },
-  sectionTitle: { fontSize: 24, fontWeight: '600', marginBottom: 8, fontFamily: 'Inter' },
-  sectionSubtitle: { fontSize: 14, marginBottom: 16, fontFamily: 'Inter' },
-
-  // Hero Card
-  heroCard: {
-    marginHorizontal: 16,
-    marginBottom: 32,
-    padding: 24,
-    borderRadius: 16,
-    justifyContent: 'center',
-  },
-  heroTitle: { fontSize: 28, fontWeight: '700', marginBottom: 8, fontFamily: 'Inter' },
-  heroSubtitle: { fontSize: 16, fontFamily: 'Inter' },
-
-  // Swatches
-  swatchGrid: { flexDirection: 'row', gap: 12, flexWrap: 'wrap' },
-  swatchItem: { alignItems: 'center', flex: 1, minWidth: '45%' },
-  swatchBox: { width: '100%', height: 80, borderRadius: 12, marginBottom: 8 },
-  swatchLabel: { fontSize: 13, fontWeight: '500' },
-  gradientBox: { width: '100%', height: 120, borderRadius: 12, marginTop: 12 },
-
-  // Semantic List
-  semanticList: { gap: 10 },
-  semanticItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 12,
-    gap: 12,
-  },
-  semanticDot: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-  },
-  semanticIcon: { fontSize: 18, fontWeight: '600' },
-  semanticName: { fontSize: 15, fontWeight: '500' },
-
-  // Bento
-  bentoGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  bentoCard: {
-    borderRadius: 16,
-    padding: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    flex: 1,
-    minWidth: '45%',
-    minHeight: 100,
-  },
-  bentoLarge: { minWidth: '100%', minHeight: 140 },
-  bentoCardTitle: { fontSize: 16, fontWeight: '700', marginTop: 8 },
-  bentoCardSubtitle: { fontSize: 12 },
-  bentoCardSmallTitle: { fontSize: 14, fontWeight: '600', marginTop: 8 },
-
-  // Extra Colors Grid
-  extraGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  extraItem: { alignItems: 'center', flex: 1, minWidth: '22%' },
-  extraBox: { width: '100%', height: 60, borderRadius: 8, marginBottom: 6 },
-  extraLabel: { fontSize: 12, fontWeight: '500' },
-
-  // Buttons
-  buttonStack: { gap: 10 },
-  button: { paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8, alignItems: 'center' },
-  buttonText: { fontSize: 14, fontWeight: '600', fontFamily: 'Inter' },
-
-  // Footer
-  footer: {
-    marginTop: 32,
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-    borderTopWidth: 1,
-    alignItems: 'center',
-  },
-  footerText: { fontSize: 14, fontWeight: '600', marginBottom: 4 },
-  footerSubtext: { fontSize: 12 },
-
-  // Inputs
-  inputStack: { gap: 10 },
-  input: {
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    marginVertical: 4,
-  },
-
-  // Badges
-  badgeStack: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  badge: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-
-  // Chips
-  chipStack: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  chip: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    borderWidth: 1,
-    alignItems: 'center',
-  },
-
-  // Progress
-  progressStack: { gap: 20 },
-  progressBar: {
-    height: 8,
-    borderRadius: 4,
-    borderWidth: 1,
-    overflow: 'hidden',
-  },
-
-  // Status
-  statusStack: { gap: 12 },
-  statusItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingVertical: 8,
-  },
-  statusDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    borderWidth: 2,
-  },
-
-  // Cards
-  cardStack: { gap: 12 },
-  card: {
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-
-  // Alerts
-  alertStack: { gap: 10 },
-  alert: {
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderLeftWidth: 4,
-  },
-
-  // Checkboxes
-  checkboxStack: { gap: 12 },
-  checkboxItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingVertical: 8,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // Radio Buttons
-  radioStack: { gap: 12 },
-  radioItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingVertical: 8,
-  },
-  radioOuter: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioInner: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-
-  // Toggles
-  toggleStack: { flexDirection: 'row', gap: 12 },
-  toggle: {
-    width: 48,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 1,
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  toggleThumb: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    position: 'absolute',
-    top: 2,
-  },
-
-  // Tags
-  tagStack: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  tag: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-  },
-
-  // Links
-  linkStack: { gap: 8 },
-
-  // Loaders
-  loaderStack: { flexDirection: 'row', gap: 24, justifyContent: 'center' },
-  spinner: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 3,
-  },
-
-  // Avatars
-  avatarStack: { flexDirection: 'row', gap: 12 },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // Dividers
-  divider: {
-    height: 1,
-    width: '100%',
-  },
-
-  // Breadcrumbs
-  breadcrumbStack: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 4,
-  },
-
-  // Tabs
-  tabsContainer: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    gap: 0,
-  },
-  tabItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomWidth: 2,
-  },
-
-  // Tooltip
-  tooltip: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-  },
-
-  // Pagination
-  paginationStack: { flexDirection: 'row', gap: 8, justifyContent: 'center' },
-  paginationItem: {
-    width: 32,
-    height: 32,
-    borderRadius: 6,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // Rating
-  ratingStack: { flexDirection: 'row', gap: 4 },
-
-  // Empty State
-  emptyState: {
-    paddingVertical: 32,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    borderWidth: 1,
-    alignItems: 'center',
-  },
-
-  // Skeleton
-  skeletonStack: { gap: 8 },
-  skeletonLine: {
-    height: 12,
-    borderRadius: 6,
-  },
-
-  // Dropdown
-  dropdown: {
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-
-  // Accent
-  accentStack: { gap: 12, alignItems: 'center' },
-  accentButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    width: '100%',
-  },
-  accentBadge: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  accentLine: {
-    height: 2,
-    width: 60,
-    borderRadius: 1,
-  },
-
-  // Radial Gradient
-  radialGradientSvg: {
-    position: 'absolute',
-    top: -200,
-    left: 0,
-    right: 0,
-    pointerEvents: 'none',
-  },
-
-  // App Tabs Navbar
-  wrap: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-  },
-  pillWrap: {
-    width: '96%',
-    maxWidth: 420,
-    height: BAR_HEIGHT,
-  },
-  clip: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    borderRadius: CORNER,
-    overflow: 'hidden',
-  },
-  row: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 8,
-  },
-  sideTab: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 44,
-    height: 44,
-  },
-  homeButton: {
-    width: HOME_SIZE,
-    height: HOME_SIZE,
-    borderRadius: HOME_SIZE / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    marginTop: -HOME_LIFT,
-    boxShadow: `0px 6px 14px ${hexToRgba(Colors.light.primary, 0.45)}`,
-  },
-  homeIconStack: {
-    position: 'relative',
-    zIndex: 1,
-  },
-  themeToggle: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 44,
-    height: 44,
-  },
-  glassBlur: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: BAR_HEIGHT + 12,
-  },
-});
