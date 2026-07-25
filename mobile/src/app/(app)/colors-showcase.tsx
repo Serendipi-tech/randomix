@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { BlurView } from 'expo-blur';
-import { ScrollView, StyleSheet, Text, View, Pressable, type LayoutChangeEvent } from 'react-native';
+import { Platform, ScrollView, StyleSheet, Text, View, Pressable, type LayoutChangeEvent, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Stop, Circle, Path } from 'react-native-svg';
+import MaskedView from '@react-native-masked-view/masked-view';
 import { Bell, Home, LayoutGrid, Moon, Sun, Users, Zap } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
@@ -134,22 +135,45 @@ function NavBar({ colorScheme, isDark, setIsDark, activeTab, toggleTab }: { colo
   const mutedColor = colors.primary;
   const activeColor = colors.secondary;
 
+  // Blur ritagliato a forma navbar: su web clip-path CSS (MaskedView rompe il backdrop-filter),
+  // su nativo MaskedView + BlurView
+  const wavePath = buildWavePath(width);
+  const blurLayer =
+    Platform.OS === 'web' ? (
+      <View
+        pointerEvents="none"
+        style={[
+          styles.clip,
+          { width, height: BAR_HEIGHT, backgroundColor: hexToRgba(colors.foreground, 0.15) },
+          {
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            clipPath: `path('${wavePath}')`,
+            WebkitClipPath: `path('${wavePath}')`,
+          } as unknown as ViewStyle,
+        ]}
+      />
+    ) : (
+      <MaskedView
+        style={[styles.clip, { width, height: BAR_HEIGHT }]}
+        pointerEvents="none"
+        maskElement={
+          <Svg width={width} height={BAR_HEIGHT}>
+            <Path d={wavePath} fill="#fff" />
+          </Svg>
+        }
+      >
+        <BlurView intensity={90} style={StyleSheet.absoluteFill} tint="dark" />
+      </MaskedView>
+    );
+
   return (
     <View pointerEvents="box-none" style={[styles.wrap, { paddingBottom: 12 }]}>
       <View style={styles.pillWrap} onLayout={onLayout}>
         {width > 0 && (
           <>
-            <View style={styles.clip}>
-              <BlurView intensity={90} style={StyleSheet.absoluteFill} tint="dark" />
-              <Svg width={width} height={BAR_HEIGHT} style={StyleSheet.absoluteFill} pointerEvents="none">
-                <Path
-                  d={`M 0 0 L ${width} 0 L ${width} ${BAR_HEIGHT} L 0 ${BAR_HEIGHT} Z ${buildWavePath(width)}`}
-                  fill={colors.background}
-                  fillRule="evenodd"
-                />
-              </Svg>
-            </View>
-            <View style={styles.clip}>
+            {blurLayer}
+            <View style={styles.clip} pointerEvents="box-none">
               <Svg width={width} height={BAR_HEIGHT} style={StyleSheet.absoluteFill}>
                 <Path d={buildWavePath(width)} fill={fill} stroke={borderColor} strokeWidth={1} />
               </Svg>
