@@ -49,8 +49,7 @@ export const Colors = {
     // components/group/group-invite-row.tsx:32; components/molecules/confirm-sheet.tsx:32,41;
     // components/molecules/friend-request-row.tsx:32; components/molecules/list-card.tsx:29;
     // components/molecules/profile-header.tsx:30; components/molecules/friend-row.tsx:35;
-    // components/molecules/item-row.tsx:61; components/molecules/user-search-row.tsx:31;
-    // components/molecules/feature-row.tsx:19 (titoli landing card)
+    // components/molecules/item-row.tsx:61; components/molecules/user-search-row.tsx:31
     text: '#000000',
     // components/group/group-invite-row.tsx:35,41,54; components/group/group-card.tsx:38,41,45;
     // components/group/group-member-row.tsx:29; components/group/group-list-card.tsx:43,47;
@@ -63,7 +62,7 @@ export const Colors = {
     // components/atoms/star-rating.tsx:14; components/molecules/friend-request-row.tsx:49;
     // components/atoms/selectable-chip.tsx:24; components/molecules/item-row.tsx:65,71,89,102;
     // components/molecules/list-card.tsx:33,38; components/molecules/user-search-row.tsx:35;
-    // components/molecules/profile-header.tsx:33; components/molecules/feature-row.tsx:20 (sottotitoli landing card)
+    // components/molecules/profile-header.tsx:33
     textSecondary: '#60646C',
     // testo/titoli sopra superfici colorate (card glass, bottone outline, sfondo gradiente, tab bar)
     // components/app-tabs.tsx:98; components/atoms/button.tsx:37; components/atoms/divider.tsx:13;
@@ -147,26 +146,18 @@ export const Colors = {
       // app/(app)/randomizer.tsx:274 (diceText); components/molecules/dice-logo.tsx:114 (pip)
       four: '#5B3FD6',
     },
-    // theme.ts (GradientGlow: sfera su in alto a sinistra)
-    backgroundCircleUp: '#7C5CFC',
-    // theme.ts (GradientGlow: sfera down in basso a destra)
-    backgroundCircleDown: '#FF6B6B',
   },
   dark: {
-    background: '#120A26',
-    backgroundElement: '#3A1C57',
-    backgroundSelected: '#4e1e5a',
+    background: '#000000',
+    backgroundElement: '#212225',
+    backgroundSelected: '#2E3135',
     text: '#ffffff',
     textSecondary: '#B0B4BA',
-    titleColor: '#ebb12a',
+    titleColor: '#F3ECFF',
     linkColor: '#C9B8FF',
     placeholder: '#B9AEDC',
-    primary: '#ebb12a',
+    primary: '#7C5CFC',
     secondary: '#FF6B6B',
-    // theme.ts (GradientGlow: sfera up in alto a sinistra)
-    backgroundCircleUp: '#7C5CFC',
-    // theme.ts (GradientGlow: sfera down in basso a destra)
-    backgroundCircleDown: '#FF6B6B',
     accent: '#208AEF',
     error: '#E53E3E',
     warning: '#FFD166',
@@ -190,19 +181,19 @@ export const Colors = {
  *  components/molecules/gradient-background.tsx:13; components/molecules/tooltip.tsx:27 (stops[1] come fill solido). */
 export const GradientBackground = {
   light: { stops: ['#E4D3FF', '#FCD9EC', '#FFE7B8'] },
-  dark: { stops: [Colors.dark.background, '#3A1C57', '#4e1e5a'] },
+  dark: { stops: ['#120A26', '#3A1C57', '#5A1E4E'] },
 } as const;
 
 /** Macchie di luce colorata sopra il GradientBackground, per dare profondità senza illustrazioni.
- *  Usato in: components/molecules/gradient-background.tsx:14. */
+ *  Riusa Colors.primary/secondary invece di tinte proprie. Usato in: components/molecules/gradient-background.tsx:14. */
 export const GradientGlow = {
   light: [
-    { color: Colors.light.backgroundCircleUp, top: -60, left: -60 },
-    { color: Colors.light.backgroundCircleDown, bottom: -80, right: -50 },
+    { color: Colors.light.primary, top: -60, left: -60 },
+    { color: Colors.light.secondary, bottom: -80, right: -50 },
   ],
   dark: [
-    { color: Colors.dark.backgroundCircleUp, top: -60, left: -60 },
-    { color: Colors.dark.backgroundCircleDown, bottom: -80, right: -50 },
+    { color: Colors.dark.primary, top: -60, left: -60 },
+    { color: Colors.dark.secondary, bottom: -80, right: -50 },
   ],
 } as const;
 

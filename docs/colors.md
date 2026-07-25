@@ -1,6 +1,7 @@
 ```js
 
-export const Colors = {
+export const NewColors = {
+    // approccio dark first. la light la vediamo dopo.
     light: { … },
     dark: {
         background: "...",

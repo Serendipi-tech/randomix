@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,6 +16,7 @@ import { useProfile } from '@/utils/useProfile';
 const USERNAME_MIN_LENGTH = 3;
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { t } = useTranslation('profile');
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
@@ -87,6 +89,7 @@ export default function ProfileScreen() {
         ) : null}
 
         <View style={styles.logoutWrap}>
+          <Button colorScheme={colorScheme} variant="secondary" label="Colors" onPress={() => router.push('colors-showcase')} />
           <Button colorScheme={colorScheme} variant="secondary" label={t('logout')} onPress={logout} />
         </View>
       </View>
@@ -117,5 +120,6 @@ const styles = StyleSheet.create({
   },
   logoutWrap: {
     marginTop: Spacing.four,
+    gap: Spacing.two,
   },
 });
