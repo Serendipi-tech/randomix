@@ -123,10 +123,11 @@ export const styles = StyleSheet.create({
   // Badges
   badgeStack: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   badge: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 6,
     alignItems: 'center',
+    justifyContent: 'center',
   },
 
   // Chips
@@ -222,9 +223,9 @@ export const styles = StyleSheet.create({
   // Toggles
   toggleStack: { flexDirection: 'row', gap: 12 },
   toggle: {
-    width: 48,
-    height: 28,
-    borderRadius: 14,
+    width: 50,
+    height: 30,
+    borderRadius: 15,
     borderWidth: 1,
     justifyContent: 'center',
     position: 'relative',
@@ -235,6 +236,7 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     position: 'absolute',
     top: 2,
+    boxShadow: '0px 1px 3px rgba(0,0,0,0.3)',
   },
 
   // Tags
@@ -391,7 +393,6 @@ export const styles = StyleSheet.create({
   pageHeaderTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#ffffff',
     fontFamily: 'Inter',
     marginBottom: 2,
   },
