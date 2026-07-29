@@ -1,15 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ActivityIndicator, Animated, Easing, Keyboard, Platform, ScrollView, StyleSheet, Text, TextInput, View, Pressable, useWindowDimensions, type LayoutChangeEvent, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Animated, Easing, Image, Keyboard, Platform, ScrollView, StyleSheet, Text, TextInput, View, Pressable, useWindowDimensions, type LayoutChangeEvent, type TextStyle, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Stop, Circle, Path } from 'react-native-svg';
 import MaskedView from '@react-native-masked-view/masked-view';
+import { Asset } from 'expo-asset';
 import { Bell, Check, ChevronLeft, Eye, EyeOff, Filter, Flame, Home, Image as ImageIcon, Inbox, LayoutGrid, Lock, MoreHorizontal, Moon, ShieldAlert, Sun, Tag, Users, X, Zap } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { useDominantColor } from '@/utils/useDominantColor';
 import { styles } from './colors-showcase.styles';
+
+const AVATAR_FOX = require('../../../assets/images/showcase-avatars/fox.png');
+const AVATAR_PANDA = require('../../../assets/images/showcase-avatars/panda.png');
+const AVATAR_OWL = require('../../../assets/images/showcase-avatars/owl.png');
+const AVATAR_URIS = { fox: Asset.fromModule(AVATAR_FOX).uri, panda: Asset.fromModule(AVATAR_PANDA).uri, owl: Asset.fromModule(AVATAR_OWL).uri };
 
 // ============ TUTTI i componenti copiati dall'auth - SOLO GRAFICA ============
 
@@ -409,7 +416,7 @@ function PasswordStrengthIndicatorCopy({ colors }: { colors: typeof ShowcaseColo
 
   return (
     <View style={{ justifyContent: 'center' }}>
-      <Pressable onPress={() => setOpen((v) => !v)} hitSlop={6}>
+      <Pressable onPress={() => setOpen((v) => !v)} hitSlop={12}>
         <ShieldAlert size={20} color={levelColor} />
       </Pressable>
 
@@ -495,11 +502,11 @@ function Input({ variant, colors, placeholder }: { variant: InputVariant; colors
       {variant === 'password' && (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <PasswordStrengthIndicatorCopy colors={colors} />
-          <Pressable onPress={() => setShowPassword(!showPassword)} hitSlop={8}>
+          <Pressable onPress={() => setShowPassword(!showPassword)} hitSlop={13}>
             {showPassword ? (
-              <EyeOff size={18} color={colors.border} />
+              <EyeOff size={18} color={colors.disabled} />
             ) : (
-              <Eye size={18} color={colors.border} />
+              <Eye size={18} color={colors.disabled} />
             )}
           </Pressable>
         </View>
@@ -1115,6 +1122,21 @@ function Spinner({ color, track }: { color: string; track: string }) {
         },
       ]}
     />
+  );
+}
+
+function ImageAvatar({ uri, name, fallbackColor, textColor }: { uri: string; name: string; fallbackColor: string; textColor: string }) {
+  const ringColor = useDominantColor(uri, fallbackColor);
+
+  return (
+    <View style={styles.avatarItem}>
+      <View style={[styles.avatarRing, { borderColor: ringColor }]}>
+        <Image source={{ uri }} style={styles.avatar} />
+      </View>
+      <Text style={[styles.avatarName, { color: textColor }]} numberOfLines={1} ellipsizeMode="tail">
+        {name}
+      </Text>
+    </View>
   );
 }
 
@@ -2115,20 +2137,11 @@ export default function ColorsShowcase() {
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Avatars</Text>
           <View style={styles.avatarStack}>
             {[
-              { initials: 'MR', name: 'Mario Rossi', color: colors.primary },
-              { initials: 'GB', name: 'Giulia Bianchi', color: colors.secondary },
-              { initials: 'FL', name: 'Francesca Luna', color: colors.success },
+              { uri: AVATAR_URIS.fox, name: 'mario_rossi', fallback: colors.primary },
+              { uri: AVATAR_URIS.panda, name: 'giulia_bianchi', fallback: colors.secondary },
+              { uri: AVATAR_URIS.owl, name: 'francesca_luna', fallback: colors.success },
             ].map((avatar) => (
-              <View key={avatar.initials} style={styles.avatarItem}>
-                <View style={[styles.avatarRing, { borderColor: avatar.color }]}>
-                  <View style={[styles.avatar, { backgroundColor: avatar.color }]}>
-                    <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 15 }}>{avatar.initials}</Text>
-                  </View>
-                </View>
-                <Text style={[styles.avatarName, { color: colors.textColor }]} numberOfLines={1} ellipsizeMode="tail">
-                  {avatar.name}
-                </Text>
-              </View>
+              <ImageAvatar key={avatar.name} uri={avatar.uri} name={avatar.name} fallbackColor={avatar.fallback} textColor={colors.textColor} />
             ))}
             <View style={styles.avatarItem}>
               <View style={[styles.avatarRing, { borderColor: hexToRgba(colors.border, 0.5) }]}>
@@ -2146,9 +2159,11 @@ export default function ColorsShowcase() {
         {/* Dividers */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Dividers</Text>
-          <View style={[styles.divider, { backgroundColor: colors.border }]} />
-          <Text style={{ color: colors.border, textAlign: 'center', marginVertical: 12 }}>Or</Text>
-          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <View style={[styles.divider, { flex: 1, width: undefined, backgroundColor: colors.border }]} />
+            <Text style={{ color: colors.textColor, fontSize: 13 }}>Or</Text>
+            <View style={[styles.divider, { flex: 1, width: undefined, backgroundColor: colors.border }]} />
+          </View>
         </View>
 
         {/* Tabs */}
@@ -2159,19 +2174,22 @@ export default function ColorsShowcase() {
               <Pressable
                 key={tab}
                 onPress={() => setCurrentTabIdx(idx)}
-                style={[
+                style={({ pressed }) => [
                   styles.tabItem,
                   {
                     borderBottomColor: currentTabIdx === idx ? colors.primary : 'transparent',
                     borderBottomWidth: 2,
+                    ...(Platform.OS === 'web' ? ({ transitionProperty: 'border-color', transitionDuration: '150ms' } as ViewStyle) : {}),
+                    ...(pressed ? { transform: [{ scale: 0.96 }] } : {}),
                   },
                 ]}
               >
                 <Text
                   style={{
-                    color: currentTabIdx === idx ? colors.primary : colors.border,
+                    color: currentTabIdx === idx ? colors.primary : colors.textColor,
                     fontSize: 14,
                     fontWeight: '500',
+                    ...(Platform.OS === 'web' ? ({ transitionProperty: 'color', transitionDuration: '150ms' } as TextStyle) : {}),
                   }}
                 >
                   {tab}
@@ -2189,15 +2207,22 @@ export default function ColorsShowcase() {
               <Pressable
                 key={page}
                 onPress={() => setCurrentPage(page)}
-                style={[
+                style={({ pressed }) => [
                   styles.paginationItem,
                   {
                     backgroundColor: currentPage === page ? colors.primary : colors.foreground,
                     borderColor: colors.border,
+                    ...(Platform.OS === 'web' ? ({ transitionProperty: 'background-color, border-color', transitionDuration: '150ms' } as ViewStyle) : {}),
+                    ...(pressed ? { transform: [{ scale: 0.94 }] } : {}),
                   },
                 ]}
               >
-                <Text style={{ color: currentPage === page ? colors.foreground : colors.textColor, fontWeight: '600' }}>
+                <Text
+                  style={{
+                    color: colors.textColor,
+                    fontWeight: '600',
+                  }}
+                >
                   {page}
                 </Text>
               </Pressable>

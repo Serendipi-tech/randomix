@@ -308,17 +308,19 @@ export const styles = StyleSheet.create({
     gap: 0,
   },
   tabItem: {
-    paddingVertical: 12,
+    minHeight: 48,
     paddingHorizontal: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
     borderBottomWidth: 2,
   },
 
   // Pagination
   paginationStack: { flexDirection: 'row', gap: 8, justifyContent: 'center' },
   paginationItem: {
-    width: 32,
-    height: 32,
-    borderRadius: 6,
+    width: 44,
+    height: 44,
+    borderRadius: 8,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
