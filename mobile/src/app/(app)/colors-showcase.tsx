@@ -2115,16 +2115,26 @@ export default function ColorsShowcase() {
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Avatars</Text>
           <View style={styles.avatarStack}>
             {[
-              { initials: 'MR', color: colors.primary },
-              { initials: 'GB', color: colors.secondary },
-              { initials: 'FL', color: colors.success },
+              { initials: 'MR', name: 'Mario Rossi', color: colors.primary },
+              { initials: 'GB', name: 'Giulia Bianchi', color: colors.secondary },
+              { initials: 'FL', name: 'Francesca Luna', color: colors.success },
             ].map((avatar) => (
-              <View key={avatar.initials} style={[styles.avatar, { backgroundColor: avatar.color }]}>
-                <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 13 }}>{avatar.initials}</Text>
+              <View key={avatar.initials} style={{ alignItems: 'center', gap: 6 }}>
+                <View style={[styles.avatar, { backgroundColor: avatar.color }]}>
+                  <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 13 }}>{avatar.initials}</Text>
+                </View>
+                <Text style={{ color: colors.textColor, fontSize: 12, width: 48, textAlign: 'center' }} numberOfLines={1}>
+                  {avatar.name}
+                </Text>
               </View>
             ))}
-            <View style={[styles.avatar, { backgroundColor: hexToRgba(colors.border, 0.3) }]}>
-              <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 13 }}>+4</Text>
+            <View style={{ alignItems: 'center', gap: 6 }}>
+              <View style={[styles.avatar, { backgroundColor: hexToRgba(colors.border, 0.3) }]}>
+                <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 13 }}>+4</Text>
+              </View>
+              <Text style={{ color: colors.border, fontSize: 11, width: 48, textAlign: 'center' }} numberOfLines={1}>
+                {4} altri
+              </Text>
             </View>
           </View>
         </View>
