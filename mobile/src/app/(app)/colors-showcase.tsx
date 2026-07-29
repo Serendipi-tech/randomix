@@ -2072,22 +2072,28 @@ export default function ColorsShowcase() {
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Links</Text>
           <View style={{ flexDirection: 'row', gap: 20 }}>
             {[
-              { label: 'Vedi profilo', color: colors.primary },
-              { label: 'Gestisci gruppo', color: colors.secondary },
+              { label: 'Vedi profilo' },
+              { label: 'Gestisci gruppo' },
             ].map((link) => (
               <Pressable key={link.label} onPress={() => { }}>
                 {({ pressed }) => (
-                  <Text
+                  <View
                     style={{
-                      color: link.color,
-                      fontSize: 14,
-                      fontWeight: '600',
-                      textDecorationLine: 'underline',
+                      borderBottomColor: colors.accent,
+                      borderBottomWidth: 1.5,
                       opacity: pressed ? 0.5 : 1,
                     }}
                   >
-                    {link.label}
-                  </Text>
+                    <Text
+                      style={{
+                        color: colors.accent,
+                        fontSize: 14,
+                        fontWeight: '600',
+                      }}
+                    >
+                      {link.label}
+                    </Text>
+                  </View>
                 )}
               </Pressable>
             ))}
