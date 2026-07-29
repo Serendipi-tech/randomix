@@ -5,7 +5,7 @@ import { ActivityIndicator, Animated, Easing, Keyboard, Platform, ScrollView, St
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Stop, Circle, Path } from 'react-native-svg';
 import MaskedView from '@react-native-masked-view/masked-view';
-import { Bell, Check, ChevronLeft, Eye, EyeOff, Filter, Flame, Home, Image as ImageIcon, Inbox, LayoutGrid, Lock, MoreHorizontal, Moon, ShieldAlert, Sun, Users, X, Zap } from 'lucide-react-native';
+import { Bell, Check, ChevronLeft, Eye, EyeOff, Filter, Flame, Home, Image as ImageIcon, Inbox, LayoutGrid, Lock, MoreHorizontal, Moon, ShieldAlert, Sun, Tag, Users, X, Zap } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
@@ -1118,10 +1118,10 @@ function Spinner({ color, track }: { color: string; track: string }) {
   );
 }
 
-function TagLabel({ name, color, textColor }: { name: string; color: string; textColor: string }) {
+function TagLabel({ name, color, textColor, useIcon }: { name: string; color: string; textColor: string; useIcon?: boolean }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 5, paddingHorizontal: 10, borderRadius: 6, backgroundColor: hexToRgba(color, 0.15) }}>
-      <Text style={{ color, fontSize: 14, fontWeight: '700' }}>#</Text>
+      {useIcon ? <Tag size={14} color={color} strokeWidth={2.5} /> : <Text style={{ color, fontSize: 14, fontWeight: '700' }}>#</Text>}
       <Text style={{ color: textColor, fontSize: 13, fontWeight: '600' }}>{name}</Text>
     </View>
   );
@@ -2057,12 +2057,12 @@ export default function ColorsShowcase() {
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Tags</Text>
           <View style={styles.tagStack}>
             {[
-              { name: 'Romance', color: colors.extraColors.one },
+              { name: 'Romance', color: colors.extraColors.one, useIcon: true },
               { name: 'Sci-Fi', color: colors.extraColors.three },
-              { name: 'Classici', color: colors.extraColors.five },
+              { name: 'Classici', color: colors.extraColors.five, useIcon: true },
               { name: 'Da rileggere', color: colors.extraColors.seven },
             ].map((tag) => (
-              <TagLabel key={tag.name} name={tag.name} color={tag.color} textColor={colors.textColor} />
+              <TagLabel key={tag.name} name={tag.name} color={tag.color} textColor={colors.textColor} useIcon={tag.useIcon} />
             ))}
           </View>
         </View>
