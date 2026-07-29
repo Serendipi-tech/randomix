@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ActivityIndicator, Animated, Easing, Platform, ScrollView, StyleSheet, Text, TextInput, View, Pressable, type LayoutChangeEvent, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Animated, Easing, Keyboard, Platform, ScrollView, StyleSheet, Text, TextInput, View, Pressable, useWindowDimensions, type LayoutChangeEvent, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Stop, Circle, Path } from 'react-native-svg';
 import MaskedView from '@react-native-masked-view/masked-view';
-import { Bell, Check, ChevronLeft, Eye, EyeOff, Flame, Home, Image as ImageIcon, LayoutGrid, Lock, MoreHorizontal, Moon, ShieldAlert, Sun, TrendingUp, Users, X, Zap } from 'lucide-react-native';
+import { Bell, Check, ChevronLeft, Eye, EyeOff, Filter, Flame, Home, Image as ImageIcon, Inbox, LayoutGrid, Lock, MoreHorizontal, Moon, ShieldAlert, Sun, Users, X, Zap } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
@@ -431,11 +431,11 @@ function PasswordStrengthIndicatorCopy({ colors }: { colors: typeof ShowcaseColo
             opacity: fadeAnim,
             ...(animating
               ? {
-                  transform: [
-                    { scale: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1] }) },
-                    { translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [6, 0] }) },
-                  ],
-                }
+                transform: [
+                  { scale: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1] }) },
+                  { translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [6, 0] }) },
+                ],
+              }
               : {}),
           }}
         >
@@ -482,7 +482,7 @@ function Input({ variant, colors, placeholder }: { variant: InputVariant; colors
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         placeholder={placeholder || defaultPlaceholder}
-        placeholderTextColor={colors.border}
+        placeholderTextColor={colors.disabled}
         secureTextEntry={variant === 'password' && !showPassword}
         multiline={variant === 'textarea'}
         numberOfLines={variant === 'textarea' ? 4 : undefined}
@@ -744,6 +744,21 @@ function ProgressBar({ value, colors }: { value: number; colors: typeof Showcase
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
       <View style={{ flex: 1, height: 6, position: 'relative' }}>
+        {isOverflow && (
+          <Animated.View
+            pointerEvents="none"
+            style={{
+              position: 'absolute',
+              left: 0,
+              bottom: 0,
+              height: 2,
+              width: widthAnim.interpolate({ inputRange: [0, 100], outputRange: ['0%', '100%'] }),
+              borderRadius: 1,
+              backgroundColor: 'transparent',
+              boxShadow: `0px 2px 13px 2px ${hexToRgba(colors.secondary, 0.4)}`,
+            }}
+          />
+        )}
         <View
           style={{
             position: 'absolute',
@@ -757,7 +772,14 @@ function ProgressBar({ value, colors }: { value: number; colors: typeof Showcase
           }}
         >
           {isOverflow ? (
-            <Animated.View style={{ height: '100%', width: widthAnim.interpolate({ inputRange: [0, 100], outputRange: ['0%', '100%'] }), borderRadius: 3, overflow: 'hidden' }}>
+            <Animated.View
+              style={{
+                height: '100%',
+                width: widthAnim.interpolate({ inputRange: [0, 100], outputRange: ['0%', '100%'] }),
+                borderRadius: 3,
+                overflow: 'hidden',
+              }}
+            >
               <LinearGradient
                 colors={[colors.secondary, colors.secondaryGradient]}
                 start={{ x: 0, y: 0 }}
@@ -790,6 +812,279 @@ function ProgressBar({ value, colors }: { value: number; colors: typeof Showcase
       </View>
       <Text style={{ color: colors.textColor, fontSize: 12, fontWeight: '600', minWidth: 36 }}>{value}%</Text>
     </View>
+  );
+}
+
+function SkeletonLine({ colors, width }: { colors: typeof ShowcaseColors.light | typeof ShowcaseColors.dark; width?: `${number}%` }) {
+  const pulseAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1, duration: 1000, easing: Easing.inOut(Easing.ease), useNativeDriver: false }),
+        Animated.timing(pulseAnim, { toValue: 0, duration: 1000, easing: Easing.inOut(Easing.ease), useNativeDriver: false }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, []);
+
+  return (
+    <Animated.View
+      style={[
+        styles.skeletonLine,
+        {
+          width: width ?? '100%',
+          backgroundColor: hexToRgba(colors.border, 0.5),
+          opacity: pulseAnim.interpolate({ inputRange: [0, 1], outputRange: [0.55, 0.95] }),
+          boxShadow: `0px 0px 6px ${hexToRgba(colors.border, 0.3)}`,
+        },
+      ]}
+    />
+  );
+}
+
+type FilterGroup = { label: string; options: Array<{ label: string; value: string }> };
+
+const FILTER_GROUPS: FilterGroup[] = [
+  {
+    label: 'Genere',
+    options: [
+      { label: 'Fantasy', value: 'fantasy' },
+      { label: 'Sci-Fi', value: 'scifi' },
+      { label: 'Romance', value: 'romance' },
+    ],
+  },
+  {
+    label: 'Stato',
+    options: [
+      { label: 'Letto', value: 'letto' },
+      { label: 'In corso', value: 'in_corso' },
+      { label: 'Da leggere', value: 'da_leggere' },
+    ],
+  },
+];
+
+function FilterButton({ colors, active, onPress }: { colors: typeof ShowcaseColors.light | typeof ShowcaseColors.dark; active: boolean; onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: active ? colors.primary : colors.border,
+        backgroundColor: active ? hexToRgba(colors.primary, 0.12) : colors.foreground,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Filter size={20} color={active ? colors.primary : colors.textColor} />
+    </Pressable>
+  );
+}
+
+function FilterBottomSheet({
+  colors,
+  visible,
+  onClose,
+  groups,
+  selected,
+  onToggle,
+}: {
+  colors: typeof ShowcaseColors.light | typeof ShowcaseColors.dark;
+  visible: boolean;
+  onClose: () => void;
+  groups: FilterGroup[];
+  selected: string[];
+  onToggle: (value: string) => void;
+}) {
+  const { height: screenHeight } = useWindowDimensions();
+  const [search, setSearch] = useState('');
+  const [mounted, setMounted] = useState(false);
+  const translateY = useRef(new Animated.Value(screenHeight)).current;
+  const keyboardOffset = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      setMounted(true);
+      Animated.timing(translateY, { toValue: 0, duration: 260, easing: Easing.out(Easing.cubic), useNativeDriver: Platform.OS !== 'web' }).start();
+    } else {
+      Keyboard.dismiss();
+      Animated.timing(translateY, { toValue: screenHeight, duration: 220, easing: Easing.in(Easing.cubic), useNativeDriver: Platform.OS !== 'web' }).start(() => {
+        setMounted(false);
+        setSearch('');
+      });
+    }
+  }, [visible]);
+
+  useEffect(() => {
+    const showEvt = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvt = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showSub = Keyboard.addListener(showEvt, (e) => {
+      Animated.timing(keyboardOffset, { toValue: e.endCoordinates.height, duration: 220, useNativeDriver: Platform.OS !== 'web' }).start();
+    });
+    const hideSub = Keyboard.addListener(hideEvt, () => {
+      Animated.timing(keyboardOffset, { toValue: 0, duration: 220, useNativeDriver: Platform.OS !== 'web' }).start();
+    });
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  const filteredGroups = groups
+    .map((group) => ({
+      ...group,
+      options: group.options.filter((opt) => opt.label.toLowerCase().includes(search.toLowerCase())),
+    }))
+    .filter((group) => group.options.length > 0);
+
+  if (!mounted && !visible) return null;
+
+  return (
+    <>
+      <Pressable onPress={onClose} style={StyleSheet.absoluteFill}>
+        <Animated.View
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              backgroundColor: hexToRgba(colors.shadow, 0.45),
+              opacity: translateY.interpolate({ inputRange: [0, screenHeight], outputRange: [1, 0], extrapolate: 'clamp' }),
+            },
+          ]}
+        />
+      </Pressable>
+      <Animated.View
+        style={{
+          position: 'absolute',
+          left: 12,
+          right: 12,
+          bottom: 0,
+          maxHeight: screenHeight * 0.7,
+          borderRadius: 20,
+          backgroundColor: colors.foreground,
+          borderWidth: 1,
+          borderColor: colors.border,
+          overflow: 'hidden',
+          boxShadow: `0px -8px 24px ${hexToRgba(colors.shadow, 0.3)}`,
+          transform: [{ translateY: Animated.subtract(translateY, keyboardOffset) }],
+        }}
+      >
+        <View style={{ alignItems: 'center', paddingTop: 10, paddingBottom: 6 }}>
+          <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: hexToRgba(colors.border, 0.6) }} />
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingBottom: 10 }}>
+          <Text style={{ color: colors.textColor, fontSize: 17, fontWeight: '700' }}>Filtri</Text>
+          <Pressable onPress={onClose} hitSlop={8}>
+            <X size={20} color={colors.border} />
+          </Pressable>
+        </View>
+        <View style={{ paddingHorizontal: 16, paddingBottom: 10 }}>
+          <View
+            style={[
+              styles.input,
+              { backgroundColor: colors.background, borderWidth: 1, borderColor: colors.border, marginBottom: 0, flexDirection: 'row', alignItems: 'center' },
+            ]}
+          >
+            <TextInput
+              value={search}
+              onChangeText={setSearch}
+              placeholder="Cerca..."
+              placeholderTextColor={colors.disabled}
+              style={[{ flex: 1, color: colors.textColor, fontSize: 14 }, Platform.OS === 'web' ? ({ outlineStyle: 'none' } as any) : {}]}
+            />
+          </View>
+        </View>
+        <ScrollView
+          style={[{ flexGrow: 0 }, Platform.OS === 'web' ? ({ scrollbarWidth: 'none' } as any) : {}]}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {filteredGroups.length === 0 && <Text style={{ color: colors.disabled, fontSize: 13, paddingHorizontal: 16, paddingVertical: 12 }}>Nessun risultato</Text>}
+          {filteredGroups.map((group) => (
+            <View key={group.label}>
+              <Text
+                style={{
+                  color: colors.textColor,
+                  opacity: 0.55,
+                  fontSize: 11,
+                  fontWeight: '700',
+                  textTransform: 'uppercase',
+                  letterSpacing: 0.5,
+                  paddingHorizontal: 16,
+                  paddingTop: 10,
+                  paddingBottom: 4,
+                }}
+              >
+                {group.label}
+              </Text>
+              {group.options.map((opt) => {
+                const isSelected = selected.includes(opt.value);
+                return (
+                  <Pressable
+                    key={opt.value}
+                    onPress={() => onToggle(opt.value)}
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, paddingHorizontal: 16 }}
+                  >
+                    <View
+                      style={[
+                        styles.checkbox,
+                        { backgroundColor: 'transparent', borderColor: colors.border, borderWidth: 1.5, overflow: 'hidden' },
+                        Platform.OS === 'web' ? ({ contain: 'paint' } as ViewStyle) : {},
+                      ]}
+                    >
+                      <LinearGradient
+                        colors={[colors.secondary, colors.secondaryGradient]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={[
+                          StyleSheet.absoluteFill,
+                          { alignItems: 'center', justifyContent: 'center', opacity: isSelected ? 1 : 0 },
+                          Platform.OS === 'web' ? ({ transitionProperty: 'opacity, transform', transitionDuration: '150ms' } as ViewStyle) : {},
+                          { transform: [{ scale: isSelected ? 1 : 0.5 }] },
+                        ]}
+                      >
+                        <Check size={14} color={colors.textColor} strokeWidth={3} />
+                      </LinearGradient>
+                    </View>
+                    <Text style={{ color: colors.textColor, fontSize: 14 }}>{opt.label}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          ))}
+        </ScrollView>
+      </Animated.View>
+    </>
+  );
+}
+
+function RatingStar({ active, color, inactiveColor, onPress }: { active: boolean; color: string; inactiveColor: string; onPress: () => void }) {
+  const fillAnim = useRef(new Animated.Value(active ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.timing(fillAnim, { toValue: active ? 1 : 0, duration: 250, easing: Easing.out(Easing.quad), useNativeDriver: false }).start();
+  }, [active]);
+
+  return (
+    <Pressable onPress={onPress}>
+      <View style={{ width: 20, height: 20 }}>
+        <Text style={{ position: 'absolute', color: inactiveColor, fontSize: 20 }}>★</Text>
+        <Animated.View
+          style={{
+            position: 'absolute',
+            overflow: 'hidden',
+            height: '100%',
+            width: fillAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
+          }}
+        >
+          <Text style={{ color, fontSize: 20 }}>★</Text>
+        </Animated.View>
+      </View>
+    </Pressable>
   );
 }
 
@@ -826,21 +1121,19 @@ function Spinner({ color, track }: { color: string; track: string }) {
 function TagLabel({ name, color, textColor }: { name: string; color: string; textColor: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 5, paddingHorizontal: 10, borderRadius: 6, backgroundColor: hexToRgba(color, 0.15) }}>
-      <View style={{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: color }} />
+      <Text style={{ color, fontSize: 14, fontWeight: '700' }}>#</Text>
       <Text style={{ color: textColor, fontSize: 13, fontWeight: '600' }}>{name}</Text>
     </View>
   );
 }
 
-type CardVariant = 'outlined' | 'filled' | 'media' | 'stat' | 'action' | 'profile' | 'item' | 'challenge' | 'notification';
+type CardVariant = 'outlined' | 'filled' | 'action' | 'profile' | 'item' | 'challenge' | 'notification';
 
 type CardProps = {
   variant: CardVariant;
   colors: typeof ShowcaseColors.light | typeof ShowcaseColors.dark;
   title: string;
   description?: string;
-  statValue?: string;
-  statDelta?: string;
   actionLabel?: string;
   profileHandle?: string;
   itemCategory?: string;
@@ -858,8 +1151,6 @@ function Card({
   colors,
   title,
   description,
-  statValue,
-  statDelta,
   actionLabel,
   profileHandle,
   itemCategory,
@@ -945,37 +1236,6 @@ function Card({
           <Text style={{ color: colors.textColor, fontSize: 15, lineHeight: 21 }}>{description}</Text>
         )}
       </LinearGradient>
-    );
-  }
-
-  if (variant === 'media') {
-    return (
-      <View style={[styles.card, { backgroundColor: colors.foreground, borderColor: colors.border, padding: 0, overflow: 'hidden' }]}>
-        <View style={{ height: 100, backgroundColor: hexToRgba(colors.primary, 0.15), alignItems: 'center', justifyContent: 'center' }}>
-          <ImageIcon size={28} color={colors.primary} />
-        </View>
-        <View style={{ padding: 16 }}>
-          <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 16, marginBottom: 4 }}>{title}</Text>
-          {description && <Text style={{ color: colors.textColor, fontSize: 14 }}>{description}</Text>}
-        </View>
-      </View>
-    );
-  }
-
-  if (variant === 'stat') {
-    return (
-      <View style={[styles.card, { backgroundColor: colors.foreground, borderColor: colors.border }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <View>
-            <Text style={{ color: colors.textColor, fontSize: 14, fontWeight: '600', marginBottom: 4 }}>{title}</Text>
-            <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 26 }}>{statValue}</Text>
-          </View>
-          <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: hexToRgba(colors.success, 0.15), alignItems: 'center', justifyContent: 'center' }}>
-            <TrendingUp size={22} color={colors.success} />
-          </View>
-        </View>
-        {statDelta && <Text style={{ color: colors.success, fontSize: 14, fontWeight: '600', marginTop: 8 }}>{statDelta}</Text>}
-      </View>
     );
   }
 
@@ -1102,6 +1362,8 @@ const ShowcaseColors = {
 
     border: '#c2b1cc',
 
+    disabled: '#495d79',
+
     textColor: '#191024',
 
     extraColors: {
@@ -1136,6 +1398,8 @@ const ShowcaseColors = {
     shadow: '#000000',
 
     border: '#334155',
+
+    disabled: '#5c7597',
 
     textColor: '#fdfcf5',
 
@@ -1382,12 +1646,18 @@ export default function ColorsShowcase() {
   const [rating, setRating] = useState(4);
   const [currentTabIdx, setCurrentTabIdx] = useState(0);
   const [buttonsLoading, setButtonsLoading] = useState(false);
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [filterSelected, setFilterSelected] = useState<string[]>([]);
 
   const colorScheme = isDark ? 'dark' : 'light';
   const colors = ShowcaseColors[colorScheme];
 
   const toggleTab = (tab: 'profile' | 'notifications' | 'friends') => {
     setActiveTab(activeTab === tab ? null : tab);
+  };
+
+  const toggleFilterValue = (value: string) => {
+    setFilterSelected((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
   };
 
   return (
@@ -1590,8 +1860,6 @@ export default function ColorsShowcase() {
               title="Solid background card"
               description="Sfondo pieno (qui in gradient) per contenuti in evidenza o call-to-action."
             />
-            <Card variant="media" colors={colors} title="Media card" description="Immagine + testo, tipico di feed e prodotti" />
-            <Card variant="stat" colors={colors} title="Total Points" statValue="2.480" statDelta="+12% questa settimana" />
             <Card
               variant="action"
               colors={colors}
@@ -1667,7 +1935,7 @@ export default function ColorsShowcase() {
                 <Text style={{ color: alert.color, fontWeight: '700', fontSize: 15, marginBottom: 2 }}>
                   {alert.type}
                 </Text>
-                <Text style={{ color: alert.color, fontSize: 14, opacity: 0.85 }}>Alert message here</Text>
+                <Text style={{ color: colors.textColor, fontSize: 14, opacity: 0.85 }}>Alert message here</Text>
               </View>
             ))}
           </View>
@@ -1893,16 +2161,6 @@ export default function ColorsShowcase() {
           </View>
         </View>
 
-        {/* Tooltip Placeholder */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Tooltips</Text>
-          <View style={[styles.tooltip, { backgroundColor: colors.textColor }]}>
-            <Text style={{ color: colors.foreground, fontSize: 12, fontWeight: '500' }}>
-              Helpful tooltip text
-            </Text>
-          </View>
-        </View>
-
         {/* Pagination */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Pagination</Text>
@@ -1932,11 +2190,13 @@ export default function ColorsShowcase() {
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Rating</Text>
           <View style={styles.ratingStack}>
             {[1, 2, 3, 4, 5].map((star) => (
-              <Pressable key={star} onPress={() => setRating(star)}>
-                <Text style={{ color: star <= rating ? colors.warning : colors.border, fontSize: 20 }}>
-                  ★
-                </Text>
-              </Pressable>
+              <RatingStar
+                key={star}
+                active={star <= rating}
+                color={colors.warning}
+                inactiveColor={colors.border}
+                onPress={() => setRating(star)}
+              />
             ))}
           </View>
         </View>
@@ -1944,10 +2204,22 @@ export default function ColorsShowcase() {
         {/* Empty State */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Empty State</Text>
-          <View style={[styles.emptyState, { borderColor: colors.border }]}>
-            <Text style={{ color: colors.border, fontSize: 14, marginBottom: 8 }}>📭</Text>
-            <Text style={{ color: colors.textColor, fontWeight: '600', marginBottom: 4 }}>Nothing here</Text>
-            <Text style={{ color: colors.border, fontSize: 12 }}>No items to display</Text>
+          <View style={[styles.emptyState, { borderColor: hexToRgba(colors.border, 0.5), borderStyle: 'dashed' }]}>
+            <View
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 28,
+                backgroundColor: hexToRgba(colors.primary, 0.12),
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 14,
+              }}
+            >
+              <Inbox size={24} color={colors.primary} strokeWidth={1.75} />
+            </View>
+            <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 18, marginBottom: 4 }}>Nothing here</Text>
+            <Text style={{ color: colors.textColor, fontSize: 15, opacity: 0.65 }}>No items to display</Text>
           </View>
         </View>
 
@@ -1955,18 +2227,16 @@ export default function ColorsShowcase() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Skeleton</Text>
           <View style={styles.skeletonStack}>
-            <View style={[styles.skeletonLine, { backgroundColor: hexToRgba(colors.border, 0.5) }]} />
-            <View style={[styles.skeletonLine, { backgroundColor: hexToRgba(colors.border, 0.5), width: '80%' }]} />
-            <View style={[styles.skeletonLine, { backgroundColor: hexToRgba(colors.border, 0.5), width: '60%' }]} />
+            <SkeletonLine colors={colors} />
+            <SkeletonLine colors={colors} width="80%" />
+            <SkeletonLine colors={colors} width="60%" />
           </View>
         </View>
 
-        {/* Dropdown Menu Placeholder */}
+        {/* Filters */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Dropdown</Text>
-          <View style={[styles.dropdown, { backgroundColor: colors.foreground, borderColor: colors.border }]}>
-            <Text style={{ color: colors.textColor, fontSize: 14 }}>Select option...</Text>
-          </View>
+          <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Filtri</Text>
+          <FilterButton colors={colors} active={filterSelected.length > 0} onPress={() => setFilterSheetOpen(true)} />
         </View>
 
         {/* Copied Components from Auth */}
@@ -2007,6 +2277,16 @@ export default function ColorsShowcase() {
 
       {/* Bottom Navbar */}
       <NavBar colorScheme={colorScheme} isDark={isDark} setIsDark={setIsDark} activeTab={activeTab} toggleTab={toggleTab} />
+
+      {/* Filter Bottom Sheet - montata dopo la navbar per stare sopra (la navbar ha un blur che sfoca ciò che sta dietro) */}
+      <FilterBottomSheet
+        colors={colors}
+        visible={filterSheetOpen}
+        onClose={() => setFilterSheetOpen(false)}
+        groups={FILTER_GROUPS}
+        selected={filterSelected}
+        onToggle={toggleFilterValue}
+      />
     </SafeAreaView>
   );
 }
