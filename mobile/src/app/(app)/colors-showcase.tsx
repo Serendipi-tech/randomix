@@ -1118,10 +1118,10 @@ function Spinner({ color, track }: { color: string; track: string }) {
   );
 }
 
-function TagLabel({ name, color, textColor, useIcon }: { name: string; color: string; textColor: string; useIcon?: boolean }) {
+function TagLabel({ name, color, textColor }: { name: string; color: string; textColor: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 5, paddingHorizontal: 10, borderRadius: 6, backgroundColor: hexToRgba(color, 0.15) }}>
-      {useIcon ? <Tag size={14} color={color} strokeWidth={2.5} /> : <Text style={{ color, fontSize: 14, fontWeight: '700' }}>#</Text>}
+      <Tag size={14} color={color} strokeWidth={2.5} />
       <Text style={{ color: textColor, fontSize: 13, fontWeight: '600' }}>{name}</Text>
     </View>
   );
@@ -2057,12 +2057,12 @@ export default function ColorsShowcase() {
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Tags</Text>
           <View style={styles.tagStack}>
             {[
-              { name: 'Romance', color: colors.extraColors.one, useIcon: true },
+              { name: 'Romance', color: colors.extraColors.one },
               { name: 'Sci-Fi', color: colors.extraColors.three },
-              { name: 'Classici', color: colors.extraColors.five, useIcon: true },
+              { name: 'Classici', color: colors.extraColors.five },
               { name: 'Da rileggere', color: colors.extraColors.seven },
             ].map((tag) => (
-              <TagLabel key={tag.name} name={tag.name} color={tag.color} textColor={colors.textColor} useIcon={tag.useIcon} />
+              <TagLabel key={tag.name} name={tag.name} color={tag.color} textColor={colors.textColor} />
             ))}
           </View>
         </View>
