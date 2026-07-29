@@ -2119,21 +2119,25 @@ export default function ColorsShowcase() {
               { initials: 'GB', name: 'Giulia Bianchi', color: colors.secondary },
               { initials: 'FL', name: 'Francesca Luna', color: colors.success },
             ].map((avatar) => (
-              <View key={avatar.initials} style={{ alignItems: 'center', gap: 6 }}>
-                <View style={[styles.avatar, { backgroundColor: avatar.color }]}>
-                  <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 13 }}>{avatar.initials}</Text>
+              <View key={avatar.initials} style={styles.avatarItem}>
+                <View style={[styles.avatarRing, { borderColor: avatar.color }]}>
+                  <View style={[styles.avatar, { backgroundColor: avatar.color }]}>
+                    <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 15 }}>{avatar.initials}</Text>
+                  </View>
                 </View>
-                <Text style={{ color: colors.textColor, fontSize: 12, width: 48, textAlign: 'center' }} numberOfLines={1}>
+                <Text style={[styles.avatarName, { color: colors.textColor }]} numberOfLines={1} ellipsizeMode="tail">
                   {avatar.name}
                 </Text>
               </View>
             ))}
-            <View style={{ alignItems: 'center', gap: 6 }}>
-              <View style={[styles.avatar, { backgroundColor: hexToRgba(colors.border, 0.3) }]}>
-                <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 13 }}>+4</Text>
+            <View style={styles.avatarItem}>
+              <View style={[styles.avatarRing, { borderColor: hexToRgba(colors.border, 0.5) }]}>
+                <View style={[styles.avatar, { backgroundColor: hexToRgba(colors.border, 0.3) }]}>
+                  <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 15 }}>+4</Text>
+                </View>
               </View>
-              <Text style={{ color: colors.border, fontSize: 11, width: 48, textAlign: 'center' }} numberOfLines={1}>
-                {4} altri
+              <Text style={[styles.avatarName, { color: colors.border }]} numberOfLines={1}>
+                Altri
               </Text>
             </View>
           </View>

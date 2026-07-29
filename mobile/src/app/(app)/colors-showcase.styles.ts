@@ -261,13 +261,30 @@ export const styles = StyleSheet.create({
   },
 
   // Avatars
-  avatarStack: { flexDirection: 'row', gap: 12 },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  avatarStack: { flexDirection: 'row', gap: 14 },
+  avatarItem: { alignItems: 'center', width: 60 },
+  avatarRing: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 2,
+  },
+  avatar: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarName: {
+    fontSize: 12,
+    fontWeight: '500',
+    marginTop: 6,
+    textAlign: 'center',
+    width: 60,
   },
 
   // Dividers
@@ -294,14 +311,6 @@ export const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderBottomWidth: 2,
-  },
-
-  // Tooltip
-  tooltip: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
   },
 
   // Pagination
@@ -332,14 +341,6 @@ export const styles = StyleSheet.create({
   skeletonLine: {
     height: 12,
     borderRadius: 6,
-  },
-
-  // Dropdown
-  dropdown: {
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    borderWidth: 1,
   },
 
   // Accent
