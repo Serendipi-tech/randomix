@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Stop, Circle, Path } from 'react-native-svg';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { Asset } from 'expo-asset';
-import { Bell, Check, ChevronLeft, Eye, EyeOff, Filter, Flame, Home, Image as ImageIcon, Inbox, LayoutGrid, Lock, MoreHorizontal, Moon, ShieldAlert, Sun, Tag, Users, X, Zap } from 'lucide-react-native';
+import { Bell, BookOpen, Check, ChevronLeft, ChevronRight, Eye, EyeOff, Filter, Film, Flame, Gamepad2, Home, Image as ImageIcon, Inbox, LayoutGrid, Lock, Moon, Pencil, ShieldAlert, Star, Sun, Tag, Users, X, Zap } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
@@ -749,7 +749,7 @@ function ProgressBar({ value, colors }: { value: number; colors: typeof Showcase
   }, [clampedWidth]);
 
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, width: '100%' }}>
       <View style={{ flex: 1, height: 6, position: 'relative' }}>
         {isOverflow && (
           <Animated.View
@@ -817,7 +817,7 @@ function ProgressBar({ value, colors }: { value: number; colors: typeof Showcase
           )
         )}
       </View>
-      <Text style={{ color: colors.textColor, fontSize: 12, fontWeight: '600', minWidth: 36 }}>{value}%</Text>
+      <Text style={{ color: colors.textColor, fontSize: 12, fontWeight: '600', minWidth: 36, textAlign: 'right' }}>{value}%</Text>
     </View>
   );
 }
@@ -982,11 +982,8 @@ function FilterBottomSheet({
         <View style={{ alignItems: 'center', paddingTop: 10, paddingBottom: 6 }}>
           <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: hexToRgba(colors.border, 0.6) }} />
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingBottom: 10 }}>
+        <View style={{ paddingHorizontal: 16, paddingBottom: 10 }}>
           <Text style={{ color: colors.textColor, fontSize: 17, fontWeight: '700' }}>Filtri</Text>
-          <Pressable onPress={onClose} hitSlop={8}>
-            <X size={20} color={colors.border} />
-          </Pressable>
         </View>
         <View style={{ paddingHorizontal: 16, paddingBottom: 10 }}>
           <View
@@ -1010,7 +1007,7 @@ function FilterBottomSheet({
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {filteredGroups.length === 0 && <Text style={{ color: colors.disabled, fontSize: 13, paddingHorizontal: 16, paddingVertical: 12 }}>Nessun risultato</Text>}
+          {filteredGroups.length === 0 && <Text style={{ color: colors.disabled, fontSize: 14, paddingHorizontal: 16, paddingVertical: 12 }}>Nessun risultato</Text>}
           {filteredGroups.map((group) => (
             <View key={group.label}>
               <Text
@@ -1069,6 +1066,238 @@ function FilterBottomSheet({
   );
 }
 
+function SectionLabel({ colors, children }: { colors: typeof ShowcaseColors.light | typeof ShowcaseColors.dark; children: string }) {
+  return (
+    <Text style={{ color: colors.textColor, opacity: 0.55, fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+      {children}
+    </Text>
+  );
+}
+
+type ItemDetailData = {
+  imageUri?: string;
+  name: string;
+  category?: string;
+  description?: string; // Item.description: generale, da API in futuro
+  userDescription?: string; // User_Item.description: personale
+  note?: string;
+  status?: keyof (typeof STATUS_ENUM_COLOR_MAP)['STATUS_COMPLETION'];
+  ratingValue?: number;
+  ratingNote?: string;
+  tags?: Array<{ name: string; color: string }>;
+  completedAt?: string;
+};
+
+function ItemDetailBottomSheet({
+  colors,
+  visible,
+  onClose,
+  item,
+  onRatingChange,
+  onStatusChange,
+  onEditPress,
+  onRemoveTag,
+  onAddTag,
+}: {
+  colors: typeof ShowcaseColors.light | typeof ShowcaseColors.dark;
+  visible: boolean;
+  onClose: () => void;
+  item: ItemDetailData;
+  onRatingChange?: (value: number) => void;
+  onStatusChange?: (status: keyof (typeof STATUS_ENUM_COLOR_MAP)['STATUS_COMPLETION']) => void;
+  onEditPress?: () => void;
+  onRemoveTag?: (name: string) => void;
+  onAddTag?: () => void;
+}) {
+  const { height: screenHeight } = useWindowDimensions();
+  const [mounted, setMounted] = useState(false);
+  const translateY = useRef(new Animated.Value(screenHeight)).current;
+
+  useEffect(() => {
+    if (visible) {
+      setMounted(true);
+      Animated.timing(translateY, { toValue: 0, duration: 260, easing: Easing.out(Easing.cubic), useNativeDriver: Platform.OS !== 'web' }).start();
+    } else {
+      Animated.timing(translateY, { toValue: screenHeight, duration: 220, easing: Easing.in(Easing.cubic), useNativeDriver: Platform.OS !== 'web' }).start(() => {
+        setMounted(false);
+      });
+    }
+  }, [visible]);
+
+  if (!mounted && !visible) return null;
+
+  return (
+    <>
+      <Pressable onPress={onClose} style={StyleSheet.absoluteFill}>
+        <Animated.View
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              backgroundColor: hexToRgba(colors.shadow, 0.45),
+              opacity: translateY.interpolate({ inputRange: [0, screenHeight], outputRange: [1, 0], extrapolate: 'clamp' }),
+            },
+          ]}
+        />
+      </Pressable>
+      <Animated.View
+        style={{
+          position: 'absolute',
+          left: 12,
+          right: 12,
+          bottom: 0,
+          // niente "transform": su web forza il browser a promuovere il layer a compositing GPU,
+          // che a DPI frazionarie (comune su Windows) sfoca il testo anche a riposo. marginBottom
+          // ottiene lo stesso slide-in restando in normale flusso di layout.
+          marginBottom: Animated.multiply(translateY, -1),
+        }}
+      >
+        <View
+          style={{
+            maxHeight: screenHeight * 0.92,
+            borderRadius: 20,
+            backgroundColor: colors.foreground,
+            borderWidth: 1,
+            borderColor: colors.border,
+            overflow: 'hidden',
+            boxShadow: `0px -8px 24px ${hexToRgba(colors.shadow, 0.3)}`,
+          }}
+        >
+          <View style={{ alignItems: 'center', paddingTop: 10, paddingBottom: 6 }}>
+            <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: hexToRgba(colors.border, 0.6) }} />
+          </View>
+          <ScrollView
+            style={[{ flexGrow: 0 }, Platform.OS === 'web' ? ({ scrollbarWidth: 'none' } as any) : {}]}
+            contentContainerStyle={{ paddingBottom: 24 }}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={{ padding: 16, gap: 18 }}>
+              {/* Header: copertina in stile "book cover" + titolo, allineati in alto */}
+              <View style={{ flexDirection: 'row', gap: 14 }}>
+                {item.imageUri && (
+                  <Image source={{ uri: item.imageUri }} style={{ width: 92, height: 122, borderRadius: 10 }} resizeMode="cover" />
+                )}
+                <View style={{ flex: 1, gap: 6, paddingTop: 2 }}>
+                  {item.category && (
+                    <Text style={{ color: colors.textColor, opacity: 0.55, fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                      {item.category}
+                    </Text>
+                  )}
+                  <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 20, lineHeight: 25 }} numberOfLines={3}>
+                    {item.name}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Stato: segmented control, un unico controllo invece di chip sparsi */}
+              <View style={{ gap: 6 }}>
+                <SectionLabel colors={colors}>Stato</SectionLabel>
+                <View style={{ flexDirection: 'row', borderRadius: 10, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' }}>
+                  {(Object.keys(STATUS_ENUM_COLOR_MAP.STATUS_COMPLETION) as Array<keyof (typeof STATUS_ENUM_COLOR_MAP)['STATUS_COMPLETION']>).map((statusKey, i) => {
+                    const isActive = item.status === statusKey;
+                    const statusColor = colors[STATUS_ENUM_COLOR_MAP.STATUS_COMPLETION[statusKey]];
+                    return (
+                      <Pressable
+                        key={statusKey}
+                        onPress={() => onStatusChange?.(statusKey)}
+                        style={{
+                          flex: 1,
+                          paddingVertical: 9,
+                          alignItems: 'center',
+                          borderLeftWidth: i > 0 ? 1 : 0,
+                          borderLeftColor: colors.border,
+                          backgroundColor: isActive ? hexToRgba(statusColor, 0.15) : 'transparent',
+                        }}
+                      >
+                        <Text style={{ color: isActive ? statusColor : colors.textColor, fontSize: 12, fontWeight: '600', textAlign: 'center' }}>
+                          {statusKey.replace(/_/g, ' ')}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              </View>
+
+              {(item.tags?.length || onAddTag) && (
+                <View style={{ gap: 6 }}>
+                  <SectionLabel colors={colors}>Tag</SectionLabel>
+                  <TagOverflowRow tags={item.tags ?? []} colors={colors} textColor={colors.textColor} expandable onRemoveTag={onRemoveTag} onAddTag={onAddTag} />
+                </View>
+              )}
+
+              {item.description && (
+                <View style={{ gap: 4 }}>
+                  <SectionLabel colors={colors}>Descrizione</SectionLabel>
+                  <Text style={{ color: colors.textColor, fontSize: 14, lineHeight: 20 }}>{item.description}</Text>
+                </View>
+              )}
+
+              {item.userDescription && (
+                <View style={{ gap: 4 }}>
+                  <SectionLabel colors={colors}>La tua descrizione</SectionLabel>
+                  <Text style={{ color: colors.textColor, fontSize: 14, lineHeight: 20 }}>{item.userDescription}</Text>
+                </View>
+              )}
+
+              {/* Nota personale: pannello tintato per distinguere visivamente il contenuto editabile dall'utente */}
+              <View style={{ gap: 8, backgroundColor: hexToRgba(colors.primary, 0.07), borderRadius: 12, padding: 12 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <SectionLabel colors={colors}>Nota personale</SectionLabel>
+                  <Pressable onPress={onEditPress} hitSlop={8} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <Pencil size={13} color={colors.primary} />
+                    <Text style={{ color: colors.primary, fontSize: 12, fontWeight: '600' }}>Modifica</Text>
+                  </Pressable>
+                </View>
+                <Text style={{ color: colors.textColor, fontSize: 14, lineHeight: 20, opacity: item.note ? 1 : 0.5, fontStyle: item.note ? 'normal' : 'italic' }}>
+                  {item.note || 'Nessuna nota aggiunta'}
+                </Text>
+              </View>
+
+              {item.completedAt && (
+                <Text style={{ color: colors.textColor, fontSize: 12, opacity: 0.5 }}>Completato il {item.completedAt}</Text>
+              )}
+
+              {/* Il tuo rating: sempre l'ultimo blocco, in evidenza — si può inserire/modificare ma mai eliminare */}
+              <View
+                style={{
+                  gap: 10,
+                  borderWidth: 1,
+                  borderColor: hexToRgba(colors.warning, 0.35),
+                  backgroundColor: hexToRgba(colors.warning, 0.08),
+                  borderRadius: 14,
+                  padding: 14,
+                  alignItems: 'center',
+                }}
+              >
+                <SectionLabel colors={colors}>Il tuo rating</SectionLabel>
+                <View style={{ flexDirection: 'row', gap: 4 }}>
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <Pressable key={n} onPress={() => onRatingChange?.(n)} hitSlop={6}>
+                      <Star
+                        size={30}
+                        color={colors.warning}
+                        fill={n <= Math.round(item.ratingValue ?? 0) ? colors.warning : colors.border}
+                        strokeWidth={0}
+                      />
+                    </Pressable>
+                  ))}
+                </View>
+                <Text style={{ color: colors.textColor, fontSize: 15, fontWeight: '700' }}>
+                  {item.ratingValue !== undefined ? item.ratingValue.toFixed(1) : 'Tocca per valutare'}
+                </Text>
+                {item.ratingNote && (
+                  <Text style={{ color: colors.textColor, fontSize: 14, lineHeight: 20, fontStyle: 'italic', textAlign: 'center' }}>
+                    “{item.ratingNote}”
+                  </Text>
+                )}
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+      </Animated.View>
+    </>
+  );
+}
+
 function RatingStar({ active, color, inactiveColor, onPress }: { active: boolean; color: string; inactiveColor: string; onPress: () => void }) {
   const fillAnim = useRef(new Animated.Value(active ? 1 : 0)).current;
 
@@ -1077,18 +1306,18 @@ function RatingStar({ active, color, inactiveColor, onPress }: { active: boolean
   }, [active]);
 
   return (
-    <Pressable onPress={onPress}>
-      <View style={{ width: 20, height: 20 }}>
-        <Text style={{ position: 'absolute', color: inactiveColor, fontSize: 20 }}>★</Text>
+    <Pressable onPress={onPress} hitSlop={8}>
+      <View style={{ width: 32, height: 32 }}>
+        <Text style={{ position: 'absolute', color: inactiveColor, fontSize: 32 }}>★</Text>
         <Animated.View
           style={{
             position: 'absolute',
             overflow: 'hidden',
-            height: '100%',
+            height: 40,
             width: fillAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
           }}
         >
-          <Text style={{ color, fontSize: 20 }}>★</Text>
+          <Text style={{ color, fontSize: 32 }}>★</Text>
         </Animated.View>
       </View>
     </Pressable>
@@ -1140,16 +1369,149 @@ function ImageAvatar({ uri, name, fallbackColor, textColor }: { uri: string; nam
   );
 }
 
-function TagLabel({ name, color, textColor }: { name: string; color: string; textColor: string }) {
+const TAG_OVERFLOW_GAP = 6;
+const TAG_OVERFLOW_BADGE_WIDTH = 34;
+
+function TagOverflowRow({
+  tags: unsortedTags,
+  textColor,
+  colors,
+  expandable,
+  onRemoveTag,
+  onAddTag,
+}: {
+  tags: Array<{ name: string; color: string }>;
+  textColor: string;
+  colors: typeof ShowcaseColors.light | typeof ShowcaseColors.dark;
+  expandable?: boolean;
+  onRemoveTag?: (name: string) => void;
+  onAddTag?: () => void;
+}) {
+  const tags = [...unsortedTags].sort((a, b) => a.name.length - b.name.length);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [measuredWidths, setMeasuredWidths] = useState<Record<string, number>>({});
+  const [expanded, setExpanded] = useState(false);
+
+  const handleMeasure = (name: string, width: number) => {
+    setMeasuredWidths((prev) => (prev[name] === width ? prev : { ...prev, [name]: width }));
+  };
+
+  const allMeasured = containerWidth > 0 && tags.every((tag) => measuredWidths[tag.name] !== undefined);
+
+  let visibleTags = tags;
+  let overflowCount = 0;
+
+  if (allMeasured && !expanded) {
+    let used = 0;
+    let count = 0;
+    for (let i = 0; i < tags.length; i++) {
+      const width = measuredWidths[tags[i].name];
+      const next = used + (count > 0 ? TAG_OVERFLOW_GAP : 0) + width;
+      if (next > containerWidth) break;
+      used = next;
+      count++;
+    }
+    if (count < tags.length) {
+      while (count > 0) {
+        const usedUpToCount = tags.slice(0, count).reduce((sum, tag, i) => sum + measuredWidths[tag.name] + (i > 0 ? TAG_OVERFLOW_GAP : 0), 0);
+        if (usedUpToCount + TAG_OVERFLOW_GAP + TAG_OVERFLOW_BADGE_WIDTH <= containerWidth) break;
+        count--;
+      }
+    }
+    visibleTags = tags.slice(0, count);
+    overflowCount = tags.length - count;
+  }
+
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 5, paddingHorizontal: 10, borderRadius: 6, backgroundColor: hexToRgba(color, 0.15) }}>
-      <Tag size={14} color={color} strokeWidth={2.5} />
-      <Text style={{ color: textColor, fontSize: 13, fontWeight: '600' }}>{name}</Text>
+    <View onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}>
+      <View style={{ position: 'absolute', opacity: 0 }} pointerEvents="none">
+        <View style={{ flexDirection: 'row' }}>
+          {tags.map((tag) => (
+            <View key={tag.name} onLayout={(e) => handleMeasure(tag.name, e.nativeEvent.layout.width)}>
+              <TagLabel name={tag.name} color={tag.color} textColor={textColor} compact />
+            </View>
+          ))}
+        </View>
+      </View>
+      {allMeasured && (
+        <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: expanded ? 'wrap' : 'nowrap', gap: TAG_OVERFLOW_GAP }}>
+          {visibleTags.map((tag) => (
+            <TagLabel
+              key={tag.name}
+              name={tag.name}
+              color={tag.color}
+              textColor={textColor}
+              compact
+              onRemove={onRemoveTag ? () => onRemoveTag(tag.name) : undefined}
+            />
+          ))}
+          {overflowCount > 0 &&
+            (expandable ? (
+              <Pressable
+                onPress={() => setExpanded(true)}
+                style={{ paddingVertical: 5, paddingHorizontal: 8, borderRadius: 6, backgroundColor: hexToRgba(colors.border, 0.2) }}
+              >
+                <Text style={{ color: textColor, fontSize: 12, fontWeight: '600' }}>+{overflowCount}</Text>
+              </Pressable>
+            ) : (
+              <View style={{ paddingVertical: 5, paddingHorizontal: 8, borderRadius: 6, backgroundColor: hexToRgba(colors.border, 0.2) }}>
+                <Text style={{ color: textColor, fontSize: 12, fontWeight: '600' }}>+{overflowCount}</Text>
+              </View>
+            ))}
+          {expanded && (
+            <Pressable onPress={() => setExpanded(false)} hitSlop={6}>
+              <Text style={{ color: textColor, fontSize: 12, fontWeight: '600', opacity: 0.6 }}>Mostra meno</Text>
+            </Pressable>
+          )}
+          {onAddTag && (
+            <Pressable
+              onPress={onAddTag}
+              style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 6, borderWidth: 1, borderColor: hexToRgba(textColor, 0.3), borderStyle: 'dashed' }}
+            >
+              <Text style={{ color: textColor, fontSize: 11, fontWeight: '700' }}>+ Tag</Text>
+            </Pressable>
+          )}
+        </View>
+      )}
     </View>
   );
 }
 
-type CardVariant = 'outlined' | 'filled' | 'action' | 'profile' | 'item' | 'challenge' | 'notification';
+function TagLabel({ name, color, textColor, compact, onRemove }: { name: string; color: string; textColor: string; compact?: boolean; onRemove?: () => void }) {
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: compact ? 4 : 6,
+        paddingVertical: compact ? 3 : 5,
+        paddingHorizontal: compact ? 7 : 10,
+        borderRadius: 6,
+        backgroundColor: hexToRgba(color, 0.15),
+      }}
+    >
+      <Tag size={compact ? 11 : 14} color={color} strokeWidth={2.5} />
+      <Text
+        style={{
+          color: textColor,
+          fontSize: compact ? 11 : 14,
+          fontWeight: '600',
+          textTransform: compact ? 'uppercase' : 'none',
+          letterSpacing: compact ? 0.3 : 0,
+        }}
+      >
+        {name}
+      </Text>
+      {onRemove && (
+        <Pressable onPress={onRemove} hitSlop={8}>
+          <X size={compact ? 11 : 13} color={textColor} strokeWidth={2.5} />
+        </Pressable>
+      )}
+    </View>
+  );
+}
+
+type CardVariant = 'outlined' | 'filled' | 'action' | 'profile' | 'item' | 'challenge' | 'notification' | 'list';
 
 type CardProps = {
   variant: CardVariant;
@@ -1158,11 +1520,27 @@ type CardProps = {
   description?: string;
   actionLabel?: string;
   profileHandle?: string;
+  profileImageUri?: string;
+  profileGroupsInCommon?: number;
   itemCategory?: string;
   itemStatus?: keyof (typeof STATUS_ENUM_COLOR_MAP)['STATUS_COMPLETION'];
+  itemShowImage?: boolean;
+  itemImageUri?: string;
+  itemRating?: number;
+  itemTags?: Array<{ name: string; color: string }>;
+  listCategory?: string;
+  listIcon?: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
+  listColor?: string;
+  listItemsCount?: number;
+  listMaxItems?: number;
+  listCompleted?: number;
+  listInProgress?: number;
+  listNotStarted?: number;
+  onPress?: () => void;
   challengeProgress?: number;
   challengeGoal?: number;
   challengeTimeframe?: string;
+  challengeGroupName?: string;
   notificationBody?: string;
   notificationTime?: string;
   notificationUnread?: boolean;
@@ -1175,29 +1553,96 @@ function Card({
   description,
   actionLabel,
   profileHandle,
+  profileImageUri,
+  profileGroupsInCommon,
   itemCategory,
   itemStatus,
+  itemShowImage = true,
+  itemImageUri,
+  itemRating,
+  itemTags,
+  listCategory,
+  listIcon,
+  listColor,
+  listItemsCount,
+  listMaxItems,
+  listCompleted,
+  listInProgress,
+  listNotStarted,
+  onPress,
   challengeProgress,
   challengeGoal,
   challengeTimeframe,
+  challengeGroupName,
   notificationBody,
   notificationTime,
   notificationUnread,
 }: CardProps) {
+  const [isFavorite, setIsFavorite] = useState(false);
+  const profileDominantColor = useDominantColor(profileImageUri ?? '', colors.primary);
+
   if (variant === 'item') {
     return (
-      <View style={[styles.card, { backgroundColor: colors.foreground, borderColor: colors.border, flexDirection: 'row', gap: 12, padding: 12 }]}>
-        <View style={{ width: 56, height: 56, borderRadius: 10, backgroundColor: hexToRgba(colors.primary, 0.15), alignItems: 'center', justifyContent: 'center' }}>
-          <ImageIcon size={22} color={colors.primary} />
-        </View>
-        <View style={{ flex: 1, gap: 4 }}>
-          <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 15 }}>{title}</Text>
-          {itemCategory && (
-            <Text style={{ color: colors.textColor, fontSize: 12, opacity: 0.7 }}>{itemCategory}</Text>
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [
+          styles.card,
+          {
+            backgroundColor: colors.foreground,
+            borderColor: colors.border,
+            flexDirection: 'row',
+            gap: 12,
+            padding: 0,
+            overflow: 'hidden',
+            opacity: pressed ? 0.85 : 1,
+          },
+        ]}
+      >
+        <View style={{ flex: 1, justifyContent: 'space-between', paddingVertical: 12, paddingLeft: 16, paddingRight: itemShowImage ? 0 : 16 }}>
+          <View style={{ gap: 4 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+              {itemCategory && (
+                <Text style={{ color: colors.textColor, fontSize: 14, opacity: 0.7, flex: 1 }}>{itemCategory}</Text>
+              )}
+              {itemStatus && <StatusBadge enumName="STATUS_COMPLETION" value={itemStatus} colors={colors} />}
+            </View>
+            <View style={{ height: 44, justifyContent: 'center' }}>
+              <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 17, lineHeight: 22 }} numberOfLines={2} ellipsizeMode="tail">
+                {title}
+              </Text>
+            </View>
+          </View>
+          {(itemTags?.length || itemRating !== undefined) && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
+              {itemTags && itemTags.length > 0 && (
+                <View style={{ flex: 1 }}>
+                  <TagOverflowRow tags={itemTags} colors={colors} textColor={colors.textColor} />
+                </View>
+              )}
+              {itemRating !== undefined && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <View style={{ width: 14, height: 14 }}>
+                    <Star size={14} color={colors.border} fill={colors.border} strokeWidth={0} style={{ position: 'absolute' }} />
+                    <View style={{ position: 'absolute', overflow: 'hidden', width: `${Math.min(itemRating / 5, 1) * 100}%`, height: 14 }}>
+                      <Star size={14} color={colors.warning} fill={colors.warning} strokeWidth={0} />
+                    </View>
+                  </View>
+                  <Text style={{ color: colors.textColor, fontSize: 14, fontWeight: '600' }}>{itemRating.toFixed(1)}</Text>
+                </View>
+              )}
+            </View>
           )}
-          {itemStatus && <StatusBadge enumName="STATUS_COMPLETION" value={itemStatus} colors={colors} />}
         </View>
-      </View>
+        {itemShowImage && (
+          <View style={{ width: 72, backgroundColor: hexToRgba(colors.primary, 0.15), alignItems: 'center', justifyContent: 'center' }}>
+            {itemImageUri ? (
+              <Image source={{ uri: itemImageUri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+            ) : (
+              <ImageIcon size={22} color={colors.primary} />
+            )}
+          </View>
+        )}
+      </Pressable>
     );
   }
 
@@ -1206,21 +1651,42 @@ function Card({
     const goal = challengeGoal ?? 1;
     const pct = Math.round((progress / goal) * 100);
     return (
-      <View style={[styles.card, { backgroundColor: colors.foreground, borderColor: colors.border }]}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-          <View style={{ flex: 1 }}>
-            <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 16, marginBottom: 2 }}>{title}</Text>
-            {challengeTimeframe && (
-              <Text style={{ color: colors.textColor, fontSize: 12, opacity: 0.7 }}>{challengeTimeframe}</Text>
-            )}
+      <LinearGradient
+        colors={[colors.secondary, colors.secondaryGradient]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{ borderRadius: 12, padding: 2 }}
+      >
+        <View style={{ borderRadius: 10, backgroundColor: colors.foreground, padding: 16 }}>
+          {challengeGroupName && (
+            <Text style={{ color: colors.secondary, fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 }}>
+              {challengeGroupName}
+            </Text>
+          )}
+          <View style={{ marginBottom: 10 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 16, marginBottom: 2 }}>{title}</Text>
+              <StatusBadge enumName="STATUS_CHALLENGE" value="IN_PROGRESS" colors={colors} />
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              {challengeTimeframe && (
+                <Text style={{ color: colors.textColor, fontSize: 12, opacity: 0.7 }}>{challengeTimeframe}</Text>
+              )}
+              <Text style={{ color: colors.textColor, fontSize: 12, opacity: 0.7 }}>
+                {progress} / {goal} completati
+              </Text>
+            </View>
           </View>
-          <StatusBadge enumName="STATUS_CHALLENGE" value="IN_PROGRESS" colors={colors} />
+          <ProgressBar value={pct} colors={colors} />
         </View>
-        <ProgressBar value={pct} colors={colors} />
-        <Text style={{ color: colors.textColor, fontSize: 12, marginTop: 6, opacity: 0.7 }}>
-          {progress} / {goal} completati
-        </Text>
-      </View>
+        <Pressable
+          onPress={() => setIsFavorite((v) => !v)}
+          hitSlop={8}
+          style={{ position: 'absolute', top: -10, right: -10 }}
+        >
+          <Star size={28} color={colors.warning} fill={isFavorite ? colors.warning : colors.background} strokeWidth={2} />
+        </Pressable>
+      </LinearGradient>
     );
   }
 
@@ -1235,7 +1701,7 @@ function Card({
             <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 15, flex: 1 }}>{title}</Text>
             {notificationUnread && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.primary }} />}
           </View>
-          {notificationBody && <Text style={{ color: colors.textColor, fontSize: 13, opacity: 0.8 }}>{notificationBody}</Text>}
+          {notificationBody && <Text style={{ color: colors.textColor, fontSize: 14, opacity: 0.8 }}>{notificationBody}</Text>}
           {notificationTime && <Text style={{ color: colors.textColor, fontSize: 11, opacity: 0.5, marginTop: 2 }}>{notificationTime}</Text>}
         </View>
       </View>
@@ -1273,18 +1739,87 @@ function Card({
     );
   }
 
+  if (variant === 'list') {
+    const ListIcon = listIcon;
+    const accentColor = listColor ?? colors.primary;
+    const LIST_CARD_HEIGHT = 66;
+    return (
+      <View
+        style={[
+          styles.card,
+          { backgroundColor: colors.foreground, borderColor: accentColor, borderWidth: 1, height: LIST_CARD_HEIGHT, flexDirection: 'row', alignItems: 'stretch', gap: 12, padding: 0, overflow: 'hidden' },
+        ]}
+      >
+        <LinearGradient
+          colors={['transparent', hexToRgba(accentColor, 0.25)]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={StyleSheet.absoluteFill}
+        />
+        <View style={{ width: LIST_CARD_HEIGHT, height: LIST_CARD_HEIGHT, alignItems: 'center', justifyContent: 'center' }}>
+          {ListIcon && (
+            <View style={{ transform: [{ rotate: '-30deg' }], opacity: 0.5 }}>
+              <ListIcon size={LIST_CARD_HEIGHT * 1.15} color={accentColor} strokeWidth={1.5} />
+            </View>
+          )}
+        </View>
+        <View style={{ flex: 1, paddingTop: 16, paddingBottom: 16, paddingLeft: 5, paddingRight: 16 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+            <View style={{ flex: 1, gap: 2, marginTop: -3 }}>
+              {listCategory && <Text style={{ color: colors.textColor, fontSize: 12, lineHeight: 14, opacity: 0.7 }}>{listCategory}</Text>}
+              <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 16, lineHeight: 18 }}>{title}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              {listItemsCount !== undefined && listMaxItems !== undefined && (
+                <Text style={{ color: colors.textColor, fontSize: 13, lineHeight: 16, fontWeight: '600', opacity: 0.7 }}>
+                  {listItemsCount}/{listMaxItems}
+                </Text>
+              )}
+              <Pressable
+                onPress={onPress}
+                hitSlop={8}
+                style={{ width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.foreground }}
+              >
+                <ChevronRight size={18} color={accentColor} />
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
   if (variant === 'profile') {
     return (
-      <View style={[styles.card, { backgroundColor: colors.foreground, borderColor: colors.border, flexDirection: 'row', alignItems: 'center', gap: 12 }]}>
-        <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
-          <Users size={22} color={colors.textColor} />
+      <View style={[styles.card, { backgroundColor: colors.foreground, borderColor: profileImageUri ? profileDominantColor : colors.border, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 10 }]}>
+        {profileImageUri ? (
+          <Image source={{ uri: profileImageUri }} style={{ width: 38, height: 38, borderRadius: 19 }} resizeMode="cover" />
+        ) : (
+          <View style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }}>
+            <Users size={18} color={colors.textColor} />
+          </View>
+        )}
+        <View style={{ flex: 1, gap: 1 }}>
+          {profileHandle && <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 14 }}>{profileHandle}</Text>}
+          {profileGroupsInCommon !== undefined && (
+            <Text style={{ color: colors.textColor, fontSize: 12, opacity: 0.7 }}>
+              {profileGroupsInCommon} grupp{profileGroupsInCommon === 1 ? 'o' : 'i'} in comune
+            </Text>
+          )}
         </View>
-        <View style={{ flex: 1 }}>
-          <Text style={{ color: colors.textColor, fontWeight: '700', fontSize: 16 }}>{title}</Text>
-          {profileHandle && <Text style={{ color: colors.textColor, fontSize: 14 }}>{profileHandle}</Text>}
-        </View>
-        <Pressable hitSlop={8}>
-          <MoreHorizontal size={20} color={colors.textColor} />
+        <Pressable
+          onPress={onPress}
+          hitSlop={8}
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 14,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: hexToRgba(profileImageUri ? profileDominantColor : colors.primary, 0.12),
+          }}
+        >
+          <ChevronRight size={18} color={profileImageUri ? profileDominantColor : colors.primary} />
         </Pressable>
       </View>
     );
@@ -1530,11 +2065,19 @@ function SideTabButton({ name, isActive, onPress, mutedColor, activeColor }: { n
   );
 }
 
-function HomeButtonComp() {
+function HomeButtonComp({ colors, isActive, onPress }: { colors: typeof ShowcaseColors.light | typeof ShowcaseColors.dark; isActive: boolean; onPress: () => void }) {
   return (
-    <Pressable style={[styles.homeButton, { backgroundColor: Colors.light.primary }]} hitSlop={6}>
+    <Pressable style={[styles.homeButton, { backgroundColor: isActive ? undefined : colors.primary }]} hitSlop={6} onPress={onPress}>
+      {isActive && (
+        <LinearGradient
+          colors={[colors.secondary, colors.secondaryGradient]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
+      )}
       <View style={styles.homeIconStack}>
-        <Home size={24} color={Colors.light.border} strokeWidth={2.5} />
+        <Home size={24} color={colors.textColor} strokeWidth={2.5} />
       </View>
     </Pressable>
   );
@@ -1568,7 +2111,7 @@ function PageHeader({
           <Text style={[styles.pageHeaderTitle, { color: colors.textColor }]}>{title}</Text>
         </View>
         {onBack && (
-          <Pressable onPress={onBack} hitSlop={8}>
+          <Pressable onPress={onBack} hitSlop={10}>
             <ChevronLeft size={24} color={colors.textColor} />
           </Pressable>
         )}
@@ -1578,50 +2121,51 @@ function PageHeader({
   );
 }
 
-function NavBar({ colorScheme, isDark, setIsDark, activeTab, toggleTab }: { colorScheme: 'light' | 'dark'; isDark: boolean; setIsDark: (val: boolean) => void; activeTab: 'profile' | 'notifications' | 'friends' | null; toggleTab: (tab: 'profile' | 'notifications' | 'friends') => void }) {
+function NavBar({ colorScheme, isDark, setIsDark, activeTab, toggleTab, onHomePress, blurDisabled }: { colorScheme: 'light' | 'dark'; isDark: boolean; setIsDark: (val: boolean) => void; activeTab: 'profile' | 'notifications' | 'friends' | null; toggleTab: (tab: 'profile' | 'notifications' | 'friends') => void; onHomePress: () => void; blurDisabled?: boolean }) {
   const colors = ShowcaseColors[colorScheme];
   const fill =
     colorScheme === 'light'
       ? hexToRgba(colors.primary, 0.2)
       : hexToRgba(colors.primary, 0.2);
-  const borderColor = hexToRgba(colors.border, colorScheme === 'light' ? 0.5 : 0.16);
   const [width, setWidth] = useState(0);
 
   const onLayout = (e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width);
-  const mutedColor = colors.primary;
+  const mutedColor = colors.textColor;
   const activeColor = colors.secondary;
 
   // Blur ritagliato a forma navbar: su web clip-path CSS (MaskedView rompe il backdrop-filter),
   // su nativo MaskedView + BlurView
   const wavePath = buildWavePath(width);
-  const blurLayer =
-    Platform.OS === 'web' ? (
-      <View
-        pointerEvents="none"
-        style={[
-          styles.clip,
-          { width, height: BAR_HEIGHT, backgroundColor: hexToRgba(colors.foreground, 0.15) },
-          {
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            clipPath: `path('${wavePath}')`,
-            WebkitClipPath: `path('${wavePath}')`,
-          } as unknown as ViewStyle,
-        ]}
-      />
-    ) : (
-      <MaskedView
-        style={[styles.clip, { width, height: BAR_HEIGHT }]}
-        pointerEvents="none"
-        maskElement={
-          <Svg width={width} height={BAR_HEIGHT}>
-            <Path d={wavePath} fill="#fff" />
-          </Svg>
-        }
-      >
-        <BlurView intensity={90} style={StyleSheet.absoluteFill} tint="dark" />
-      </MaskedView>
-    );
+  const blurLayer = blurDisabled ? (
+    // backdrop-filter (web) sfoca anche i contenuti sovrapposti come le bottomsheet: disattivato quando una è aperta
+    <View pointerEvents="none" style={[styles.clip, { width, height: BAR_HEIGHT, backgroundColor: hexToRgba(colors.foreground, 0.85) }]} />
+  ) : Platform.OS === 'web' ? (
+    <View
+      pointerEvents="none"
+      style={[
+        styles.clip,
+        { width, height: BAR_HEIGHT, backgroundColor: hexToRgba(colors.foreground, 0.15) },
+        {
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          clipPath: `path('${wavePath}')`,
+          WebkitClipPath: `path('${wavePath}')`,
+        } as unknown as ViewStyle,
+      ]}
+    />
+  ) : (
+    <MaskedView
+      style={[styles.clip, { width, height: BAR_HEIGHT }]}
+      pointerEvents="none"
+      maskElement={
+        <Svg width={width} height={BAR_HEIGHT}>
+          <Path d={wavePath} fill="#fff" />
+        </Svg>
+      }
+    >
+      <BlurView intensity={90} style={StyleSheet.absoluteFill} tint="dark" />
+    </MaskedView>
+  );
 
   return (
     <View pointerEvents="box-none" style={[styles.wrap, { paddingBottom: 12 }]}>
@@ -1631,15 +2175,15 @@ function NavBar({ colorScheme, isDark, setIsDark, activeTab, toggleTab }: { colo
             {blurLayer}
             <View style={styles.clip} pointerEvents="box-none">
               <Svg width={width} height={BAR_HEIGHT} style={StyleSheet.absoluteFill}>
-                <Path d={buildWavePath(width)} fill={fill} stroke={borderColor} strokeWidth={1} />
+                <Path d={buildWavePath(width)} fill={fill} />
               </Svg>
               <View style={styles.row}>
                 <SideTabButton name="profile" isActive={activeTab === 'profile'} onPress={() => toggleTab('profile')} mutedColor={mutedColor} activeColor={activeColor} />
                 <SideTabButton name="notifications" isActive={activeTab === 'notifications'} onPress={() => toggleTab('notifications')} mutedColor={mutedColor} activeColor={activeColor} />
-                <HomeButtonComp />
+                <HomeButtonComp colors={colors} isActive={activeTab === null} onPress={onHomePress} />
                 <SideTabButton name="friends" isActive={activeTab === 'friends'} onPress={() => toggleTab('friends')} mutedColor={mutedColor} activeColor={activeColor} />
                 <View style={styles.themeToggle}>
-                  <Pressable hitSlop={8} onPress={() => setIsDark(!isDark)}>
+                  <Pressable hitSlop={10} onPress={() => setIsDark(!isDark)}>
                     {isDark ? (
                       <Sun size={24} color={activeColor} />
                     ) : (
@@ -1658,6 +2202,8 @@ function NavBar({ colorScheme, isDark, setIsDark, activeTab, toggleTab }: { colo
 
 export default function ColorsShowcase() {
   const [isDark, setIsDark] = useState(true);
+  const colorScheme = isDark ? 'dark' : 'light';
+  const colors = ShowcaseColors[colorScheme];
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'friends' | null>(null);
   const [showColorSections, setShowColorSections] = useState(true);
   const [chipState, setChipState] = useState<Record<string, boolean>>({ Active: true, Inactive: false, Disabled: false });
@@ -1670,9 +2216,39 @@ export default function ColorsShowcase() {
   const [buttonsLoading, setButtonsLoading] = useState(false);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [filterSelected, setFilterSelected] = useState<string[]>([]);
-
-  const colorScheme = isDark ? 'dark' : 'light';
-  const colors = ShowcaseColors[colorScheme];
+  const [itemDetailOpen, setItemDetailOpen] = useState(false);
+  const DEMO_TAGS = [
+    { name: 'Fantasy', color: colors.extraColors.one },
+    { name: 'Avventura', color: colors.extraColors.three },
+    { name: 'Magia', color: colors.extraColors.six },
+    { name: 'Classici', color: colors.extraColors.five },
+    { name: 'Da rileggere', color: colors.extraColors.seven },
+    { name: 'Teen', color: colors.extraColors.nine },
+  ];
+  const ITEM_DETAIL_WITH_IMAGE: ItemDetailData = {
+    imageUri: 'https://a.wattpad.com/useravatar/Ga22ia.256.878100.jpg',
+    name: 'Harry Potter e il prigioniero di Azkaban',
+    category: 'Libri',
+    status: 'IN_PROGRESS',
+    ratingValue: 4.7,
+    ratingNote: 'Il migliore della saga finora: Sirius Black è un personaggio scritto benissimo.',
+    description: 'Terzo capitolo della saga: Harry scopre la verità su Sirius Black e affronta i Dissennatori di Azkaban.',
+    userDescription: 'La mia copia è quella con la cover illustrata, edizione 2004.',
+    note: 'Rileggerlo prima del quarto libro.',
+    tags: DEMO_TAGS,
+  };
+  const ITEM_DETAIL_NO_IMAGE: ItemDetailData = {
+    name: 'Harry Potter e il prigioniero di Azkaban',
+    category: 'Libri',
+    status: 'IN_PROGRESS',
+    ratingValue: 4.7,
+    ratingNote: 'Il migliore della saga finora: Sirius Black è un personaggio scritto benissimo.',
+    description: 'Terzo capitolo della saga: Harry scopre la verità su Sirius Black e affronta i Dissennatori di Azkaban.',
+    userDescription: 'La mia copia è quella con la cover illustrata, edizione 2004.',
+    note: 'Rileggerlo prima del quarto libro.',
+    tags: DEMO_TAGS,
+  };
+  const [itemDetail, setItemDetail] = useState<ItemDetailData>(ITEM_DETAIL_WITH_IMAGE);
 
   const toggleTab = (tab: 'profile' | 'notifications' | 'friends') => {
     setActiveTab(activeTab === tab ? null : tab);
@@ -1889,8 +2465,111 @@ export default function ColorsShowcase() {
               description="Completa la sfida per guadagnare punti extra"
               actionLabel="Partecipa"
             />
-            <Card variant="profile" colors={colors} title="Mario Rossi" profileHandle="@mario.rossi" />
-            <Card variant="item" colors={colors} title="Harry Potter" itemCategory="Libri" itemStatus="IN_PROGRESS" />
+            <Card
+              variant="profile"
+              colors={colors}
+              title="mario_rossi"
+              profileHandle="mario_rossi"
+              profileImageUri={AVATAR_URIS.fox}
+              profileGroupsInCommon={3}
+              onPress={() => { }}
+            />
+            <Card
+              variant="profile"
+              colors={colors}
+              title="giulia_bianchi"
+              profileHandle="giulia_bianchi"
+              profileImageUri={AVATAR_URIS.panda}
+              profileGroupsInCommon={1}
+              onPress={() => { }}
+            />
+            <Card
+              variant="profile"
+              colors={colors}
+              title="francesca_luna"
+              profileHandle="francesca_luna"
+              profileImageUri={AVATAR_URIS.owl}
+              profileGroupsInCommon={7}
+              onPress={() => { }}
+            />
+            <Card
+              variant="list"
+              colors={colors}
+              title="Da leggere"
+              listCategory="Cultura"
+              listIcon={BookOpen}
+              listColor={colors.extraColors.three}
+              listItemsCount={12}
+              listMaxItems={20}
+              listCompleted={5}
+              listInProgress={3}
+              listNotStarted={4}
+              onPress={() => { }}
+            />
+            <Card
+              variant="list"
+              colors={colors}
+              title="Serata film"
+              listCategory="Intrattenimento"
+              listIcon={Film}
+              listColor={colors.extraColors.one}
+              listItemsCount={5}
+              listMaxItems={10}
+              listCompleted={2}
+              listInProgress={1}
+              listNotStarted={2}
+              onPress={() => { }}
+            />
+            <Card
+              variant="list"
+              colors={colors}
+              title="Backlog videogiochi"
+              listCategory="Hobby"
+              listIcon={Gamepad2}
+              listColor={colors.extraColors.six}
+              listItemsCount={8}
+              listMaxItems={15}
+              listCompleted={3}
+              listInProgress={2}
+              listNotStarted={3}
+              onPress={() => { }}
+            />
+            <Card
+              variant="item"
+              colors={colors}
+              title="Harry Potter e il prigioniero di Azkaban"
+              itemCategory="Libri"
+              itemStatus="IN_PROGRESS"
+              itemImageUri="https://a.wattpad.com/useravatar/Ga22ia.256.878100.jpg"
+              itemRating={4.7}
+              itemTags={[
+                { name: 'Fantasy', color: colors.extraColors.one },
+                { name: 'Avventura', color: colors.extraColors.three },
+                { name: 'Magia', color: colors.extraColors.six },
+                { name: 'Classici', color: colors.extraColors.five },
+                { name: 'Da rileggere', color: colors.extraColors.seven },
+                { name: 'Teen', color: colors.extraColors.nine },
+              ]}
+              onPress={() => { setItemDetail(ITEM_DETAIL_WITH_IMAGE); setItemDetailOpen(true); }}
+            />
+            <Card
+              variant="item"
+              colors={colors}
+              title="Harry Potter e il prigioniero di Azkaban"
+              itemCategory="Libri"
+              itemStatus="IN_PROGRESS"
+              itemShowImage={false}
+              itemRating={4.7}
+              itemTags={[
+                { name: 'Fantasy', color: colors.extraColors.one },
+                { name: 'Avventura', color: colors.extraColors.three },
+                { name: 'Magia', color: colors.extraColors.six },
+                { name: 'Classici', color: colors.extraColors.five },
+                { name: 'Da rileggere', color: colors.extraColors.seven },
+                { name: 'Teen', color: colors.extraColors.nine },
+              ]}
+              onPress={() => { setItemDetail(ITEM_DETAIL_NO_IMAGE); setItemDetailOpen(true); }}
+            />
             <Card
               variant="challenge"
               colors={colors}
@@ -1898,6 +2577,15 @@ export default function ColorsShowcase() {
               challengeTimeframe="Entro fine mese"
               challengeProgress={2}
               challengeGoal={3}
+            />
+            <Card
+              variant="challenge"
+              colors={colors}
+              title="Leggi 3 libri"
+              challengeTimeframe="Entro fine mese"
+              challengeProgress={2}
+              challengeGoal={3}
+              challengeGroupName="Lettori Forti"
             />
             <Card
               variant="notification"
@@ -1975,6 +2663,7 @@ export default function ColorsShowcase() {
                     key={state}
                     onPress={() => setCheckboxState({ ...checkboxState, [state]: !isChecked })}
                     style={styles.checkboxItem}
+                    hitSlop={4}
                   >
                     <View style={[styles.checkbox, { backgroundColor: 'transparent', borderColor: colors.border, borderWidth: 1.5, overflow: 'hidden' }]}>
                       <LinearGradient
@@ -2008,6 +2697,7 @@ export default function ColorsShowcase() {
                     key={option}
                     onPress={() => setRadioState(option)}
                     style={styles.radioItem}
+                    hitSlop={4}
                   >
                     <View
                       style={[
@@ -2049,6 +2739,7 @@ export default function ColorsShowcase() {
                   key={key}
                   onPress={() => setToggleState({ ...toggleState, [key]: !isActive })}
                   style={{ borderRadius: 14, overflow: 'hidden' }}
+                  hitSlop={7}
                 >
                   <View
                     style={[
@@ -2097,7 +2788,7 @@ export default function ColorsShowcase() {
               { label: 'Vedi profilo' },
               { label: 'Gestisci gruppo' },
             ].map((link) => (
-              <Pressable key={link.label} onPress={() => { }}>
+              <Pressable key={link.label} onPress={() => { }} hitSlop={12} style={{ paddingVertical: 12 }}>
                 {({ pressed }) => (
                   <View
                     style={{
@@ -2321,7 +3012,15 @@ export default function ColorsShowcase() {
       </ScrollView>
 
       {/* Bottom Navbar */}
-      <NavBar colorScheme={colorScheme} isDark={isDark} setIsDark={setIsDark} activeTab={activeTab} toggleTab={toggleTab} />
+      <NavBar
+        colorScheme={colorScheme}
+        isDark={isDark}
+        setIsDark={setIsDark}
+        activeTab={activeTab}
+        toggleTab={toggleTab}
+        onHomePress={() => setActiveTab(null)}
+        blurDisabled={filterSheetOpen || itemDetailOpen}
+      />
 
       {/* Filter Bottom Sheet - montata dopo la navbar per stare sopra (la navbar ha un blur che sfoca ciò che sta dietro) */}
       <FilterBottomSheet
@@ -2331,6 +3030,23 @@ export default function ColorsShowcase() {
         groups={FILTER_GROUPS}
         selected={filterSelected}
         onToggle={toggleFilterValue}
+      />
+
+      <ItemDetailBottomSheet
+        colors={colors}
+        visible={itemDetailOpen}
+        onClose={() => setItemDetailOpen(false)}
+        item={itemDetail}
+        onRatingChange={(value) => setItemDetail((prev) => ({ ...prev, ratingValue: value }))}
+        onStatusChange={(status) => setItemDetail((prev) => ({ ...prev, status }))}
+        onEditPress={() => { }}
+        onRemoveTag={(name) => setItemDetail((prev) => ({ ...prev, tags: prev.tags?.filter((t) => t.name !== name) }))}
+        onAddTag={() => {
+          const pool = DEMO_TAGS.filter((t) => !itemDetail.tags?.some((existing) => existing.name === t.name));
+          if (pool.length === 0) return;
+          const next = pool[0];
+          setItemDetail((prev) => ({ ...prev, tags: [...(prev.tags ?? []), next] }));
+        }}
       />
     </SafeAreaView>
   );
