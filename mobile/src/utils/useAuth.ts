@@ -49,7 +49,7 @@ export function useAuth() {
 
   const afterAuth = async (accessToken: string, refreshToken: string) => {
     await tokenStorage.saveTokens(accessToken, refreshToken);
-    router.replace('/(app)');
+    router.replace('/(app)/(tabs)');
   };
 
   const loginWithCredentials = async (identifier: string, password: string) => {

@@ -8,7 +8,7 @@ import Animated, { ZoomIn } from 'react-native-reanimated';
 import { Colors, Spacing } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Button } from '@/components/atoms/button';
+import { Button } from '@/components/atoms/Button';
 import { StickerShape } from '@/components/atoms/sticker-shape';
 import { useListDraw } from '@/utils/useListDraw';
 import type { ListItemEntry } from '@/utils/useListDetail';
@@ -57,9 +57,9 @@ export default function DrawScreen() {
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
       <View style={styles.topBar}>
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Text style={[styles.back, { color: colors.textSecondary }]}>{t('back')}</Text>
+          <Text style={[styles.back, { color: colors.disabled }]}>{t('back')}</Text>
         </Pressable>
-        <Text style={[styles.title, { color: colors.text }]}>{t('draw.title')}</Text>
+        <Text style={[styles.title, { color: colors.textColor }]}>{t('draw.title')}</Text>
       </View>
 
       <View style={styles.center}>
@@ -67,7 +67,7 @@ export default function DrawScreen() {
         <StickerShape variant="dot" color={colors.success} size={14} style={styles.stickerDot} />
 
         {drawError ? (
-          <Text style={[styles.errorTitle, { color: colors.text }]}>{drawError}</Text>
+          <Text style={[styles.errorTitle, { color: colors.textColor }]}>{drawError}</Text>
         ) : entry ? (
           <Animated.View key={entry.id} entering={ZoomIn.springify().damping(14)}>
             <View style={styles.card}>
@@ -107,21 +107,18 @@ export default function DrawScreen() {
       <View style={styles.actions}>
         {accepted ? (
           <Button
-            colorScheme={colorScheme}
             label={t('draw.backToList')}
             onPress={() => router.back()}
           />
         ) : (
           <>
             <Button
-              colorScheme={colorScheme}
               label={t('draw.accept')}
               onPress={handleAccept}
               loading={accepting}
               disabled={!entry || drawing}
             />
             <Button
-              colorScheme={colorScheme}
               variant="secondary"
               label={t('draw.regenerate')}
               onPress={() => runDraw(entry?.id)}

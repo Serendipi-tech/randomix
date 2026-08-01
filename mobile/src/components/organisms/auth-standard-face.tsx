@@ -2,7 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ClipboardList, Shuffle, Star, Users } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
-import { Button } from '@/components/atoms/button';
+import { Button } from '@/components/atoms/Button';
 import { FeatureRow } from '@/components/molecules/feature-row';
 import { Title } from '@/components/molecules/title';
 import { darkenColor } from '@/utils/color';
@@ -44,7 +44,7 @@ export function AuthStandardFace({ colorScheme, onSignIn }: AuthStandardFaceProp
         ))}
       </View>
 
-      <Button colorScheme={colorScheme} label={t('standard.cta')} onPress={onSignIn} />
+      <Button label={t('standard.cta')} onPress={onSignIn} />
     </View>
   );
 }

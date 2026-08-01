@@ -27,9 +27,9 @@ export function FriendRequestRow({
   const colors = Colors[colorScheme];
 
   return (
-    <View style={[styles.row, { backgroundColor: colors.backgroundElement }]}>
+    <View style={[styles.row, { backgroundColor: colors.foreground }]}>
       <UserAvatar username={username} avatarUrl={avatarUrl} size={40} />
-      <Text style={[styles.username, { color: colors.text }]} numberOfLines={1}>
+      <Text style={[styles.username, { color: colors.textColor }]} numberOfLines={1}>
         {username}
       </Text>
       <Pressable
@@ -45,8 +45,8 @@ export function FriendRequestRow({
         disabled={disabled}
         hitSlop={8}
         accessibilityLabel={rejectLabel}
-        style={[styles.actionButton, { backgroundColor: colors.backgroundSelected }]}>
-        <Text style={[styles.rejectGlyph, { color: colors.textSecondary }]}>✕</Text>
+        style={[styles.actionButton, { backgroundColor: colors.border }]}>
+        <Text style={[styles.rejectGlyph, { color: colors.disabled }]}>✕</Text>
       </Pressable>
     </View>
   );

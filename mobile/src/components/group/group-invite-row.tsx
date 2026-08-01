@@ -27,18 +27,18 @@ export function GroupInviteRow({
   const colors = Colors[colorScheme];
 
   return (
-    <View style={[styles.row, { backgroundColor: colors.backgroundElement }]}>
+    <View style={[styles.row, { backgroundColor: colors.foreground }]}>
       <View style={styles.info}>
-        <Text style={[styles.groupName, { color: colors.text }]} numberOfLines={1}>
+        <Text style={[styles.groupName, { color: colors.textColor }]} numberOfLines={1}>
           {groupName}
         </Text>
-        <Text style={[styles.sender, { color: colors.textSecondary }]}>
+        <Text style={[styles.sender, { color: colors.disabled }]}>
           {fromLabel.replace('{{sender}}', senderUsername)}
         </Text>
       </View>
       <View style={styles.actions}>
         {disabled ? (
-          <ActivityIndicator size="small" color={colors.textSecondary} />
+          <ActivityIndicator size="small" color={colors.disabled} />
         ) : (
           <>
             <Pressable
@@ -49,9 +49,9 @@ export function GroupInviteRow({
             </Pressable>
             <Pressable
               onPress={onReject}
-              style={[styles.btn, { backgroundColor: colors.backgroundSelected }]}
+              style={[styles.btn, { backgroundColor: colors.border }]}
               hitSlop={6}>
-              <Text style={[styles.rejectLabel, { color: colors.textSecondary }]}>
+              <Text style={[styles.rejectLabel, { color: colors.disabled }]}>
                 {rejectLabel}
               </Text>
             </Pressable>

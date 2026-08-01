@@ -5,9 +5,9 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { GradientBackgroundView } from '@/components/molecules/gradient-background';
-import { Button } from '@/components/atoms/button';
-import { Input } from '@/components/atoms/input';
+import { RadialBackground } from '@/components/molecules/radial-background';
+import { Button } from '@/components/atoms/Button';
+import { Input } from '@/components/molecules/Input';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { GroupCard } from '@/components/group/group-card';
 import { GroupInviteRow } from '@/components/group/group-invite-row';
@@ -65,7 +65,7 @@ export default function GroupsScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <GradientBackgroundView colorScheme={colorScheme} />
+      <RadialBackground colorScheme={colorScheme} />
       <FlatList
         data={showSkeleton ? [] : groups}
         keyExtractor={(g: GroupSummary) => g.id}
@@ -88,19 +88,17 @@ export default function GroupsScreen() {
         )}
         ListHeaderComponent={
           <View style={styles.header}>
-            <Text style={[styles.title, { color: colors.text }]}>{t('title')}</Text>
+            <Text style={[styles.title, { color: colors.textColor }]}>{t('title')}</Text>
 
             {showCreate && (
-              <View style={[styles.createCard, { backgroundColor: colors.backgroundElement }]}>
+              <View style={[styles.createCard, { backgroundColor: colors.foreground }]}>
                 <Input
-                  colorScheme={colorScheme}
                   placeholder={t('createModal.namePlaceholder')}
                   value={groupName}
                   onChangeText={setGroupName}
                   autoCapitalize="words"
                 />
                 <Input
-                  colorScheme={colorScheme}
                   placeholder={t('createModal.descriptionPlaceholder')}
                   value={groupDescription}
                   onChangeText={setGroupDescription}
@@ -109,13 +107,11 @@ export default function GroupsScreen() {
                   <Text style={styles.errorText}>{createError}</Text>
                 )}
                 <Button
-                  colorScheme={colorScheme}
                   label={t('createModal.submit')}
                   onPress={handleCreate}
                   loading={creating}
                 />
                 <Button
-                  colorScheme={colorScheme}
                   variant="secondary"
                   label={t('createModal.cancel')}
                   onPress={() => {
@@ -129,7 +125,6 @@ export default function GroupsScreen() {
 
             {!showCreate && (
               <Button
-                colorScheme={colorScheme}
                 label={t('create')}
                 onPress={() => setShowCreate(true)}
               />
@@ -137,7 +132,7 @@ export default function GroupsScreen() {
 
             {invites.length > 0 && (
               <>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                <Text style={[styles.sectionTitle, { color: colors.textColor }]}>
                   {t('invites.title')}
                 </Text>
                 {invites.map((invite) => (
@@ -166,11 +161,11 @@ export default function GroupsScreen() {
         ListEmptyComponent={
           showSkeleton ? null : (
             <View style={styles.empty}>
-              <Text style={[styles.emptyTitle, { color: colors.text }]}>
+              <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
                 {groupsError ? t('error') : t('empty.title')}
               </Text>
               {!groupsError && (
-                <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+                <Text style={[styles.emptySubtitle, { color: colors.disabled }]}>
                   {t('empty.subtitle')}
                 </Text>
               )}

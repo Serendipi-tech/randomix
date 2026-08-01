@@ -8,7 +8,7 @@ type TitleProps = { colorScheme: 'light' | 'dark' } & (
 
 /** Titolo riusabile: variante "plain" (una riga) o "lead-accent" (due righe, con parola finale in evidenza). */
 export function Title(props: TitleProps) {
-  const textColor = Colors[props.colorScheme].titleColor;
+  const textColor = Colors[props.colorScheme].textColor;
 
   if (props.variant === 'lead-accent') {
     return (

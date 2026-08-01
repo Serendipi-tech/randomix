@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
-import { UserAvatar } from '@/components/atoms/user-avatar';
+import { Avatar } from '@/components/atoms/Avatar';
 
 interface ProfileHeaderProps {
   username: string;
@@ -24,13 +24,13 @@ export function ProfileHeader({
   const colors = Colors[colorScheme];
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.backgroundElement }]}>
-      <UserAvatar username={username} avatarUrl={avatarUrl} size={64} />
+    <View style={[styles.card, { backgroundColor: colors.foreground }]}>
+      <Avatar uri={avatarUrl ?? undefined} fallbackColor={colors.primary} />
       <View style={styles.textZone}>
-        <Text style={[styles.username, { color: colors.text }]} numberOfLines={1}>
+        <Text style={[styles.username, { color: colors.textColor }]} numberOfLines={1}>
           {username}
         </Text>
-        <Text style={[styles.email, { color: colors.textSecondary }]} numberOfLines={1}>
+        <Text style={[styles.email, { color: colors.disabled }]} numberOfLines={1}>
           {email}
         </Text>
       </View>

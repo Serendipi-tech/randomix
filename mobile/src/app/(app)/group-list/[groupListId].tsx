@@ -8,7 +8,7 @@ import Animated, { ZoomIn } from 'react-native-reanimated';
 import { Colors, Spacing } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Button } from '@/components/atoms/button';
+import { Button } from '@/components/atoms/Button';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import {
   useGroupListDraw,
@@ -91,9 +91,9 @@ export default function GroupListScreen() {
       />
       <View style={styles.topBar}>
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Text style={[styles.back, { color: colors.textSecondary }]}>←</Text>
+          <Text style={[styles.back, { color: colors.disabled }]}>←</Text>
         </Pressable>
-        <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+        <Text style={[styles.title, { color: colors.textColor }]} numberOfLines={1}>
           {listName ?? ''}
         </Text>
         <View style={styles.topBarSpacer} />
@@ -101,13 +101,13 @@ export default function GroupListScreen() {
 
       {drawnItem ? (
         <View style={styles.drawResult}>
-          <Animated.View entering={ZoomIn} style={[styles.drawnCard, { backgroundColor: colors.backgroundElement }]}>
-            <Text style={[styles.drawnLabel, { color: colors.textSecondary }]}>
+          <Animated.View entering={ZoomIn} style={[styles.drawnCard, { backgroundColor: colors.foreground }]}>
+            <Text style={[styles.drawnLabel, { color: colors.disabled }]}>
               {t('groupList.draw')}
             </Text>
-            <Text style={[styles.drawnName, { color: colors.text }]}>{drawnItem.name}</Text>
+            <Text style={[styles.drawnName, { color: colors.textColor }]}>{drawnItem.name}</Text>
             {drawnItem.description ? (
-              <Text style={[styles.drawnDescription, { color: colors.textSecondary }]}>
+              <Text style={[styles.drawnDescription, { color: colors.disabled }]}>
                 {drawnItem.description}
               </Text>
             ) : null}
@@ -120,13 +120,11 @@ export default function GroupListScreen() {
           {!accepted ? (
             <View style={styles.drawActions}>
               <Button
-                colorScheme={colorScheme}
                 label={t('groupList.accept')}
                 onPress={handleAccept}
                 loading={accepting}
               />
               <Button
-                colorScheme={colorScheme}
                 variant="secondary"
                 label={t('groupList.regenerate')}
                 onPress={() => runDraw(drawnItem.id)}
@@ -134,7 +132,6 @@ export default function GroupListScreen() {
                 disabled={accepting}
               />
               <Button
-                colorScheme={colorScheme}
                 variant="secondary"
                 label="↩"
                 onPress={handleReset}
@@ -143,7 +140,6 @@ export default function GroupListScreen() {
             </View>
           ) : (
             <Button
-              colorScheme={colorScheme}
               label="↩"
               onPress={handleReset}
             />
@@ -152,11 +148,10 @@ export default function GroupListScreen() {
       ) : (
         <>
           <View style={styles.drawBar}>
-            <Text style={[styles.mergedTitle, { color: colors.textSecondary }]}>
+            <Text style={[styles.mergedTitle, { color: colors.disabled }]}>
               {t('groupList.mergedItems', { count: items.length })}
             </Text>
             <Button
-              colorScheme={colorScheme}
               label={t('groupList.draw')}
               onPress={() => runDraw()}
               loading={drawing}
@@ -169,16 +164,16 @@ export default function GroupListScreen() {
           {/* Condivisione delle proprie liste in questa GroupList */}
           <View style={styles.manageBar}>
             <Pressable onPress={() => setShowManage((v) => !v)} style={styles.manageToggle}>
-              <Text style={[styles.manageTitle, { color: colors.text }]}>
+              <Text style={[styles.manageTitle, { color: colors.textColor }]}>
                 {t('groupList.myLists')}
               </Text>
-              <Text style={[styles.manageChevron, { color: colors.textSecondary }]}>
+              <Text style={[styles.manageChevron, { color: colors.disabled }]}>
                 {showManage ? '▾' : '▸'}
               </Text>
             </Pressable>
             {showManage &&
               (myLists.length === 0 ? (
-                <Text style={[styles.manageEmpty, { color: colors.textSecondary }]}>
+                <Text style={[styles.manageEmpty, { color: colors.disabled }]}>
                   {t('groupList.noLists')}
                 </Text>
               ) : (
@@ -191,8 +186,8 @@ export default function GroupListScreen() {
                         key={l.id}
                         onPress={() => handleToggleShare(l.id, shared)}
                         disabled={busy}
-                        style={[styles.manageRow, { backgroundColor: colors.backgroundElement }]}>
-                        <Text style={[styles.manageRowName, { color: colors.text }]} numberOfLines={1}>
+                        style={[styles.manageRow, { backgroundColor: colors.foreground }]}>
+                        <Text style={[styles.manageRowName, { color: colors.textColor }]} numberOfLines={1}>
                           {l.icon} {l.name}
                         </Text>
                         <Text
@@ -217,7 +212,7 @@ export default function GroupListScreen() {
             </View>
           ) : items.length === 0 ? (
             <View style={styles.empty}>
-              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+              <Text style={[styles.emptyText, { color: colors.disabled }]}>
                 {t('groupList.empty')}
               </Text>
             </View>
@@ -227,10 +222,10 @@ export default function GroupListScreen() {
               keyExtractor={(item: GroupListItem) => item.id}
               contentContainerStyle={styles.itemList}
               renderItem={({ item }) => (
-                <View style={[styles.itemRow, { backgroundColor: colors.backgroundElement }]}>
-                  <Text style={[styles.itemName, { color: colors.text }]}>{item.name}</Text>
+                <View style={[styles.itemRow, { backgroundColor: colors.foreground }]}>
+                  <Text style={[styles.itemName, { color: colors.textColor }]}>{item.name}</Text>
                   {item.description ? (
-                    <Text style={[styles.itemDescription, { color: colors.textSecondary }]} numberOfLines={1}>
+                    <Text style={[styles.itemDescription, { color: colors.disabled }]} numberOfLines={1}>
                       {item.description}
                     </Text>
                   ) : null}

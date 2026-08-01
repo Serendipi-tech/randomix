@@ -1,9 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/atoms/button';
-import { Divider } from '@/components/atoms/divider';
-import { Input } from '@/components/atoms/input';
-import { PasswordInput } from '@/components/atoms/password-input';
+import { Button } from '@/components/atoms/Button';
+import { Divider } from '@/components/atoms/Divider';
+import { Input } from '@/components/molecules/Input';
 import { Pressable } from 'react-native';
 import { Colors } from '@/constants/theme';
 import { Title } from '@/components/molecules/title';
@@ -40,25 +39,24 @@ export function AuthLoginFace({
   onBack,
 }: AuthLoginFaceProps) {
   const { t } = useTranslation('auth');
-  const textColor = Colors[colorScheme].titleColor;
-  const linkColor = Colors[colorScheme].linkColor;
+  const textColor = Colors[colorScheme].textColor;
+  const linkColor = Colors[colorScheme].primary;
 
   return (
     <View style={styles.form}>
       <Title variant="lead-accent" lead={t('login.headline')} accent={t('login.brand')} colorScheme={colorScheme} />
 
       <Input
-        colorScheme={colorScheme}
         placeholder={t('login.identifierPlaceholder')}
         autoCapitalize="none"
         value={identifier}
         onChangeText={onIdentifierChange}
       />
-      <PasswordInput
-        colorScheme={colorScheme}
+      <Input variant="password"
         placeholder={t('login.passwordPlaceholder')}
         value={password}
         onChangeText={onPasswordChange}
+        showStrength={false}
       />
 
       <Pressable onPress={onGoToRecover} style={styles.forgotPassword}>
@@ -67,12 +65,11 @@ export function AuthLoginFace({
 
       {error && <FormError message={error} />}
 
-      <Button colorScheme={colorScheme} label={t('login.submit')} onPress={onSubmit} loading={loading} />
+      <Button label={t('login.submit')} onPress={onSubmit} loading={loading} />
 
-      <Divider label={t('login.or')} colorScheme={colorScheme} />
+      <Divider label={t('login.or')} />
 
       <Button
-        colorScheme={colorScheme}
         variant="secondary"
         label={t('login.google')}
         onPress={onGoogle}

@@ -1,8 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/atoms/button';
-import { Input } from '@/components/atoms/input';
-import { PasswordInput } from '@/components/atoms/password-input';
+import { Button } from '@/components/atoms/Button';
+import { Input } from '@/components/molecules/Input';
 import { Colors } from '@/constants/theme';
 import { Title } from '@/components/molecules/title';
 import { FormError } from '@/components/molecules/form-error';
@@ -45,7 +44,7 @@ export function AuthRecoverFace({
   onBack,
 }: AuthRecoverFaceProps) {
   const { t } = useTranslation('auth');
-  const textColor = Colors[colorScheme].titleColor;
+  const textColor = Colors[colorScheme].textColor;
 
   if (step === 'request') {
     return (
@@ -53,7 +52,6 @@ export function AuthRecoverFace({
         <Title variant="lead-accent" lead={t('forgotPassword.headline')} accent={t('forgotPassword.brand')} colorScheme={colorScheme} />
         <Text style={[styles.tagline, { color: textColor }]}>{t('forgotPassword.tagline')}</Text>
         <Input
-          colorScheme={colorScheme}
           placeholder={t('forgotPassword.emailPlaceholder')}
           autoCapitalize="none"
           keyboardType="email-address"
@@ -64,7 +62,6 @@ export function AuthRecoverFace({
         {error && <FormError message={error} />}
 
         <Button
-          colorScheme={colorScheme}
           label={t('forgotPassword.submit')}
           onPress={onSubmitRequest}
           loading={loading}
@@ -84,31 +81,28 @@ export function AuthRecoverFace({
       <Title variant="lead-accent" lead={t('resetPassword.headline')} accent={t('resetPassword.brand')} colorScheme={colorScheme} />
       <Text style={[styles.tagline, { color: textColor }]}>{t('resetPassword.tagline')}</Text>
       <Input
-        colorScheme={colorScheme}
         placeholder={t('resetPassword.otpPlaceholder')}
         keyboardType="number-pad"
         maxLength={6}
         value={otp}
         onChangeText={onOtpChange}
       />
-      <PasswordInput
-        colorScheme={colorScheme}
+      <Input variant="password"
         placeholder={t('resetPassword.newPasswordPlaceholder')}
         value={newPassword}
         onChangeText={onNewPasswordChange}
         showStrength
       />
-      <PasswordInput
-        colorScheme={colorScheme}
+      <Input variant="password"
         placeholder={t('resetPassword.confirmPasswordPlaceholder')}
         value={confirmPassword}
         onChangeText={onConfirmPasswordChange}
+        showStrength={false}
       />
 
       {error && <FormError message={error} />}
 
       <Button
-        colorScheme={colorScheme}
         label={t('resetPassword.submit')}
         onPress={onSubmitConfirm}
         loading={loading}

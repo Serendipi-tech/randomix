@@ -28,21 +28,21 @@ export function GroupCard({
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,
-        { backgroundColor: colors.backgroundElement },
+        { backgroundColor: colors.foreground },
         pressed && styles.pressed,
       ]}>
       <View style={styles.row}>
-        <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
+        <Text style={[styles.name, { color: colors.textColor }]} numberOfLines={1}>
           {name}
         </Text>
-        <Text style={[styles.role, { color: colors.textSecondary }]}>{roleLabel}</Text>
+        <Text style={[styles.role, { color: colors.disabled }]}>{roleLabel}</Text>
       </View>
       {description ? (
-        <Text style={[styles.description, { color: colors.textSecondary }]} numberOfLines={2}>
+        <Text style={[styles.description, { color: colors.disabled }]} numberOfLines={2}>
           {description}
         </Text>
       ) : null}
-      <Text style={[styles.meta, { color: colors.textSecondary }]}>
+      <Text style={[styles.meta, { color: colors.disabled }]}>
         {memberCount} {membersLabel}
       </Text>
     </Pressable>

@@ -5,12 +5,12 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { GradientBackgroundView } from '@/components/molecules/gradient-background';
-import { Input } from '@/components/atoms/input';
+import { RadialBackground } from '@/components/molecules/radial-background';
+import { Input } from '@/components/molecules/Input';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { FriendRequestRow } from '@/components/molecules/friend-request-row';
-import { FriendRow } from '@/components/molecules/friend-row';
+import { FriendCard } from '@/components/cards/FriendCard';
 import { UserSearchRow } from '@/components/molecules/user-search-row';
 import { useMyFriends, useRemoveFriend, type Friend } from '@/utils/useFriends';
 import { useFriendRequests } from '@/utils/useFriendRequests';
@@ -44,28 +44,26 @@ export default function FriendsScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <GradientBackgroundView colorScheme={colorScheme} />
+      <RadialBackground colorScheme={colorScheme} />
       <FlatList
         data={showFriendsSkeleton ? [] : friends}
         keyExtractor={(item) => item.id}
         contentContainerStyle={[styles.content, { paddingBottom: BottomTabInset + Spacing.four }]}
         renderItem={({ item }) => (
-          <FriendRow
+          <FriendCard
             username={item.username}
-            avatarUrl={item.avatarUrl}
-            colorScheme={colorScheme}
+            imageUri={item.avatarUrl ?? undefined}
             onPress={() => router.push({ pathname: '/friend/[id]', params: { id: item.id } })}
             onRemove={() => setFriendToRemove(item)}
-            removeLabel={t('friends.remove')}
           />
         )}
         ListHeaderComponent={
           <View style={styles.header}>
-            <Text style={[styles.title, { color: colors.text }]}>{t('title')}</Text>
+            <Text style={[styles.title, { color: colors.textColor }]}>{t('title')}</Text>
 
             {requests.length > 0 && (
               <>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('requests.title')}</Text>
+                <Text style={[styles.sectionTitle, { color: colors.textColor }]}>{t('requests.title')}</Text>
                 {requests.map((request) => (
                   <FriendRequestRow
                     key={request.id}
@@ -82,9 +80,8 @@ export default function FriendsScreen() {
               </>
             )}
 
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('search.title')}</Text>
+            <Text style={[styles.sectionTitle, { color: colors.textColor }]}>{t('search.title')}</Text>
             <Input
-              colorScheme={colorScheme}
               placeholder={t('search.placeholder')}
               autoCapitalize="none"
               value={search.query}
@@ -104,10 +101,10 @@ export default function FriendsScreen() {
               />
             ))}
             {search.active && !search.searching && !search.error && search.results.length === 0 && (
-              <Text style={[styles.searchEmpty, { color: colors.textSecondary }]}>{t('search.empty')}</Text>
+              <Text style={[styles.searchEmpty, { color: colors.disabled }]}>{t('search.empty')}</Text>
             )}
 
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('friends.title')}</Text>
+            <Text style={[styles.sectionTitle, { color: colors.textColor }]}>{t('friends.title')}</Text>
             {showFriendsSkeleton &&
               Array.from({ length: SKELETON_COUNT }).map((_, i) => (
                 <ListCardSkeleton key={i} colorScheme={colorScheme} />
@@ -117,11 +114,11 @@ export default function FriendsScreen() {
         ListEmptyComponent={
           showFriendsSkeleton ? null : (
             <View style={styles.empty}>
-              <Text style={[styles.emptyTitle, { color: colors.text }]}>
+              <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
                 {friendsError ? t('friends.error') : t('friends.empty.title')}
               </Text>
               {!friendsError && (
-                <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+                <Text style={[styles.emptySubtitle, { color: colors.disabled }]}>
                   {t('friends.empty.subtitle')}
                 </Text>
               )}

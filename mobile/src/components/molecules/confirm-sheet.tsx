@@ -30,16 +30,16 @@ export function ConfirmSheet({
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onCancel}>
       <Pressable style={styles.backdrop} onPress={onCancel} />
       <View style={[styles.sheet, { backgroundColor: colors.background }]}>
-        <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-        <Text style={[styles.message, { color: colors.textSecondary }]}>{message}</Text>
+        <Text style={[styles.title, { color: colors.textColor }]}>{title}</Text>
+        <Text style={[styles.message, { color: colors.disabled }]}>{message}</Text>
 
         <Pressable onPress={onConfirm} style={styles.confirmButton}>
           <Text style={styles.confirmLabel}>{confirmLabel}</Text>
         </Pressable>
         <Pressable
           onPress={onCancel}
-          style={[styles.cancelButton, { backgroundColor: colors.backgroundElement }]}>
-          <Text style={[styles.cancelLabel, { color: colors.text }]}>{cancelLabel}</Text>
+          style={[styles.cancelButton, { backgroundColor: colors.foreground }]}>
+          <Text style={[styles.cancelLabel, { color: colors.textColor }]}>{cancelLabel}</Text>
         </Pressable>
       </View>
     </Modal>

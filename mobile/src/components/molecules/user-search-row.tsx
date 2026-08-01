@@ -26,13 +26,13 @@ export function UserSearchRow({
   const colors = Colors[colorScheme];
 
   return (
-    <View style={[styles.row, { backgroundColor: colors.backgroundElement }]}>
+    <View style={[styles.row, { backgroundColor: colors.foreground }]}>
       <UserAvatar username={username} avatarUrl={avatarUrl} size={40} />
-      <Text style={[styles.username, { color: colors.text }]} numberOfLines={1}>
+      <Text style={[styles.username, { color: colors.textColor }]} numberOfLines={1}>
         {username}
       </Text>
       {statusLabel ? (
-        <Text style={[styles.status, { color: colors.textSecondary }]}>{statusLabel}</Text>
+        <Text style={[styles.status, { color: colors.disabled }]}>{statusLabel}</Text>
       ) : (
         <Pressable
           onPress={onAdd}

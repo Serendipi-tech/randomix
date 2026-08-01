@@ -10,7 +10,7 @@ interface ColorPickerRowProps {
 
 /** Riga di pallini colore selezionabili per il colore della lista. */
 export function ColorPickerRow({ colors, selected, onSelect, colorScheme }: ColorPickerRowProps) {
-  const ringColor = Colors[colorScheme].text;
+  const ringColor = Colors[colorScheme].textColor;
 
   return (
     <View style={styles.row}>

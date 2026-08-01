@@ -29,22 +29,22 @@ export function GroupListCard({
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,
-        { backgroundColor: colors.backgroundElement },
+        { backgroundColor: colors.foreground },
         pressed && styles.pressed,
       ]}>
       <View style={[styles.iconBadge, { backgroundColor: color + '33' }]}>
         <Text style={styles.icon}>{icon}</Text>
       </View>
       <View style={styles.info}>
-        <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
+        <Text style={[styles.name, { color: colors.textColor }]} numberOfLines={1}>
           {name}
         </Text>
         {description ? (
-          <Text style={[styles.description, { color: colors.textSecondary }]} numberOfLines={1}>
+          <Text style={[styles.description, { color: colors.disabled }]} numberOfLines={1}>
             {description}
           </Text>
         ) : null}
-        <Text style={[styles.meta, { color: colors.textSecondary }]}>{memberListCountLabel}</Text>
+        <Text style={[styles.meta, { color: colors.disabled }]}>{memberListCountLabel}</Text>
       </View>
     </Pressable>
   );

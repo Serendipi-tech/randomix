@@ -5,10 +5,10 @@ import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-nat
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Button } from '@/components/atoms/button';
-import { Input } from '@/components/atoms/input';
+import { Button } from '@/components/atoms/Button';
+import { Input } from '@/components/molecules/Input';
 import { ColorPickerRow } from '@/components/atoms/color-picker-row';
-import { SelectableChip } from '@/components/atoms/selectable-chip';
+import { Chip } from '@/components/atoms/Chip';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { useListCategories } from '@/utils/useListCategories';
 import { useListDetail } from '@/utils/useListDetail';
@@ -91,7 +91,7 @@ export default function ListFormScreen() {
     setShowDeleteConfirm(false);
     if (!id) return;
     await deleteList(id);
-    router.replace('/(app)');
+    router.replace('/(app)/(tabs)');
   };
 
   const displayError = localError ?? error?.message ?? null;
@@ -101,34 +101,31 @@ export default function ListFormScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.topBar}>
           <Pressable onPress={() => router.back()} hitSlop={8}>
-            <Text style={[styles.back, { color: colors.textSecondary }]}>{t('form.cancel')}</Text>
+            <Text style={[styles.back, { color: colors.disabled }]}>{t('form.cancel')}</Text>
           </Pressable>
-          <Text style={[styles.title, { color: colors.text }]}>
+          <Text style={[styles.title, { color: colors.textColor }]}>
             {isEdit ? t('form.titleEdit') : t('form.titleCreate')}
           </Text>
         </View>
 
         <Input
-          colorScheme={colorScheme}
           placeholder={t('form.namePlaceholder')}
           value={name}
           onChangeText={setName}
         />
         <Input
-          colorScheme={colorScheme}
           placeholder={t('form.iconPlaceholder')}
           value={icon}
           onChangeText={setIcon}
         />
         <Input
-          colorScheme={colorScheme}
           placeholder={t('form.descriptionPlaceholder')}
           value={description}
           onChangeText={setDescription}
-          multiline
+          variant="textarea"
         />
 
-        <Text style={[styles.sectionLabel, { color: colors.text }]}>{t('form.color')}</Text>
+        <Text style={[styles.sectionLabel, { color: colors.textColor }]}>{t('form.color')}</Text>
         <ColorPickerRow
           colors={LIST_COLORS}
           selected={color}
@@ -138,17 +135,16 @@ export default function ListFormScreen() {
 
         {categories.length > 0 && (
           <>
-            <Text style={[styles.sectionLabel, { color: colors.text }]}>
+            <Text style={[styles.sectionLabel, { color: colors.textColor }]}>
               {t('form.categories')}
             </Text>
             <View style={styles.chipWrap}>
               {categories.map((cat) => (
-                <SelectableChip
+                <Chip
                   key={cat.id}
                   label={`${cat.icon} ${cat.name}`}
                   selected={categoryIds.includes(cat.id)}
                   onPress={() => toggleCategory(cat.id)}
-                  colorScheme={colorScheme}
                 />
               ))}
             </View>
@@ -156,14 +152,13 @@ export default function ListFormScreen() {
         )}
 
         <View style={styles.switchRow}>
-          <Text style={[styles.switchLabel, { color: colors.text }]}>{t('form.hidden')}</Text>
+          <Text style={[styles.switchLabel, { color: colors.textColor }]}>{t('form.hidden')}</Text>
           <Switch value={isHidden} onValueChange={setIsHidden} />
         </View>
 
         {displayError && <Text style={styles.error}>{displayError}</Text>}
 
         <Button
-          colorScheme={colorScheme}
           label={isEdit ? t('form.save') : t('form.create')}
           onPress={save}
           loading={saving}
@@ -171,7 +166,6 @@ export default function ListFormScreen() {
 
         {isEdit && (
           <Button
-            colorScheme={colorScheme}
             variant="secondary"
             label={t('form.delete')}
             onPress={() => setShowDeleteConfirm(true)}

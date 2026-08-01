@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Platform, Pressable, StyleSheet, View, type LayoutChangeEvent, type ViewStyle } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Bell, Home, LayoutGrid, User, Users } from 'lucide-react-native';
-import { BottomTabInset, Colors, GradientBackground } from '@/constants/theme';
+import { BottomTabInset, Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
 
@@ -17,9 +17,9 @@ const webGlassStyle = {
 } as ViewStyle;
 
 const BAR_HEIGHT = 68;
-const CORNER = BAR_HEIGHT / 2;
-const NOTCH_HALF_WIDTH = 40;
-const NOTCH_DEPTH = 30;
+const CORNER = 12;
+const NOTCH_HALF_WIDTH = 76;
+const NOTCH_DEPTH = 64;
 const HOME_SIZE = 52;
 // centra HOME_SIZE nella riga (alta BAR_HEIGHT) e lo spinge fino a toccare il bordo superiore:
 // resta sempre dentro il perimetro della barra, mai sopra.
@@ -44,8 +44,8 @@ function buildWavePath(width: number): string {
   return [
     `M ${CORNER} 0`,
     `L ${left} 0`,
-    `C ${left + 16} 0 ${cx - 30} ${NOTCH_DEPTH} ${cx} ${NOTCH_DEPTH}`,
-    `C ${cx + 30} ${NOTCH_DEPTH} ${right - 16} 0 ${right} 0`,
+    `C ${left + 37} 0 ${cx - 40} ${NOTCH_DEPTH} ${cx} ${NOTCH_DEPTH}`,
+    `C ${cx + 40} ${NOTCH_DEPTH} ${right - 37} 0 ${right} 0`,
     `L ${width - CORNER} 0`,
     `A ${CORNER} ${CORNER} 0 0 1 ${width} ${CORNER}`,
     `L ${width} ${BAR_HEIGHT - CORNER}`,
@@ -94,8 +94,8 @@ type SideTabButtonProps = TabTriggerSlotProps & { name: SideTabName };
 function SideTabButton({ name, isFocused, ...props }: SideTabButtonProps) {
   const { colorScheme } = useAppTheme();
   const Icon = SIDE_TAB_ICONS[name];
-  const mutedColor = Colors[colorScheme].placeholder;
-  const activeColor = Colors[colorScheme].titleColor;
+  const mutedColor = Colors[colorScheme].disabled;
+  const activeColor = Colors[colorScheme].textColor;
   const color = isFocused ? activeColor : mutedColor;
 
   return (
@@ -108,16 +108,18 @@ function SideTabButton({ name, isFocused, ...props }: SideTabButtonProps) {
 /** Pulsante Home: aspetto sempre identico (non cambia con il tab attivo), sopraelevato nella tacca ma
  *  contenuto entro l'altezza della barra. */
 function HomeButton(props: TabTriggerSlotProps) {
+  const { colorScheme } = useAppTheme();
+  const colors = Colors[colorScheme];
   return (
     <Pressable {...props} style={styles.homeButton} hitSlop={6}>
       <LinearGradient
-        colors={[Colors.light.secondary, Colors.light.primary]}
+        colors={[colors.secondary, colors.secondaryGradient]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
       <View style={styles.homeIconStack}>
-        <Home size={24} color={Colors.light.border} strokeWidth={2.5} />
+        <Home size={24} color={colors.textColor} strokeWidth={2.5} />
       </View>
     </Pressable>
   );
@@ -126,10 +128,7 @@ function HomeButton(props: TabTriggerSlotProps) {
 function TabBar(props: TabListProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
-  const fill =
-    colorScheme === 'light'
-      ? hexToRgba(colors.primary, 0.3)
-      : hexToRgba(GradientBackground.dark.stops[1], 0.58);
+  const fill = hexToRgba(colors.primary, 0.2);
   const border = hexToRgba(colors.border, colorScheme === 'light' ? 0.5 : 0.16);
   const [width, setWidth] = useState(0);
 
@@ -168,7 +167,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pillWrap: {
-    width: '92%',
+    width: '96%',
     maxWidth: 420,
     height: BAR_HEIGHT,
   },
@@ -186,7 +185,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
   },
   sideTab: {
     alignItems: 'center',

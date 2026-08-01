@@ -7,7 +7,8 @@ import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
-import { ItemRow } from '@/components/molecules/item-row';
+import { ItemCard } from '@/components/cards/ItemCard';
+import { Button } from '@/components/atoms/Button';
 import { useItemMutations } from '@/utils/useItemMutations';
 import { useListDetail, type ListItemEntry } from '@/utils/useListDetail';
 
@@ -54,11 +55,11 @@ export default function ListDetailScreen() {
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
       <View style={styles.topBar}>
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Text style={[styles.back, { color: colors.textSecondary }]}>{t('detail.back')}</Text>
+          <Text style={[styles.back, { color: colors.disabled }]}>{t('detail.back')}</Text>
         </Pressable>
         {list && (
           <Pressable onPress={() => router.push({ pathname: '/list-form', params: { id } })} hitSlop={8}>
-            <Text style={[styles.edit, { color: colors.text }]}>{t('detail.edit')}</Text>
+            <Text style={[styles.edit, { color: colors.textColor }]}>{t('detail.edit')}</Text>
           </Pressable>
         )}
       </View>
@@ -71,7 +72,7 @@ export default function ListDetailScreen() {
         </View>
       ) : !list ? (
         <View style={styles.empty}>
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>
+          <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
             {error ? t('detail.error') : t('detail.notFound')}
           </Text>
         </View>
@@ -81,59 +82,63 @@ export default function ListDetailScreen() {
           keyExtractor={(entry) => entry.id}
           contentContainerStyle={styles.content}
           renderItem={({ item: entry }) => (
-            <ItemRow
-              name={entry.userItem.item.name}
-              categoryLabel={t(`categories.${entry.userItem.item.category}`)}
-              status={entry.userItem.status}
-              statusLabel={t(`status.${entry.userItem.status}`)}
-              ratingValue={entry.userItem.item.myRating?.value}
+            <ItemCard
+              title={entry.userItem.item.name}
+              category={t(`categories.${entry.userItem.item.category}`)}
+              status={t(`status.${entry.userItem.status}`)}
+              statusColor={
+                entry.userItem.status === 'IN_PROGRESS'
+                  ? colors.warning
+                  : entry.userItem.status === 'COMPLETED'
+                    ? colors.success
+                    : colors.border
+              }
+              rating={entry.userItem.item.myRating?.value ?? undefined}
               tags={entry.userItem.tags}
-              colorScheme={colorScheme}
               onPress={() => openItem(entry)}
               onRemove={() => setEntryToRemove(entry)}
-              removeLabel={t('detail.remove')}
             />
           )}
           ListHeaderComponent={
             <View style={styles.header}>
-              <Text style={[styles.title, { color: colors.text }]}>
+              <Text style={[styles.title, { color: colors.textColor }]}>
                 {list.icon} {list.name}
               </Text>
               {list.description ? (
-                <Text style={[styles.description, { color: colors.textSecondary }]}>
+                <Text style={[styles.description, { color: colors.disabled }]}>
                   {list.description}
                 </Text>
               ) : null}
               <View style={styles.itemsBar}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                <Text style={[styles.sectionTitle, { color: colors.textColor }]}>
                   {t('detail.items')}
                 </Text>
                 <View style={styles.itemsActions}>
-                  <Pressable
+                  <Button
+                    variant="primary"
+                    label={t('detail.draw')}
                     onPress={() =>
                       router.push({
                         pathname: '/draw',
                         params: { listId: id, listColor: list.color },
                       })
                     }
-                    style={[styles.addButton, { backgroundColor: list.color }]}>
-                    <Text style={styles.addLabel}>{t('detail.draw')}</Text>
-                  </Pressable>
-                  <Pressable
+                  />
+                  <Button
+                    variant="secondary"
+                    label={t('detail.addItem')}
                     onPress={() => router.push({ pathname: '/item-form', params: { listId: id } })}
-                    style={[styles.addButton, { backgroundColor: list.color }]}>
-                    <Text style={styles.addLabel}>{t('detail.addItem')}</Text>
-                  </Pressable>
+                  />
                 </View>
               </View>
             </View>
           }
           ListEmptyComponent={
             <View style={styles.empty}>
-              <Text style={[styles.emptyTitle, { color: colors.text }]}>
+              <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
                 {t('detail.emptyTitle')}
               </Text>
-              <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+              <Text style={[styles.emptySubtitle, { color: colors.disabled }]}>
                 {t('detail.emptySubtitle')}
               </Text>
             </View>

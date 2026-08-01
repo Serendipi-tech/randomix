@@ -10,11 +10,11 @@ export function ListCardSkeleton({ colorScheme }: ListCardSkeletonProps) {
   const colors = Colors[colorScheme];
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.backgroundElement }]}>
-      <View style={[styles.iconChip, { backgroundColor: colors.backgroundSelected }]} />
+    <View style={[styles.card, { backgroundColor: colors.foreground }]}>
+      <View style={[styles.iconChip, { backgroundColor: colors.border }]} />
       <View style={styles.textZone}>
-        <View style={[styles.lineTitle, { backgroundColor: colors.backgroundSelected }]} />
-        <View style={[styles.lineSubtitle, { backgroundColor: colors.backgroundSelected }]} />
+        <View style={[styles.lineTitle, { backgroundColor: colors.border }]} />
+        <View style={[styles.lineSubtitle, { backgroundColor: colors.border }]} />
       </View>
     </View>
   );

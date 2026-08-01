@@ -234,8 +234,8 @@ const authStyles = StyleSheet.create({
 
 function FeatureRowCopy({ Icon, tint, gradient, title, subtitle, colorScheme }: { Icon: React.ComponentType<any>; tint: string; gradient: readonly [string, string]; title: string; subtitle: string; colorScheme: 'light' | 'dark' }) {
   const colors = Colors[colorScheme];
-  const textColor = colors.text;
-  const subtitleColor = colors.textSecondary;
+  const textColor = colors.textColor;
+  const subtitleColor = colors.disabled;
 
   return (
     <View style={[authStyles.featureRow, { backgroundColor: `${tint}1F` }]}>

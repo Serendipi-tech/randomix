@@ -18,11 +18,11 @@ export function RefreshButton({ onPress, colorScheme, style }: RefreshButtonProp
       hitSlop={10}
       style={[
         styles.button,
-        { backgroundColor: isDark ? hexToRgba(Colors.dark.border, 0.12) : hexToRgba(Colors.light.titleColor, 0.08) },
+        { backgroundColor: isDark ? hexToRgba(Colors.dark.border, 0.12) : hexToRgba(Colors.light.textColor, 0.08) },
         style,
       ]}
     >
-      <Text style={[styles.glyph, { color: isDark ? Colors.dark.titleColor : Colors.light.titleColor }]}>↻</Text>
+      <Text style={[styles.glyph, { color: isDark ? Colors.dark.textColor : Colors.light.textColor }]}>↻</Text>
     </Pressable>
   );
 }

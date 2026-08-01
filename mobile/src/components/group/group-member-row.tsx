@@ -22,12 +22,12 @@ export function GroupMemberRow({
   const colors = Colors[colorScheme];
 
   return (
-    <View style={[styles.row, { backgroundColor: colors.backgroundElement }]}>
+    <View style={[styles.row, { backgroundColor: colors.foreground }]}>
       <View style={styles.info}>
-        <Text style={[styles.username, { color: colors.text }]} numberOfLines={1}>
+        <Text style={[styles.username, { color: colors.textColor }]} numberOfLines={1}>
           {username}
         </Text>
-        <Text style={[styles.role, { color: colors.textSecondary }]}>{roleLabel}</Text>
+        <Text style={[styles.role, { color: colors.disabled }]}>{roleLabel}</Text>
       </View>
       {canRemove && onRemove ? (
         <Pressable onPress={onRemove} hitSlop={8} style={styles.removeBtn}>

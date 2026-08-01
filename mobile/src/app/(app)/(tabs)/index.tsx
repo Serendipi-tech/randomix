@@ -1,14 +1,16 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { List } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { GradientBackgroundView } from '@/components/molecules/gradient-background';
+import { RadialBackground } from '@/components/molecules/radial-background';
+import { Button } from '@/components/atoms/Button';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
-import { ListCard } from '@/components/molecules/list-card';
+import { ListCard } from '@/components/cards/ListCard';
 import { useMyLists } from '@/utils/useLists';
 
 const SKELETON_COUNT = 6;
@@ -26,15 +28,10 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <GradientBackgroundView colorScheme={colorScheme} />
+      <RadialBackground colorScheme={colorScheme} />
       <View style={styles.titleBar}>
-        <Text style={[styles.title, { color: colors.text }]}>{t('title')}</Text>
-        <Pressable
-          onPress={() => router.push('/list-form')}
-          hitSlop={8}
-          style={styles.addButton}>
-          <Text style={styles.addLabel}>{t('addList')}</Text>
-        </Pressable>
+        <Text style={[styles.title, { color: colors.textColor }]}>{t('title')}</Text>
+        <Button variant="primary" label={t('addList')} onPress={() => router.push('/list-form')} />
       </View>
 
       <Pressable
@@ -68,21 +65,20 @@ export default function HomeScreen() {
           onEndReachedThreshold={0.4}
           renderItem={({ item }) => (
             <ListCard
-              name={item.name}
-              icon={item.icon}
+              title={item.name}
+              category={item.description ?? undefined}
+              icon={List}
               color={item.color}
-              description={item.description}
-              colorScheme={colorScheme}
               onPress={() => router.push({ pathname: '/list/[id]', params: { id: item.id } })}
             />
           )}
           ListEmptyComponent={
             <View style={styles.empty}>
-              <Text style={[styles.emptyTitle, { color: colors.text }]}>
+              <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
                 {error ? t('error') : t('empty.title')}
               </Text>
               {!error && (
-                <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+                <Text style={[styles.emptySubtitle, { color: colors.disabled }]}>
                   {t('empty.subtitle')}
                 </Text>
               )}

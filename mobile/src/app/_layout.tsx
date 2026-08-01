@@ -27,7 +27,7 @@ export default function RootLayout() {
           return;
         }
 
-        router.replace('/(app)');
+        router.replace('/(app)/(tabs)');
       } finally {
         SplashScreen.hideAsync();
       }

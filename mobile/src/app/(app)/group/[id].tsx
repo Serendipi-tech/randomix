@@ -5,8 +5,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Button } from '@/components/atoms/button';
-import { Input } from '@/components/atoms/input';
+import { Button } from '@/components/atoms/Button';
+import { Input } from '@/components/molecules/Input';
 import { ColorPickerRow } from '@/components/atoms/color-picker-row';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
@@ -155,7 +155,7 @@ export default function GroupDetailScreen() {
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
       <View style={styles.topBar}>
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Text style={[styles.back, { color: colors.textSecondary }]}>←</Text>
+          <Text style={[styles.back, { color: colors.disabled }]}>←</Text>
         </Pressable>
       </View>
 
@@ -167,21 +167,21 @@ export default function GroupDetailScreen() {
         </View>
       ) : !group ? (
         <View style={styles.empty}>
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>{t('detail.error')}</Text>
+          <Text style={[styles.emptyTitle, { color: colors.textColor }]}>{t('detail.error')}</Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.content}>
-          <Text style={[styles.title, { color: colors.text }]}>{group.name}</Text>
+          <Text style={[styles.title, { color: colors.textColor }]}>{group.name}</Text>
           {group.description ? (
-            <Text style={[styles.description, { color: colors.textSecondary }]}>
+            <Text style={[styles.description, { color: colors.disabled }]}>
               {group.description}
             </Text>
           ) : null}
 
           {/* Liste del gruppo */}
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('detail.lists')}</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textColor }]}>{t('detail.lists')}</Text>
           {group.groupLists.length === 0 ? (
-            <Text style={[styles.emptySection, { color: colors.textSecondary }]}>
+            <Text style={[styles.emptySection, { color: colors.disabled }]}>
               {t('groupList.empty')}
             </Text>
           ) : (
@@ -209,21 +209,19 @@ export default function GroupDetailScreen() {
           {canManage && (
             <>
               {showCreateList ? (
-                <View style={[styles.createCard, { backgroundColor: colors.backgroundElement }]}>
+                <View style={[styles.createCard, { backgroundColor: colors.foreground }]}>
                   <Input
-                    colorScheme={colorScheme}
                     placeholder={t('detail.newList.namePlaceholder')}
                     value={listName}
                     onChangeText={setListName}
                     autoCapitalize="words"
                   />
                   <Input
-                    colorScheme={colorScheme}
                     placeholder={t('detail.newList.iconPlaceholder')}
                     value={listIcon}
                     onChangeText={setListIcon}
                   />
-                  <Text style={[styles.pickerLabel, { color: colors.textSecondary }]}>
+                  <Text style={[styles.pickerLabel, { color: colors.disabled }]}>
                     {t('detail.newList.color')}
                   </Text>
                   <ColorPickerRow
@@ -234,13 +232,11 @@ export default function GroupDetailScreen() {
                   />
                   {listError && <Text style={styles.listError}>{listError}</Text>}
                   <Button
-                    colorScheme={colorScheme}
                     label={t('detail.newList.submit')}
                     onPress={handleCreateList}
                     loading={creatingList}
                   />
                   <Button
-                    colorScheme={colorScheme}
                     variant="secondary"
                     label={t('detail.newList.cancel')}
                     onPress={() => {
@@ -253,8 +249,8 @@ export default function GroupDetailScreen() {
               ) : (
                 <Pressable
                   onPress={() => setShowCreateList(true)}
-                  style={[styles.secondaryBtn, { backgroundColor: colors.backgroundElement }]}>
-                  <Text style={[styles.secondaryBtnText, { color: colors.text }]}>
+                  style={[styles.secondaryBtn, { backgroundColor: colors.foreground }]}>
+                  <Text style={[styles.secondaryBtnText, { color: colors.textColor }]}>
                     {t('detail.createList')}
                   </Text>
                 </Pressable>
@@ -263,7 +259,7 @@ export default function GroupDetailScreen() {
           )}
 
           {/* Membri */}
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('detail.members')}</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textColor }]}>{t('detail.members')}</Text>
           {group.members.map((member) => (
             <GroupMemberRow
               key={member.id}
@@ -281,15 +277,15 @@ export default function GroupDetailScreen() {
             <>
               <Pressable
                 onPress={() => setShowInvite((v) => !v)}
-                style={[styles.secondaryBtn, { backgroundColor: colors.backgroundElement }]}>
-                <Text style={[styles.secondaryBtnText, { color: colors.text }]}>
+                style={[styles.secondaryBtn, { backgroundColor: colors.foreground }]}>
+                <Text style={[styles.secondaryBtnText, { color: colors.textColor }]}>
                   {t('detail.invite')}
                 </Text>
               </Pressable>
               {showInvite && (
                 <View style={styles.inviteList}>
                   {inviteRows.length === 0 ? (
-                    <Text style={[styles.emptySection, { color: colors.textSecondary }]}>
+                    <Text style={[styles.emptySection, { color: colors.disabled }]}>
                       {t('detail.noFriends')}
                     </Text>
                   ) : (
@@ -302,18 +298,18 @@ export default function GroupDetailScreen() {
                             row.pending ? handleRevoke(row.userId) : handleInvite(row.userId)
                           }
                           disabled={isProcessing}
-                          style={[styles.friendRow, { backgroundColor: colors.backgroundElement }]}>
+                          style={[styles.friendRow, { backgroundColor: colors.foreground }]}>
                           <View style={styles.friendInfo}>
-                            <Text style={[styles.friendName, { color: colors.text }]}>
+                            <Text style={[styles.friendName, { color: colors.textColor }]}>
                               {row.username}
                             </Text>
                             {row.pending && (
-                              <Text style={[styles.invitedBadge, { color: colors.textSecondary }]}>
+                              <Text style={[styles.invitedBadge, { color: colors.disabled }]}>
                                 {t('detail.invited')}
                               </Text>
                             )}
                           </View>
-                          <Text style={[styles.inviteAction, { color: colors.textSecondary }]}>
+                          <Text style={[styles.inviteAction, { color: colors.disabled }]}>
                             {isProcessing
                               ? '…'
                               : row.pending
@@ -334,7 +330,7 @@ export default function GroupDetailScreen() {
             {!isOwner && (
               <Pressable
                 onPress={() => setConfirmLeave(true)}
-                style={[styles.dangerBtn, { backgroundColor: colors.backgroundElement }]}>
+                style={[styles.dangerBtn, { backgroundColor: colors.foreground }]}>
                 <Text style={styles.dangerText}>{t('detail.leave')}</Text>
               </Pressable>
             )}
@@ -342,7 +338,7 @@ export default function GroupDetailScreen() {
               <Pressable
                 onPress={() => setConfirmDelete(true)}
                 disabled={deleting}
-                style={[styles.dangerBtn, { backgroundColor: colors.backgroundElement }]}>
+                style={[styles.dangerBtn, { backgroundColor: colors.foreground }]}>
                 <Text style={styles.dangerText}>{t('detail.delete')}</Text>
               </Pressable>
             )}

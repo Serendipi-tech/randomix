@@ -1,8 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/atoms/button';
-import { Input } from '@/components/atoms/input';
-import { PasswordInput } from '@/components/atoms/password-input';
+import { Button } from '@/components/atoms/Button';
+import { Input } from '@/components/molecules/Input';
 import { Colors } from '@/constants/theme';
 import { Title } from '@/components/molecules/title';
 import { FormError } from '@/components/molecules/form-error';
@@ -42,15 +41,14 @@ export function AuthRegisterFace({
   onBack,
 }: AuthRegisterFaceProps) {
   const { t } = useTranslation('auth');
-  const textColor = Colors[colorScheme].titleColor;
-  const linkColor = Colors[colorScheme].linkColor;
+  const textColor = Colors[colorScheme].textColor;
+  const linkColor = Colors[colorScheme].primary;
 
   return (
     <View style={styles.form}>
       <Title variant="lead-accent" lead={t('register.headline')} accent={t('register.brand')} colorScheme={colorScheme} />
 
       <Input
-        colorScheme={colorScheme}
         placeholder={t('register.emailPlaceholder')}
         autoCapitalize="none"
         keyboardType="email-address"
@@ -58,29 +56,27 @@ export function AuthRegisterFace({
         onChangeText={onEmailChange}
       />
       <Input
-        colorScheme={colorScheme}
         placeholder={t('register.usernamePlaceholder')}
         autoCapitalize="none"
         value={username}
         onChangeText={onUsernameChange}
       />
-      <PasswordInput
-        colorScheme={colorScheme}
+      <Input variant="password"
         placeholder={t('register.passwordPlaceholder')}
         value={password}
         onChangeText={onPasswordChange}
         showStrength
       />
-      <PasswordInput
-        colorScheme={colorScheme}
+      <Input variant="password"
         placeholder={t('register.confirmPasswordPlaceholder')}
         value={confirmPassword}
         onChangeText={onConfirmPasswordChange}
+        showStrength={false}
       />
 
       {error && <FormError message={error} />}
 
-      <Button colorScheme={colorScheme} label={t('register.submit')} onPress={onSubmit} loading={loading} />
+      <Button label={t('register.submit')} onPress={onSubmit} loading={loading} />
 
       <Pressable onPress={onGoToLogin} style={styles.link}>
         <Text style={[styles.linkText, { color: linkColor }]}>{t('register.haveAccount')}</Text>

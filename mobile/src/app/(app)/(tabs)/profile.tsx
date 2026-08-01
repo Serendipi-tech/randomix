@@ -5,9 +5,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { GradientBackgroundView } from '@/components/molecules/gradient-background';
-import { Button } from '@/components/atoms/button';
-import { Input } from '@/components/atoms/input';
+import { RadialBackground } from '@/components/molecules/radial-background';
+import { Button } from '@/components/atoms/Button';
+import { Input } from '@/components/molecules/Input';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ProfileHeader } from '@/components/molecules/profile-header';
 import { useAuth } from '@/utils/useAuth';
@@ -52,9 +52,9 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <GradientBackgroundView colorScheme={colorScheme} />
+      <RadialBackground colorScheme={colorScheme} />
       <View style={styles.content}>
-        <Text style={[styles.title, { color: colors.text }]}>{t('title')}</Text>
+        <Text style={[styles.title, { color: colors.textColor }]}>{t('title')}</Text>
 
         {loadingProfile && !profile ? (
           <ListCardSkeleton colorScheme={colorScheme} />
@@ -68,18 +68,16 @@ export default function ProfileScreen() {
             onEditPress={startEditing}
           />
         ) : profile ? (
-          <View style={[styles.editCard, { backgroundColor: colors.backgroundElement }]}>
+          <View style={[styles.editCard, { backgroundColor: colors.foreground }]}>
             <Input
-              colorScheme={colorScheme}
               placeholder={t('usernamePlaceholder')}
               autoCapitalize="none"
               value={username}
               onChangeText={setUsername}
             />
             {editError && <Text style={styles.error}>{editError}</Text>}
-            <Button colorScheme={colorScheme} label={t('save')} onPress={saveProfile} loading={saving} />
+            <Button label={t('save')} onPress={saveProfile} loading={saving} />
             <Button
-              colorScheme={colorScheme}
               variant="secondary"
               label={t('cancel')}
               onPress={() => setEditing(false)}
@@ -89,8 +87,8 @@ export default function ProfileScreen() {
         ) : null}
 
         <View style={styles.logoutWrap}>
-          <Button colorScheme={colorScheme} variant="secondary" label="Colors" onPress={() => router.push('colors-showcase')} />
-          <Button colorScheme={colorScheme} variant="secondary" label={t('logout')} onPress={logout} />
+          <Button variant="secondary" label="Colors" onPress={() => router.push('/colors-showcase')} />
+          <Button variant="secondary" label={t('logout')} onPress={logout} />
         </View>
       </View>
     </SafeAreaView>

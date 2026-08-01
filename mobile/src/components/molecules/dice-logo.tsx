@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, View } from 'react-native';
 import { Colors } from '@/constants/theme';
+import { DICE_COLORS } from '@/constants/dice';
 import { hexToRgba } from '@/utils/color';
 
 const DICE_SIZE = 108;
@@ -35,7 +36,7 @@ export function DiceLogo() {
           style={styles.bevelHighlight}
         />
         <LinearGradient
-          colors={['transparent', Colors.light.extraColors.two]}
+          colors={['transparent', DICE_COLORS.bevel]}
           start={{ x: 0.5, y: 0.55 }}
           end={{ x: 0.5, y: 1 }}
           style={styles.bevelShadow}
@@ -82,9 +83,9 @@ const styles = StyleSheet.create({
     width: DICE_SIZE,
     height: DICE_SIZE,
     borderRadius: 24,
-    backgroundColor: Colors.light.extraColors.one,
+    backgroundColor: DICE_COLORS.face,
     borderWidth: 2,
-    borderColor: Colors.light.extraColors.three,
+    borderColor: DICE_COLORS.border,
     overflow: 'hidden',
     shadowColor: Colors.light.shadow,
     shadowOffset: { width: 0, height: 12 },
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     width: PIP_SIZE,
     height: PIP_SIZE,
     borderRadius: PIP_SIZE / 2,
-    backgroundColor: Colors.light.extraColors.four,
+    backgroundColor: DICE_COLORS.pip,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: Colors.light.shadow,

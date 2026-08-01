@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState, type PropsWithChildren } from 'react';
-import { useColorScheme as useSystemColorScheme } from '@/hooks/use-color-scheme';
+import { useSystemColorScheme } from '@/hooks/use-system-color-scheme';
 
 type Scheme = 'light' | 'dark';
 
@@ -8,7 +8,8 @@ type AppThemeContextValue = {
   toggleColorScheme: () => void;
 };
 
-const AppThemeContext = createContext<AppThemeContextValue | null>(null);
+// Esportato per il wrapper `useColorScheme` (legge l'override se dentro il provider, altrimenti sistema)
+export const AppThemeContext = createContext<AppThemeContextValue | null>(null);
 
 /** Override manuale del tema, applicato a monte di tutta l'app: parte dal tema di sistema finché l'utente non lo cambia col toggle. */
 export function AppThemeProvider({ children }: PropsWithChildren) {

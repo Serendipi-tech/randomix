@@ -5,9 +5,10 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Button } from '@/components/atoms/button';
-import { Input } from '@/components/atoms/input';
-import { SelectableChip } from '@/components/atoms/selectable-chip';
+import { Button } from '@/components/atoms/Button';
+import { Input } from '@/components/molecules/Input';
+import { Chip } from '@/components/atoms/Chip';
+import { DICE_COLORS } from '@/constants/dice';
 import { useRandomizer } from '@/utils/useRandomizer';
 
 const MODES = ['numbers', 'letters', 'colors', 'dice'] as const;
@@ -86,19 +87,18 @@ export default function RandomizerScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.topBar}>
           <Pressable onPress={() => router.back()} hitSlop={8}>
-            <Text style={[styles.back, { color: colors.textSecondary }]}>{t('back')}</Text>
+            <Text style={[styles.back, { color: colors.disabled }]}>{t('back')}</Text>
           </Pressable>
-          <Text style={[styles.title, { color: colors.text }]}>{t('title')}</Text>
+          <Text style={[styles.title, { color: colors.textColor }]}>{t('title')}</Text>
         </View>
 
         <View style={styles.chipWrap}>
           {MODES.map((m) => (
-            <SelectableChip
+            <Chip
               key={m}
               label={t(`modes.${m}`)}
               selected={mode === m}
               onPress={() => switchMode(m)}
-              colorScheme={colorScheme}
             />
           ))}
         </View>
@@ -107,7 +107,6 @@ export default function RandomizerScreen() {
           {mode === 'numbers' && (
             <>
               <Input
-                colorScheme={colorScheme}
                 placeholder={t('minPlaceholder')}
                 keyboardType="number-pad"
                 value={min}
@@ -115,7 +114,6 @@ export default function RandomizerScreen() {
                 style={styles.inputFlex}
               />
               <Input
-                colorScheme={colorScheme}
                 placeholder={t('maxPlaceholder')}
                 keyboardType="number-pad"
                 value={max}
@@ -126,7 +124,6 @@ export default function RandomizerScreen() {
           )}
           {mode === 'dice' && (
             <Input
-              colorScheme={colorScheme}
               placeholder={t('facesPlaceholder')}
               keyboardType="number-pad"
               value={faces}
@@ -135,7 +132,6 @@ export default function RandomizerScreen() {
             />
           )}
           <Input
-            colorScheme={colorScheme}
             placeholder={t('countPlaceholder')}
             keyboardType="number-pad"
             value={count}
@@ -147,7 +143,6 @@ export default function RandomizerScreen() {
         {displayError && <Text style={styles.error}>{displayError}</Text>}
 
         <Button
-          colorScheme={colorScheme}
           label={t('generate')}
           onPress={generate}
           loading={loading}
@@ -160,7 +155,7 @@ export default function RandomizerScreen() {
                 return (
                   <View key={`${value}-${i}`} style={styles.colorResult}>
                     <View style={[styles.colorSwatch, { backgroundColor: value }]} />
-                    <Text style={[styles.colorHex, { color: colors.textSecondary }]}>{value}</Text>
+                    <Text style={[styles.colorHex, { color: colors.disabled }]}>{value}</Text>
                   </View>
                 );
               }
@@ -186,7 +181,7 @@ export default function RandomizerScreen() {
         )}
 
         {mode === 'dice' && results.length > 1 && (
-          <Text style={[styles.total, { color: colors.textSecondary }]}>
+          <Text style={[styles.total, { color: colors.disabled }]}>
             {t('total')}: {diceTotal}
           </Text>
         )}
@@ -260,10 +255,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 16,
-    backgroundColor: Colors.light.extraColors.one,
+    backgroundColor: DICE_COLORS.face,
     borderWidth: 2,
-    borderColor: Colors.light.extraColors.three,
-    shadowColor: Colors.light.extraColors.two,
+    borderColor: DICE_COLORS.border,
+    shadowColor: DICE_COLORS.bevel,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.6,
     shadowRadius: 6,
@@ -271,7 +266,7 @@ const styles = StyleSheet.create({
   },
   diceText: {
     fontSize: 24,
-    color: Colors.light.extraColors.four,
+    color: DICE_COLORS.pip,
   },
   colorResult: {
     alignItems: 'center',

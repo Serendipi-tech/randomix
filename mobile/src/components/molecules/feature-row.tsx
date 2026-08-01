@@ -16,8 +16,8 @@ type FeatureRowProps = {
 /** Riga riusabile icona-a-sx/testo-a-dx: icon-chip con gradiente soft + titolo/sottotitolo, superficie tinta leggera. */
 export function FeatureRow({ Icon, tint, gradient, title, subtitle, colorScheme }: FeatureRowProps) {
   const colors = Colors[colorScheme];
-  const textColor = colors.text;
-  const subtitleColor = colors.textSecondary;
+  const textColor = colors.textColor;
+  const subtitleColor = colors.disabled;
 
   return (
     <View style={[styles.row, { backgroundColor: `${tint}1F` }]}>

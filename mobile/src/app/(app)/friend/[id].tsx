@@ -1,12 +1,13 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { List } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
-import { UserAvatar } from '@/components/atoms/user-avatar';
-import { ListCard } from '@/components/molecules/list-card';
+import { Avatar } from '@/components/atoms/Avatar';
+import { ListCard } from '@/components/cards/ListCard';
 import { useFriendProfile } from '@/utils/useFriendProfile';
 
 const SKELETON_COUNT = 3;
@@ -26,7 +27,7 @@ export default function FriendProfileScreen() {
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
       <View style={styles.topBar}>
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Text style={[styles.back, { color: colors.textSecondary }]}>{t('friend.back')}</Text>
+          <Text style={[styles.back, { color: colors.disabled }]}>{t('friend.back')}</Text>
         </Pressable>
       </View>
 
@@ -38,7 +39,7 @@ export default function FriendProfileScreen() {
         </View>
       ) : !profile ? (
         <View style={styles.empty}>
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>
+          <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
             {error ? t('friend.error') : t('friend.notFound')}
           </Text>
         </View>
@@ -49,33 +50,32 @@ export default function FriendProfileScreen() {
           contentContainerStyle={styles.content}
           renderItem={({ item: list }) => (
             <ListCard
-              name={list.name}
-              icon={list.icon}
+              title={list.name}
+              category={t('friend.itemCount', { count: list.itemCount })}
+              icon={List}
               color={list.color}
-              description={t('friend.itemCount', { count: list.itemCount })}
-              colorScheme={colorScheme}
+              onPress={() => {}}
             />
           )}
           ListHeaderComponent={
             <View style={styles.header}>
               <View style={styles.userRow}>
-                <UserAvatar
-                  username={profile.user.username}
-                  avatarUrl={profile.user.avatarUrl}
-                  size={64}
+                <Avatar
+                  uri={profile.user.avatarUrl ?? undefined}
+                  fallbackColor={colors.primary}
                 />
-                <Text style={[styles.username, { color: colors.text }]} numberOfLines={1}>
+                <Text style={[styles.username, { color: colors.textColor }]} numberOfLines={1}>
                   {profile.user.username}
                 </Text>
               </View>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              <Text style={[styles.sectionTitle, { color: colors.textColor }]}>
                 {t('friend.listsTitle')}
               </Text>
             </View>
           }
           ListEmptyComponent={
             <View style={styles.empty}>
-              <Text style={[styles.emptyTitle, { color: colors.text }]}>
+              <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
                 {t('friend.listsEmpty')}
               </Text>
             </View>

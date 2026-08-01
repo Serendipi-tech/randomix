@@ -5,10 +5,10 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Button } from '@/components/atoms/button';
-import { Input } from '@/components/atoms/input';
-import { SelectableChip } from '@/components/atoms/selectable-chip';
-import { StarRating } from '@/components/atoms/star-rating';
+import { Button } from '@/components/atoms/Button';
+import { Input } from '@/components/molecules/Input';
+import { Chip } from '@/components/atoms/Chip';
+import { RatingInput } from '@/components/molecules/RatingInput';
 import { useItemMutations } from '@/utils/useItemMutations';
 import { ITEM_CATEGORIES, type Category } from '@/utils/useListCategories';
 import { useTags } from '@/utils/useTags';
@@ -123,18 +123,17 @@ export default function ItemFormScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.topBar}>
           <Pressable onPress={() => router.back()} hitSlop={8}>
-            <Text style={[styles.back, { color: colors.textSecondary }]}>{t('form.cancel')}</Text>
+            <Text style={[styles.back, { color: colors.disabled }]}>{t('form.cancel')}</Text>
           </Pressable>
-          <Text style={[styles.title, { color: colors.text }]}>
+          <Text style={[styles.title, { color: colors.textColor }]}>
             {isEdit ? t('itemForm.titleEdit') : t('itemForm.titleAdd')}
           </Text>
         </View>
 
         {isEdit ? (
-          <Text style={[styles.itemName, { color: colors.text }]}>{name}</Text>
+          <Text style={[styles.itemName, { color: colors.textColor }]}>{name}</Text>
         ) : (
           <Input
-            colorScheme={colorScheme}
             placeholder={t('itemForm.namePlaceholder')}
             value={name}
             onChangeText={setName}
@@ -143,17 +142,16 @@ export default function ItemFormScreen() {
 
         {!isEdit && (
           <>
-            <Text style={[styles.sectionLabel, { color: colors.text }]}>
+            <Text style={[styles.sectionLabel, { color: colors.textColor }]}>
               {t('itemForm.category')}
             </Text>
             <View style={styles.chipWrap}>
               {ITEM_CATEGORIES.map((cat) => (
-                <SelectableChip
+                <Chip
                   key={cat}
                   label={t(`categories.${cat}`)}
                   selected={category === cat}
                   onPress={() => setCategory(cat)}
-                  colorScheme={colorScheme}
                 />
               ))}
             </View>
@@ -161,81 +159,76 @@ export default function ItemFormScreen() {
         )}
 
         <Input
-          colorScheme={colorScheme}
           placeholder={t('itemForm.descriptionPlaceholder')}
           value={description}
           onChangeText={setDescription}
-          multiline
+          variant="textarea"
         />
         <Input
-          colorScheme={colorScheme}
           placeholder={t('itemForm.notePlaceholder')}
           value={note}
           onChangeText={setNote}
-          multiline
+          variant="textarea"
         />
 
         {isEdit && (
           <>
-            <Text style={[styles.sectionLabel, { color: colors.text }]}>
+            <Text style={[styles.sectionLabel, { color: colors.textColor }]}>
               {t('itemForm.status')}
             </Text>
             <View style={styles.chipWrap}>
               {STATUSES.map((s) => (
-                <SelectableChip
+                <Chip
                   key={s}
                   label={t(`status.${s}`)}
                   selected={status === s}
                   onPress={() => setStatus(s)}
-                  colorScheme={colorScheme}
                 />
               ))}
             </View>
 
-            <Text style={[styles.sectionLabel, { color: colors.text }]}>
+            <Text style={[styles.sectionLabel, { color: colors.textColor }]}>
               {t('itemForm.rating')}
             </Text>
-            <StarRating value={ratingValue} onChange={setRatingValue} colorScheme={colorScheme} />
+            <RatingInput value={ratingValue} onChange={setRatingValue} />
             {ratingValue > 0 && (
               <Input
-                colorScheme={colorScheme}
                 placeholder={t('itemForm.ratingNotePlaceholder')}
                 value={ratingNote}
                 onChangeText={setRatingNote}
-                multiline
+                variant="textarea"
               />
             )}
 
-            <Text style={[styles.sectionLabel, { color: colors.text }]}>
+            <Text style={[styles.sectionLabel, { color: colors.textColor }]}>
               {t('itemForm.tags')}
             </Text>
             {tags.length > 0 && (
               <View style={styles.chipWrap}>
                 {tags.map((tag) => (
-                  <SelectableChip
+                  <Chip
                     key={tag.id}
                     label={tag.name}
                     selected={selectedTagIds.includes(tag.id)}
                     onPress={() => toggleTag(tag.id)}
-                    colorScheme={colorScheme}
                   />
                 ))}
               </View>
             )}
             <View style={styles.newTagRow}>
               <Input
-                colorScheme={colorScheme}
                 placeholder={t('itemForm.newTagPlaceholder')}
                 value={newTagName}
                 onChangeText={setNewTagName}
                 style={styles.newTagInput}
               />
-              <Pressable
+              <Button
+                variant="primary"
+                label={t('itemForm.addTag')}
                 onPress={handleCreateTag}
-                disabled={creating || !newTagName.trim()}
-                style={[styles.addTagButton, (creating || !newTagName.trim()) && styles.disabled]}>
-                <Text style={styles.addTagLabel}>{t('itemForm.addTag')}</Text>
-              </Pressable>
+                disabled={!newTagName.trim()}
+                loading={creating}
+              />
             </View>
           </>
         )}
@@ -243,7 +236,6 @@ export default function ItemFormScreen() {
         {displayError && <Text style={styles.error}>{displayError}</Text>}
 
         <Button
-          colorScheme={colorScheme}
           label={isEdit ? t('itemForm.save') : t('itemForm.add')}
           onPress={save}
           loading={saving}

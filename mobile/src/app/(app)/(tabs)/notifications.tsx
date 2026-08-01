@@ -3,7 +3,7 @@ import { StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { GradientBackgroundView } from '@/components/molecules/gradient-background';
+import { RadialBackground } from '@/components/molecules/radial-background';
 
 export default function NotificationsScreen() {
   const { t } = useTranslation('notifications');
@@ -12,9 +12,9 @@ export default function NotificationsScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <GradientBackgroundView colorScheme={colorScheme} />
-      <Text style={[styles.title, { color: colors.text }]}>{t('title')}</Text>
-      <Text style={[styles.comingSoon, { color: colors.textSecondary }]}>{t('comingSoon')}</Text>
+      <RadialBackground colorScheme={colorScheme} />
+      <Text style={[styles.title, { color: colors.textColor }]}>{t('title')}</Text>
+      <Text style={[styles.comingSoon, { color: colors.disabled }]}>{t('comingSoon')}</Text>
     </SafeAreaView>
   );
 }
