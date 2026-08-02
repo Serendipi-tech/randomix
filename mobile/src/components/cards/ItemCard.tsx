@@ -21,7 +21,8 @@ type ItemCardProps = {
   imageUri?: string;
   rating?: number;
   tags?: ItemTag[];
-  onPress: () => void;
+  /** Se presente la card è cliccabile; altrimenti è statica (es. anteprima in sola lettura). */
+  onPress?: () => void;
   /** Se presente, mostra la ✕ di rimozione in alto a destra. */
   onRemove?: () => void;
 };

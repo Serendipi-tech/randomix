@@ -1,107 +1,58 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Colors, Spacing } from '@/constants/theme';
+import { StyleSheet, Text, View } from 'react-native';
+import { Button } from '@/components/atoms/Button';
+import { CardShell } from '@/components/cards/CardShell';
+import { Colors } from '@/constants/theme';
+import { useAppTheme } from '@/utils/useAppTheme';
 
-interface GroupInviteRowProps {
+type GroupInviteRowProps = {
   groupName: string;
   senderUsername: string;
+  /** Testo "da {{sender}}": il placeholder viene sostituito con lo username. */
   fromLabel: string;
   acceptLabel: string;
   rejectLabel: string;
-  colorScheme: 'light' | 'dark';
   disabled?: boolean;
   onAccept: () => void;
   onReject: () => void;
-}
+};
 
+/** Riga invito gruppo (showcase): nome gruppo + mittente, con Button conferma/rifiuta a tutta larghezza. */
 export function GroupInviteRow({
   groupName,
   senderUsername,
   fromLabel,
   acceptLabel,
   rejectLabel,
-  colorScheme,
   disabled,
   onAccept,
   onReject,
 }: GroupInviteRowProps) {
+  const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
   return (
-    <View style={[styles.row, { backgroundColor: colors.foreground }]}>
-      <View style={styles.info}>
-        <Text style={[styles.groupName, { color: colors.textColor }]} numberOfLines={1}>
-          {groupName}
-        </Text>
-        <Text style={[styles.sender, { color: colors.disabled }]}>
-          {fromLabel.replace('{{sender}}', senderUsername)}
-        </Text>
-      </View>
+    <CardShell>
+      <Text style={[styles.groupName, { color: colors.textColor }]} numberOfLines={1}>
+        {groupName}
+      </Text>
+      <Text style={[styles.sender, { color: colors.textColor }]}>
+        {fromLabel.replace('{{sender}}', senderUsername)}
+      </Text>
       <View style={styles.actions}>
-        {disabled ? (
-          <ActivityIndicator size="small" color={colors.disabled} />
-        ) : (
-          <>
-            <Pressable
-              onPress={onAccept}
-              style={[styles.btn, styles.acceptBtn]}
-              hitSlop={6}>
-              <Text style={styles.acceptLabel}>{acceptLabel}</Text>
-            </Pressable>
-            <Pressable
-              onPress={onReject}
-              style={[styles.btn, { backgroundColor: colors.border }]}
-              hitSlop={6}>
-              <Text style={[styles.rejectLabel, { color: colors.disabled }]}>
-                {rejectLabel}
-              </Text>
-            </Pressable>
-          </>
-        )}
+        <View style={styles.action}>
+          <Button variant="confirm" label={acceptLabel} onPress={onAccept} loading={disabled} />
+        </View>
+        <View style={styles.action}>
+          <Button variant="ghost" label={rejectLabel} onPress={onReject} disabled={disabled} />
+        </View>
       </View>
-    </View>
+    </CardShell>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 14,
-    padding: Spacing.three,
-    gap: Spacing.three,
-  },
-  info: {
-    flex: 1,
-    gap: 2,
-  },
-  groupName: {
-    fontSize: 15,
-    fontFamily: 'Fredoka_600SemiBold',
-  },
-  sender: {
-    fontSize: 13,
-    fontFamily: 'Nunito_400Regular',
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: Spacing.two,
-    alignItems: 'center',
-  },
-  btn: {
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.one + 2,
-    borderRadius: 20,
-  },
-  acceptBtn: {
-    backgroundColor: Colors.light.success,
-  },
-  acceptLabel: {
-    color: Colors.light.border,
-    fontSize: 13,
-    fontFamily: 'Nunito_700Bold',
-  },
-  rejectLabel: {
-    fontSize: 13,
-    fontFamily: 'Nunito_600SemiBold',
-  },
+  groupName: { fontWeight: '700', fontSize: 15 },
+  sender: { fontSize: 13, opacity: 0.7, marginTop: 2 },
+  actions: { flexDirection: 'row', gap: 8, marginTop: 12 },
+  action: { flex: 1 },
 });

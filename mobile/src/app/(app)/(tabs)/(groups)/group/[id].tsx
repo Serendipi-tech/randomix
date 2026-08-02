@@ -3,15 +3,17 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { List } from 'lucide-react-native';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
+import { CardShell } from '@/components/cards/CardShell';
 import { ColorPickerRow } from '@/components/atoms/color-picker-row';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
+import { ListCard } from '@/components/cards/ListCard';
+import { FriendCard } from '@/components/cards/FriendCard';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
-import { GroupMemberRow } from '@/components/group/group-member-row';
-import { GroupListCard } from '@/components/group/group-list-card';
 import { useGroupDetail, type GroupMember } from '@/utils/useGroupDetail';
 import { useDeleteGroup } from '@/utils/useGroups';
 import { useMyFriends, type Friend } from '@/utils/useFriends';
@@ -146,8 +148,6 @@ export default function GroupDetailScreen() {
   };
 
   const roleLabel = (role: string) => t(`member.roles.${role}`, { defaultValue: role });
-  const memberListCountLabel = (count: number) =>
-    t('groupList.memberListCount_other', { count });
 
   const showSkeleton = loading && !group;
 
@@ -173,7 +173,7 @@ export default function GroupDetailScreen() {
         <ScrollView contentContainerStyle={styles.content}>
           <Text style={[styles.title, { color: colors.textColor }]}>{group.name}</Text>
           {group.description ? (
-            <Text style={[styles.description, { color: colors.disabled }]}>
+            <Text style={[styles.description, { color: colors.textColor }]}>
               {group.description}
             </Text>
           ) : null}
@@ -181,20 +181,18 @@ export default function GroupDetailScreen() {
           {/* Liste del gruppo */}
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>{t('detail.lists')}</Text>
           {group.groupLists.length === 0 ? (
-            <Text style={[styles.emptySection, { color: colors.disabled }]}>
+            <Text style={[styles.emptySection, { color: colors.textColor }]}>
               {t('groupList.empty')}
             </Text>
           ) : (
             group.groupLists.map((gl) => (
-              <GroupListCard
+              <ListCard
                 key={gl.id}
-                name={gl.name}
-                icon={gl.icon}
+                title={gl.name}
+                category={gl.description ?? undefined}
+                icon={List}
+                emoji={gl.icon || undefined}
                 color={gl.color}
-                description={gl.description}
-                memberListCount={gl.memberListCount}
-                memberListCountLabel={memberListCountLabel(gl.memberListCount)}
-                colorScheme={colorScheme}
                 onPress={() =>
                   router.push({
                     pathname: '/group-list/[groupListId]',
@@ -221,7 +219,7 @@ export default function GroupDetailScreen() {
                     value={listIcon}
                     onChangeText={setListIcon}
                   />
-                  <Text style={[styles.pickerLabel, { color: colors.disabled }]}>
+                  <Text style={[styles.pickerLabel, { color: colors.textColor }]}>
                     {t('detail.newList.color')}
                   </Text>
                   <ColorPickerRow
@@ -247,76 +245,80 @@ export default function GroupDetailScreen() {
                   />
                 </View>
               ) : (
-                <Pressable
+                <Button
+                  variant="secondary"
+                  label={t('detail.createList')}
                   onPress={() => setShowCreateList(true)}
-                  style={[styles.secondaryBtn, { backgroundColor: colors.foreground }]}>
-                  <Text style={[styles.secondaryBtnText, { color: colors.textColor }]}>
-                    {t('detail.createList')}
-                  </Text>
-                </Pressable>
+                />
               )}
             </>
           )}
 
           {/* Membri */}
           <Text style={[styles.sectionTitle, { color: colors.textColor }]}>{t('detail.members')}</Text>
-          {group.members.map((member) => (
-            <GroupMemberRow
-              key={member.id}
-              username={member.user.username}
-              roleLabel={roleLabel(member.role)}
-              removeLabel={t('member.remove')}
-              colorScheme={colorScheme}
-              canRemove={canManage && member.userId !== myUserId && member.role !== 'OWNER'}
-              onRemove={() => setMemberToRemove(member)}
-            />
-          ))}
+          {group.members.map((member) => {
+            const canRemove = canManage && member.userId !== myUserId && member.role !== 'OWNER';
+            return (
+              <FriendCard
+                key={member.id}
+                username={member.user.username}
+                imageUri={member.user.avatarUrl ?? undefined}
+                subtitle={roleLabel(member.role)}
+                onRemove={canRemove ? () => setMemberToRemove(member) : undefined}
+              />
+            );
+          })}
 
           {/* Invita amici */}
           {canManage && (
             <>
-              <Pressable
+              <Button
+                variant="secondary"
+                label={t('detail.invite')}
                 onPress={() => setShowInvite((v) => !v)}
-                style={[styles.secondaryBtn, { backgroundColor: colors.foreground }]}>
-                <Text style={[styles.secondaryBtnText, { color: colors.textColor }]}>
-                  {t('detail.invite')}
-                </Text>
-              </Pressable>
+              />
               {showInvite && (
                 <View style={styles.inviteList}>
                   {inviteRows.length === 0 ? (
-                    <Text style={[styles.emptySection, { color: colors.disabled }]}>
+                    <Text style={[styles.emptySection, { color: colors.textColor }]}>
                       {t('detail.noFriends')}
                     </Text>
                   ) : (
                     inviteRows.map((row) => {
                       const isProcessing = processingId === row.userId;
                       return (
-                        <Pressable
+                        <CardShell
                           key={row.userId}
-                          onPress={() =>
-                            row.pending ? handleRevoke(row.userId) : handleInvite(row.userId)
-                          }
-                          disabled={isProcessing}
-                          style={[styles.friendRow, { backgroundColor: colors.foreground }]}>
-                          <View style={styles.friendInfo}>
-                            <Text style={[styles.friendName, { color: colors.textColor }]}>
-                              {row.username}
-                            </Text>
-                            {row.pending && (
-                              <Text style={[styles.invitedBadge, { color: colors.disabled }]}>
-                                {t('detail.invited')}
+                          onPress={() => {
+                            if (isProcessing) return;
+                            row.pending ? handleRevoke(row.userId) : handleInvite(row.userId);
+                          }}
+                        >
+                          <View style={styles.inviteRow}>
+                            <View style={styles.friendInfo}>
+                              <Text style={[styles.friendName, { color: colors.textColor }]} numberOfLines={1}>
+                                {row.username}
                               </Text>
-                            )}
+                              {row.pending && (
+                                <Text style={[styles.invitedBadge, { color: colors.textColor }]}>
+                                  {t('detail.invited')}
+                                </Text>
+                              )}
+                            </View>
+                            <Text
+                              style={[
+                                styles.inviteAction,
+                                { color: row.pending ? colors.error : colors.primary },
+                              ]}
+                            >
+                              {isProcessing
+                                ? '…'
+                                : row.pending
+                                  ? t('detail.revoke')
+                                  : t('detail.invite')}
+                            </Text>
                           </View>
-                          <Text style={[styles.inviteAction, { color: colors.disabled }]}>
-                            {isProcessing
-                              ? '…'
-                              : row.pending
-                                ? t('detail.revoke')
-                                : t('detail.invite')}
-                          </Text>
-                        </Pressable>
+                        </CardShell>
                       );
                     })
                   )}
@@ -328,19 +330,20 @@ export default function GroupDetailScreen() {
           {/* Azioni pericolose */}
           <View style={styles.dangerZone}>
             {!isOwner && (
-              <Pressable
+              <Button
+                variant="destructive"
+                label={t('detail.leave')}
                 onPress={() => setConfirmLeave(true)}
-                style={[styles.dangerBtn, { backgroundColor: colors.foreground }]}>
-                <Text style={styles.dangerText}>{t('detail.leave')}</Text>
-              </Pressable>
+                loading={leaving}
+              />
             )}
             {isOwner && (
-              <Pressable
+              <Button
+                variant="destructive"
+                label={t('detail.delete')}
                 onPress={() => setConfirmDelete(true)}
-                disabled={deleting}
-                style={[styles.dangerBtn, { backgroundColor: colors.foreground }]}>
-                <Text style={styles.dangerText}>{t('detail.delete')}</Text>
-              </Pressable>
+                loading={deleting}
+              />
             )}
           </View>
         </ScrollView>
@@ -400,21 +403,21 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontFamily: 'Fredoka_700Bold',
+    fontWeight: '700',
     paddingBottom: Spacing.one,
   },
   description: {
     fontSize: 14,
-    fontFamily: 'Nunito_400Regular',
+    opacity: 0.7,
   },
   sectionTitle: {
     fontSize: 20,
-    fontFamily: 'Fredoka_700Bold',
+    fontWeight: '700',
     paddingTop: Spacing.three,
   },
   emptySection: {
     fontSize: 14,
-    fontFamily: 'Nunito_400Regular',
+    opacity: 0.7,
     textAlign: 'center',
     paddingVertical: Spacing.two,
   },
@@ -425,61 +428,44 @@ const styles = StyleSheet.create({
   },
   pickerLabel: {
     fontSize: 14,
-    fontFamily: 'Nunito_600SemiBold',
+    fontWeight: '600',
+    opacity: 0.7,
   },
   listError: {
     fontSize: 14,
     color: Colors.light.error,
     textAlign: 'center',
-    fontFamily: 'Nunito_500Medium',
-  },
-  secondaryBtn: {
-    borderRadius: 14,
-    padding: Spacing.three,
-    alignItems: 'center',
-  },
-  secondaryBtnText: {
-    fontSize: 15,
-    fontFamily: 'Nunito_600SemiBold',
   },
   inviteList: { gap: Spacing.two },
-  friendRow: {
+  inviteRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderRadius: 14,
-    padding: Spacing.three,
+    gap: Spacing.two,
   },
   friendInfo: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.two,
   },
   friendName: {
+    flex: 1,
     fontSize: 15,
-    fontFamily: 'Nunito_600SemiBold',
+    fontWeight: '600',
   },
   invitedBadge: {
     fontSize: 12,
-    fontFamily: 'Nunito_600SemiBold',
+    fontWeight: '600',
+    opacity: 0.6,
   },
   inviteAction: {
     fontSize: 13,
-    fontFamily: 'Nunito_500Medium',
+    fontWeight: '700',
   },
   dangerZone: {
     marginTop: Spacing.four,
     gap: Spacing.two,
-  },
-  dangerBtn: {
-    borderRadius: 14,
-    padding: Spacing.three,
-    alignItems: 'center',
-  },
-  dangerText: {
-    fontSize: 15,
-    fontFamily: 'Nunito_600SemiBold',
-    color: Colors.light.error,
   },
   empty: {
     flex: 1,
@@ -488,7 +474,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 18,
-    fontFamily: 'Fredoka_700Bold',
+    fontWeight: '700',
     textAlign: 'center',
   },
 });

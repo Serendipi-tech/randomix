@@ -68,6 +68,7 @@ export default function HomeScreen() {
               title={item.name}
               category={item.description ?? undefined}
               icon={List}
+              emoji={item.icon || undefined}
               color={item.color}
               onPress={() => router.push({ pathname: '/list/[id]', params: { id: item.id } })}
             />

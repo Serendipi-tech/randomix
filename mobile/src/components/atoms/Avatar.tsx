@@ -1,5 +1,6 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '@/constants/theme';
+import { resolveAvatarUri } from '@/constants/avatar-presets';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { useDominantColor } from '@/utils/useDominantColor';
 
@@ -16,15 +17,17 @@ export function Avatar({ uri, name, fallbackColor, ring = true }: AvatarProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
+  // I preset sono salvati come path relativo: li risolvo in URL assoluto prima di renderizzare.
+  const resolvedUri = resolveAvatarUri(uri);
   // L'hook va chiamato sempre (regole degli hook): senza uri passiamo stringa vuota e non mostriamo il ring.
-  const ringColor = useDominantColor(uri ?? '', fallbackColor);
-  const showRing = ring && !!uri;
+  const ringColor = useDominantColor(resolvedUri ?? '', fallbackColor);
+  const showRing = ring && !!resolvedUri;
 
   return (
     <View style={styles.avatarItem}>
       <View style={[styles.avatarRing, { borderColor: showRing ? ringColor : 'transparent' }]}>
-        {uri ? (
-          <Image source={{ uri }} style={styles.avatar} />
+        {resolvedUri ? (
+          <Image source={{ uri: resolvedUri }} style={styles.avatar} />
         ) : (
           <View style={[styles.avatar, { backgroundColor: fallbackColor }]} />
         )}

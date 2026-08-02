@@ -13,15 +13,17 @@ type ListCardProps = {
   title: string;
   category?: string;
   icon: ComponentType<{ size?: number; color?: string }>;
+  /** Emoji della lista (scelta in creazione): se presente sostituisce l'icona di fallback. */
+  emoji?: string;
   color: string;
   itemsCount?: number;
   maxItems?: number;
   onPress: () => void;
 };
 
-/** Card lista: icona gigante ruotata a riempimento dell'area sinistra, gradient di sfondo transparent -> color,
- *  titolo/categoria e conteggio. Bordo colorato dal `color`; card interamente cliccabile. */
-export function ListCard({ title, category, icon: Icon, color, itemsCount, maxItems, onPress }: ListCardProps) {
+/** Card lista: emoji della lista (o icona gigante ruotata di fallback) a riempimento dell'area sinistra,
+ *  gradient di sfondo transparent -> color, titolo/categoria e conteggio. Bordo colorato dal `color`; card interamente cliccabile. */
+export function ListCard({ title, category, icon: Icon, emoji, color, itemsCount, maxItems, onPress }: ListCardProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
@@ -36,9 +38,15 @@ export function ListCard({ title, category, icon: Icon, color, itemsCount, maxIt
           style={StyleSheet.absoluteFill}
         />
         <View style={styles.iconArea}>
-          <View style={styles.iconRotation}>
-            <Icon size={LIST_CARD_HEIGHT * 1.15} color={color} />
-          </View>
+          {emoji ? (
+            <Text style={[styles.emoji, { color }]} numberOfLines={1} adjustsFontSizeToFit>
+              {emoji}
+            </Text>
+          ) : (
+            <View style={styles.iconRotation}>
+              <Icon size={LIST_CARD_HEIGHT * 1.15} color={color} />
+            </View>
+          )}
         </View>
         <View style={styles.content}>
           <View style={styles.contentRow}>
@@ -79,6 +87,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconRotation: { transform: [{ rotate: '-30deg' }], opacity: 0.5 },
+  emoji: { fontSize: 40, maxWidth: LIST_CARD_HEIGHT, fontWeight: '700', textAlign: 'center' },
   content: { flex: 1, paddingTop: 16, paddingBottom: 16, paddingLeft: 5, paddingRight: 16 },
   contentRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   textBlock: { flex: 1, gap: 2, marginTop: -3 },

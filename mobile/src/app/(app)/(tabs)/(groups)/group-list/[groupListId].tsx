@@ -9,6 +9,8 @@ import { Colors, Spacing } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Button } from '@/components/atoms/Button';
+import { CardShell } from '@/components/cards/CardShell';
+import { ItemCard } from '@/components/cards/ItemCard';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import {
   useGroupListDraw,
@@ -102,12 +104,12 @@ export default function GroupListScreen() {
       {drawnItem ? (
         <View style={styles.drawResult}>
           <Animated.View entering={ZoomIn} style={[styles.drawnCard, { backgroundColor: colors.foreground }]}>
-            <Text style={[styles.drawnLabel, { color: colors.disabled }]}>
+            <Text style={[styles.drawnLabel, { color: colors.textColor }]}>
               {t('groupList.draw')}
             </Text>
             <Text style={[styles.drawnName, { color: colors.textColor }]}>{drawnItem.name}</Text>
             {drawnItem.description ? (
-              <Text style={[styles.drawnDescription, { color: colors.disabled }]}>
+              <Text style={[styles.drawnDescription, { color: colors.textColor }]}>
                 {drawnItem.description}
               </Text>
             ) : null}
@@ -148,7 +150,7 @@ export default function GroupListScreen() {
       ) : (
         <>
           <View style={styles.drawBar}>
-            <Text style={[styles.mergedTitle, { color: colors.disabled }]}>
+            <Text style={[styles.mergedTitle, { color: colors.textColor }]}>
               {t('groupList.mergedItems', { count: items.length })}
             </Text>
             <Button
@@ -167,37 +169,46 @@ export default function GroupListScreen() {
               <Text style={[styles.manageTitle, { color: colors.textColor }]}>
                 {t('groupList.myLists')}
               </Text>
-              <Text style={[styles.manageChevron, { color: colors.disabled }]}>
+              <Text style={[styles.manageChevron, { color: colors.textColor }]}>
                 {showManage ? '▾' : '▸'}
               </Text>
             </Pressable>
             {showManage &&
               (myLists.length === 0 ? (
-                <Text style={[styles.manageEmpty, { color: colors.disabled }]}>
+                <Text style={[styles.manageEmpty, { color: colors.textColor }]}>
                   {t('groupList.noLists')}
                 </Text>
               ) : (
-                <ScrollView style={styles.manageList} nestedScrollEnabled>
+                <ScrollView
+                  style={styles.manageList}
+                  contentContainerStyle={styles.manageListContent}
+                  nestedScrollEnabled
+                >
                   {myLists.map((l) => {
                     const shared = sharedIds.includes(l.id);
                     const busy = togglingId === l.id;
                     return (
-                      <Pressable
+                      <CardShell
                         key={l.id}
-                        onPress={() => handleToggleShare(l.id, shared)}
-                        disabled={busy}
-                        style={[styles.manageRow, { backgroundColor: colors.foreground }]}>
-                        <Text style={[styles.manageRowName, { color: colors.textColor }]} numberOfLines={1}>
-                          {l.icon} {l.name}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.manageRowAction,
-                            { color: shared ? colors.secondary : colors.accent },
-                          ]}>
-                          {busy ? '…' : shared ? t('groupList.removeMyList') : t('groupList.addMyList')}
-                        </Text>
-                      </Pressable>
+                        onPress={() => {
+                          if (busy) return;
+                          handleToggleShare(l.id, shared);
+                        }}
+                      >
+                        <View style={styles.manageRow}>
+                          <Text style={[styles.manageRowName, { color: colors.textColor }]} numberOfLines={1}>
+                            {l.icon} {l.name}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.manageRowAction,
+                              { color: shared ? colors.secondary : colors.primary },
+                            ]}
+                          >
+                            {busy ? '…' : shared ? t('groupList.removeMyList') : t('groupList.addMyList')}
+                          </Text>
+                        </View>
+                      </CardShell>
                     );
                   })}
                 </ScrollView>
@@ -212,7 +223,7 @@ export default function GroupListScreen() {
             </View>
           ) : items.length === 0 ? (
             <View style={styles.empty}>
-              <Text style={[styles.emptyText, { color: colors.disabled }]}>
+              <Text style={[styles.emptyText, { color: colors.textColor }]}>
                 {t('groupList.empty')}
               </Text>
             </View>
@@ -222,14 +233,11 @@ export default function GroupListScreen() {
               keyExtractor={(item: GroupListItem) => item.id}
               contentContainerStyle={styles.itemList}
               renderItem={({ item }) => (
-                <View style={[styles.itemRow, { backgroundColor: colors.foreground }]}>
-                  <Text style={[styles.itemName, { color: colors.textColor }]}>{item.name}</Text>
-                  {item.description ? (
-                    <Text style={[styles.itemDescription, { color: colors.disabled }]} numberOfLines={1}>
-                      {item.description}
-                    </Text>
-                  ) : null}
-                </View>
+                <ItemCard
+                  title={item.name}
+                  category={t(`categories.${item.category}`, { ns: 'lists' })}
+                  imageUri={item.imageUrl ?? undefined}
+                />
               )}
             />
           )}
@@ -252,7 +260,7 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     fontSize: 18,
-    fontFamily: 'Fredoka_600SemiBold',
+    fontWeight: '700',
     textAlign: 'center',
   },
   topBarSpacer: { width: 24 },
@@ -263,7 +271,7 @@ const styles = StyleSheet.create({
   },
   mergedTitle: {
     fontSize: 14,
-    fontFamily: 'Nunito_500Medium',
+    opacity: 0.7,
   },
   manageBar: {
     paddingHorizontal: Spacing.four,
@@ -277,35 +285,36 @@ const styles = StyleSheet.create({
   },
   manageTitle: {
     fontSize: 15,
-    fontFamily: 'Fredoka_600SemiBold',
+    fontWeight: '700',
   },
   manageChevron: {
     fontSize: 16,
+    opacity: 0.7,
   },
   manageEmpty: {
     fontSize: 14,
-    fontFamily: 'Nunito_400Regular',
+    opacity: 0.7,
   },
   manageList: {
     maxHeight: 220,
+  },
+  manageListContent: {
+    gap: Spacing.two,
   },
   manageRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: Spacing.two,
-    borderRadius: 14,
-    padding: Spacing.three,
-    marginBottom: Spacing.two,
   },
   manageRowName: {
     flex: 1,
     fontSize: 15,
-    fontFamily: 'Nunito_600SemiBold',
+    fontWeight: '600',
   },
   manageRowAction: {
     fontSize: 13,
-    fontFamily: 'Nunito_700Bold',
+    fontWeight: '700',
   },
   skeletonContainer: {
     padding: Spacing.four,
@@ -316,19 +325,6 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.six ?? 48,
     gap: Spacing.two,
   },
-  itemRow: {
-    borderRadius: 14,
-    padding: Spacing.three,
-    gap: 2,
-  },
-  itemName: {
-    fontSize: 15,
-    fontFamily: 'Nunito_600SemiBold',
-  },
-  itemDescription: {
-    fontSize: 13,
-    fontFamily: 'Nunito_400Regular',
-  },
   empty: {
     flex: 1,
     alignItems: 'center',
@@ -337,7 +333,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 15,
-    fontFamily: 'Nunito_500Medium',
+    opacity: 0.7,
     textAlign: 'center',
   },
   drawResult: {
@@ -355,16 +351,16 @@ const styles = StyleSheet.create({
   },
   drawnLabel: {
     fontSize: 14,
-    fontFamily: 'Nunito_500Medium',
+    opacity: 0.7,
   },
   drawnName: {
     fontSize: 26,
-    fontFamily: 'Fredoka_700Bold',
+    fontWeight: '700',
     textAlign: 'center',
   },
   drawnDescription: {
     fontSize: 14,
-    fontFamily: 'Nunito_400Regular',
+    opacity: 0.7,
     textAlign: 'center',
   },
   drawActions: {
@@ -374,6 +370,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.light.error,
     textAlign: 'center',
-    fontFamily: 'Nunito_500Medium',
   },
 });

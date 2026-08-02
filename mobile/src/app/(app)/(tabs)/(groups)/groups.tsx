@@ -77,10 +77,8 @@ export default function GroupsScreen() {
             name={item.name}
             description={item.description}
             memberCount={item.memberCount}
-            myRole={item.myRole}
             membersLabel={item.memberCount === 1 ? 'member' : 'members'}
             roleLabel={roleLabel(item.myRole)}
-            colorScheme={colorScheme}
             onPress={() =>
               router.push({ pathname: '/group/[id]', params: { id: item.id } })
             }
@@ -143,7 +141,6 @@ export default function GroupsScreen() {
                     fromLabel={t('invites.from')}
                     acceptLabel={t('invites.accept')}
                     rejectLabel={t('invites.reject')}
-                    colorScheme={colorScheme}
                     disabled={answeringId === invite.id}
                     onAccept={() => handleAnswer(invite.id, acceptInvite)}
                     onReject={() => handleAnswer(invite.id, rejectInvite)}
@@ -188,13 +185,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: 'Fredoka_700Bold',
+    fontWeight: '700',
     paddingTop: Spacing.three,
     paddingBottom: Spacing.one,
   },
   sectionTitle: {
     fontSize: 20,
-    fontFamily: 'Fredoka_700Bold',
+    fontWeight: '700',
     paddingTop: Spacing.three,
   },
   createCard: {
@@ -206,7 +203,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.light.error,
     textAlign: 'center',
-    fontFamily: 'Nunito_500Medium',
   },
   empty: {
     alignItems: 'center',
@@ -216,12 +212,11 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 18,
-    fontFamily: 'Fredoka_700Bold',
+    fontWeight: '700',
     textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 14,
-    fontFamily: 'Nunito_500Medium',
     textAlign: 'center',
   },
 });

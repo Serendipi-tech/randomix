@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
+import { AVATAR_PRESETS, resolveAvatarUri } from '@/constants/avatar-presets';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
 import { Button } from '@/components/atoms/Button';
@@ -26,10 +27,12 @@ export default function ProfileScreen() {
 
   const [editing, setEditing] = useState(false);
   const [username, setUsername] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
 
   const startEditing = () => {
     setUsername(profile?.username ?? '');
+    setAvatarUrl(profile?.avatarUrl ?? '');
     setLocalError(null);
     setEditing(true);
   };
@@ -41,7 +44,7 @@ export default function ProfileScreen() {
       return;
     }
     try {
-      await updateProfile({ username: username.trim() });
+      await updateProfile({ username: username.trim(), avatarUrl });
       setEditing(false);
     } catch (e) {
       setLocalError((e as Error).message);
@@ -75,6 +78,21 @@ export default function ProfileScreen() {
               value={username}
               onChangeText={setUsername}
             />
+            <Text style={[styles.avatarLabel, { color: colors.textColor }]}>{t('avatarLabel')}</Text>
+            <View style={styles.avatarRow}>
+              {AVATAR_PRESETS.map((preset) => {
+                const selected = avatarUrl === preset.path;
+                return (
+                  <Pressable
+                    key={preset.key}
+                    onPress={() => setAvatarUrl(preset.path)}
+                    style={[styles.avatarOption, { borderColor: selected ? colors.primary : 'transparent' }]}
+                  >
+                    <Image source={{ uri: resolveAvatarUri(preset.path) }} style={styles.avatarImg} />
+                  </Pressable>
+                );
+              })}
+            </View>
             {editError && <Text style={styles.error}>{editError}</Text>}
             <Button label={t('save')} onPress={saveProfile} loading={saving} />
             <Button
@@ -110,6 +128,25 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 16,
     gap: 12,
+  },
+  avatarLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    opacity: 0.7,
+  },
+  avatarRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  avatarOption: {
+    borderWidth: 2,
+    borderRadius: 34,
+    padding: 3,
+  },
+  avatarImg: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
   },
   error: {
     fontSize: 14,

@@ -1,6 +1,7 @@
 import { Image } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
 import { Colors } from '@/constants/theme';
+import { resolveAvatarUri } from '@/constants/avatar-presets';
 
 interface UserAvatarProps {
   username: string;
@@ -11,10 +12,12 @@ interface UserAvatarProps {
 /** Avatar circolare: immagine se presente, altrimenti iniziale su fondo colorato. */
 export function UserAvatar({ username, avatarUrl, size = 48 }: UserAvatarProps) {
   const radius = size / 2;
+  // I preset sono salvati come path relativo: li risolvo in URL assoluto prima di renderizzare.
+  const resolvedUri = resolveAvatarUri(avatarUrl);
 
-  if (avatarUrl) {
+  if (resolvedUri) {
     return (
-      <Image source={{ uri: avatarUrl }} style={{ width: size, height: size, borderRadius: radius }} />
+      <Image source={{ uri: resolvedUri }} style={{ width: size, height: size, borderRadius: radius }} />
     );
   }
 

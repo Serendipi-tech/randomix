@@ -11,14 +11,17 @@ type FriendCardProps = {
   username: string;
   imageUri?: string;
   groupsInCommon?: number;
-  onPress: () => void;
+  /** Riga secondaria libera (es. ruolo del membro nel gruppo). */
+  subtitle?: string;
+  /** Se presente, la card è cliccabile e mostra la freccia; altrimenti è statica (es. membro non navigabile). */
+  onPress?: () => void;
   /** Se presente, mostra la ✕ di rimozione a destra (prima della freccia). */
   onRemove?: () => void;
 };
 
-/** Card amico: avatar + username + gruppi in comune, freccia a destra (card interamente cliccabile).
+/** Card utente: avatar + username + riga secondaria (gruppi in comune o sottotitolo), freccia a destra se navigabile.
  *  Con immagine bordo e freccia riflettono il colore dominante; senza, fallback al tema con icona generica. */
-export function FriendCard({ username, imageUri, groupsInCommon, onPress, onRemove }: FriendCardProps) {
+export function FriendCard({ username, imageUri, groupsInCommon, subtitle, onPress, onRemove }: FriendCardProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
@@ -44,15 +47,18 @@ export function FriendCard({ username, imageUri, groupsInCommon, onPress, onRemo
               {groupsInCommon} grupp{groupsInCommon === 1 ? 'o' : 'i'} in comune
             </Text>
           )}
+          {subtitle && <Text style={[styles.groups, { color: colors.textColor }]}>{subtitle}</Text>}
         </View>
         {onRemove && (
           <Pressable onPress={onRemove} hitSlop={8} style={styles.remove}>
             <X size={18} color={colors.disabled} />
           </Pressable>
         )}
-        <View style={[styles.arrow, { backgroundColor: hexToRgba(accentColor, 0.12) }]}>
-          <ChevronRight size={18} color={accentColor} />
-        </View>
+        {onPress && (
+          <View style={[styles.arrow, { backgroundColor: hexToRgba(accentColor, 0.12) }]}>
+            <ChevronRight size={18} color={accentColor} />
+          </View>
+        )}
       </View>
     </CardShell>
   );
