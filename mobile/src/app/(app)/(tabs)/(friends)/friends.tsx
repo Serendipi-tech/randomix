@@ -1,11 +1,13 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Users } from 'lucide-react-native';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
+import { PageHeader } from '@/components/molecules/PageHeader';
 import { Input } from '@/components/molecules/Input';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
@@ -45,7 +47,9 @@ export default function FriendsScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <RadialBackground colorScheme={colorScheme} />
+      <PageHeader icon={Users} title={t('title')} />
       <FlatList
+        showsVerticalScrollIndicator={false}
         data={showFriendsSkeleton ? [] : friends}
         keyExtractor={(item) => item.id}
         contentContainerStyle={[styles.content, { paddingBottom: BottomTabInset + Spacing.four }]}
@@ -59,8 +63,6 @@ export default function FriendsScreen() {
         )}
         ListHeaderComponent={
           <View style={styles.header}>
-            <Text style={[styles.title, { color: colors.textColor }]}>{t('title')}</Text>
-
             {requests.length > 0 && (
               <>
                 <Text style={[styles.sectionTitle, { color: colors.textColor }]}>{t('requests.title')}</Text>
@@ -151,11 +153,6 @@ const styles = StyleSheet.create({
   },
   header: {
     gap: Spacing.two + Spacing.one,
-  },
-  title: {
-    fontSize: 28,
-    paddingTop: Spacing.three,
-    paddingBottom: Spacing.one,
   },
   error: {
     fontSize: 14,

@@ -2,13 +2,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Dices } from 'lucide-react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 import { Colors, Spacing } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Button } from '@/components/atoms/Button';
+import { PageHeader } from '@/components/molecules/PageHeader';
 import { StickerShape } from '@/components/atoms/sticker-shape';
 import { useListDraw } from '@/utils/useListDraw';
 import type { ListItemEntry } from '@/utils/useListDetail';
@@ -55,12 +57,7 @@ export default function DrawScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <View style={styles.topBar}>
-        <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Text style={[styles.back, { color: colors.disabled }]}>{t('back')}</Text>
-        </Pressable>
-        <Text style={[styles.title, { color: colors.textColor }]}>{t('draw.title')}</Text>
-      </View>
+      <PageHeader icon={Dices} title={t('draw.title')} onBack={() => router.back()} />
 
       <View style={styles.center}>
         <StickerShape variant="star" color={colors.warning} size={22} rotation={-12} style={styles.stickerStar} />
@@ -135,17 +132,6 @@ export default function DrawScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-  },
-  topBar: {
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.three,
-    gap: Spacing.two,
-  },
-  back: {
-    fontSize: 15,
-  },
-  title: {
-    fontSize: 26,
   },
   center: {
     flex: 1,

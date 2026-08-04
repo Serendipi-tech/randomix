@@ -1,12 +1,14 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Shuffle } from 'lucide-react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
+import { PageHeader } from '@/components/molecules/PageHeader';
 import { Chip } from '@/components/atoms/Chip';
 import { DICE_COLORS } from '@/constants/dice';
 import { useRandomizer } from '@/utils/useRandomizer';
@@ -84,14 +86,8 @@ export default function RandomizerScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.topBar}>
-          <Pressable onPress={() => router.back()} hitSlop={8}>
-            <Text style={[styles.back, { color: colors.disabled }]}>{t('back')}</Text>
-          </Pressable>
-          <Text style={[styles.title, { color: colors.textColor }]}>{t('title')}</Text>
-        </View>
-
+      <PageHeader icon={Shuffle} title={t('title')} onBack={() => router.back()} />
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.chipWrap}>
           {MODES.map((m) => (
             <Chip
@@ -197,15 +193,6 @@ const styles = StyleSheet.create({
   content: {
     padding: Spacing.four,
     gap: Spacing.three,
-  },
-  topBar: {
-    gap: Spacing.two,
-  },
-  back: {
-    fontSize: 15,
-  },
-  title: {
-    fontSize: 26,
   },
   chipWrap: {
     flexDirection: 'row',

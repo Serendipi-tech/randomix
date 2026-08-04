@@ -1,12 +1,13 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { List } from 'lucide-react-native';
+import { List, Users } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { Avatar } from '@/components/atoms/Avatar';
+import { PageHeader } from '@/components/molecules/PageHeader';
 import { ListCard } from '@/components/cards/ListCard';
 import { useFriendProfile } from '@/utils/useFriendProfile';
 
@@ -25,11 +26,7 @@ export default function FriendProfileScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <View style={styles.topBar}>
-        <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Text style={[styles.back, { color: colors.disabled }]}>{t('friend.back')}</Text>
-        </Pressable>
-      </View>
+      <PageHeader icon={Users} title={profile?.user.username ?? ''} onBack={() => router.back()} />
 
       {showSkeleton ? (
         <View style={styles.content}>
@@ -45,6 +42,7 @@ export default function FriendProfileScreen() {
         </View>
       ) : (
         <FlatList
+          showsVerticalScrollIndicator={false}
           data={profile.lists}
           keyExtractor={(list) => list.id}
           contentContainerStyle={styles.content}
@@ -89,13 +87,6 @@ export default function FriendProfileScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-  },
-  topBar: {
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.three,
-  },
-  back: {
-    fontSize: 15,
   },
   content: {
     padding: Spacing.four,

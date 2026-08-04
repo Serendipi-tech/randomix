@@ -4,6 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Scrollbar sempre nascosta su web: gli indicatori nativi (iOS/Android) sono già disattivati via showsVerticalScrollIndicator sui singoli ScrollView/FlatList. */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}
+
 :root {
   --font-display:
     Inter, Spline Sans, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,

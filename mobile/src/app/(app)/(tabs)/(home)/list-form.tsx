@@ -1,13 +1,17 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { List } from 'lucide-react-native';
+import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
+import { DEFAULT_LIST_ICON_KEY, LIST_ICONS, type ListIconKey } from '@/constants/list-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
+import { PageHeader } from '@/components/molecules/PageHeader';
 import { ColorPickerRow } from '@/components/atoms/color-picker-row';
+import { IconPickerRow } from '@/components/atoms/icon-picker-row';
 import { Chip } from '@/components/atoms/Chip';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { useListCategories } from '@/utils/useListCategories';
@@ -36,7 +40,7 @@ export default function ListFormScreen() {
   const { createList, updateList, deleteList, saving, deleting, error } = useListMutations();
 
   const [name, setName] = useState('');
-  const [icon, setIcon] = useState('');
+  const [icon, setIcon] = useState<ListIconKey>(DEFAULT_LIST_ICON_KEY);
   const [description, setDescription] = useState('');
   const [color, setColor] = useState<string>(LIST_COLORS[0]);
   const [isHidden, setIsHidden] = useState(false);
@@ -48,7 +52,7 @@ export default function ListFormScreen() {
   useEffect(() => {
     if (!isEdit || !list) return;
     setName(list.name);
-    setIcon(list.icon);
+    setIcon(LIST_ICONS.some((entry) => entry.key === list.icon) ? (list.icon as ListIconKey) : DEFAULT_LIST_ICON_KEY);
     setDescription(list.description ?? '');
     setColor(list.color);
     setIsHidden(list.isHidden);
@@ -63,13 +67,13 @@ export default function ListFormScreen() {
 
   const save = async () => {
     setLocalError(null);
-    if (!name.trim() || !icon.trim()) {
+    if (!name.trim()) {
       setLocalError(t('form.missingFields'));
       return;
     }
     const input = {
       name: name.trim(),
-      icon: icon.trim(),
+      icon,
       color,
       description: description.trim() || null,
       isHidden,
@@ -98,25 +102,16 @@ export default function ListFormScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.topBar}>
-          <Pressable onPress={() => router.back()} hitSlop={8}>
-            <Text style={[styles.back, { color: colors.disabled }]}>{t('form.cancel')}</Text>
-          </Pressable>
-          <Text style={[styles.title, { color: colors.textColor }]}>
-            {isEdit ? t('form.titleEdit') : t('form.titleCreate')}
-          </Text>
-        </View>
-
+      <PageHeader
+        icon={List}
+        title={isEdit ? t('form.titleEdit') : t('form.titleCreate')}
+        onBack={() => router.back()}
+      />
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Input
           placeholder={t('form.namePlaceholder')}
           value={name}
           onChangeText={setName}
-        />
-        <Input
-          placeholder={t('form.iconPlaceholder')}
-          value={icon}
-          onChangeText={setIcon}
         />
         <Input
           placeholder={t('form.descriptionPlaceholder')}
@@ -130,6 +125,14 @@ export default function ListFormScreen() {
           colors={LIST_COLORS}
           selected={color}
           onSelect={setColor}
+          colorScheme={colorScheme}
+        />
+
+        <Text style={[styles.sectionLabel, { color: colors.textColor }]}>{t('form.icon')}</Text>
+        <IconPickerRow
+          selected={icon}
+          onSelect={setIcon}
+          accentColor={color}
           colorScheme={colorScheme}
         />
 
@@ -195,15 +198,6 @@ const styles = StyleSheet.create({
   content: {
     padding: Spacing.four,
     gap: Spacing.three,
-  },
-  topBar: {
-    gap: Spacing.two,
-  },
-  back: {
-    fontSize: 15,
-  },
-  title: {
-    fontSize: 26,
   },
   sectionLabel: {
     fontSize: 16,

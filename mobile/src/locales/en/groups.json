@@ -38,11 +38,11 @@
     "revoke": "Cancel",
     "newList": {
       "namePlaceholder": "List name",
-      "iconPlaceholder": "Icon (emoji)",
       "color": "Color",
+      "icon": "Icon",
       "submit": "Create list",
       "cancel": "Cancel",
-      "missing": "Name and icon are required"
+      "missing": "Name is required"
     }
   },
   "member": {

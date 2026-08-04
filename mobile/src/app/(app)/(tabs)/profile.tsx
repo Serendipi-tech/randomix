@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { User } from 'lucide-react-native';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { AVATAR_PRESETS, resolveAvatarUri } from '@/constants/avatar-presets';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
+import { PageHeader } from '@/components/molecules/PageHeader';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
@@ -56,9 +58,8 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <RadialBackground colorScheme={colorScheme} />
+      <PageHeader icon={User} title={t('title')} />
       <View style={styles.content}>
-        <Text style={[styles.title, { color: colors.textColor }]}>{t('title')}</Text>
-
         {loadingProfile && !profile ? (
           <ListCardSkeleton colorScheme={colorScheme} />
         ) : profile && !editing ? (
@@ -118,11 +119,6 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: Spacing.four,
     gap: Spacing.two + Spacing.one,
-  },
-  title: {
-    fontSize: 28,
-    paddingTop: Spacing.three,
-    paddingBottom: Spacing.one,
   },
   editCard: {
     borderRadius: 20,

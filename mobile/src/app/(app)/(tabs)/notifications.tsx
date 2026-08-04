@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next';
+import { Bell } from 'lucide-react-native';
 import { StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
+import { PageHeader } from '@/components/molecules/PageHeader';
 
 export default function NotificationsScreen() {
   const { t } = useTranslation('notifications');
@@ -13,7 +15,7 @@ export default function NotificationsScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <RadialBackground colorScheme={colorScheme} />
-      <Text style={[styles.title, { color: colors.textColor }]}>{t('title')}</Text>
+      <PageHeader icon={Bell} title={t('title')} />
       <Text style={[styles.comingSoon, { color: colors.disabled }]}>{t('comingSoon')}</Text>
     </SafeAreaView>
   );
@@ -21,12 +23,6 @@ export default function NotificationsScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  title: {
-    fontSize: 28,
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.three,
-    paddingBottom: Spacing.one,
-  },
   comingSoon: {
     fontSize: 16,
     paddingHorizontal: Spacing.four,

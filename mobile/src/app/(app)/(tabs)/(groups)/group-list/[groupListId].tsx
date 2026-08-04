@@ -2,13 +2,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { List } from 'lucide-react-native';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 import { Colors, Spacing } from '@/constants/theme';
+import { resolveListIcon } from '@/constants/list-icons';
 import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Button } from '@/components/atoms/Button';
+import { PageHeader } from '@/components/molecules/PageHeader';
 import { CardShell } from '@/components/cards/CardShell';
 import { ItemCard } from '@/components/cards/ItemCard';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
@@ -91,15 +94,7 @@ export default function GroupListScreen() {
         colors={[hexToRgba(colors.accent, 0.13), colors.background]}
         style={StyleSheet.absoluteFill}
       />
-      <View style={styles.topBar}>
-        <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Text style={[styles.back, { color: colors.disabled }]}>←</Text>
-        </Pressable>
-        <Text style={[styles.title, { color: colors.textColor }]} numberOfLines={1}>
-          {listName ?? ''}
-        </Text>
-        <View style={styles.topBarSpacer} />
-      </View>
+      <PageHeader icon={List} title={listName ?? ''} onBack={() => router.back()} />
 
       {drawnItem ? (
         <View style={styles.drawResult}>
@@ -183,10 +178,12 @@ export default function GroupListScreen() {
                   style={styles.manageList}
                   contentContainerStyle={styles.manageListContent}
                   nestedScrollEnabled
+                  showsVerticalScrollIndicator={false}
                 >
                   {myLists.map((l) => {
                     const shared = sharedIds.includes(l.id);
                     const busy = togglingId === l.id;
+                    const ListIcon = resolveListIcon(l.icon);
                     return (
                       <CardShell
                         key={l.id}
@@ -196,9 +193,12 @@ export default function GroupListScreen() {
                         }}
                       >
                         <View style={styles.manageRow}>
-                          <Text style={[styles.manageRowName, { color: colors.textColor }]} numberOfLines={1}>
-                            {l.icon} {l.name}
-                          </Text>
+                          <View style={styles.manageRowNameGroup}>
+                            <ListIcon size={16} color={colors.textColor} />
+                            <Text style={[styles.manageRowName, { color: colors.textColor }]} numberOfLines={1}>
+                              {l.name}
+                            </Text>
+                          </View>
                           <Text
                             style={[
                               styles.manageRowAction,
@@ -229,6 +229,7 @@ export default function GroupListScreen() {
             </View>
           ) : (
             <FlatList
+              showsVerticalScrollIndicator={false}
               data={items}
               keyExtractor={(item: GroupListItem) => item.id}
               contentContainerStyle={styles.itemList}
@@ -249,21 +250,6 @@ export default function GroupListScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.three,
-    gap: Spacing.two,
-  },
-  back: { fontSize: 24 },
-  title: {
-    flex: 1,
-    fontSize: 18,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  topBarSpacer: { width: 24 },
   drawBar: {
     paddingHorizontal: Spacing.four,
     paddingBottom: Spacing.three,
@@ -306,6 +292,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: Spacing.two,
+  },
+  manageRowNameGroup: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   manageRowName: {
     flex: 1,

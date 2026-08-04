@@ -1,11 +1,13 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LayoutGrid } from 'lucide-react-native';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
+import { PageHeader } from '@/components/molecules/PageHeader';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
@@ -66,7 +68,9 @@ export default function GroupsScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <RadialBackground colorScheme={colorScheme} />
+      <PageHeader icon={LayoutGrid} title={t('title')} />
       <FlatList
+        showsVerticalScrollIndicator={false}
         data={showSkeleton ? [] : groups}
         keyExtractor={(g: GroupSummary) => g.id}
         contentContainerStyle={[styles.content, { paddingBottom: BottomTabInset + Spacing.four }]}
@@ -86,8 +90,6 @@ export default function GroupsScreen() {
         )}
         ListHeaderComponent={
           <View style={styles.header}>
-            <Text style={[styles.title, { color: colors.textColor }]}>{t('title')}</Text>
-
             {showCreate && (
               <View style={[styles.createCard, { backgroundColor: colors.foreground }]}>
                 <Input
@@ -182,12 +184,6 @@ const styles = StyleSheet.create({
   },
   header: {
     gap: Spacing.two + Spacing.one,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    paddingTop: Spacing.three,
-    paddingBottom: Spacing.one,
   },
   sectionTitle: {
     fontSize: 20,

@@ -1,14 +1,15 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { List } from 'lucide-react-native';
+import { Home, Plus } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
+import { resolveListIcon } from '@/constants/list-icons';
 import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
-import { Button } from '@/components/atoms/Button';
+import { PageHeader } from '@/components/molecules/PageHeader';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ListCard } from '@/components/cards/ListCard';
 import { useMyLists } from '@/utils/useLists';
@@ -29,10 +30,11 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <RadialBackground colorScheme={colorScheme} />
-      <View style={styles.titleBar}>
-        <Text style={[styles.title, { color: colors.textColor }]}>{t('title')}</Text>
-        <Button variant="primary" label={t('addList')} onPress={() => router.push('/list-form')} />
-      </View>
+      <PageHeader
+        icon={Home}
+        title={t('title')}
+        action={{ icon: Plus, onPress: () => router.push('/list-form') }}
+      />
 
       <Pressable
         onPress={() => router.push('/randomizer')}
@@ -58,6 +60,7 @@ export default function HomeScreen() {
         </View>
       ) : (
         <FlatList
+          showsVerticalScrollIndicator={false}
           data={lists}
           keyExtractor={(item) => item.id}
           contentContainerStyle={[styles.listContent, { paddingBottom: BottomTabInset + Spacing.four }]}
@@ -67,8 +70,7 @@ export default function HomeScreen() {
             <ListCard
               title={item.name}
               category={item.description ?? undefined}
-              icon={List}
-              emoji={item.icon || undefined}
+              icon={resolveListIcon(item.icon)}
               color={item.color}
               onPress={() => router.push({ pathname: '/list/[id]', params: { id: item.id } })}
             />
@@ -94,27 +96,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-  },
-  titleBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.three,
-    paddingBottom: Spacing.two,
-  },
-  title: {
-    fontSize: 28,
-  },
-  addButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 14,
-    backgroundColor: Colors.light.primary,
-  },
-  addLabel: {
-    fontSize: 14,
-    color: Colors.light.border,
   },
   randomizerCard: {
     marginHorizontal: Spacing.four,

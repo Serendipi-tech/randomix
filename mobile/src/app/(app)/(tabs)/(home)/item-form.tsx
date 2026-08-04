@@ -1,12 +1,14 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Package } from 'lucide-react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
+import { PageHeader } from '@/components/molecules/PageHeader';
 import { Chip } from '@/components/atoms/Chip';
 import { RatingInput } from '@/components/molecules/RatingInput';
 import { useItemMutations } from '@/utils/useItemMutations';
@@ -120,16 +122,12 @@ export default function ItemFormScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.topBar}>
-          <Pressable onPress={() => router.back()} hitSlop={8}>
-            <Text style={[styles.back, { color: colors.disabled }]}>{t('form.cancel')}</Text>
-          </Pressable>
-          <Text style={[styles.title, { color: colors.textColor }]}>
-            {isEdit ? t('itemForm.titleEdit') : t('itemForm.titleAdd')}
-          </Text>
-        </View>
-
+      <PageHeader
+        icon={Package}
+        title={isEdit ? t('itemForm.titleEdit') : t('itemForm.titleAdd')}
+        onBack={() => router.back()}
+      />
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {isEdit ? (
           <Text style={[styles.itemName, { color: colors.textColor }]}>{name}</Text>
         ) : (
@@ -252,15 +250,6 @@ const styles = StyleSheet.create({
   content: {
     padding: Spacing.four,
     gap: Spacing.three,
-  },
-  topBar: {
-    gap: Spacing.two,
-  },
-  back: {
-    fontSize: 15,
-  },
-  title: {
-    fontSize: 26,
   },
   itemName: {
     fontSize: 20,

@@ -4,29 +4,23 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Platform, Pressable, StyleSheet, View, type LayoutChangeEvent, type ViewStyle } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { Bell, Home, LayoutGrid, User, Users } from 'lucide-react-native';
-import { BottomTabInset, Colors } from '@/constants/theme';
+import MaskedView from '@react-native-masked-view/masked-view';
+import { Bell, Home, LayoutGrid, Users } from 'lucide-react-native';
+import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
 
-// expo-blur applica un wash bianco/nero suo sul web (schiarisce qualunque tinta ci mettessimo sopra):
-// su web il "vetro" è backdrop-filter CSS puro, su native è BlurView. Stesso motivo di card.tsx/card.web.tsx.
-const webGlassStyle = {
-  backdropFilter: 'blur(20px) saturate(180%)',
-  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-} as ViewStyle;
-
 const BAR_HEIGHT = 68;
 const CORNER = 12;
-const NOTCH_HALF_WIDTH = 76;
-const NOTCH_DEPTH = 64;
 const HOME_SIZE = 52;
 // centra HOME_SIZE nella riga (alta BAR_HEIGHT) e lo spinge fino a toccare il bordo superiore:
 // resta sempre dentro il perimetro della barra, mai sopra.
 const HOME_LIFT = (BAR_HEIGHT - HOME_SIZE) / 2;
+const NOTCH_HALF_WIDTH = 76;
+const NOTCH_DEPTH = 64;
 
 const SIDE_TAB_ICONS = {
-  profile: User,
+  profile: Users,
   notifications: Bell,
   friends: Users,
   groups: LayoutGrid,
@@ -58,9 +52,8 @@ function buildWavePath(width: number): string {
   ].join(' ');
 }
 
-/** Tab bar dell'app: pillola flottante in vetro con tacca a onda e pulsante Home sempre sopraelevato al
- *  centro (statico, non dipende dal tab attivo). L'icona esposta resta comunque dentro il perimetro della
- *  barra, non sborda mai sopra il bordo. Un solo file per tutte le piattaforme (vedi webGlassStyle). */
+/** Tab bar dell'app: pillola flottante con tacca a onda, blur ritagliato sulla forma e pulsante Home
+ *  sopraelevato al centro. Stile allineato al componente NavBar del design system (colors-showcase). */
 export default function AppTabs() {
   return (
     <Tabs>
@@ -93,9 +86,10 @@ type SideTabButtonProps = TabTriggerSlotProps & { name: SideTabName };
 /** Icona piena quando attiva, solo contorno quando inattiva — nessuna label (icon-only). */
 function SideTabButton({ name, isFocused, ...props }: SideTabButtonProps) {
   const { colorScheme } = useAppTheme();
+  const colors = Colors[colorScheme];
   const Icon = SIDE_TAB_ICONS[name];
-  const mutedColor = Colors[colorScheme].disabled;
-  const activeColor = Colors[colorScheme].textColor;
+  const mutedColor = colors.textColor;
+  const activeColor = colors.secondary;
   const color = isFocused ? activeColor : mutedColor;
 
   return (
@@ -105,19 +99,20 @@ function SideTabButton({ name, isFocused, ...props }: SideTabButtonProps) {
   );
 }
 
-/** Pulsante Home: aspetto sempre identico (non cambia con il tab attivo), sopraelevato nella tacca ma
- *  contenuto entro l'altezza della barra. */
-function HomeButton(props: TabTriggerSlotProps) {
+/** Pulsante Home: gradient secondary→secondaryGradient solo quando il tab è attivo, altrimenti sfondo primary. */
+function HomeButton({ isFocused, ...props }: TabTriggerSlotProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   return (
-    <Pressable {...props} style={styles.homeButton} hitSlop={6}>
-      <LinearGradient
-        colors={[colors.secondary, colors.secondaryGradient]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
+    <Pressable {...props} style={[styles.homeButton, { backgroundColor: isFocused ? undefined : colors.primary }]} hitSlop={6}>
+      {isFocused && (
+        <LinearGradient
+          colors={[colors.secondary, colors.secondaryGradient]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
+      )}
       <View style={styles.homeIconStack}>
         <Home size={24} color={colors.textColor} strokeWidth={2.5} />
       </View>
@@ -129,29 +124,61 @@ function TabBar(props: TabListProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   const fill = hexToRgba(colors.primary, 0.2);
-  const border = hexToRgba(colors.border, colorScheme === 'light' ? 0.5 : 0.16);
   const [width, setWidth] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
 
   const onLayout = (e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width);
+  const onWrapLayout = (e: LayoutChangeEvent) => setContainerWidth(e.nativeEvent.layout.width);
+  // margine laterale reale della pillola (screen width - pillWrap width) / 2: il bottom deve essere identico
+  const sideGap = containerWidth > 0 && width > 0 ? (containerWidth - width) / 2 : 12;
+
+  // Blur ritagliato a forma navbar: su web clip-path CSS (MaskedView rompe il backdrop-filter),
+  // su nativo MaskedView + BlurView.
+  const wavePath = buildWavePath(width);
+  const blurLayer =
+    Platform.OS === 'web' ? (
+      <View
+        pointerEvents="none"
+        style={[
+          styles.clip,
+          { width, height: BAR_HEIGHT, backgroundColor: hexToRgba(colors.foreground, 0.15) },
+          {
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            clipPath: `path('${wavePath}')`,
+            WebkitClipPath: `path('${wavePath}')`,
+          } as unknown as ViewStyle,
+        ]}
+      />
+    ) : (
+      <MaskedView
+        style={[styles.clip, { width, height: BAR_HEIGHT }]}
+        pointerEvents="none"
+        maskElement={
+          <Svg width={width} height={BAR_HEIGHT}>
+            <Path d={wavePath} fill="#fff" />
+          </Svg>
+        }
+      >
+        <BlurView intensity={90} style={StyleSheet.absoluteFill} tint="dark" />
+      </MaskedView>
+    );
 
   return (
-    <View pointerEvents="box-none" style={[styles.wrap, { paddingBottom: BottomTabInset / 2 }]}>
+    <View pointerEvents="box-none" style={[styles.wrap, { paddingBottom: sideGap }]} onLayout={onWrapLayout}>
       <View style={styles.pillWrap} onLayout={onLayout}>
         {width > 0 && (
-          <View style={styles.clip}>
-            {/* layer di blur dietro a tutto: BlurView su native, backdrop-filter CSS su web (mai sulla view che avvolge il contenuto, altrimenti sfoca anche icone/testo) */}
-            {Platform.OS !== 'web' ? (
-              <BlurView intensity={60} tint="default" style={StyleSheet.absoluteFill} />
-            ) : (
-              <View style={[StyleSheet.absoluteFill, webGlassStyle]} />
-            )}
-            <Svg width={width} height={BAR_HEIGHT} style={StyleSheet.absoluteFill}>
-              <Path d={buildWavePath(width)} fill={fill} stroke={border} strokeWidth={1} />
-            </Svg>
-            <View {...props} style={styles.row}>
-              {props.children}
+          <>
+            {blurLayer}
+            <View style={styles.clip} pointerEvents="box-none">
+              <Svg width={width} height={BAR_HEIGHT} style={StyleSheet.absoluteFill}>
+                <Path d={buildWavePath(width)} fill={fill} />
+              </Svg>
+              <View {...props} style={styles.row}>
+                {props.children}
+              </View>
             </View>
-          </View>
+          </>
         )}
       </View>
     </View>

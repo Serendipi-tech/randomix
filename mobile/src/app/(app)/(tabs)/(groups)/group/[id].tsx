@@ -1,15 +1,18 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { List } from 'lucide-react-native';
+import { LayoutGrid, List } from 'lucide-react-native';
 import { Colors, Spacing } from '@/constants/theme';
+import { DEFAULT_LIST_ICON_KEY, resolveListIcon, type ListIconKey } from '@/constants/list-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
+import { PageHeader } from '@/components/molecules/PageHeader';
 import { CardShell } from '@/components/cards/CardShell';
 import { ColorPickerRow } from '@/components/atoms/color-picker-row';
+import { IconPickerRow } from '@/components/atoms/icon-picker-row';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ListCard } from '@/components/cards/ListCard';
 import { FriendCard } from '@/components/cards/FriendCard';
@@ -58,7 +61,7 @@ export default function GroupDetailScreen() {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [showCreateList, setShowCreateList] = useState(false);
   const [listName, setListName] = useState('');
-  const [listIcon, setListIcon] = useState('');
+  const [listIcon, setListIcon] = useState<ListIconKey>(DEFAULT_LIST_ICON_KEY);
   const [listColor, setListColor] = useState<string>(LIST_COLORS[0]);
   const [listError, setListError] = useState<string | null>(null);
 
@@ -123,14 +126,14 @@ export default function GroupDetailScreen() {
 
   const handleCreateList = async () => {
     setListError(null);
-    if (!listName.trim() || !listIcon.trim()) {
+    if (!listName.trim()) {
       setListError(t('detail.newList.missing'));
       return;
     }
     try {
-      await createGroupList({ name: listName.trim(), icon: listIcon.trim(), color: listColor });
+      await createGroupList({ name: listName.trim(), icon: listIcon, color: listColor });
       setListName('');
-      setListIcon('');
+      setListIcon(DEFAULT_LIST_ICON_KEY);
       setListColor(LIST_COLORS[0]);
       setShowCreateList(false);
     } catch (e) {
@@ -153,11 +156,7 @@ export default function GroupDetailScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <View style={styles.topBar}>
-        <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Text style={[styles.back, { color: colors.disabled }]}>←</Text>
-        </Pressable>
-      </View>
+      <PageHeader icon={LayoutGrid} title={group?.name ?? ''} onBack={() => router.back()} />
 
       {showSkeleton ? (
         <View style={styles.skeletonContainer}>
@@ -170,8 +169,7 @@ export default function GroupDetailScreen() {
           <Text style={[styles.emptyTitle, { color: colors.textColor }]}>{t('detail.error')}</Text>
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.content}>
-          <Text style={[styles.title, { color: colors.textColor }]}>{group.name}</Text>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           {group.description ? (
             <Text style={[styles.description, { color: colors.textColor }]}>
               {group.description}
@@ -190,8 +188,7 @@ export default function GroupDetailScreen() {
                 key={gl.id}
                 title={gl.name}
                 category={gl.description ?? undefined}
-                icon={List}
-                emoji={gl.icon || undefined}
+                icon={resolveListIcon(gl.icon)}
                 color={gl.color}
                 onPress={() =>
                   router.push({
@@ -214,11 +211,6 @@ export default function GroupDetailScreen() {
                     onChangeText={setListName}
                     autoCapitalize="words"
                   />
-                  <Input
-                    placeholder={t('detail.newList.iconPlaceholder')}
-                    value={listIcon}
-                    onChangeText={setListIcon}
-                  />
                   <Text style={[styles.pickerLabel, { color: colors.textColor }]}>
                     {t('detail.newList.color')}
                   </Text>
@@ -226,6 +218,15 @@ export default function GroupDetailScreen() {
                     colors={LIST_COLORS}
                     selected={listColor}
                     onSelect={setListColor}
+                    colorScheme={colorScheme}
+                  />
+                  <Text style={[styles.pickerLabel, { color: colors.textColor }]}>
+                    {t('detail.newList.icon')}
+                  </Text>
+                  <IconPickerRow
+                    selected={listIcon}
+                    onSelect={setListIcon}
+                    accentColor={listColor}
                     colorScheme={colorScheme}
                   />
                   {listError && <Text style={styles.listError}>{listError}</Text>}
@@ -385,13 +386,6 @@ export default function GroupDetailScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.three,
-  },
-  back: { fontSize: 24 },
   content: {
     paddingHorizontal: Spacing.four,
     paddingBottom: 48,
@@ -400,11 +394,6 @@ const styles = StyleSheet.create({
   skeletonContainer: {
     padding: Spacing.four,
     gap: Spacing.two + Spacing.one,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: '700',
-    paddingBottom: Spacing.one,
   },
   description: {
     fontSize: 14,

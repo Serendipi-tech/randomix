@@ -1,12 +1,15 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pencil } from 'lucide-react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
+import { resolveListIcon } from '@/constants/list-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
+import { PageHeader } from '@/components/molecules/PageHeader';
 import { ItemCard } from '@/components/cards/ItemCard';
 import { Button } from '@/components/atoms/Button';
 import { useItemMutations } from '@/utils/useItemMutations';
@@ -53,16 +56,16 @@ export default function ListDetailScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <View style={styles.topBar}>
-        <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Text style={[styles.back, { color: colors.disabled }]}>{t('detail.back')}</Text>
-        </Pressable>
-        {list && (
-          <Pressable onPress={() => router.push({ pathname: '/list-form', params: { id } })} hitSlop={8}>
-            <Text style={[styles.edit, { color: colors.textColor }]}>{t('detail.edit')}</Text>
-          </Pressable>
-        )}
-      </View>
+      <PageHeader
+        icon={resolveListIcon(list?.icon)}
+        title={list?.name ?? ''}
+        onBack={() => router.back()}
+        action={
+          list
+            ? { icon: Pencil, onPress: () => router.push({ pathname: '/list-form', params: { id } }) }
+            : undefined
+        }
+      />
 
       {showSkeleton ? (
         <View style={styles.content}>
@@ -78,6 +81,7 @@ export default function ListDetailScreen() {
         </View>
       ) : (
         <FlatList
+          showsVerticalScrollIndicator={false}
           data={list.items}
           keyExtractor={(entry) => entry.id}
           contentContainerStyle={styles.content}
@@ -101,9 +105,6 @@ export default function ListDetailScreen() {
           )}
           ListHeaderComponent={
             <View style={styles.header}>
-              <Text style={[styles.title, { color: colors.textColor }]}>
-                {list.icon} {list.name}
-              </Text>
               {list.description ? (
                 <Text style={[styles.description, { color: colors.disabled }]}>
                   {list.description}
@@ -164,28 +165,12 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
   },
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.three,
-  },
-  back: {
-    fontSize: 15,
-  },
-  edit: {
-    fontSize: 15,
-  },
   content: {
     padding: Spacing.four,
     gap: Spacing.two + Spacing.one,
   },
   header: {
     gap: Spacing.two,
-  },
-  title: {
-    fontSize: 26,
   },
   description: {
     fontSize: 15,
