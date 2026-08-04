@@ -9,6 +9,7 @@ export interface UserList {
   icon: string;
   color: string;
   description: string | null;
+  itemCount: number;
   updatedAt: string;
 }
 

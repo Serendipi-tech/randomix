@@ -190,6 +190,7 @@ export default function GroupDetailScreen() {
                 category={gl.description ?? undefined}
                 icon={resolveListIcon(gl.icon)}
                 color={gl.color}
+                itemsCount={gl.memberListCount}
                 onPress={() =>
                   router.push({
                     pathname: '/group-list/[groupListId]',

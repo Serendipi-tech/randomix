@@ -16,14 +16,14 @@ type ListCardProps = {
   /** Emoji della lista (scelta in creazione): se presente sostituisce l'icona di fallback. */
   emoji?: string;
   color: string;
-  itemsCount?: number;
-  maxItems?: number;
+  /** Numero di elementi nella lista: sempre visibile, "0" se vuota, "N/N" altrimenti. */
+  itemsCount: number;
   onPress: () => void;
 };
 
 /** Card lista: emoji della lista (o icona gigante ruotata di fallback) a riempimento dell'area sinistra,
  *  gradient di sfondo transparent -> color, titolo/categoria e conteggio. Bordo colorato dal `color`; card interamente cliccabile. */
-export function ListCard({ title, category, icon: Icon, emoji, color, itemsCount, maxItems, onPress }: ListCardProps) {
+export function ListCard({ title, category, icon: Icon, emoji, color, itemsCount, onPress }: ListCardProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
@@ -55,11 +55,9 @@ export function ListCard({ title, category, icon: Icon, emoji, color, itemsCount
               <Text style={[styles.title, { color: colors.textColor }]}>{title}</Text>
             </View>
             <View style={styles.trailing}>
-              {itemsCount !== undefined && maxItems !== undefined && (
-                <Text style={[styles.count, { color: colors.textColor }]}>
-                  {itemsCount}/{maxItems}
-                </Text>
-              )}
+              <Text style={[styles.count, { color: colors.textColor }]}>
+                {itemsCount === 0 ? '0' : `${itemsCount}/${itemsCount}`}
+              </Text>
               <View style={[styles.arrow, { backgroundColor: colors.foreground }]}>
                 <ChevronRight size={18} color={color} />
               </View>

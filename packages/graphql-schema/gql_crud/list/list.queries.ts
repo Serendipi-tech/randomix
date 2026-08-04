@@ -58,6 +58,7 @@ export const MY_LISTS: DocumentNode = parse(`
         icon
         color
         description
+        itemCount
         updatedAt
       }
       nextCursor

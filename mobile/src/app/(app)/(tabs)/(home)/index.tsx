@@ -1,8 +1,7 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Home, Plus } from 'lucide-react-native';
+import { ChevronRight, Home, List, Plus, Shuffle } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
 import { resolveListIcon } from '@/constants/list-icons';
@@ -10,8 +9,10 @@ import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
 import { PageHeader } from '@/components/molecules/PageHeader';
+import { EmptyState } from '@/components/molecules/EmptyState';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ListCard } from '@/components/cards/ListCard';
+import { CardShell } from '@/components/cards/CardShell';
 import { useMyLists } from '@/utils/useLists';
 
 const SKELETON_COUNT = 6;
@@ -36,21 +37,24 @@ export default function HomeScreen() {
         action={{ icon: Plus, onPress: () => router.push('/list-form') }}
       />
 
-      <Pressable
-        onPress={() => router.push('/randomizer')}
-        style={({ pressed }) => [styles.randomizerCard, pressed && styles.pressed]}>
-        <LinearGradient
-          colors={[colors.accent, colors.primary]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
-        <View style={styles.randomizerText}>
-          <Text style={styles.randomizerTitle}>{t('randomizer')}</Text>
-          <Text style={styles.randomizerSubtitle}>{t('randomizerSubtitle')}</Text>
-        </View>
-        <Text style={styles.randomizerArrow}>›</Text>
-      </Pressable>
+      <View style={styles.randomizerWrap}>
+        <CardShell backgroundColor={colors.primary} borderColor="transparent" onPress={() => router.push('/randomizer')}>
+          <View style={styles.randomizerRow}>
+            <View style={[styles.randomizerIcon, { backgroundColor: hexToRgba(colors.textColor, 0.15) }]}>
+              <Shuffle size={22} color={colors.textColor} />
+            </View>
+            <View style={styles.randomizerText}>
+              <Text style={[styles.randomizerTitle, { color: colors.textColor }]}>{t('randomizer')}</Text>
+              <Text style={[styles.randomizerSubtitle, { color: hexToRgba(colors.textColor, 0.75) }]}>
+                {t('randomizerSubtitle')}
+              </Text>
+            </View>
+            <View style={[styles.randomizerArrow, { backgroundColor: hexToRgba(colors.textColor, 0.15) }]}>
+              <ChevronRight size={18} color={colors.textColor} />
+            </View>
+          </View>
+        </CardShell>
+      </View>
 
       {showSkeleton ? (
         <View style={styles.listContent}>
@@ -72,19 +76,19 @@ export default function HomeScreen() {
               category={item.description ?? undefined}
               icon={resolveListIcon(item.icon)}
               color={item.color}
+              itemsCount={item.itemCount}
               onPress={() => router.push({ pathname: '/list/[id]', params: { id: item.id } })}
             />
           )}
           ListEmptyComponent={
             <View style={styles.empty}>
-              <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
-                {error ? t('error') : t('empty.title')}
-              </Text>
-              {!error && (
-                <Text style={[styles.emptySubtitle, { color: colors.disabled }]}>
-                  {t('empty.subtitle')}
-                </Text>
-              )}
+              <EmptyState
+                icon={List}
+                title={error ? t('error') : t('empty.title')}
+                subtitle={error ? undefined : t('empty.subtitle')}
+                actionLabel={error ? undefined : t('addList')}
+                onAction={error ? undefined : () => router.push('/list-form')}
+              />
             </View>
           }
         />
@@ -97,39 +101,39 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
   },
-  randomizerCard: {
+  randomizerWrap: {
     marginHorizontal: Spacing.four,
     marginBottom: Spacing.two,
-    borderRadius: 22,
-    padding: 18,
+  },
+  randomizerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    overflow: 'hidden',
-    shadowColor: Colors.light.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 14,
-    elevation: 5,
+    gap: 12,
   },
-  pressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.98 }],
+  randomizerIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   randomizerText: {
     flex: 1,
     gap: 2,
   },
   randomizerTitle: {
-    fontSize: 18,
-    color: Colors.light.border,
+    fontSize: 16,
+    fontWeight: '700',
   },
   randomizerSubtitle: {
-    fontSize: 14,
-    color: hexToRgba(Colors.light.border, 0.85),
+    fontSize: 13,
   },
   randomizerArrow: {
-    fontSize: 26,
-    color: Colors.light.border,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   listContent: {
     paddingHorizontal: Spacing.four,
@@ -137,17 +141,7 @@ const styles = StyleSheet.create({
     gap: Spacing.two + Spacing.one,
   },
   empty: {
-    alignItems: 'center',
     paddingTop: Spacing.six,
     paddingHorizontal: Spacing.five,
-    gap: Spacing.two,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    textAlign: 'center',
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    textAlign: 'center',
   },
 });

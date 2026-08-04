@@ -52,6 +52,7 @@ export default function FriendProfileScreen() {
               category={t('friend.itemCount', { count: list.itemCount })}
               icon={List}
               color={list.color}
+              itemsCount={list.itemCount}
               onPress={() => {}}
             />
           )}

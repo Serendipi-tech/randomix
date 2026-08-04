@@ -30,7 +30,7 @@ export function RadialBackground({ colorScheme }: RadialBackgroundProps) {
 const styles = StyleSheet.create({
   glow: {
     position: 'absolute',
-    top: 0,
+    top: -200,
     left: 0,
     right: 0,
   },

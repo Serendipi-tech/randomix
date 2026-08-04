@@ -35,6 +35,7 @@ builder.queryField('myLists', (t) =>
         where: { userId: ctx.userId },
         orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
         take: take + 1,
+        include: { _count: { select: { items: true } } },
         ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       });
       const hasMore = rows.length > take;

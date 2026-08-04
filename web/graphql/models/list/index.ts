@@ -15,6 +15,7 @@ export const ListRef = builder.prismaObject('List', {
       // gli elementi più recenti in cima, coerente con l'ordinamento globale
       query: { orderBy: { id: 'desc' } },
     }),
+    itemCount: t.relationCount('items'),
     createdAt: t.expose('createdAt', { type: 'DateTime' }),
     updatedAt: t.expose('updatedAt', { type: 'DateTime' }),
   }),
