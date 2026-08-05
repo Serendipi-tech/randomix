@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Tabs, TabList, TabTrigger, TabSlot, type TabTriggerSlotProps, type TabListProps } from 'expo-router/ui';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Platform, Pressable, StyleSheet, View, type LayoutChangeEvent, type ViewStyle } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { Bell, Home, LayoutGrid, Users } from 'lucide-react-native';
@@ -83,39 +84,72 @@ export default function AppTabs() {
 
 type SideTabButtonProps = TabTriggerSlotProps & { name: SideTabName };
 
-/** Icona piena quando attiva, solo contorno quando inattiva — nessuna label (icon-only). */
+/** Icona piena quando attiva, solo contorno quando inattiva — nessuna label (icon-only).
+ *  La scala usa uno spring (il rimbalzo dà l'effetto "pop"), il crossfade colore usa withTiming
+ *  su un valore separato: uno spring sottosmorzato supera lo zero e rimbalza indietro, e se
+ *  guidasse anche l'opacità farebbe "riapparire" per un istante il colore pieno mentre sparisce. */
 function SideTabButton({ name, isFocused, ...props }: SideTabButtonProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   const Icon = SIDE_TAB_ICONS[name];
   const mutedColor = colors.textColor;
   const activeColor = colors.secondary;
-  const color = isFocused ? activeColor : mutedColor;
+
+  const scale = useSharedValue(isFocused ? 1.05 : 1);
+  const progress = useSharedValue(isFocused ? 1 : 0);
+  useEffect(() => {
+    scale.value = withSpring(isFocused ? 1.05 : 1, { damping: 14, stiffness: 280 });
+    progress.value = withTiming(isFocused ? 1 : 0, { duration: 200 });
+  }, [isFocused, scale, progress]);
+
+  const containerStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const mutedStyle = useAnimatedStyle(() => ({ opacity: 1 - progress.value }));
+  const activeStyle = useAnimatedStyle(() => ({ opacity: progress.value }));
 
   return (
     <Pressable {...props} style={styles.sideTab} hitSlop={6}>
-      <Icon size={24} color={color} fill={isFocused ? color : 'none'} strokeWidth={2} />
+      <Animated.View style={[styles.iconWrap, containerStyle]}>
+        <Animated.View style={mutedStyle}>
+          <Icon size={24} color={mutedColor} fill="none" strokeWidth={2} />
+        </Animated.View>
+        <Animated.View style={[styles.iconOverlay, activeStyle]}>
+          <Icon size={24} color={activeColor} fill={activeColor} strokeWidth={2} />
+        </Animated.View>
+      </Animated.View>
     </Pressable>
   );
 }
 
-/** Pulsante Home: gradient secondary→secondaryGradient solo quando il tab è attivo, altrimenti sfondo primary. */
+/** Pulsante Home: sfondo primary di base con il gradient secondary→secondaryGradient in overlay.
+ *  Scala e opacità del gradient usano valori separati per lo stesso motivo di SideTabButton:
+ *  lo spring della scala può rimbalzare, l'opacità deve solo salire/scendere senza oscillare. */
 function HomeButton({ isFocused, ...props }: TabTriggerSlotProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
+
+  const scale = useSharedValue(isFocused ? 1.05 : 1);
+  const progress = useSharedValue(isFocused ? 1 : 0);
+  useEffect(() => {
+    scale.value = withSpring(isFocused ? 1.05 : 1, { damping: 12, stiffness: 300 });
+    progress.value = withTiming(isFocused ? 1 : 0, { duration: 200 });
+  }, [isFocused, scale, progress]);
+
+  const scaleStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const gradientStyle = useAnimatedStyle(() => ({ opacity: progress.value }));
+
   return (
-    <Pressable {...props} style={[styles.homeButton, { backgroundColor: isFocused ? undefined : colors.primary }]} hitSlop={6}>
-      {isFocused && (
+    <Pressable {...props} style={[styles.homeButton, { backgroundColor: colors.primary }]} hitSlop={6}>
+      <Animated.View style={[StyleSheet.absoluteFill, gradientStyle]}>
         <LinearGradient
           colors={[colors.secondary, colors.secondaryGradient]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFill}
         />
-      )}
-      <View style={styles.homeIconStack}>
+      </Animated.View>
+      <Animated.View style={[styles.homeIconStack, scaleStyle]}>
         <Home size={24} color={colors.textColor} strokeWidth={2.5} />
-      </View>
+      </Animated.View>
     </Pressable>
   );
 }
@@ -219,6 +253,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 44,
     height: 44,
+  },
+  iconWrap: {
+    position: 'relative',
+  },
+  iconOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
   homeButton: {
     width: HOME_SIZE,

@@ -14,7 +14,8 @@ export const AppThemeContext = createContext<AppThemeContextValue | null>(null);
 /** Override manuale del tema, applicato a monte di tutta l'app: parte dal tema di sistema finché l'utente non lo cambia col toggle. */
 export function AppThemeProvider({ children }: PropsWithChildren) {
   const systemScheme: Scheme = useSystemColorScheme() === 'dark' ? 'dark' : 'light';
-  const [override, setOverride] = useState<Scheme | null>(null);
+  // Dark mode come tema di default, indipendente dallo scheme di sistema
+  const [override, setOverride] = useState<Scheme | null>('dark');
   const colorScheme = override ?? systemScheme;
 
   const toggleColorScheme = useCallback(() => {
