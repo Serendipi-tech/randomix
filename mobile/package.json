@@ -28,6 +28,7 @@
     "graphql": "^16.14.2",
     "i18next": "^26.3.6",
     "lucide-react-native": "^0.545.0",
+    "lucide-static": "^1.28.0",
     "nativewind": "^4.2.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",

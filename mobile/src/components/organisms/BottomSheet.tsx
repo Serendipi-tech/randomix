@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
@@ -9,11 +9,15 @@ type BottomSheetProps = {
   visible: boolean;
   onClose: () => void;
   children: ReactNode;
+  /** Altezza fissa del pannello (indipendente dal contenuto): utile quando il contenuto interno
+   *  cambia dimensione (es. tab) e non deve far "saltare" la dimensione dello sheet. Se assente,
+   *  l'altezza segue il contenuto fino a `maxHeight`. */
+  height?: number;
 };
 
 /** Shell generica per bottomsheet: backdrop + slide-in dal basso + handle bar. Content-agnostica,
  *  il contenuto è interamente a carico del chiamante via `children`. */
-export function BottomSheet({ visible, onClose, children }: BottomSheetProps) {
+export function BottomSheet({ visible, onClose, children, height }: BottomSheetProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   const { height: screenHeight } = useWindowDimensions();
@@ -40,7 +44,9 @@ export function BottomSheet({ visible, onClose, children }: BottomSheetProps) {
   if (!mounted && !visible) return null;
 
   return (
-    <>
+    // Modal (non solo View assoluta) per dipingere sempre sopra la navbar flottante, che è un sibling
+    // disegnato dopo il contenuto della schermata e altrimenti la coprirebbe.
+    <Modal visible transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
       <Pressable onPress={onClose} style={StyleSheet.absoluteFill}>
         <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: hexToRgba(colors.shadow, 0.45) }, backdropStyle]} />
       </Pressable>
@@ -49,6 +55,7 @@ export function BottomSheet({ visible, onClose, children }: BottomSheetProps) {
           style={[
             styles.container,
             {
+              height,
               maxHeight: screenHeight * 0.92,
               backgroundColor: colors.foreground,
               borderColor: colors.border,
@@ -62,7 +69,7 @@ export function BottomSheet({ visible, onClose, children }: BottomSheetProps) {
           {children}
         </View>
       </Animated.View>
-    </>
+    </Modal>
   );
 }
 
@@ -74,7 +81,8 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   container: {
-    borderRadius: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     borderWidth: 1,
     overflow: 'hidden',
   },

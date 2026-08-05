@@ -2,7 +2,9 @@
   "form": {
     "titleCreate": "New list",
     "titleEdit": "Edit list",
+    "name": "Name",
     "namePlaceholder": "List name",
+    "description": "Description",
     "descriptionPlaceholder": "Description (optional)",
     "color": "Color",
     "icon": "Icon",
@@ -14,7 +16,28 @@
     "deleteConfirmTitle": "Delete list?",
     "deleteConfirmMessage": "This can't be undone.",
     "cancel": "Cancel",
-    "missingFields": "Name and icon are required."
+    "missingFields": "Name and icon are required.",
+    "editIcon": "Edit icon",
+    "editColor": "Edit color",
+    "iconPickerTitle": "Icon",
+    "iconCategories": {
+      "people": "People & animals",
+      "nature": "Nature & weather",
+      "food": "Food & drink",
+      "travel": "Travel & transport",
+      "sports": "Sports & leisure",
+      "devices": "Technology & devices",
+      "communication": "Communication",
+      "business": "Business & finance",
+      "media": "Media & entertainment",
+      "home": "Home & objects",
+      "shapes": "Shapes & symbols",
+      "arrows": "Arrows & UI navigation",
+      "text": "Text & documents",
+      "health": "Health",
+      "security": "Security",
+      "other": "Other"
+    }
   },
   "detail": {
     "back": "Back",

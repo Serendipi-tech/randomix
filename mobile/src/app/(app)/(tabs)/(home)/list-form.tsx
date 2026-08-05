@@ -1,30 +1,25 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { List } from 'lucide-react-native';
-import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { List, Pencil } from 'lucide-react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
-import { DEFAULT_LIST_ICON_KEY, LIST_ICONS, type ListIconKey } from '@/constants/list-icons';
+import { DEFAULT_LIST_ICON_KEY } from '@/constants/list-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { resolvePreviewIcon } from '@/utils/resolvePreviewIcon';
 import { Button } from '@/components/atoms/Button';
+import { Switch } from '@/components/atoms/Switch';
 import { Input } from '@/components/molecules/Input';
 import { PageHeader } from '@/components/molecules/PageHeader';
-import { ColorPickerRow } from '@/components/atoms/color-picker-row';
-import { IconPickerRow } from '@/components/atoms/icon-picker-row';
+import { ColorPickerTooltip } from '@/components/molecules/ColorPickerTooltip';
 import { Chip } from '@/components/atoms/Chip';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
+import { IconPickerSheet } from '@/components/organisms/IconPickerSheet';
+import { ListCard } from '@/components/cards/ListCard';
 import { useListCategories } from '@/utils/useListCategories';
 import { useListDetail } from '@/utils/useListDetail';
 import { useListMutations } from '@/utils/useListMutations';
-
-const LIST_COLORS = [
-  Colors.light.accent,
-  Colors.light.secondary,
-  Colors.light.warning,
-  Colors.light.success,
-  Colors.light.primary,
-];
 
 export default function ListFormScreen() {
   const { t } = useTranslation('lists');
@@ -38,21 +33,23 @@ export default function ListFormScreen() {
   const { list } = useListDetail(id);
   const { categories } = useListCategories();
   const { createList, updateList, deleteList, saving, deleting, error } = useListMutations();
+  const listColors = Object.values(colors.extraColors);
 
   const [name, setName] = useState('');
-  const [icon, setIcon] = useState<ListIconKey>(DEFAULT_LIST_ICON_KEY);
+  const [icon, setIcon] = useState<string>(DEFAULT_LIST_ICON_KEY);
   const [description, setDescription] = useState('');
-  const [color, setColor] = useState<string>(LIST_COLORS[0]);
+  const [color, setColor] = useState<string>(listColors[0]);
   const [isHidden, setIsHidden] = useState(false);
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showIconPicker, setShowIconPicker] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
   // precompilo il form quando arrivano i dati della lista in modifica
   useEffect(() => {
     if (!isEdit || !list) return;
     setName(list.name);
-    setIcon(LIST_ICONS.some((entry) => entry.key === list.icon) ? (list.icon as ListIconKey) : DEFAULT_LIST_ICON_KEY);
+    setIcon(list.icon);
     setDescription(list.description ?? '');
     setColor(list.color);
     setIsHidden(list.isHidden);
@@ -109,32 +106,39 @@ export default function ListFormScreen() {
       />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Input
+          label={t('form.name')}
+          required
           placeholder={t('form.namePlaceholder')}
           value={name}
           onChangeText={setName}
         />
         <Input
+          label={t('form.description')}
           placeholder={t('form.descriptionPlaceholder')}
           value={description}
           onChangeText={setDescription}
           variant="textarea"
         />
 
-        <Text style={[styles.sectionLabel, { color: colors.textColor }]}>{t('form.color')}</Text>
-        <ColorPickerRow
-          colors={LIST_COLORS}
-          selected={color}
-          onSelect={setColor}
-          colorScheme={colorScheme}
-        />
-
-        <Text style={[styles.sectionLabel, { color: colors.textColor }]}>{t('form.icon')}</Text>
-        <IconPickerRow
-          selected={icon}
-          onSelect={setIcon}
-          accentColor={color}
-          colorScheme={colorScheme}
-        />
+        {/* Anteprima non cliccabile di come apparirà la card lista, con controlli per modificare icona/colore */}
+        <View pointerEvents="none">
+          <ListCard
+            title={name || t('form.namePlaceholder')}
+            icon={resolvePreviewIcon(icon)}
+            color={color}
+            itemsCount={0}
+          />
+        </View>
+        <View style={styles.appearanceControls}>
+          <Button variant="soft" icon={Pencil} label={t('form.editIcon')} onPress={() => setShowIconPicker(true)} />
+          <ColorPickerTooltip
+            colors={listColors}
+            selected={color}
+            onSelect={setColor}
+            colorScheme={colorScheme}
+            label={t('form.editColor')}
+          />
+        </View>
 
         {categories.length > 0 && (
           <>
@@ -156,7 +160,7 @@ export default function ListFormScreen() {
 
         <View style={styles.switchRow}>
           <Text style={[styles.switchLabel, { color: colors.textColor }]}>{t('form.hidden')}</Text>
-          <Switch value={isHidden} onValueChange={setIsHidden} />
+          <Switch value={isHidden} onChange={setIsHidden} />
         </View>
 
         {displayError && <Text style={styles.error}>{displayError}</Text>}
@@ -168,12 +172,14 @@ export default function ListFormScreen() {
         />
 
         {isEdit && (
-          <Button
-            variant="secondary"
-            label={t('form.delete')}
-            onPress={() => setShowDeleteConfirm(true)}
-            loading={deleting}
-          />
+          <View style={styles.deleteZone}>
+            <Button
+              variant="secondary"
+              label={t('form.delete')}
+              onPress={() => setShowDeleteConfirm(true)}
+              loading={deleting}
+            />
+          </View>
         )}
       </ScrollView>
 
@@ -186,6 +192,13 @@ export default function ListFormScreen() {
         colorScheme={colorScheme}
         onConfirm={handleDeleteConfirmed}
         onCancel={() => setShowDeleteConfirm(false)}
+      />
+
+      <IconPickerSheet
+        visible={showIconPicker}
+        onClose={() => setShowIconPicker(false)}
+        selected={icon}
+        onSelect={setIcon}
       />
     </SafeAreaView>
   );
@@ -202,6 +215,11 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 16,
   },
+  appearanceControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   chipWrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -214,6 +232,9 @@ const styles = StyleSheet.create({
   },
   switchLabel: {
     fontSize: 16,
+  },
+  deleteZone: {
+    marginTop: Spacing.four,
   },
   error: {
     fontSize: 14,

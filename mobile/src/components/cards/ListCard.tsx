@@ -18,7 +18,8 @@ type ListCardProps = {
   color: string;
   /** Numero di elementi nella lista: sempre visibile, "0" se vuota, "N/N" altrimenti. */
   itemsCount: number;
-  onPress: () => void;
+  /** Se assente la card non è cliccabile (es. anteprima in sola lettura). */
+  onPress?: () => void;
 };
 
 /** Card lista: emoji della lista (o icona gigante ruotata di fallback) a riempimento dell'area sinistra,

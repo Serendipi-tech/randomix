@@ -3,6 +3,7 @@ import {
   Platform,
   Pressable,
   StyleSheet,
+  Text,
   TextInput,
   View,
   type StyleProp,
@@ -40,6 +41,9 @@ type InputProps = {
   disabled?: boolean;
   /** Solo per variant `password`: mostra l'indicatore di forza (default true). */
   showStrength?: boolean;
+  /** Etichetta sopra il campo; con `required` mostra un asterisco rosso accanto. */
+  label?: string;
+  required?: boolean;
   /** Stile del contenitore esterno (layout: margini, larghezza...). */
   style?: StyleProp<ViewStyle>;
 } & Omit<TextInputProps, ControlledTextInputProps>;
@@ -54,6 +58,8 @@ export function Input({
   placeholder,
   disabled = false,
   showStrength = true,
+  label,
+  required = false,
   style,
   ...textInputProps
 }: InputProps) {
@@ -68,46 +74,53 @@ export function Input({
   const isPassword = variant === 'password';
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.foreground,
-          borderColor: isFocused ? colors.primary : colors.border,
-          alignItems: isTextarea ? 'flex-start' : 'center',
-        },
-        disabled ? styles.disabled : null,
-        style,
-      ]}
-    >
-      <TextInput
-        {...textInputProps}
-        value={value}
-        onChangeText={onChangeText}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        editable={!disabled}
-        placeholder={placeholder}
-        placeholderTextColor={colors.disabled}
-        secureTextEntry={isPassword && !showPassword}
-        multiline={isTextarea}
-        numberOfLines={isTextarea ? 4 : undefined}
-        style={[
-          styles.field,
-          { color: colors.textColor },
-          isTextarea ? styles.textarea : null,
-          // Rimuove il contorno di focus del browser su web (non tipizzato in RNWeb)
-          Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : null,
-        ]}
-      />
-      {isPassword && (
-        <View style={styles.passwordControls}>
-          {showStrength && <PasswordIndicator value={value} t={t} />}
-          <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={13} disabled={disabled}>
-            {showPassword ? <EyeOff size={18} color={colors.disabled} /> : <Eye size={18} color={colors.disabled} />}
-          </Pressable>
-        </View>
+    <View style={style}>
+      {label && (
+        <Text style={[styles.label, { color: colors.textColor }]}>
+          {label}
+          {required && <Text style={{ color: colors.error }}> *</Text>}
+        </Text>
       )}
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.foreground,
+            borderColor: isFocused ? colors.primary : colors.border,
+            alignItems: isTextarea ? 'flex-start' : 'center',
+          },
+          disabled ? styles.disabled : null,
+        ]}
+      >
+        <TextInput
+          {...textInputProps}
+          value={value}
+          onChangeText={onChangeText}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          editable={!disabled}
+          placeholder={placeholder}
+          placeholderTextColor={colors.disabled}
+          secureTextEntry={isPassword && !showPassword}
+          multiline={isTextarea}
+          numberOfLines={isTextarea ? 4 : undefined}
+          style={[
+            styles.field,
+            { color: colors.textColor },
+            isTextarea ? styles.textarea : null,
+            // Rimuove il contorno di focus del browser su web (non tipizzato in RNWeb)
+            Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : null,
+          ]}
+        />
+        {isPassword && (
+          <View style={styles.passwordControls}>
+            {showStrength && <PasswordIndicator value={value} t={t} />}
+            <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={13} disabled={disabled}>
+              {showPassword ? <EyeOff size={18} color={colors.disabled} /> : <Eye size={18} color={colors.disabled} />}
+            </Pressable>
+          </View>
+        )}
+      </View>
     </View>
   );
 }
@@ -125,10 +138,15 @@ function PasswordIndicator({ value, t }: { value: string; t: (key: string) => st
 }
 
 const styles = StyleSheet.create({
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 6,
+  },
   container: {
     flexDirection: 'row',
     borderWidth: 1.5,
-    borderRadius: 14,
+    borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
     minHeight: 48,
@@ -136,7 +154,7 @@ const styles = StyleSheet.create({
   },
   field: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 16,
   },
   textarea: {
     minHeight: 80,

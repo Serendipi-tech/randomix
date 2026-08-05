@@ -29,6 +29,7 @@ export function ColorPickerRow({ colors, selected, onSelect, colorScheme }: Colo
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 10,
   },
   ring: {
