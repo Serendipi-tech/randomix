@@ -1,15 +1,26 @@
 import { useEffect, useState } from 'react';
 import { Tabs, TabList, TabTrigger, TabSlot, type TabTriggerSlotProps, type TabListProps } from 'expo-router/ui';
 import { BlurView } from 'expo-blur';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Platform, Pressable, StyleSheet, View, type LayoutChangeEvent, type ViewStyle } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
-import Svg, { Path } from 'react-native-svg';
+import Animated, {
+  Easing,
+  Extrapolation,
+  interpolate,
+  useAnimatedProps,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+import Svg, { Defs, LinearGradient as SvgLinearGradient, Path, Stop } from 'react-native-svg';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { Bell, Home, LayoutGrid, Users } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { buildFillWavePath } from '@/utils/buildFillWavePath';
+
+const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 const BAR_HEIGHT = 68;
 const CORNER = 12;
@@ -19,6 +30,8 @@ const HOME_SIZE = 52;
 const HOME_LIFT = (BAR_HEIGHT - HOME_SIZE) / 2;
 const NOTCH_HALF_WIDTH = 76;
 const NOTCH_DEPTH = 64;
+const WAVE_AMPLITUDE = 5;
+const WAVE_DURATION = 800;
 
 const SIDE_TAB_ICONS = {
   profile: Users,
@@ -120,33 +133,48 @@ function SideTabButton({ name, isFocused, ...props }: SideTabButtonProps) {
   );
 }
 
-/** Pulsante Home: sfondo primary di base con il gradient secondary→secondaryGradient in overlay.
- *  Scala e opacità del gradient usano valori separati per lo stesso motivo di SideTabButton:
- *  lo spring della scala può rimbalzare, l'opacità deve solo salire/scendere senza oscillare. */
+/** Pulsante Home: sfondo primary di base, il colore secondary→secondaryGradient sale come
+ *  un'onda (cresta singola, vedi buildFillWavePath) fino a riempire il cerchio, fermandosi
+ *  appena sotto il bordo per lasciare sempre un filo d'onda visibile. La cresta scorre in x
+ *  in contemporanea alla risalita: stesso timing (durata + easing) di progress, nessuna
+ *  sequenza né oscillazione dopo il riempimento. Scala separata dal resto: lo spring può
+ *  rimbalzare, l'onda no. */
 function HomeButton({ isFocused, ...props }: TabTriggerSlotProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
+  const crestXLeft = HOME_SIZE * 0.15;
+  const crestXRight = HOME_SIZE * 0.55;
+
   const scale = useSharedValue(isFocused ? 1.05 : 1);
   const progress = useSharedValue(isFocused ? 1 : 0);
+  const crestX = useSharedValue(isFocused ? crestXRight : crestXLeft);
   useEffect(() => {
     scale.value = withSpring(isFocused ? 1.05 : 1, { damping: 12, stiffness: 300 });
-    progress.value = withTiming(isFocused ? 1 : 0, { duration: 200 });
-  }, [isFocused, scale, progress]);
+    progress.value = withTiming(isFocused ? 1 : 0, { duration: WAVE_DURATION, easing: Easing.out(Easing.cubic) });
+    crestX.value = withTiming(isFocused ? crestXRight : crestXLeft, {
+      duration: WAVE_DURATION,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [isFocused, scale, progress, crestX, crestXLeft, crestXRight]);
 
   const scaleStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-  const gradientStyle = useAnimatedStyle(() => ({ opacity: progress.value }));
+  const waveProps = useAnimatedProps(() => {
+    const waveY = interpolate(progress.value, [0, 1], [HOME_SIZE + WAVE_AMPLITUDE, WAVE_AMPLITUDE], Extrapolation.CLAMP);
+    return { d: buildFillWavePath(HOME_SIZE, HOME_SIZE, waveY, WAVE_AMPLITUDE, crestX.value) };
+  });
 
   return (
     <Pressable {...props} style={[styles.homeButton, { backgroundColor: colors.primary }]} hitSlop={6}>
-      <Animated.View style={[StyleSheet.absoluteFill, gradientStyle]}>
-        <LinearGradient
-          colors={[colors.secondary, colors.secondaryGradient]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
-      </Animated.View>
+      <Svg width={HOME_SIZE} height={HOME_SIZE} style={StyleSheet.absoluteFill}>
+        <Defs>
+          <SvgLinearGradient id="homeWaveGradient" x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor={colors.secondary} />
+            <Stop offset="1" stopColor={colors.secondaryGradient} />
+          </SvgLinearGradient>
+        </Defs>
+        <AnimatedPath animatedProps={waveProps} fill="url(#homeWaveGradient)" />
+      </Svg>
       <Animated.View style={[styles.homeIconStack, scaleStyle]}>
         <Home size={24} color={colors.textColor} strokeWidth={2.5} />
       </Animated.View>
