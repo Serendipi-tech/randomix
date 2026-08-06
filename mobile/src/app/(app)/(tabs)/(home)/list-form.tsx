@@ -225,7 +225,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: Spacing.four,
+    paddingHorizontal: Spacing.four,
+    paddingTop: 0,
+    paddingBottom: Spacing.four,
     gap: Spacing.three,
   },
   sectionLabel: {

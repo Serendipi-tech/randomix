@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.four,
-    paddingBottom: 20,
+    paddingBottom: 30,
     gap: 8,
   },
   topRow: {

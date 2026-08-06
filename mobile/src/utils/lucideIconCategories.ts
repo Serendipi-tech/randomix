@@ -7,6 +7,12 @@ export type IconCategory = {
   icons: string[]; // nomi export PascalCase di lucide-react-native
 };
 
+export type SearchableIcon = {
+  name: string; // nome export PascalCase
+  categoryKey: string; // categoria di appartenenza (per saltarci quando trovata da ricerca)
+  haystack: string; // slug + tag ufficiali, minuscolo, per il match testuale
+};
+
 // Poche parole chiave per macroargomento: il raggruppamento è euristico (basato sui tag ufficiali
 // di lucide-static), non la categorizzazione esatta del sito lucide.dev.
 const CATEGORY_KEYWORDS: { key: string; label: string; keywords: string[] }[] = [
@@ -42,12 +48,13 @@ function normalizeForCompare(words: string[]): string[] {
   return words.map((w) => w.replace(/\d+$/, '')).filter(Boolean);
 }
 
-/** Tiene solo le icone "radice" di una categoria: se "Account"/"Clock" sono già presenti, scarta le
- *  varianti ("AccountDelete", "Clock1"..."Clock12"...) confrontando le parole PascalCase per intero
- *  (numeri finali ignorati), non per sottostringa (così "Car" non scarta "Card"). Poi limita il
- *  risultato a MAX_ICONS_PER_CATEGORY tenendo le icone più "di base" (nome radice, non numerato),
- *  infine riordina alfabeticamente per la visualizzazione. */
-function dedupeAndCap(names: string[]): string[] {
+/** Tiene solo le icone "radice" di un elenco: se "Account"/"Clock" sono presenti, scarta le varianti
+ *  ("AccountDelete", "Clock1"..."Clock12"...) confrontando le parole PascalCase per intero (numeri
+ *  finali ignorati), non per sottostringa (così "Car" non scarta "Card"). Applicata UNA VOLTA su
+ *  tutto l'elenco globale delle icone, PRIMA di smistarle nelle categorie — altrimenti il cap per
+ *  categoria si applicherebbe già a un sottoinsieme "sporco" di varianti, riducendo artificialmente
+ *  quante icone uniche restano disponibili per categoria. */
+function dedupeGlobal(names: string[]): string[] {
   const withWords = names.map((name) => {
     const words = splitPascalWords(name);
     return { name, compareWords: normalizeForCompare(words) };
@@ -72,42 +79,61 @@ function dedupeAndCap(names: string[]): string[] {
     kept.push(name);
   }
 
-  return kept.slice(0, MAX_ICONS_PER_CATEGORY).sort((a, b) => a.localeCompare(b));
+  return kept;
 }
 
 /** Raggruppa tutte le icone Lucide disponibili in macroargomenti, cercando le parole chiave
- *  di CATEGORY_KEYWORDS dentro slug + tag ufficiali (lucide-static/tags.json). Ogni icona finisce
- *  in UNA sola categoria (la prima che matcha, nell'ordine di CATEGORY_KEYWORDS) — mai duplicata
- *  tra sezioni diverse; se non matcha nessuna parola chiave finisce in "Altro". Calcolato una sola
- *  volta al load del modulo. */
-function buildIconCategories(): IconCategory[] {
-  const buckets = new Map<string, Set<string>>(CATEGORY_KEYWORDS.map((c) => [c.key, new Set<string>()]));
-  const other = new Set<string>();
-
+ *  di CATEGORY_KEYWORDS dentro slug + tag ufficiali (lucide-static/tags.json).
+ *
+ *  Ordine delle operazioni (importante): 1) valido tutte le icone reali, 2) deduplico le varianti
+ *  A MONTE su tutto l'elenco globale, 3) smisto le icone deduplicate nelle categorie (una sola
+ *  categoria a testa, la prima che matcha — mai duplicata tra sezioni), 4) taglio a
+ *  MAX_ICONS_PER_CATEGORY solo a questo punto. Così il limite per categoria non viene "consumato"
+ *  da varianti che sarebbero comunque state scartate. */
+function buildIconData(): { categories: IconCategory[]; searchable: SearchableIcon[] } {
+  const validIcons: { pascal: string; haystack: string }[] = [];
   for (const [slug, iconTags] of Object.entries(tags as Record<string, string[]>)) {
     const pascal = slugToPascalCase(slug);
     if (!getLucideIcon(pascal)) continue; // solo icone realmente esportate dalla libreria installata
+    validIcons.push({ pascal, haystack: `${slug} ${iconTags.join(' ')}`.toLowerCase() });
+  }
 
-    const haystack = `${slug} ${iconTags.join(' ')}`.toLowerCase();
+  const dedupedNames = new Set(dedupeGlobal(validIcons.map((i) => i.pascal).sort()));
+  const dedupedIcons = validIcons.filter((i) => dedupedNames.has(i.pascal));
+
+  const buckets = new Map<string, Set<string>>(CATEGORY_KEYWORDS.map((c) => [c.key, new Set<string>()]));
+  const other = new Set<string>();
+  // indice di ricerca: TUTTE le icone deduplicate con la loro categoria, non solo le prime
+  // MAX_ICONS_PER_CATEGORY mostrate sfogliando — altrimenti la ricerca "perderebbe" le icone tagliate dal cap.
+  const searchable: SearchableIcon[] = [];
+
+  for (const { pascal, haystack } of dedupedIcons) {
     const category = CATEGORY_KEYWORDS.find((c) => c.keywords.some((keyword) => haystack.includes(keyword)));
+    const categoryKey = category?.key ?? OTHER_CATEGORY.key;
     if (category) {
       buckets.get(category.key)!.add(pascal);
     } else {
       other.add(pascal);
     }
+    searchable.push({ name: pascal, categoryKey, haystack });
   }
 
   const categories = CATEGORY_KEYWORDS.map((c) => ({
     key: c.key,
     label: c.label,
-    icons: dedupeAndCap(Array.from(buckets.get(c.key)!).sort()),
+    icons: Array.from(buckets.get(c.key)!).sort().slice(0, MAX_ICONS_PER_CATEGORY),
   })).filter((c) => c.icons.length > 0);
 
   if (other.size > 0) {
-    categories.push({ ...OTHER_CATEGORY, icons: dedupeAndCap(Array.from(other).sort()) });
+    categories.push({ ...OTHER_CATEGORY, icons: Array.from(other).sort().slice(0, MAX_ICONS_PER_CATEGORY) });
   }
 
-  return categories;
+  return { categories, searchable };
 }
 
-export const ICON_CATEGORIES: IconCategory[] = buildIconCategories();
+const { categories: builtCategories, searchable: builtSearchable } = buildIconData();
+
+export const ICON_CATEGORIES: IconCategory[] = builtCategories;
+/** Tutte le icone deduplicate (non limitate a MAX_ICONS_PER_CATEGORY), per la ricerca: sfogliare
+ *  le categorie mostra solo le prime N, ma cercare per nome deve poter trovare qualsiasi icona. */
+export const SEARCHABLE_ICONS: SearchableIcon[] = builtSearchable;

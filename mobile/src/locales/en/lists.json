@@ -22,6 +22,9 @@
     "editIcon": "Edit icon",
     "editColor": "Edit color",
     "iconPickerTitle": "Icon",
+    "iconSearchPlaceholder": "Search icon or category...",
+    "iconSearchResults": "Results",
+    "iconNoResults": "No icon found",
     "iconCategories": {
       "people": "People & animals",
       "nature": "Nature & weather",

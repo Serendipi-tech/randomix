@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   label: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
   },
   counter: {
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   },
   field: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
   },
   textarea: {
     minHeight: 80,
