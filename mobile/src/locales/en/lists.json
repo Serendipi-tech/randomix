@@ -17,6 +17,8 @@
     "deleteConfirmMessage": "This can't be undone.",
     "cancel": "Cancel",
     "missingFields": "Name and icon are required.",
+    "nameTooLong": "Name can't be longer than {{max}} characters.",
+    "descriptionTooLong": "Description can't be longer than {{max}} characters.",
     "editIcon": "Edit icon",
     "editColor": "Edit color",
     "iconPickerTitle": "Icon",

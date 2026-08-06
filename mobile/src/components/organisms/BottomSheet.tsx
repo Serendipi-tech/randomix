@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Modal, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Modal, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
@@ -47,7 +47,10 @@ export function BottomSheet({ visible, onClose, children, height }: BottomSheetP
     // Modal (non solo View assoluta) per dipingere sempre sopra la navbar flottante, che è un sibling
     // disegnato dopo il contenuto della schermata e altrimenti la coprirebbe.
     <Modal visible transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
-      <Pressable onPress={onClose} style={StyleSheet.absoluteFill}>
+      <Pressable
+        onPress={onClose}
+        style={[StyleSheet.absoluteFill, Platform.OS === 'web' ? ({ cursor: 'default' } as object) : null]}
+      >
         <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: hexToRgba(colors.shadow, 0.45) }, backdropStyle]} />
       </Pressable>
       <Animated.View style={[styles.anchor, sheetStyle]}>

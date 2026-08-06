@@ -74,7 +74,10 @@ export function Tooltip({ trigger, content, visible, onToggle }: TooltipProps) {
 
       {mounted && (
         <Modal visible transparent animationType="none" statusBarTranslucent onRequestClose={() => setOpen(false)}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={() => setOpen(false)} />
+          <Pressable
+            style={[StyleSheet.absoluteFill, Platform.OS === 'web' ? ({ cursor: 'default' } as object) : null]}
+            onPress={() => setOpen(false)}
+          />
           {panelPosition && (
             <Animated.View
               pointerEvents={open ? 'auto' : 'none'}

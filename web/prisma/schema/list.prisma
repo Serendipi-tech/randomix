@@ -1,10 +1,10 @@
 model List {
     id String @id @default(cuid())
 
-    name        String
+    name        String  @db.VarChar(20)
     icon        String
     color       String
-    description String?
+    description String? @db.VarChar(225)
 
     isHidden               Boolean @default(false) // nasconde o mostra la lista agli amici
     isGiftedAtRegistration Boolean @default(false) // se è "gratis" all'iscrizione

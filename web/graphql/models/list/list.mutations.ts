@@ -24,9 +24,25 @@ const UpdateListInput = builder.inputType('UpdateListInput', {
   }),
 });
 
+const NAME_MAX_LENGTH = 20;
+const DESCRIPTION_MAX_LENGTH = 225;
+
 function requireAuth(userId: string | null): asserts userId is string {
   if (!userId) {
     throw new GraphQLError('Non autenticato.', { extensions: { code: 'UNAUTHENTICATED' } });
+  }
+}
+
+function validateListFields(name: string | null | undefined, description: string | null | undefined) {
+  if (name != null && name.trim().length > NAME_MAX_LENGTH) {
+    throw new GraphQLError(`Il nome non può superare i ${NAME_MAX_LENGTH} caratteri.`, {
+      extensions: { code: 'BAD_USER_INPUT' },
+    });
+  }
+  if (description != null && description.length > DESCRIPTION_MAX_LENGTH) {
+    throw new GraphQLError(`La descrizione non può superare i ${DESCRIPTION_MAX_LENGTH} caratteri.`, {
+      extensions: { code: 'BAD_USER_INPUT' },
+    });
   }
 }
 
@@ -45,6 +61,7 @@ builder.mutationField('createList', (t) =>
     args: { input: t.arg({ type: CreateListInput, required: true }) },
     resolve: async (query, _root, { input }, ctx) => {
       requireAuth(ctx.userId);
+      validateListFields(input.name, input.description);
       return prisma.list.create({
         ...query,
         data: {
@@ -73,6 +90,7 @@ builder.mutationField('updateList', (t) =>
     resolve: async (query, _root, { id, input }, ctx) => {
       requireAuth(ctx.userId);
       await requireOwnedList(String(id), ctx.userId);
+      validateListFields(input.name, input.description);
       return prisma.list.update({
         ...query,
         where: { id: String(id) },

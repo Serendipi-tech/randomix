@@ -54,14 +54,14 @@ export function Button({ variant = 'primary', label, onPress, disabled = false, 
         style={({ pressed }) => [
           styles.softButton,
           pressTransition,
-          { backgroundColor: hexToRgba(colors.textColor, 0.1) },
+          { backgroundColor: colors.foreground },
           pressed && !isBlocked ? styles.pressed : null,
         ]}
         onPress={onPress}
         disabled={isBlocked}
         android_ripple={{ color: colors.textColor, radius: 8 }}
       >
-        {Icon && <Icon size={16} color={colors.textColor} />}
+        {Icon && <Icon size={18} color={colors.textColor} />}
         {swatchColor && <View style={[styles.swatch, { backgroundColor: swatchColor }]} />}
         <Text style={[styles.softLabel, { color: colors.textColor }]}>{label}</Text>
       </Pressable>
@@ -149,13 +149,14 @@ const styles = StyleSheet.create({
   softButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    justifyContent: 'center',
+    gap: 8,
+    minHeight: 44,
+    paddingHorizontal: 16,
     borderRadius: 10,
   },
   softLabel: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
   },
   swatch: {

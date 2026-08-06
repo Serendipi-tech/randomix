@@ -76,9 +76,10 @@ function dedupeAndCap(names: string[]): string[] {
 }
 
 /** Raggruppa tutte le icone Lucide disponibili in macroargomenti, cercando le parole chiave
- *  di CATEGORY_KEYWORDS dentro slug + tag ufficiali (lucide-static/tags.json). Un'icona può
- *  finire in più categorie; se non matcha nessuna parola chiave finisce in "Altro". Calcolato
- *  una sola volta al load del modulo. */
+ *  di CATEGORY_KEYWORDS dentro slug + tag ufficiali (lucide-static/tags.json). Ogni icona finisce
+ *  in UNA sola categoria (la prima che matcha, nell'ordine di CATEGORY_KEYWORDS) — mai duplicata
+ *  tra sezioni diverse; se non matcha nessuna parola chiave finisce in "Altro". Calcolato una sola
+ *  volta al load del modulo. */
 function buildIconCategories(): IconCategory[] {
   const buckets = new Map<string, Set<string>>(CATEGORY_KEYWORDS.map((c) => [c.key, new Set<string>()]));
   const other = new Set<string>();
@@ -88,14 +89,12 @@ function buildIconCategories(): IconCategory[] {
     if (!getLucideIcon(pascal)) continue; // solo icone realmente esportate dalla libreria installata
 
     const haystack = `${slug} ${iconTags.join(' ')}`.toLowerCase();
-    let matched = false;
-    for (const category of CATEGORY_KEYWORDS) {
-      if (category.keywords.some((keyword) => haystack.includes(keyword))) {
-        buckets.get(category.key)!.add(pascal);
-        matched = true;
-      }
+    const category = CATEGORY_KEYWORDS.find((c) => c.keywords.some((keyword) => haystack.includes(keyword)));
+    if (category) {
+      buckets.get(category.key)!.add(pascal);
+    } else {
+      other.add(pascal);
     }
-    if (!matched) other.add(pascal);
   }
 
   const categories = CATEGORY_KEYWORDS.map((c) => ({

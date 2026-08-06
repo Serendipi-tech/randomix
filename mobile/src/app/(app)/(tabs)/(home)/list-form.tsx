@@ -12,14 +12,17 @@ import { Button } from '@/components/atoms/Button';
 import { Switch } from '@/components/atoms/Switch';
 import { Input } from '@/components/molecules/Input';
 import { PageHeader } from '@/components/molecules/PageHeader';
-import { ColorPickerTooltip } from '@/components/molecules/ColorPickerTooltip';
 import { Chip } from '@/components/atoms/Chip';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { IconPickerSheet } from '@/components/organisms/IconPickerSheet';
+import { ColorPickerSheet } from '@/components/organisms/ColorPickerSheet';
 import { ListCard } from '@/components/cards/ListCard';
 import { useListCategories } from '@/utils/useListCategories';
 import { useListDetail } from '@/utils/useListDetail';
 import { useListMutations } from '@/utils/useListMutations';
+
+const NAME_MAX_LENGTH = 20;
+const DESCRIPTION_MAX_LENGTH = 225;
 
 export default function ListFormScreen() {
   const { t } = useTranslation('lists');
@@ -43,6 +46,7 @@ export default function ListFormScreen() {
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
+  const [showColorPicker, setShowColorPicker] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
   // precompilo il form quando arrivano i dati della lista in modifica
@@ -66,6 +70,14 @@ export default function ListFormScreen() {
     setLocalError(null);
     if (!name.trim()) {
       setLocalError(t('form.missingFields'));
+      return;
+    }
+    if (name.trim().length > NAME_MAX_LENGTH) {
+      setLocalError(t('form.nameTooLong', { max: NAME_MAX_LENGTH }));
+      return;
+    }
+    if (description.length > DESCRIPTION_MAX_LENGTH) {
+      setLocalError(t('form.descriptionTooLong', { max: DESCRIPTION_MAX_LENGTH }));
       return;
     }
     const input = {
@@ -92,7 +104,7 @@ export default function ListFormScreen() {
     setShowDeleteConfirm(false);
     if (!id) return;
     await deleteList(id);
-    router.replace('/(app)/(tabs)');
+    router.replace('/(app)/(tabs)/(home)');
   };
 
   const displayError = localError ?? error?.message ?? null;
@@ -111,6 +123,7 @@ export default function ListFormScreen() {
           placeholder={t('form.namePlaceholder')}
           value={name}
           onChangeText={setName}
+          maxLength={NAME_MAX_LENGTH}
         />
         <Input
           label={t('form.description')}
@@ -118,6 +131,7 @@ export default function ListFormScreen() {
           value={description}
           onChangeText={setDescription}
           variant="textarea"
+          maxLength={DESCRIPTION_MAX_LENGTH}
         />
 
         {/* Anteprima non cliccabile di come apparirà la card lista, con controlli per modificare icona/colore */}
@@ -131,13 +145,7 @@ export default function ListFormScreen() {
         </View>
         <View style={styles.appearanceControls}>
           <Button variant="soft" icon={Pencil} label={t('form.editIcon')} onPress={() => setShowIconPicker(true)} />
-          <ColorPickerTooltip
-            colors={listColors}
-            selected={color}
-            onSelect={setColor}
-            colorScheme={colorScheme}
-            label={t('form.editColor')}
-          />
+          <Button variant="soft" swatchColor={color} label={t('form.editColor')} onPress={() => setShowColorPicker(true)} />
         </View>
 
         {categories.length > 0 && (
@@ -199,6 +207,14 @@ export default function ListFormScreen() {
         onClose={() => setShowIconPicker(false)}
         selected={icon}
         onSelect={setIcon}
+      />
+
+      <ColorPickerSheet
+        visible={showColorPicker}
+        onClose={() => setShowColorPicker(false)}
+        colors={listColors}
+        selected={color}
+        onSelect={setColor}
       />
     </SafeAreaView>
   );

@@ -61,6 +61,7 @@ export function Input({
   label,
   required = false,
   style,
+  maxLength,
   ...textInputProps
 }: InputProps) {
   const { colorScheme } = useAppTheme();
@@ -75,11 +76,20 @@ export function Input({
 
   return (
     <View style={style}>
-      {label && (
-        <Text style={[styles.label, { color: colors.textColor }]}>
-          {label}
-          {required && <Text style={{ color: colors.error }}> *</Text>}
-        </Text>
+      {(label || maxLength) && (
+        <View style={styles.labelRow}>
+          {label && (
+            <Text style={[styles.label, { color: colors.textColor }]}>
+              {label}
+              {required && <Text style={{ color: colors.error }}> *</Text>}
+            </Text>
+          )}
+          {maxLength && (
+            <Text style={[styles.counter, { color: colors.disabled }]}>
+              {value.length}/{maxLength}
+            </Text>
+          )}
+        </View>
       )}
       <View
         style={[
@@ -94,6 +104,7 @@ export function Input({
       >
         <TextInput
           {...textInputProps}
+          maxLength={maxLength}
           value={value}
           onChangeText={onChangeText}
           onFocus={() => setIsFocused(true)}
@@ -138,10 +149,18 @@ function PasswordIndicator({ value, t }: { value: string; t: (key: string) => st
 }
 
 const styles = StyleSheet.create({
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
   label: {
     fontSize: 14,
     fontWeight: '600',
-    marginBottom: 6,
+  },
+  counter: {
+    fontSize: 12,
   },
   container: {
     flexDirection: 'row',
