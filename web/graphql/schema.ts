@@ -23,6 +23,11 @@ import './models/randomizer/randomizer.mutations';
 import './models/group/index';
 import './models/group/group.queries';
 import './models/group/group.mutations';
+import './models/adminDashboard/index';
+import './models/adminDashboard/adminDashboard.queries';
+import './models/adminUser/index';
+import './models/adminUser/adminUser.queries';
+import './models/adminUser/adminUser.mutations';
 
 builder.queryType({});
 builder.mutationType({});

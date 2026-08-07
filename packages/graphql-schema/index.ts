@@ -13,3 +13,6 @@ export * as RandomizerQueries from './gql_crud/randomizer/randomizer.queries';
 export * as RandomizerMutations from './gql_crud/randomizer/randomizer.mutations';
 export * as GroupQueries from './gql_crud/group/group.queries';
 export * as GroupMutations from './gql_crud/group/group.mutations';
+export * as AdminDashboardQueries from './gql_crud/adminDashboard/adminDashboard.queries';
+export * as AdminUserQueries from './gql_crud/adminUser/adminUser.queries';
+export * as AdminUserMutations from './gql_crud/adminUser/adminUser.mutations';

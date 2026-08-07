@@ -3,6 +3,7 @@ import { startServerAndCreateNextHandler } from '@as-integrations/next';
 import { type NextRequest, NextResponse } from 'next/server';
 import { schema } from '@graphql/schema';
 import { verifyToken } from '@/lib/jwt';
+import { ADMIN_SESSION_COOKIE } from '@/lib/session';
 import type { Context } from '@graphql/builder';
 
 const server = new ApolloServer<Context>({
@@ -13,7 +14,11 @@ const server = new ApolloServer<Context>({
 const apolloHandler = startServerAndCreateNextHandler<NextRequest, Context>(server, {
   context: async (req) => {
     const auth = req.headers.get('authorization');
-    const token = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
+    const bearerToken = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
+    // fallback sul cookie httpOnly: le chiamate Apollo lato browser del pannello admin
+    // non possono leggerlo/reinviarlo come header, ma il browser lo allega da solo
+    const cookieToken = req.cookies.get(ADMIN_SESSION_COOKIE)?.value ?? null;
+    const token = bearerToken ?? cookieToken;
     if (!token) return { userId: null };
 
     const payload = await verifyToken(token);
