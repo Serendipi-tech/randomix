@@ -1,9 +1,11 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'confirm' | 'gradient';
+export type ButtonSize = 'md' | 'sm';
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'children'> {
   variant?: ButtonVariant;
+  size?: ButtonSize;
   label: string;
   loading?: boolean;
 }
@@ -17,8 +19,14 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   gradient: 'border-0 bg-gradient-to-br from-secondary to-secondary-gradient text-text-color',
 };
 
+// sm: per contesti stretti (azioni dentro una card) — stessa forma, meno padding/testo più piccolo.
+const SIZE_CLASSES: Record<ButtonSize, string> = {
+  md: 'rounded-[14px] px-6 py-[15px] text-sm',
+  sm: 'rounded-lg px-3 py-1.5 text-xs',
+};
+
 // disabled forza sempre l'aspetto ghost, a prescindere dalla variante richiesta (stesso comportamento del Button mobile)
-export function Button({ variant = 'primary', label, loading = false, disabled, ...rest }: ButtonProps) {
+export function Button({ variant = 'primary', size = 'md', label, loading = false, disabled, ...rest }: ButtonProps) {
   const isBlocked = disabled || loading;
   const effectiveVariant: ButtonVariant = disabled ? 'ghost' : variant;
 
@@ -26,7 +34,7 @@ export function Button({ variant = 'primary', label, loading = false, disabled, 
     <button
       {...rest}
       disabled={isBlocked}
-      className={`rounded-[14px] px-6 py-[15px] text-center text-sm font-semibold uppercase tracking-wide transition-transform active:scale-[0.97] disabled:opacity-50 ${VARIANT_CLASSES[effectiveVariant]}`}
+      className={`text-center font-semibold uppercase tracking-wide transition-transform active:scale-[0.97] disabled:opacity-50 ${SIZE_CLASSES[size]} ${VARIANT_CLASSES[effectiveVariant]}`}
     >
       {loading ? <Spinner /> : (label as ReactNode)}
     </button>

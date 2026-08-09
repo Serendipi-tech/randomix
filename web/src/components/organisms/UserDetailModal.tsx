@@ -33,9 +33,15 @@ export function UserDetailModal({ userId, onClose }: UserDetailModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      onClick={(e) => {
+        e.stopPropagation();
+        onClose();
+      }}
+    >
       <div
-        className="w-full max-w-md rounded-2xl border border-border bg-foreground p-6"
+        className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border border-border bg-foreground p-6"
         onClick={(e) => e.stopPropagation()}
       >
         {loading && <p className="text-sm text-disabled">Caricamento…</p>}

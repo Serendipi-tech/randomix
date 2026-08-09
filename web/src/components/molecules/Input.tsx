@@ -34,7 +34,7 @@ export function Input({
   const isPassword = variant === 'password';
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex min-w-0 flex-1 flex-col gap-1.5">
       {label && (
         <label className="text-sm font-semibold text-text-color">
           {label}

@@ -9,5 +9,6 @@ export const TagRef = builder.prismaObject('Tag', {
     isSystem: t.boolean({
       resolve: (tag) => tag.userId == null,
     }),
+    itemsCount: t.relationCount('useItems'),
   }),
 });

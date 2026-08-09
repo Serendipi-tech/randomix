@@ -9,6 +9,8 @@ export const LIST_CATEGORIES: DocumentNode = parse(`
       description
       icon
       includedCategories
+      listsCount
+      groupListsCount
     }
   }
 `);
