@@ -1,12 +1,13 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { X } from 'lucide-react-native';
+import { useState } from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import { Star } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
-import { hexToRgba } from '@/utils/color';
+import { PLACEHOLDER_ITEM_IMAGE } from '@/constants/placeholders';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { CardShell } from '@/components/cards/CardShell';
 import { StatusBadge } from '@/components/atoms/StatusBadge';
-import { RatingStar } from '@/components/atoms/RatingStar';
 import { TagList } from '@/components/molecules/TagList';
+import { ItemCardDetails, type ItemCardDetailsProps } from '@/components/organisms/ItemCardDetails';
 
 type ThemeColors = (typeof Colors)[keyof typeof Colors];
 
@@ -21,13 +22,15 @@ type ItemCardProps = {
   imageUri?: string;
   rating?: number;
   tags?: ItemTag[];
-  /** Se presente la card è cliccabile; altrimenti è statica (es. anteprima in sola lettura). */
+  /** Dati/azioni del bottomsheet di dettaglio: se presente, il tap sulla card lo apre SEMPRE. */
+  detail?: Omit<ItemCardDetailsProps, 'visible' | 'onClose'>;
+  /** Tap alternativo quando la card non ha un dettaglio (es. anteprima statica). */
   onPress?: () => void;
-  /** Se presente, mostra la ✕ di rimozione in alto a destra. */
-  onRemove?: () => void;
 };
 
-const STAR_COUNT = 5;
+const IMAGE_WIDTH = 72;
+const TITLE_HEIGHT = 44;
+const MAX_RATING = 5;
 
 // Mappa neutra nome-stato -> colore del tema, nessun enum di dominio: fallback su info
 function resolveStatusColor(status: string, colors: ThemeColors): string {
@@ -41,37 +44,41 @@ function resolveStatusColor(status: string, colors: ThemeColors): string {
   return map[status.toUpperCase()] ?? colors.info;
 }
 
-/** Card di item: categoria + stato, titolo e footer con tag e rating. L'area immagine appare solo con `imageUri`.
- *  L'intera card è cliccabile via CardShell; l'apertura del dettaglio resta al chiamante tramite `onPress`. */
-export function ItemCard({ title, category, status, statusColor, imageUri, rating, tags, onPress, onRemove }: ItemCardProps) {
+/** Card di item: categoria + stato, titolo ad altezza fissa e footer con tag e rating (stella frazionaria + valore).
+ *  Colonna immagine full-bleed a destra (placeholder se senza `imageUri`). Shell condivisa (CardShell); tap gestito dal chiamante. */
+export function ItemCard({ title, category, status, statusColor, imageUri, rating, tags, detail, onPress }: ItemCardProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const hasFooter = (tags && tags.length > 0) || rating !== undefined;
-  // Numero di stelle piene arrotondato sul rating
-  const filledStars = rating !== undefined ? Math.round(rating) : 0;
+  // Percentuale di riempimento della stella singola in base al rating (0..MAX_RATING)
+  const fillPercent = rating !== undefined ? Math.min(rating / MAX_RATING, 1) * 100 : 0;
+  // Regola fissa: con un dettaglio il tap apre sempre il bottomsheet; altrimenti resta il tap del chiamante
+  const handlePress = detail ? () => setDetailOpen(true) : onPress;
 
   return (
-    <CardShell onPress={onPress}>
-      <View style={styles.row}>
+    <>
+      <CardShell onPress={handlePress}>
+      {/* Margine negativo per annullare il padding del guscio e ottenere il layout full-bleed */}
+      <View style={styles.fullBleed}>
         <View style={styles.body}>
-          <View style={styles.header}>
-            {category && (
-              <Text style={[styles.category, { color: colors.textColor }]} numberOfLines={1}>
-                {category}
-              </Text>
-            )}
-            {status && <StatusBadge label={status} color={statusColor ?? resolveStatusColor(status, colors)} />}
-            {onRemove && (
-              <Pressable onPress={onRemove} hitSlop={8} style={styles.remove}>
-                <X size={16} color={colors.disabled} />
-              </Pressable>
-            )}
-          </View>
+          <View style={styles.topGroup}>
+            <View style={styles.header}>
+              {category && (
+                <Text style={[styles.category, { color: colors.textColor }]} numberOfLines={1}>
+                  {category}
+                </Text>
+              )}
+              {status && <StatusBadge label={status} color={statusColor ?? resolveStatusColor(status, colors)} />}
+            </View>
 
-          <Text style={[styles.title, { color: colors.textColor }]} numberOfLines={2} ellipsizeMode="tail">
-            {title}
-          </Text>
+            <View style={styles.titleWrap}>
+              <Text style={[styles.title, { color: colors.textColor }]} numberOfLines={2} ellipsizeMode="tail">
+                {title}
+              </Text>
+            </View>
+          </View>
 
           {hasFooter && (
             <View style={styles.footer}>
@@ -82,41 +89,47 @@ export function ItemCard({ title, category, status, statusColor, imageUri, ratin
               )}
               {rating !== undefined && (
                 <View style={styles.rating}>
-                  {Array.from({ length: STAR_COUNT }).map((_, i) => (
-                    <RatingStar
-                      key={i}
-                      active={i < filledStars}
-                      color={colors.warning}
-                      inactiveColor={colors.border}
-                      onPress={() => {}}
-                    />
-                  ))}
+                  <View style={styles.starWrap}>
+                    <Star size={14} color={colors.border} fill={colors.border} strokeWidth={0} style={styles.starBase} />
+                    <View style={[styles.starClip, { width: `${fillPercent}%` }]}>
+                      <Star size={14} color={colors.warning} fill={colors.warning} strokeWidth={0} />
+                    </View>
+                  </View>
+                  <Text style={[styles.ratingValue, { color: colors.textColor }]}>{rating.toFixed(1)}</Text>
                 </View>
               )}
             </View>
           )}
         </View>
 
-        {imageUri && (
-          <View style={[styles.imageWrap, { backgroundColor: hexToRgba(colors.primary, 0.15) }]}>
-            <Image source={{ uri: imageUri }} style={styles.image} resizeMode="cover" />
-          </View>
-        )}
+        <View style={styles.imageWrap}>
+          {/* Placeholder statico temporaneo quando manca imageUri (in attesa della gestione immagini) */}
+          <Image source={imageUri ? { uri: imageUri } : PLACEHOLDER_ITEM_IMAGE} style={styles.image} resizeMode="cover" />
+        </View>
       </View>
-    </CardShell>
+      </CardShell>
+
+      {detail && <ItemCardDetails visible={detailOpen} onClose={() => setDetailOpen(false)} {...detail} />}
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
+  fullBleed: {
+    margin: -16,
     flexDirection: 'row',
     alignItems: 'stretch',
     gap: 12,
+    overflow: 'hidden',
   },
   body: {
     flex: 1,
     justifyContent: 'space-between',
-    gap: 8,
+    paddingVertical: 12,
+    paddingLeft: 16,
+  },
+  topGroup: {
+    gap: 4,
   },
   header: {
     flexDirection: 'row',
@@ -124,13 +137,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 8,
   },
-  remove: {
-    padding: 2,
-  },
   category: {
     fontSize: 14,
     opacity: 0.7,
     flex: 1,
+  },
+  titleWrap: {
+    height: TITLE_HEIGHT,
+    justifyContent: 'center',
   },
   title: {
     fontWeight: '700',
@@ -141,6 +155,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginTop: 8,
   },
   tags: {
     flex: 1,
@@ -148,11 +163,26 @@ const styles = StyleSheet.create({
   rating: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
+  },
+  starWrap: {
+    width: 14,
+    height: 14,
+  },
+  starBase: {
+    position: 'absolute',
+  },
+  starClip: {
+    position: 'absolute',
+    height: 14,
+    overflow: 'hidden',
+  },
+  ratingValue: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   imageWrap: {
-    width: 72,
-    borderRadius: 8,
-    overflow: 'hidden',
+    width: IMAGE_WIDTH,
     alignItems: 'center',
     justifyContent: 'center',
   },

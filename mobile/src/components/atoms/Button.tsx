@@ -7,16 +7,20 @@ import { useAppTheme } from '@/utils/useAppTheme';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'confirm' | 'gradient' | 'soft';
 
+// Altezza unica per ogni variante: i bottoni sono sempre allineati tra loro
+const BUTTON_HEIGHT = 48;
+
 // Unione dei due schemi: `Colors[colorScheme]` non è restringibile a un solo scheme (literal `as const`)
 type ThemeColors = typeof Colors.light | typeof Colors.dark;
 
 type ButtonProps = {
   variant?: ButtonVariant;
-  label: string;
+  /** Opzionale: se assente il bottone è icon-only (richiede `icon`). */
+  label?: string;
   onPress: () => void;
   disabled?: boolean;
   loading?: boolean;
-  /** Solo per variant `soft`: icona a sinistra della label. */
+  /** Icona opzionale a sinistra della label, valida per tutte le varianti. */
   icon?: ComponentType<{ size?: number; color?: string }>;
   /** Solo per variant `soft`, alternativa a `icon`: quadretto colorato (per trigger tipo "scegli colore"). */
   swatchColor?: string;
@@ -63,7 +67,7 @@ export function Button({ variant = 'primary', label, onPress, disabled = false, 
       >
         {Icon && <Icon size={18} color={colors.textColor} />}
         {swatchColor && <View style={[styles.swatch, { backgroundColor: swatchColor }]} />}
-        <Text style={[styles.softLabel, { color: colors.textColor }]}>{label}</Text>
+        {label ? <Text style={[styles.softLabel, { color: colors.textColor }]}>{label}</Text> : null}
       </Pressable>
     );
   }
@@ -82,7 +86,7 @@ export function Button({ variant = 'primary', label, onPress, disabled = false, 
           end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFill}
         />
-        <ButtonContent label={label} color={v.textColor} fontWeight={v.fontWeight} loading={loading} />
+        <ButtonContent label={label} icon={Icon} color={v.textColor} fontWeight={v.fontWeight} loading={loading} />
       </Pressable>
     );
   }
@@ -100,15 +104,36 @@ export function Button({ variant = 'primary', label, onPress, disabled = false, 
       disabled={isBlocked}
       android_ripple={{ color: v.rippleColor, radius: 8 }}
     >
-      <ButtonContent label={label} color={v.textColor} fontWeight={v.fontWeight} loading={loading} />
+      <ButtonContent label={label} icon={Icon} color={v.textColor} fontWeight={v.fontWeight} loading={loading} />
     </Pressable>
   );
 }
 
-function ButtonContent({ label, color, fontWeight, loading }: { label: string; color: string; fontWeight: '600' | '700'; loading: boolean }) {
+function ButtonContent({
+  label,
+  color,
+  fontWeight,
+  loading,
+  icon: Icon,
+}: {
+  label?: string;
+  color: string;
+  fontWeight: '600' | '700';
+  loading: boolean;
+  icon?: ComponentType<{ size?: number; color?: string }>;
+}) {
+  if (loading) {
+    return (
+      <View style={styles.contentRow}>
+        <ActivityIndicator size="small" color={color} />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.labelWrap}>
-      {loading ? <ActivityIndicator size="small" color={color} /> : <Text style={[styles.label, { color, fontWeight }]}>{label}</Text>}
+    <View style={styles.contentRow}>
+      {Icon && <Icon size={18} color={color} />}
+      {label ? <Text style={[styles.label, { color, fontWeight }]}>{label}</Text> : null}
     </View>
   );
 }
@@ -136,8 +161,8 @@ function resolveVariant(variant: ButtonVariant, colors: ThemeColors): VariantSty
 
 const styles = StyleSheet.create({
   button: {
+    height: BUTTON_HEIGHT,
     borderRadius: 14,
-    paddingVertical: 15,
     paddingHorizontal: 24,
     alignItems: 'center',
     justifyContent: 'center',
@@ -151,7 +176,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    minHeight: 44,
+    height: BUTTON_HEIGHT,
     paddingHorizontal: 16,
     borderRadius: 10,
   },
@@ -164,10 +189,11 @@ const styles = StyleSheet.create({
     height: 16,
     borderRadius: 4,
   },
-  labelWrap: {
-    height: 18,
-    justifyContent: 'center',
+  contentRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
   label: {
     fontSize: 14,

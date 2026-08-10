@@ -5,9 +5,8 @@ import { List, Pencil } from 'lucide-react-native';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
-import { DEFAULT_LIST_ICON_KEY } from '@/constants/list-icons';
+import { DEFAULT_LIST_ICON_KEY, resolveListIcon } from '@/constants/list-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { resolvePreviewIcon } from '@/utils/resolvePreviewIcon';
 import { Button } from '@/components/atoms/Button';
 import { Switch } from '@/components/atoms/Switch';
 import { Input } from '@/components/molecules/Input';
@@ -138,7 +137,7 @@ export default function ListFormScreen() {
         <View pointerEvents="none">
           <ListCard
             title={name || t('form.namePlaceholder')}
-            icon={resolvePreviewIcon(icon)}
+            icon={resolveListIcon(icon)}
             color={color}
             itemsCount={0}
           />

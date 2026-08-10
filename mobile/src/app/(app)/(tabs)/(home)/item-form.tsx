@@ -1,5 +1,5 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Package } from 'lucide-react-native';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -9,36 +9,17 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
 import { PageHeader } from '@/components/molecules/PageHeader';
-import { Chip } from '@/components/atoms/Chip';
-import { RatingInput } from '@/components/molecules/RatingInput';
+import { CategoryPickerSheet, type CategoryOption } from '@/components/organisms/CategoryPickerSheet';
 import { useItemMutations } from '@/utils/useItemMutations';
-import { ITEM_CATEGORIES, type Category } from '@/utils/useListCategories';
-import { useTags } from '@/utils/useTags';
-import type { CompletionStatus } from '@/utils/useListDetail';
-
-const STATUSES: CompletionStatus[] = ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED'];
-const TAG_COLORS = [
-  Colors.light.accent,
-  Colors.light.secondary,
-  Colors.light.warning,
-  Colors.light.success,
-  Colors.light.primary,
-];
+import { useListCategories, type Category } from '@/utils/useListCategories';
+import { useListDetail } from '@/utils/useListDetail';
 
 type ItemFormParams = {
   listId?: string;
-  userItemId?: string;
-  itemId?: string;
-  name?: string;
-  category?: string;
-  description?: string;
-  note?: string;
-  status?: string;
-  rating?: string;
-  ratingNote?: string;
-  tagIds?: string;
 };
 
+/** Schermata di sola creazione item: nome, categoria (dalla lista padre) e descrizione personale.
+ *  Ogni modifica successiva avviene nel bottomsheet ItemCardDetails, non qui. */
 export default function ItemFormScreen() {
   const { t } = useTranslation('lists');
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
@@ -46,72 +27,40 @@ export default function ItemFormScreen() {
   const router = useRouter();
 
   const params = useLocalSearchParams<ItemFormParams>();
-  const isEdit = Boolean(params.userItemId);
 
-  const { addItemToList, updateUserItem, rateItem, saving, error } = useItemMutations();
-  const { tags, createTag, creating } = useTags();
+  const { addItemToList, saving, error } = useItemMutations();
+  const { list } = useListDetail(params.listId);
+  const { categories: allMacroCategories } = useListCategories();
 
-  const [name, setName] = useState(params.name ?? '');
-  const [category, setCategory] = useState<Category | null>(
-    (params.category as Category | undefined) ?? null,
-  );
-  const [description, setDescription] = useState(params.description ?? '');
-  const [note, setNote] = useState(params.note ?? '');
-  const [status, setStatus] = useState<CompletionStatus>(
-    (params.status as CompletionStatus | undefined) ?? 'NOT_STARTED',
-  );
-  const [ratingValue, setRatingValue] = useState(Number(params.rating ?? 0));
-  const [ratingNote, setRatingNote] = useState(params.ratingNote ?? '');
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
-    params.tagIds ? params.tagIds.split(',') : [],
-  );
-  const [newTagName, setNewTagName] = useState('');
+  // Categorie sceglibili = unione degli includedCategories delle macro-categorie della lista padre
+  const categoryOptions = useMemo<CategoryOption[]>(() => {
+    const listMacroIds = new Set((list?.categories ?? []).map((c) => c.id));
+    const values = new Set<Category>();
+    allMacroCategories
+      .filter((macro) => listMacroIds.has(macro.id))
+      .forEach((macro) => macro.includedCategories.forEach((value) => values.add(value)));
+    return Array.from(values).map((value) => ({ value, label: t(`categories.${value}`) }));
+  }, [allMacroCategories, list, t]);
+
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState<Category | null>(null);
+  const [description, setDescription] = useState('');
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
-
-  const toggleTag = (tagId: string) => {
-    setSelectedTagIds((prev) =>
-      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId],
-    );
-  };
-
-  const handleCreateTag = async () => {
-    if (!newTagName.trim()) return;
-    setLocalError(null);
-    try {
-      const tag = await createTag(newTagName.trim(), TAG_COLORS[tags.length % TAG_COLORS.length]);
-      if (tag) setSelectedTagIds((prev) => [...prev, tag.id]);
-      setNewTagName('');
-    } catch (e) {
-      setLocalError((e as Error).message);
-    }
-  };
 
   const save = async () => {
     setLocalError(null);
+    if (!name.trim() || !category || !params.listId) {
+      setLocalError(t('itemForm.missingFields'));
+      return;
+    }
     try {
-      if (isEdit && params.userItemId) {
-        await updateUserItem(params.userItemId, {
-          description: description.trim() || null,
-          note: note.trim() || null,
-          status,
-          tagIds: selectedTagIds,
-        });
-        if (ratingValue > 0 && params.itemId) {
-          await rateItem(params.itemId, ratingValue, ratingNote.trim() || null);
-        }
-      } else {
-        if (!name.trim() || !category || !params.listId) {
-          setLocalError(t('itemForm.missingFields'));
-          return;
-        }
-        await addItemToList({
-          listId: params.listId,
-          name: name.trim(),
-          category,
-          description: description.trim() || null,
-          note: note.trim() || null,
-        });
-      }
+      await addItemToList({
+        listId: params.listId,
+        name: name.trim(),
+        category,
+        description: description.trim() || null,
+      });
       router.back();
     } catch (e) {
       setLocalError((e as Error).message);
@@ -122,123 +71,46 @@ export default function ItemFormScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <PageHeader
-        icon={Package}
-        title={isEdit ? t('itemForm.titleEdit') : t('itemForm.titleAdd')}
-        onBack={() => router.back()}
-      />
+      <PageHeader icon={Package} title={t('itemForm.titleAdd')} onBack={() => router.back()} />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {isEdit ? (
-          <Text style={[styles.itemName, { color: colors.textColor }]}>{name}</Text>
-        ) : (
-          <Input
-            placeholder={t('itemForm.namePlaceholder')}
-            value={name}
-            onChangeText={setName}
-          />
-        )}
+        <Input
+          label={t('itemForm.name')}
+          required
+          placeholder={t('itemForm.namePlaceholder')}
+          value={name}
+          onChangeText={setName}
+        />
 
-        {!isEdit && (
-          <>
-            <Text style={[styles.sectionLabel, { color: colors.textColor }]}>
-              {t('itemForm.category')}
-            </Text>
-            <View style={styles.chipWrap}>
-              {ITEM_CATEGORIES.map((cat) => (
-                <Chip
-                  key={cat}
-                  label={t(`categories.${cat}`)}
-                  selected={category === cat}
-                  onPress={() => setCategory(cat)}
-                />
-              ))}
-            </View>
-          </>
-        )}
+        <View>
+          <Text style={[styles.fieldLabel, { color: colors.textColor }]}>{t('itemForm.category')}</Text>
+          <Button
+            variant="soft"
+            label={category ? t(`categories.${category}`) : t('itemForm.categoryPlaceholder')}
+            onPress={() => setShowCategoryPicker(true)}
+          />
+        </View>
 
         <Input
+          label={t('itemForm.description')}
           placeholder={t('itemForm.descriptionPlaceholder')}
           value={description}
           onChangeText={setDescription}
           variant="textarea"
         />
-        <Input
-          placeholder={t('itemForm.notePlaceholder')}
-          value={note}
-          onChangeText={setNote}
-          variant="textarea"
-        />
-
-        {isEdit && (
-          <>
-            <Text style={[styles.sectionLabel, { color: colors.textColor }]}>
-              {t('itemForm.status')}
-            </Text>
-            <View style={styles.chipWrap}>
-              {STATUSES.map((s) => (
-                <Chip
-                  key={s}
-                  label={t(`status.${s}`)}
-                  selected={status === s}
-                  onPress={() => setStatus(s)}
-                />
-              ))}
-            </View>
-
-            <Text style={[styles.sectionLabel, { color: colors.textColor }]}>
-              {t('itemForm.rating')}
-            </Text>
-            <RatingInput value={ratingValue} onChange={setRatingValue} />
-            {ratingValue > 0 && (
-              <Input
-                placeholder={t('itemForm.ratingNotePlaceholder')}
-                value={ratingNote}
-                onChangeText={setRatingNote}
-                variant="textarea"
-              />
-            )}
-
-            <Text style={[styles.sectionLabel, { color: colors.textColor }]}>
-              {t('itemForm.tags')}
-            </Text>
-            {tags.length > 0 && (
-              <View style={styles.chipWrap}>
-                {tags.map((tag) => (
-                  <Chip
-                    key={tag.id}
-                    label={tag.name}
-                    selected={selectedTagIds.includes(tag.id)}
-                    onPress={() => toggleTag(tag.id)}
-                  />
-                ))}
-              </View>
-            )}
-            <View style={styles.newTagRow}>
-              <Input
-                placeholder={t('itemForm.newTagPlaceholder')}
-                value={newTagName}
-                onChangeText={setNewTagName}
-                style={styles.newTagInput}
-              />
-              <Button
-                variant="primary"
-                label={t('itemForm.addTag')}
-                onPress={handleCreateTag}
-                disabled={!newTagName.trim()}
-                loading={creating}
-              />
-            </View>
-          </>
-        )}
 
         {displayError && <Text style={styles.error}>{displayError}</Text>}
 
-        <Button
-          label={isEdit ? t('itemForm.save') : t('itemForm.add')}
-          onPress={save}
-          loading={saving}
-        />
+        <Button label={t('itemForm.add')} onPress={save} loading={saving} />
       </ScrollView>
+
+      <CategoryPickerSheet
+        visible={showCategoryPicker}
+        onClose={() => setShowCategoryPicker(false)}
+        options={categoryOptions}
+        selected={category}
+        onSelect={setCategory}
+        emptyLabel={t('itemForm.noCategories')}
+      />
     </SafeAreaView>
   );
 }
@@ -248,40 +120,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: Spacing.four,
+    paddingHorizontal: Spacing.four,
+    paddingBottom: Spacing.four,
     gap: Spacing.three,
   },
-  itemName: {
-    fontSize: 20,
-  },
-  sectionLabel: {
+  fieldLabel: {
     fontSize: 16,
-  },
-  chipWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.two,
-  },
-  newTagRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.two,
-  },
-  newTagInput: {
-    flex: 1,
-  },
-  addTagButton: {
-    paddingVertical: 14,
-    paddingHorizontal: 18,
-    borderRadius: 14,
-    backgroundColor: Colors.light.primary,
-  },
-  addTagLabel: {
-    fontSize: 14,
-    color: Colors.light.border,
-  },
-  disabled: {
-    opacity: 0.5,
+    fontWeight: '600',
+    marginBottom: 6,
   },
   error: {
     fontSize: 14,

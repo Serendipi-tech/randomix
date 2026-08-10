@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
@@ -21,6 +22,7 @@ const TAG_OVERFLOW_BADGE_WIDTH = 34;
 /** Riga di tag con troncamento automatico: misura le larghezze off-screen e mostra un badge "+N"
  *  per l'overflow. Se `expandable`, il badge espande la riga al tap. Logica di misura tutta interna. */
 export function TagList({ tags, expandable = false, onRemoveTag, onAddTag }: TagListProps) {
+  const { t } = useTranslation('lists');
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
@@ -101,13 +103,13 @@ export function TagList({ tags, expandable = false, onRemoveTag, onAddTag }: Tag
 
           {expanded && (
             <Pressable onPress={() => setExpanded(false)} hitSlop={6}>
-              <Text style={[styles.showLess, { color: colors.textColor }]}>Mostra meno</Text>
+              <Text style={[styles.showLess, { color: colors.textColor }]}>{t('itemDetail.showLess')}</Text>
             </Pressable>
           )}
 
           {onAddTag && (
             <Pressable onPress={onAddTag} style={[styles.addTag, { borderColor: hexToRgba(colors.textColor, 0.3) }]}>
-              <Text style={[styles.addTagText, { color: colors.textColor }]}>+ Tag</Text>
+              <Text style={[styles.addTagText, { color: colors.textColor }]}>{t('itemDetail.addTag')}</Text>
             </Pressable>
           )}
         </View>

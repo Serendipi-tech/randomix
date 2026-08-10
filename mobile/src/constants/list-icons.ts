@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+import { getLucideIcon } from '@/utils/lucideIconRegistry';
 import {
   List,
   Book,
@@ -72,7 +73,9 @@ export const LIST_ICONS: { key: ListIconKey; icon: IconComponent }[] = [
 
 export const DEFAULT_LIST_ICON_KEY: ListIconKey = 'list';
 
-/** Risolve la chiave salvata in `list.icon` sull'icona Lucide corrispondente; fallback all'icona di default se la chiave non è (più) valida. */
+/** Risolve il valore salvato in `list.icon` sull'icona: prima come nome export Lucide (nuovo picker, es. "BookSearch"),
+ *  poi come chiave legacy del set fisso (`ListIconKey`); fallback all'icona di default se nessuno combacia. */
 export function resolveListIcon(key?: string | null): IconComponent {
-  return LIST_ICONS.find((entry) => entry.key === key)?.icon ?? List;
+  if (!key) return List;
+  return getLucideIcon(key) ?? LIST_ICONS.find((entry) => entry.key === key)?.icon ?? List;
 }
