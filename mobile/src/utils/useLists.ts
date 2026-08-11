@@ -11,6 +11,7 @@ export interface UserList {
   description: string | null;
   itemCount: number;
   updatedAt: string;
+  categories: { id: string; name: string }[];
 }
 
 interface MyListsPayload {

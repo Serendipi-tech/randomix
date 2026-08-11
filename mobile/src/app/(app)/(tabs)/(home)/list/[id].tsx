@@ -9,6 +9,7 @@ import { Colors, Spacing } from '@/constants/theme';
 import { resolveListIcon } from '@/constants/list-icons';
 import { darkenColor, hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { RadialBackground } from '@/components/molecules/radial-background';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { PageHeader } from '@/components/molecules/PageHeader';
@@ -45,7 +46,8 @@ export default function ListDetailScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.safe}>
+      <RadialBackground colorScheme={colorScheme} />
       <PageHeader
         icon={resolveListIcon(list?.icon)}
         title={list?.name ?? ''}

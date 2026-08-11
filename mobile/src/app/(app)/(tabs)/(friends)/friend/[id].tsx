@@ -5,6 +5,7 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { RadialBackground } from '@/components/molecules/radial-background';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { Avatar } from '@/components/atoms/Avatar';
 import { PageHeader } from '@/components/molecules/PageHeader';
@@ -25,7 +26,8 @@ export default function FriendProfileScreen() {
   const showSkeleton = loading && !profile;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.safe}>
+      <RadialBackground colorScheme={colorScheme} />
       <PageHeader icon={Users} title={profile?.user.username ?? ''} onBack={() => router.back()} />
 
       {showSkeleton ? (

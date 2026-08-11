@@ -9,6 +9,7 @@ import Animated, { ZoomIn } from 'react-native-reanimated';
 import { Colors, Spacing } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { RadialBackground } from '@/components/molecules/radial-background';
 import { Button } from '@/components/atoms/Button';
 import { PageHeader } from '@/components/molecules/PageHeader';
 import { StickerShape } from '@/components/atoms/sticker-shape';
@@ -56,7 +57,8 @@ export default function DrawScreen() {
   const accentColor = listColor || colors.primary;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.safe}>
+      <RadialBackground colorScheme={colorScheme} />
       <PageHeader icon={Dices} title={t('draw.title')} onBack={() => router.back()} />
 
       <View style={styles.center}>

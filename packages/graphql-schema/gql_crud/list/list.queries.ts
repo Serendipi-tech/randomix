@@ -60,6 +60,10 @@ export const MY_LISTS: DocumentNode = parse(`
         description
         itemCount
         updatedAt
+        categories {
+          id
+          name
+        }
       }
       nextCursor
     }
