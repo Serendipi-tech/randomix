@@ -22,7 +22,7 @@ import { useListDetail } from '@/utils/useListDetail';
 import { useListMutations } from '@/utils/useListMutations';
 
 const NAME_MAX_LENGTH = 20;
-const DESCRIPTION_MAX_LENGTH = 225;
+const DESCRIPTION_MAX_LENGTH = 100;
 
 export default function ListFormScreen() {
   const { t } = useTranslation('lists');
@@ -133,6 +133,7 @@ export default function ListFormScreen() {
           value={description}
           onChangeText={setDescription}
           variant="textarea"
+          textareaMinHeight={48}
           maxLength={DESCRIPTION_MAX_LENGTH}
         />
 

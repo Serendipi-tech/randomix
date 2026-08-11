@@ -44,6 +44,8 @@ type InputProps = {
   /** Etichetta sopra il campo; con `required` mostra un asterisco rosso accanto. */
   label?: string;
   required?: boolean;
+  /** Solo per variant `textarea`: altezza minima personalizzata (default 80). */
+  textareaMinHeight?: number;
   /** Stile del contenitore esterno (layout: margini, larghezza...). */
   style?: StyleProp<ViewStyle>;
 } & Omit<TextInputProps, ControlledTextInputProps>;
@@ -60,6 +62,7 @@ export function Input({
   showStrength = true,
   label,
   required = false,
+  textareaMinHeight,
   style,
   maxLength,
   ...textInputProps
@@ -118,7 +121,7 @@ export function Input({
           style={[
             styles.field,
             { color: colors.textColor },
-            isTextarea ? styles.textarea : null,
+            isTextarea ? [styles.textarea, textareaMinHeight != null ? { minHeight: textareaMinHeight } : null] : null,
             // Rimuove il contorno di focus del browser su web (non tipizzato in RNWeb)
             Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : null,
           ]}
@@ -173,7 +176,7 @@ const styles = StyleSheet.create({
   },
   field: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 16,
   },
   textarea: {
     minHeight: 80,
