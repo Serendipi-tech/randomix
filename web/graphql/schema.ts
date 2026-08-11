@@ -36,6 +36,11 @@ import './models/notification/adminNotification.mutations';
 import './models/membership/index';
 import './models/membership/adminMembership.queries';
 import './models/membership/adminMembership.mutations';
+import './models/report/index';
+import './models/report/adminReport.queries';
+import './models/report/adminReport.mutations';
+import './models/payment/index';
+import './models/payment/adminPayment.queries';
 
 builder.queryType({});
 builder.mutationType({});

@@ -15,6 +15,8 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard/tags', label: 'Tag' },
   { href: '/dashboard/notifications', label: 'Notifiche' },
   { href: '/dashboard/memberships', label: 'Membership' },
+  { href: '/dashboard/reports', label: 'Segnalazioni' },
+  { href: '/dashboard/payments', label: 'Pagamenti' },
 ];
 
 // Sidebar fissa, desktop-first (architecture.md: web/ ha sempre layout a sidebar, mai bottom tabs come mobile).

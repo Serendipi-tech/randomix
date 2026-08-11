@@ -1,5 +1,5 @@
 import { builder, prisma } from '../../builder';
-import { RolesEnum } from '../../enum';
+import { RolesEnum, StatusPaymentEnum } from '../../enum';
 
 interface AdminUserRowShape {
   id: string;
@@ -10,12 +10,20 @@ interface AdminUserRowShape {
   createdAt: Date;
 }
 
+interface AdminUserPaymentShape {
+  id: string;
+  amount: number;
+  status: 'SUCCESS' | 'PENDING' | 'FAILED';
+  createdAt: Date;
+}
+
 interface AdminUserDetailShape extends AdminUserRowShape {
   avatarUrl: string | null;
   membershipPlan: string;
   listsCount: number;
   groupsCount: number;
   friendsCount: number;
+  payments: AdminUserPaymentShape[];
 }
 
 export const AdminUserRowRef = builder.objectRef<AdminUserRowShape>('AdminUserRow');
@@ -43,6 +51,16 @@ AdminUsersPayloadRef.implement({
   }),
 });
 
+const AdminUserPaymentRef = builder.objectRef<AdminUserPaymentShape>('AdminUserPayment');
+AdminUserPaymentRef.implement({
+  fields: (t) => ({
+    id: t.exposeID('id'),
+    amount: t.exposeFloat('amount'),
+    status: t.field({ type: StatusPaymentEnum, resolve: (p) => p.status }),
+    createdAt: t.field({ type: 'DateTime', resolve: (p) => p.createdAt }),
+  }),
+});
+
 export const AdminUserDetailRef = builder.objectRef<AdminUserDetailShape>('AdminUserDetail');
 AdminUserDetailRef.implement({
   fields: (t) => ({
@@ -57,12 +75,13 @@ AdminUserDetailRef.implement({
     listsCount: t.exposeInt('listsCount'),
     groupsCount: t.exposeInt('groupsCount'),
     friendsCount: t.exposeInt('friendsCount'),
+    payments: t.field({ type: [AdminUserPaymentRef], resolve: (u) => u.payments }),
   }),
 });
 
 // Riusata da query adminUser e mutation adminSetUserSuspended per non duplicare l'assemblaggio delle stats
 export async function getAdminUserDetail(userId: string): Promise<AdminUserDetailShape | null> {
-  const [user, activeSubscription, listsCount, groupsCount, friendsCount] = await Promise.all([
+  const [user, activeSubscription, listsCount, groupsCount, friendsCount, payments] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId } }),
     prisma.subscription.findFirst({
       where: { userId, status: 'ACTIVE' },
@@ -74,6 +93,11 @@ export async function getAdminUserDetail(userId: string): Promise<AdminUserDetai
     prisma.friendship.count({
       where: { status: 'ACCEPTED', OR: [{ senderId: userId }, { receiverId: userId }] },
     }),
+    prisma.payment.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: { id: true, amount: true, status: true, createdAt: true },
+    }),
   ]);
 
   if (!user) return null;
@@ -84,5 +108,6 @@ export async function getAdminUserDetail(userId: string): Promise<AdminUserDetai
     listsCount,
     groupsCount,
     friendsCount,
+    payments,
   };
 }

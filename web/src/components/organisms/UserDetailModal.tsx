@@ -19,6 +19,19 @@ const PLAN_LABELS: Record<string, string> = {
 };
 
 const dateFormatter = new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+const currencyFormatter = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' });
+
+const PAYMENT_STATUS_LABELS: Record<string, string> = {
+  SUCCESS: 'Riuscito',
+  PENDING: 'In sospeso',
+  FAILED: 'Fallito',
+};
+
+const PAYMENT_STATUS_COLORS: Record<string, string> = {
+  SUCCESS: 'var(--success)',
+  PENDING: 'var(--warning)',
+  FAILED: 'var(--error)',
+};
 
 export function UserDetailModal({ userId, onClose }: UserDetailModalProps) {
   const { user, loading, toggleSuspended, suspending, sendPasswordReset, sendingReset, resetSent } =
@@ -80,6 +93,19 @@ export function UserDetailModal({ userId, onClose }: UserDetailModalProps) {
             </div>
 
             <p className="text-sm text-disabled">Iscritto il {dateFormatter.format(new Date(user.createdAt))}</p>
+
+            {user.payments.length > 0 && (
+              <div className="flex flex-col gap-1.5 border-t border-border pt-4">
+                <span className="text-xs font-semibold uppercase tracking-wide text-disabled">Storico pagamenti</span>
+                {user.payments.map((payment) => (
+                  <div key={payment.id} className="flex items-center justify-between text-sm">
+                    <span className="text-text-color">{currencyFormatter.format(payment.amount)}</span>
+                    <span className="text-xs text-disabled">{dateFormatter.format(new Date(payment.createdAt))}</span>
+                    <Badge label={PAYMENT_STATUS_LABELS[payment.status] ?? payment.status} color={PAYMENT_STATUS_COLORS[payment.status] ?? 'var(--disabled)'} />
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div className="flex flex-col gap-2 border-t border-border pt-4">
               {confirmingSuspend ? (
