@@ -72,6 +72,7 @@ export default function HomeScreen() {
           renderItem={({ item }) => (
             <ListCard
               title={item.name}
+              category={item.categories[0]?.name}
               icon={resolveListIcon(item.icon)}
               color={item.color}
               itemsCount={item.itemCount}

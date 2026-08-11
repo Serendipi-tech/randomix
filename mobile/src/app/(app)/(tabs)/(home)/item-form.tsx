@@ -6,6 +6,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { RadialBackground } from '@/components/molecules/radial-background';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
 import { PageHeader } from '@/components/molecules/PageHeader';
@@ -70,7 +71,8 @@ export default function ItemFormScreen() {
   const displayError = localError ?? error?.message ?? null;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.safe}>
+      <RadialBackground colorScheme={colorScheme} />
       <PageHeader icon={Package} title={t('itemForm.titleAdd')} onBack={() => router.back()} />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Input

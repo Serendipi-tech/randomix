@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pillWrap: {
-    width: '96%',
+    width: '92%',
     maxWidth: 420,
     height: BAR_HEIGHT,
   },

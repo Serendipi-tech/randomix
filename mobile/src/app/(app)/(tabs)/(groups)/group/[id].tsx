@@ -7,6 +7,7 @@ import { LayoutGrid, List } from 'lucide-react-native';
 import { Colors, Spacing } from '@/constants/theme';
 import { DEFAULT_LIST_ICON_KEY, resolveListIcon, type ListIconKey } from '@/constants/list-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { RadialBackground } from '@/components/molecules/radial-background';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
 import { PageHeader } from '@/components/molecules/PageHeader';
@@ -155,7 +156,8 @@ export default function GroupDetailScreen() {
   const showSkeleton = loading && !group;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.safe}>
+      <RadialBackground colorScheme={colorScheme} />
       <PageHeader icon={LayoutGrid} title={group?.name ?? ''} onBack={() => router.back()} />
 
       {showSkeleton ? (

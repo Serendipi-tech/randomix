@@ -10,6 +10,7 @@ import { Colors, Spacing } from '@/constants/theme';
 import { resolveListIcon } from '@/constants/list-icons';
 import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { RadialBackground } from '@/components/molecules/radial-background';
 import { Button } from '@/components/atoms/Button';
 import { PageHeader } from '@/components/molecules/PageHeader';
 import { CardShell } from '@/components/cards/CardShell';
@@ -90,6 +91,7 @@ export default function GroupListScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      <RadialBackground colorScheme={colorScheme} />
       <LinearGradient
         colors={[hexToRgba(colors.accent, 0.13), colors.background]}
         style={StyleSheet.absoluteFill}

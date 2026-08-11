@@ -7,14 +7,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { DEFAULT_LIST_ICON_KEY, resolveListIcon } from '@/constants/list-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { RadialBackground } from '@/components/molecules/radial-background';
 import { Button } from '@/components/atoms/Button';
 import { Switch } from '@/components/atoms/Switch';
 import { Input } from '@/components/molecules/Input';
 import { PageHeader } from '@/components/molecules/PageHeader';
-import { Chip } from '@/components/atoms/Chip';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { IconPickerSheet } from '@/components/organisms/IconPickerSheet';
 import { ColorPickerSheet } from '@/components/organisms/ColorPickerSheet';
+import { ListCategoryPickerSheet } from '@/components/organisms/ListCategoryPickerSheet';
 import { ListCard } from '@/components/cards/ListCard';
 import { useListCategories } from '@/utils/useListCategories';
 import { useListDetail } from '@/utils/useListDetail';
@@ -42,11 +43,14 @@ export default function ListFormScreen() {
   const [description, setDescription] = useState('');
   const [color, setColor] = useState<string>(listColors[0]);
   const [isHidden, setIsHidden] = useState(false);
-  const [categoryIds, setCategoryIds] = useState<string[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+
+  const selectedCategory = categories.find((c) => c.id === selectedCategoryId) ?? null;
 
   // precompilo il form quando arrivano i dati della lista in modifica
   useEffect(() => {
@@ -56,14 +60,8 @@ export default function ListFormScreen() {
     setDescription(list.description ?? '');
     setColor(list.color);
     setIsHidden(list.isHidden);
-    setCategoryIds(list.categories.map((c) => c.id));
+    setSelectedCategoryId(list.categories[0]?.id ?? null);
   }, [isEdit, list]);
-
-  const toggleCategory = (catId: string) => {
-    setCategoryIds((prev) =>
-      prev.includes(catId) ? prev.filter((c) => c !== catId) : [...prev, catId],
-    );
-  };
 
   const save = async () => {
     setLocalError(null);
@@ -73,6 +71,10 @@ export default function ListFormScreen() {
     }
     if (name.trim().length > NAME_MAX_LENGTH) {
       setLocalError(t('form.nameTooLong', { max: NAME_MAX_LENGTH }));
+      return;
+    }
+    if (!selectedCategoryId) {
+      setLocalError(t('form.categoryRequired'));
       return;
     }
     if (description.length > DESCRIPTION_MAX_LENGTH) {
@@ -85,7 +87,7 @@ export default function ListFormScreen() {
       color,
       description: description.trim() || null,
       isHidden,
-      categoryIds,
+      categoryIds: selectedCategoryId ? [selectedCategoryId] : [],
     };
     try {
       if (isEdit && id) {
@@ -109,7 +111,8 @@ export default function ListFormScreen() {
   const displayError = localError ?? error?.message ?? null;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.safe}>
+      <RadialBackground colorScheme={colorScheme} />
       <PageHeader
         icon={List}
         title={isEdit ? t('form.titleEdit') : t('form.titleCreate')}
@@ -137,6 +140,7 @@ export default function ListFormScreen() {
         <View pointerEvents="none">
           <ListCard
             title={name || t('form.namePlaceholder')}
+            category={selectedCategory?.name}
             icon={resolveListIcon(icon)}
             color={color}
             itemsCount={0}
@@ -148,21 +152,18 @@ export default function ListFormScreen() {
         </View>
 
         {categories.length > 0 && (
-          <>
-            <Text style={[styles.sectionLabel, { color: colors.textColor }]}>
+          <View>
+            <Text style={[styles.fieldLabel, { color: colors.textColor }]}>
               {t('form.categories')}
+              <Text style={{ color: colors.error }}> *</Text>
             </Text>
-            <View style={styles.chipWrap}>
-              {categories.map((cat) => (
-                <Chip
-                  key={cat.id}
-                  label={`${cat.icon} ${cat.name}`}
-                  selected={categoryIds.includes(cat.id)}
-                  onPress={() => toggleCategory(cat.id)}
-                />
-              ))}
-            </View>
-          </>
+            <Button
+              variant="soft"
+              icon={selectedCategory ? resolveListIcon(selectedCategory.icon) : undefined}
+              label={selectedCategory ? selectedCategory.name : t('form.categoryPlaceholder')}
+              onPress={() => setShowCategoryPicker(true)}
+            />
+          </View>
         )}
 
         <View style={styles.switchRow}>
@@ -215,6 +216,16 @@ export default function ListFormScreen() {
         selected={color}
         onSelect={setColor}
       />
+
+      <ListCategoryPickerSheet
+        visible={showCategoryPicker}
+        onClose={() => setShowCategoryPicker(false)}
+        categories={categories}
+        selectedId={selectedCategoryId}
+        onSelect={setSelectedCategoryId}
+        searchPlaceholder={t('form.categorySearch')}
+        emptyLabel={t('form.categoryEmpty')}
+      />
     </SafeAreaView>
   );
 }
@@ -229,18 +240,15 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.four,
     gap: Spacing.three,
   },
-  sectionLabel: {
+  fieldLabel: {
     fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 6,
   },
   appearanceControls: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  chipWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.two,
   },
   switchRow: {
     flexDirection: 'row',
