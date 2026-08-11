@@ -187,6 +187,16 @@ UI — `/dashboard/memberships`: card per ognuno dei 5 slot piano — configurat
 
 Gestione Report (bug/feedback/segnalazioni utenti)
 
+Scope confermato: sola lettura + cambio stato (SENT/IN_PROGRESS/SOLVED/REJECTED), nessuna eliminazione. Il target polimorfico opzionale (`reportedId`/`itemId`/`groupId`/`challengeId`) va risolto nel dettaglio (username se utente reportato, nome se gruppo, ecc.) invece di mostrare solo l'id grezzo.
+
+### Fase 1
+
+Query `adminReports` (filtro per `status`/`reportType` opzionali + paginazione cursor, stesso pattern `take+1`/`nextCursor` già usato altrove) — righe con mittente risolto (username) e un campo `targetLabel` calcolato lato resolver (risolve `reportedId`→username, `itemId`→nome item, `groupId`→nome gruppo, `challengeId`→nome sfida, in base a quale dei quattro è valorizzato). Mutation `adminUpdateReportStatus(id, status)`. Entrambe guardate da `requireAdmin`. Tipo `AdminReportRow`/`AdminReportDetail` come `objectRef` dedicati (stesso motivo di `AdminUserRow`: non estendere un `ReportRef` pubblico che non esiste ancora e non serve altrove).
+
+### Fase 2
+
+UI — `/dashboard/reports`: tabella (mittente, tipo, target risolto, stato con `Badge` colorato, data) con filtri stato/tipo sopra, colonne essenziali come la tabella utenti (niente scroll orizzontale). Click riga apre modale dettaglio: titolo, corpo, `attachedFiles` (link), target risolto, select cambio stato.
+
 ## STEP 9
 
 Statistiche pagamenti/abbonamenti aggregate (temporali) + storico dettagliato per utente

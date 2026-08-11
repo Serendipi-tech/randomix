@@ -26,11 +26,17 @@ const apolloHandler = startServerAndCreateNextHandler<NextRequest, Context>(serv
   },
 });
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': process.env.CORS_ORIGIN ?? 'http://localhost:8081',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key',
-};
+const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN ?? 'http://localhost:8081').split(',');
+
+function corsHeaders(req: NextRequest) {
+  const origin = req.headers.get('origin');
+  return {
+    'Access-Control-Allow-Origin':
+      origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key',
+  };
+}
 
 type RouteContext = { params: Promise<Record<string, string>> };
 
@@ -39,24 +45,26 @@ function checkApiKey(req: NextRequest): boolean {
   return key === process.env.CLIENT_API_KEY;
 }
 
-export async function OPTIONS() {
-  return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: corsHeaders(req) });
 }
 
 export async function GET(req: NextRequest, _ctx: RouteContext) {
+  const headers = corsHeaders(req);
   if (!checkApiKey(req)) {
-    return new NextResponse('Unauthorized', { status: 401, headers: CORS_HEADERS });
+    return new NextResponse('Unauthorized', { status: 401, headers });
   }
   const res = await apolloHandler(req);
-  Object.entries(CORS_HEADERS).forEach(([k, v]) => res.headers.set(k, v));
+  Object.entries(headers).forEach(([k, v]) => res.headers.set(k, v));
   return res;
 }
 
 export async function POST(req: NextRequest, _ctx: RouteContext) {
+  const headers = corsHeaders(req);
   if (!checkApiKey(req)) {
-    return new NextResponse('Unauthorized', { status: 401, headers: CORS_HEADERS });
+    return new NextResponse('Unauthorized', { status: 401, headers });
   }
   const res = await apolloHandler(req);
-  Object.entries(CORS_HEADERS).forEach(([k, v]) => res.headers.set(k, v));
+  Object.entries(headers).forEach(([k, v]) => res.headers.set(k, v));
   return res;
 }
