@@ -22,19 +22,30 @@ const CATEGORY_KEYWORDS: { key: string; label: string; keywords: string[] }[] = 
   { key: 'travel', label: 'Viaggi e trasporti', keywords: ['travel', 'transport', 'vehicle', 'car', 'plane', 'flight', 'train', 'ship', 'map', 'navigation', 'location'] },
   { key: 'sports', label: 'Sport e tempo libero', keywords: ['sport', 'game', 'gaming', 'exercise', 'fitness', 'ball', 'play'] },
   { key: 'devices', label: 'Tecnologia e dispositivi', keywords: ['device', 'computer', 'phone', 'tech', 'battery', 'wifi', 'bluetooth', 'hardware', 'electronic'] },
-  { key: 'communication', label: 'Comunicazione', keywords: ['message', 'chat', 'mail', 'email', 'phone call', 'notification', 'communication', 'send'] },
   { key: 'business', label: 'Business e finanza', keywords: ['money', 'finance', 'business', 'chart', 'currency', 'payment', 'shopping', 'store', 'bank'] },
   { key: 'media', label: 'Media e intrattenimento', keywords: ['music', 'video', 'photo', 'camera', 'image', 'media', 'movie', 'sound', 'audio', 'entertainment'] },
   { key: 'home', label: 'Casa e oggetti', keywords: ['home', 'house', 'building', 'furniture', 'tool', 'object', 'kitchen appliance'] },
   { key: 'shapes', label: 'Forme e simboli', keywords: ['shape', 'symbol', 'geometry', 'icon shape'] },
   { key: 'arrows', label: 'Frecce e navigazione UI', keywords: ['arrow', 'direction', 'chevron', 'navigation ui'] },
   { key: 'text', label: 'Testo e documenti', keywords: ['text', 'document', 'file', 'writing', 'edit', 'note', 'book'] },
-  { key: 'health', label: 'Salute', keywords: ['health', 'medical', 'hospital', 'doctor', 'pill', 'heart rate'] },
-  { key: 'security', label: 'Sicurezza', keywords: ['security', 'lock', 'shield', 'privacy', 'protection'] },
+  // Categoria mista: accorpa comunicazione, sicurezza e salute (singolarmente troppo magre). In coda,
+  // così cattura solo ciò che le categorie precedenti non hanno già preso.
+  { key: 'utility', label: 'Utility', keywords: ['message', 'chat', 'mail', 'email', 'phone call', 'notification', 'communication', 'send', 'security', 'lock', 'shield', 'privacy', 'protection', 'health', 'medical', 'hospital', 'doctor', 'pill', 'heart rate'] },
 ];
 
 const OTHER_CATEGORY: Pick<IconCategory, 'key' | 'label'> = { key: 'other', label: 'Altro' };
 const MAX_ICONS_PER_CATEGORY = 30;
+
+// Icone usate dai ListCategory: vanno sempre incluse e selezionabili nel picker, anche se il dedupe
+// delle varianti le scarterebbe (es. BookOpen come variante di Book) o il cap per categoria le taglierebbe.
+const PRIORITY_ICONS = [
+  'BookOpen', 'BookMarked', 'Clapperboard', 'Headphones', 'Music', 'Gamepad2', 'Dices',
+  'UtensilsCrossed', 'ChefHat', 'Wine', 'Plane', 'ShoppingBag', 'Ticket', 'PartyPopper',
+  'Dumbbell', 'GraduationCap', 'Palette', 'Drama', 'Smartphone', 'Heart', 'Gift', 'Sparkles', 'Shapes',
+  // Icone salute: poche, garantite nella categoria mista "utility" (ordinate per prime nel cap)
+  'Microscope', 'Pill', 'Syringe', 'Tablets',
+];
+const PRIORITY_SET = new Set(PRIORITY_ICONS);
 
 /** Spezza un nome PascalCase in parole sui confini di maiuscola (es. "AccountDelete" -> ["Account","Delete"]). */
 function splitPascalWords(name: string): string[] {
@@ -101,6 +112,14 @@ function buildIconData(): { categories: IconCategory[]; searchable: SearchableIc
   const dedupedNames = new Set(dedupeGlobal(validIcons.map((i) => i.pascal).sort()));
   const dedupedIcons = validIcons.filter((i) => dedupedNames.has(i.pascal));
 
+  // Reintegra le icone prioritarie eventualmente scartate dal dedupe (se esistono davvero nella libreria)
+  const haystackByPascal = new Map(validIcons.map((i) => [i.pascal, i.haystack]));
+  for (const name of PRIORITY_ICONS) {
+    if (dedupedNames.has(name) || !getLucideIcon(name)) continue;
+    dedupedNames.add(name);
+    dedupedIcons.push({ pascal: name, haystack: haystackByPascal.get(name) ?? splitPascalWords(name).join(' ').toLowerCase() });
+  }
+
   const buckets = new Map<string, Set<string>>(CATEGORY_KEYWORDS.map((c) => [c.key, new Set<string>()]));
   const other = new Set<string>();
   // indice di ricerca: TUTTE le icone deduplicate con la loro categoria, non solo le prime
@@ -118,14 +137,21 @@ function buildIconData(): { categories: IconCategory[]; searchable: SearchableIc
     searchable.push({ name: pascal, categoryKey, haystack });
   }
 
+  // Le prioritarie vengono ordinate per prime nella categoria, così sopravvivono sempre al cap
+  const sortPriorityFirst = (a: string, b: string) => {
+    const ap = PRIORITY_SET.has(a) ? 0 : 1;
+    const bp = PRIORITY_SET.has(b) ? 0 : 1;
+    return ap !== bp ? ap - bp : a.localeCompare(b);
+  };
+
   const categories = CATEGORY_KEYWORDS.map((c) => ({
     key: c.key,
     label: c.label,
-    icons: Array.from(buckets.get(c.key)!).sort().slice(0, MAX_ICONS_PER_CATEGORY),
+    icons: Array.from(buckets.get(c.key)!).sort(sortPriorityFirst).slice(0, MAX_ICONS_PER_CATEGORY),
   })).filter((c) => c.icons.length > 0);
 
   if (other.size > 0) {
-    categories.push({ ...OTHER_CATEGORY, icons: Array.from(other).sort().slice(0, MAX_ICONS_PER_CATEGORY) });
+    categories.push({ ...OTHER_CATEGORY, icons: Array.from(other).sort(sortPriorityFirst).slice(0, MAX_ICONS_PER_CATEGORY) });
   }
 
   return { categories, searchable };

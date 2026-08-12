@@ -1,7 +1,7 @@
 import type { ComponentType } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ChevronRight } from 'lucide-react-native';
+import { ChevronRight, Lock } from 'lucide-react-native';
 import { CardShell } from '@/components/cards/CardShell';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
@@ -18,13 +18,15 @@ type ListCardProps = {
   color: string;
   /** Numero di elementi nella lista: sempre visibile, "0" se vuota, "N/N" altrimenti. */
   itemsCount: number;
+  /** Lista nascosta agli amici: mostra un lucchetto accanto al titolo. */
+  isHidden?: boolean;
   /** Se assente la card non è cliccabile (es. anteprima in sola lettura). */
   onPress?: () => void;
 };
 
 /** Card lista: emoji della lista (o icona gigante ruotata di fallback) a riempimento dell'area sinistra,
  *  gradient di sfondo transparent -> color, titolo/categoria e conteggio. Bordo colorato dal `color`; card interamente cliccabile. */
-export function ListCard({ title, category, icon: Icon, emoji, color, itemsCount, onPress }: ListCardProps) {
+export function ListCard({ title, category, icon: Icon, emoji, color, itemsCount, isHidden, onPress }: ListCardProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
@@ -51,9 +53,15 @@ export function ListCard({ title, category, icon: Icon, emoji, color, itemsCount
         </View>
         <View style={styles.content}>
           <View style={styles.contentRow}>
+            {/* Lucchetto lista nascosta: in absolute a sinistra del blocco categoria/nome */}
+            {isHidden && (
+              <View style={styles.lockBadge} pointerEvents="none">
+                <Lock size={20} color="#FFFFFF" />
+              </View>
+            )}
             <View style={styles.textBlock}>
               {category && <Text style={[styles.category, { color: colors.textColor }]}>{category}</Text>}
-              <Text style={[styles.title, { color: colors.textColor }]}>{title}</Text>
+              <Text style={[styles.title, { color: colors.textColor }]} numberOfLines={1}>{title}</Text>
             </View>
             <View style={styles.trailing}>
               <Text style={[styles.count, { color: colors.textColor }]}>
@@ -90,8 +98,10 @@ const styles = StyleSheet.create({
   content: { flex: 1, justifyContent: 'center', paddingTop: 16, paddingBottom: 16, paddingLeft: 5, paddingRight: 16 },
   contentRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   textBlock: { flex: 1, gap: 2 },
+  // Lucchetto in absolute (floating, nessuno spazio riservato): galleggia nel gap a sinistra del testo
+  lockBadge: { position: 'absolute', left: -28, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', zIndex: 2 },
   category: { fontSize: 12, lineHeight: 14, opacity: 0.7, textTransform: 'uppercase', letterSpacing: 0.5 },
-  title: { fontWeight: '700', fontSize: 16, lineHeight: 18 },
+  title: { flexShrink: 1, fontWeight: '700', fontSize: 16, lineHeight: 18 },
   trailing: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   count: { fontSize: 13, lineHeight: 16, fontWeight: '600', opacity: 0.7 },
   arrow: {

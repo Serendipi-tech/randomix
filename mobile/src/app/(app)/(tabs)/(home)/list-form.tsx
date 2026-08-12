@@ -34,12 +34,14 @@ export default function ListFormScreen() {
   const isEdit = Boolean(id);
 
   const { list } = useListDetail(id);
-  const { categories } = useListCategories();
+  const { categories, loading: categoriesLoading } = useListCategories();
   const { createList, updateList, deleteList, saving, deleting, error } = useListMutations();
   const listColors = Object.values(colors.extraColors);
 
   const [name, setName] = useState('');
   const [icon, setIcon] = useState<string>(DEFAULT_LIST_ICON_KEY);
+  // true se l'utente ha scelto un'icona a mano: in tal caso la categoria non la sovrascrive più
+  const [iconTouched, setIconTouched] = useState(false);
   const [description, setDescription] = useState('');
   const [color, setColor] = useState<string>(listColors[0]);
   const [isHidden, setIsHidden] = useState(false);
@@ -51,6 +53,8 @@ export default function ListFormScreen() {
   const [localError, setLocalError] = useState<string | null>(null);
 
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId) ?? null;
+  // Stato neutro dello slot category: solo se sto caricando e non ho ancora dati (con la cache non appare)
+  const isCategoriesLoading = categoriesLoading && categories.length === 0;
 
   // precompilo il form quando arrivano i dati della lista in modifica
   useEffect(() => {
@@ -61,12 +65,28 @@ export default function ListFormScreen() {
     setColor(list.color);
     setIsHidden(list.isHidden);
     setSelectedCategoryId(list.categories[0]?.id ?? null);
+    // in modifica l'icona esistente è "voluta": la categoria non la sovrascrive
+    setIconTouched(true);
   }, [isEdit, list]);
+
+  // Sceglie la categoria e, se l'utente non ha ancora scelto un'icona a mano, la inizializza con quella della categoria
+  const selectCategory = (id: string) => {
+    setSelectedCategoryId(id);
+    if (iconTouched) return;
+    const cat = categories.find((c) => c.id === id);
+    if (cat) setIcon(cat.icon);
+  };
+
+  // Icona scelta a mano dall'utente: da ora la categoria non la tocca più
+  const selectIcon = (name: string) => {
+    setIcon(name);
+    setIconTouched(true);
+  };
 
   const save = async () => {
     setLocalError(null);
     if (!name.trim()) {
-      setLocalError(t('form.missingFields'));
+      setLocalError(t('form.nameRequired'));
       return;
     }
     if (name.trim().length > NAME_MAX_LENGTH) {
@@ -119,6 +139,18 @@ export default function ListFormScreen() {
         onBack={() => router.back()}
       />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Anteprima in cima: si aggiorna mentre modifichi nome/icona/colore/categoria */}
+        <View pointerEvents="none">
+          <ListCard
+            title={name || t('form.namePlaceholder')}
+            category={selectedCategory?.name}
+            icon={resolveListIcon(icon)}
+            color={color}
+            itemsCount={0}
+            isHidden={isHidden}
+          />
+        </View>
+
         <Input
           label={t('form.name')}
           required
@@ -127,6 +159,40 @@ export default function ListFormScreen() {
           onChangeText={setName}
           maxLength={NAME_MAX_LENGTH}
         />
+
+        {/* Slot sempre presente (layout fisso, niente pop-in): finché le categorie caricano resta neutro/disabilitato */}
+        <View>
+          <Text style={[styles.fieldLabel, { color: colors.textColor }]}>
+            {t('form.categories')}
+            <Text style={{ color: colors.error }}> *</Text>
+          </Text>
+          <Button
+            variant="soft"
+            icon={selectedCategory ? resolveListIcon(selectedCategory.icon) : undefined}
+            label={
+              isCategoriesLoading
+                ? t('form.categoryLoading')
+                : selectedCategory
+                  ? selectedCategory.name
+                  : t('form.categoryPlaceholder')
+            }
+            onPress={() => setShowCategoryPicker(true)}
+            disabled={isCategoriesLoading}
+          />
+        </View>
+
+        <View>
+          <Text style={[styles.fieldLabel, { color: colors.textColor }]}>{t('form.appearance')}</Text>
+          <View style={styles.appearanceControls}>
+            <View style={styles.appearanceItem}>
+              <Button variant="soft" icon={Pencil} label={t('form.editIcon')} onPress={() => setShowIconPicker(true)} />
+            </View>
+            <View style={styles.appearanceItem}>
+              <Button variant="soft" swatchColor={color} label={t('form.editColor')} onPress={() => setShowColorPicker(true)} />
+            </View>
+          </View>
+        </View>
+
         <Input
           label={t('form.description')}
           placeholder={t('form.descriptionPlaceholder')}
@@ -137,60 +203,37 @@ export default function ListFormScreen() {
           maxLength={DESCRIPTION_MAX_LENGTH}
         />
 
-        {/* Anteprima non cliccabile di come apparirà la card lista, con controlli per modificare icona/colore */}
-        <View pointerEvents="none">
-          <ListCard
-            title={name || t('form.namePlaceholder')}
-            category={selectedCategory?.name}
-            icon={resolveListIcon(icon)}
-            color={color}
-            itemsCount={0}
-          />
-        </View>
-        <View style={styles.appearanceControls}>
-          <Button variant="soft" icon={Pencil} label={t('form.editIcon')} onPress={() => setShowIconPicker(true)} />
-          <Button variant="soft" swatchColor={color} label={t('form.editColor')} onPress={() => setShowColorPicker(true)} />
-        </View>
-
-        {categories.length > 0 && (
-          <View>
-            <Text style={[styles.fieldLabel, { color: colors.textColor }]}>
-              {t('form.categories')}
-              <Text style={{ color: colors.error }}> *</Text>
-            </Text>
-            <Button
-              variant="soft"
-              icon={selectedCategory ? resolveListIcon(selectedCategory.icon) : undefined}
-              label={selectedCategory ? selectedCategory.name : t('form.categoryPlaceholder')}
-              onPress={() => setShowCategoryPicker(true)}
-            />
-          </View>
-        )}
-
         <View style={styles.switchRow}>
           <Text style={[styles.switchLabel, { color: colors.textColor }]}>{t('form.hidden')}</Text>
           <Switch value={isHidden} onChange={setIsHidden} />
         </View>
 
         {displayError && <Text style={styles.error}>{displayError}</Text>}
+      </ScrollView>
 
-        <Button
-          label={isEdit ? t('form.save') : t('form.create')}
-          onPress={save}
-          loading={saving}
-        />
-
-        {isEdit && (
-          <View style={styles.deleteZone}>
+      {/* Azioni fisse in fondo alla pagina */}
+      <View style={styles.footer}>
+        <View style={styles.actionItem}>
+          {isEdit ? (
             <Button
-              variant="secondary"
+              variant="destructive"
               label={t('form.delete')}
               onPress={() => setShowDeleteConfirm(true)}
               loading={deleting}
             />
-          </View>
-        )}
-      </ScrollView>
+          ) : (
+            <Button variant="secondary" label={t('form.cancel')} onPress={() => router.back()} />
+          )}
+        </View>
+        <View style={styles.actionItem}>
+          <Button
+            variant="primary"
+            label={isEdit ? t('form.save') : t('form.create')}
+            onPress={save}
+            loading={saving}
+          />
+        </View>
+      </View>
 
       <ConfirmSheet
         visible={showDeleteConfirm}
@@ -207,7 +250,7 @@ export default function ListFormScreen() {
         visible={showIconPicker}
         onClose={() => setShowIconPicker(false)}
         selected={icon}
-        onSelect={setIcon}
+        onSelect={selectIcon}
       />
 
       <ColorPickerSheet
@@ -223,7 +266,7 @@ export default function ListFormScreen() {
         onClose={() => setShowCategoryPicker(false)}
         categories={categories}
         selectedId={selectedCategoryId}
-        onSelect={setSelectedCategoryId}
+        onSelect={selectCategory}
         searchPlaceholder={t('form.categorySearch')}
         emptyLabel={t('form.categoryEmpty')}
       />
@@ -248,8 +291,10 @@ const styles = StyleSheet.create({
   },
   appearanceControls: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: Spacing.two,
+  },
+  appearanceItem: {
+    flex: 1,
   },
   switchRow: {
     flexDirection: 'row',
@@ -259,8 +304,15 @@ const styles = StyleSheet.create({
   switchLabel: {
     fontSize: 16,
   },
-  deleteZone: {
-    marginTop: Spacing.four,
+  footer: {
+    flexDirection: 'row',
+    gap: Spacing.five,
+    paddingHorizontal: Spacing.four,
+    paddingTop: Spacing.two,
+    paddingBottom: Spacing.four,
+  },
+  actionItem: {
+    flex: 1,
   },
   error: {
     fontSize: 14,

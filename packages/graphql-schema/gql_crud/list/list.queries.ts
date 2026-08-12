@@ -60,6 +60,7 @@ export const MY_LISTS: DocumentNode = parse(`
         description
         itemCount
         updatedAt
+        isHidden
         categories {
           id
           name

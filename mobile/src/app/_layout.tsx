@@ -4,6 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { GlobalDevOverlay } from '@/components/organisms/global-dev-overlay';
 import { apolloClient } from '@/lib/apollo';
 import '@/lib/i18n';
 import { AppThemeProvider } from '@/utils/useAppTheme';
@@ -43,6 +44,7 @@ export default function RootLayout() {
             <Stack.Screen name="(auth)" />
             <Stack.Screen name="(app)" />
           </Stack>
+          <GlobalDevOverlay />
         </AuthIntroReplayProvider>
       </AppThemeProvider>
       <AnimatedSplashOverlay />

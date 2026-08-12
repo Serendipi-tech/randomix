@@ -162,7 +162,7 @@ function resolveVariant(variant: ButtonVariant, colors: ThemeColors): VariantSty
 const styles = StyleSheet.create({
   button: {
     height: BUTTON_HEIGHT,
-    borderRadius: 14,
+    borderRadius: 10,
     paddingHorizontal: 24,
     alignItems: 'center',
     justifyContent: 'center',
@@ -178,10 +178,10 @@ const styles = StyleSheet.create({
     gap: 8,
     height: BUTTON_HEIGHT,
     paddingHorizontal: 16,
-    borderRadius: 10,
+    borderRadius: 8,
   },
   softLabel: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
   },
   swatch: {
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   label: {
-    fontSize: 14,
+    fontSize: 16,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },

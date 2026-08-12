@@ -76,6 +76,7 @@ export default function HomeScreen() {
               icon={resolveListIcon(item.icon)}
               color={item.color}
               itemsCount={item.itemCount}
+              isHidden={item.isHidden}
               onPress={() => router.push({ pathname: '/list/[id]', params: { id: item.id } })}
             />
           )}
