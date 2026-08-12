@@ -7,6 +7,13 @@ const { ADMIN_USER } = AdminUserQueries;
 const { ADMIN_SET_USER_SUSPENDED } = AdminUserMutations;
 const { REQUEST_PASSWORD_RESET } = UserMutations;
 
+export interface AdminUserPayment {
+  id: string;
+  amount: number;
+  status: 'SUCCESS' | 'PENDING' | 'FAILED';
+  createdAt: string;
+}
+
 export interface AdminUserDetail {
   id: string;
   username: string;
@@ -19,6 +26,7 @@ export interface AdminUserDetail {
   listsCount: number;
   groupsCount: number;
   friendsCount: number;
+  payments: AdminUserPayment[];
 }
 
 interface AdminUserQueryResult {

@@ -11,9 +11,12 @@ builder.queryField('adminDashboardStats', (t) =>
     resolve: async (_root, _args, ctx) => {
       await requireAdmin(ctx);
 
-      const startDate = new Date();
-      startDate.setHours(0, 0, 0, 0);
-      startDate.setDate(startDate.getDate() - (GROWTH_WINDOW_DAYS - 1));
+      // Calcolo interamente in UTC: mischiare confini di giorno locali (setHours/setDate, timezone
+      // del server) con etichette UTC (toISOString) sfasa i bucket di un giorno quando il fuso del
+      // server non è UTC — gli utenti "di oggi" finiscono in un bucket randagio invece che nell'ultimo
+      // giorno atteso. Anche più robusto per il deploy: i server serverless girano tipicamente in UTC.
+      const now = new Date();
+      const startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - (GROWTH_WINDOW_DAYS - 1)));
 
       const [totalUsers, usersBeforeWindow, recentUsers, totalLists, totalGroups, totalGroupMemberships, activeSubscriptions] =
         await Promise.all([
@@ -33,8 +36,7 @@ builder.queryField('adminDashboardStats', (t) =>
       // Bucket per giorno (finestra fissa) poi cumulativo a partire dagli utenti precedenti alla finestra
       const dayBuckets = new Map<string, number>();
       for (let i = 0; i < GROWTH_WINDOW_DAYS; i++) {
-        const day = new Date(startDate);
-        day.setDate(day.getDate() + i);
+        const day = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - (GROWTH_WINDOW_DAYS - 1) + i));
         dayBuckets.set(day.toISOString().slice(0, 10), 0);
       }
       recentUsers.forEach((u) => {

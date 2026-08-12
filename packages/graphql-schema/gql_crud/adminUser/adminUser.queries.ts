@@ -31,6 +31,12 @@ export const ADMIN_USER: DocumentNode = parse(`
       listsCount
       groupsCount
       friendsCount
+      payments {
+        id
+        amount
+        status
+        createdAt
+      }
     }
   }
 `);

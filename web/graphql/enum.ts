@@ -34,7 +34,7 @@ builder.enumType('NOTIFICATION_TYPE', {
   ] as const,
 });
 
-builder.enumType('REPORT_TYPE', {
+export const ReportTypeEnum = builder.enumType('REPORT_TYPE', {
   values: ['BUG', 'FEEDBACK', 'REPORT'] as const,
 });
 
@@ -46,11 +46,11 @@ builder.enumType('STATUS_FRIENDSHIP', {
   values: ['PENDING', 'ACCEPTED', 'REJECTED', 'CANCELED'] as const,
 });
 
-builder.enumType('STATUS_PAYMENT', {
+export const StatusPaymentEnum = builder.enumType('STATUS_PAYMENT', {
   values: ['SUCCESS', 'PENDING', 'FAILED'] as const,
 });
 
-builder.enumType('STATUS_REPORT', {
+export const StatusReportEnum = builder.enumType('STATUS_REPORT', {
   values: ['SENT', 'IN_PROGRESS', 'SOLVED', 'REJECTED'] as const,
 });
 

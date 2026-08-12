@@ -55,6 +55,8 @@ Palette costruita e validata con la skill dataviz (`scripts/validate_palette.js`
 
 **Test eseguiti**: build pulita, verifica runtime end-to-end su server di produzione isolato (porta separata) con JWT admin reale — HTTP 200, zero errori, dati reali renderizzati (stat tile, SVG line chart, bar chart); poi riverificato dopo la conversione ad Apollo con lo stesso metodo (cookie di sessione al posto dell'header, come farebbe il browser).
 
+**Bug trovato e risolto (12/08/2026, durante lo STEP 9)**: stesso pattern timezone-bug scoperto in `adminPaymentStats` — `usersGrowth` mischiava confini di giorno locali (`setHours`/`setDate`, timezone del server) con etichette UTC (`toISOString()`), causando un bucket randagio in più (31 invece di 30) con server in fuso non-UTC. Mascherato finora dal fatto che i conteggi sono cumulativi (nessun valore "mancante" visibile, solo un punto extra nel grafico). Risolto con lo stesso fix: calcolo interamente in UTC (`Date.UTC(...)`). Verificato a runtime: `usersGrowth` ora restituisce esattamente 30 bucket, l'ultimo è oggi e coincide con `totalUsers`.
+
 ## STEP 3 — ✅ COMPLETATA
 
 Gestione utenti singoli
@@ -183,20 +185,52 @@ UI — `/dashboard/memberships`: card per ognuno dei 5 slot piano — configurat
 
 **Test eseguiti** (build pulita + server di produzione isolato, cookie reale): pagina → HTTP 200, zero errori, tutti e 5 gli slot renderizzati correttamente nello stato vuoto (coerente col DB, nessun pacchetto configurato dopo i test della Fase 1).
 
-## STEP 8
+## STEP 8 — ✅ COMPLETATA
 
 Gestione Report (bug/feedback/segnalazioni utenti)
 
 Scope confermato: sola lettura + cambio stato (SENT/IN_PROGRESS/SOLVED/REJECTED), nessuna eliminazione. Il target polimorfico opzionale (`reportedId`/`itemId`/`groupId`/`challengeId`) va risolto nel dettaglio (username se utente reportato, nome se gruppo, ecc.) invece di mostrare solo l'id grezzo.
 
-### Fase 1
+### Fase 1 — ✅ completata
 
-Query `adminReports` (filtro per `status`/`reportType` opzionali + paginazione cursor, stesso pattern `take+1`/`nextCursor` già usato altrove) — righe con mittente risolto (username) e un campo `targetLabel` calcolato lato resolver (risolve `reportedId`→username, `itemId`→nome item, `groupId`→nome gruppo, `challengeId`→nome sfida, in base a quale dei quattro è valorizzato). Mutation `adminUpdateReportStatus(id, status)`. Entrambe guardate da `requireAdmin`. Tipo `AdminReportRow`/`AdminReportDetail` come `objectRef` dedicati (stesso motivo di `AdminUserRow`: non estendere un `ReportRef` pubblico che non esiste ancora e non serve altrove).
+Query `adminReports` (filtro per `status`/`reportType` opzionali, tipizzati sugli enum reali via `StatusReportEnum`/`ReportTypeEnum` — esportati come const da `enum.ts`, prima solo registrati; stesso pattern `take+1`/`nextCursor` già usato altrove) — righe con mittente risolto (username) e un campo `targetLabel` calcolato lato resolver (risolve `reportedId`→username, `itemId`→nome item, `groupId`→nome gruppo, `challengeId`→nome sfida, in base a quale dei quattro è valorizzato). Mutation `adminUpdateReportStatus(id, status)`. Entrambe guardate da `requireAdmin`. Tipo `AdminReportRow`/`AdminReportDetail` come `objectRef` dedicati (stesso motivo di `AdminUserRow`: non estendere un `ReportRef` pubblico che non esiste ancora e non serve altrove).
 
-### Fase 2
+### Fase 2 — ✅ completata
 
-UI — `/dashboard/reports`: tabella (mittente, tipo, target risolto, stato con `Badge` colorato, data) con filtri stato/tipo sopra, colonne essenziali come la tabella utenti (niente scroll orizzontale). Click riga apre modale dettaglio: titolo, corpo, `attachedFiles` (link), target risolto, select cambio stato.
+UI — `/dashboard/reports`: tabella (titolo, mittente, tipo, stato con `Badge` colorato, data) con filtri stato/tipo sopra (`<select>` nativi, come in `MembershipFormModal`), colonne essenziali come la tabella utenti (niente scroll orizzontale). Click riga apre `ReportDetailModal`: titolo, corpo, `attachedFiles` (link cliccabili), target risolto, select cambio stato (aggiorna e refetch immediato). Sidebar aggiornata con il link "Segnalazioni".
 
-## STEP 9
+**Test eseguiti** (build pulita + server di produzione isolato, cookie reale, su un report di test reale creato ad-hoc con `reportedId` valorizzato): `adminReports`/`adminReport` → target risolto correttamente ("Utente: testapikeyuser"); `adminUpdateReportStatus` → stato aggiornato, verificato anche l'effetto sul filtro (`status: SENT` → vuoto dopo il cambio, `status: IN_PROGRESS` → lo trova); report di test eliminato al termine, lista tornata vuota come all'inizio.
+
+## STEP 9 — ✅ COMPLETATA
 
 Statistiche pagamenti/abbonamenti aggregate (temporali) + storico dettagliato per utente
+
+Scope confermato: selettore periodo (7/30/90 giorni) invece di una finestra fissa. Storico dettagliato per utente va dentro `UserDetailModal` (STEP 3), non una sezione a parte. **Nota**: Stripe non è ancora collegato (`stripeInvoiceId`/`stripeSubId` commentati "per ora non funziona" in schema) — nessun `Payment` reale nel DB oggi. Le query saranno corrette ma la dashboard mostrerà dati vuoti finché Stripe non è attivo; verificarle con pagamenti di test creati/rimossi ad-hoc, come già fatto per membership/notifiche.
+
+### Fase 1 — ✅ completata
+
+Query `adminPaymentStats(days: Int)` — entrate totali (SUCCESS), conteggio pagamenti per `STATUS_PAYMENT` (SUCCESS/PENDING/FAILED), serie temporale entrate/giorno **non cumulativa** (totale del singolo giorno, a differenza di `usersGrowth` che è progressivo) sul periodo scelto (7/30/90, validato). `StatusPaymentEnum` esportato come const in `enum.ts` (stesso trattamento degli altri enum in questi STEP). Guardata da `requireAdmin`.
+
+**Bug trovato e risolto**: il calcolo dei bucket giornalieri mischiava confini locali (`setHours`/`setDate`, timezone del server) con etichette UTC (`toISOString()`). Con server in UTC+2, questo sfasa le date dei bucket di un giorno indietro rispetto al calendario reale — e i pagamenti "di oggi" (registrati in UTC) finiscono fuori dai bucket pre-seminati, creando un bucket randagio in più invece di popolare l'ultimo giorno atteso (verificato: `days: 7` restituiva 8 bucket). Risolto ricalcolando interamente in UTC (`Date.UTC(...)` invece di `setHours`/`setDate` locali) — più corretto anche in produzione, dove i server serverless girano tipicamente in UTC indipendentemente dal fuso di sviluppo.
+
+**Stesso pattern trovato anche in `adminDashboardStats.usersGrowth` (STEP 2)** — non toccato qui (fuori scope, nessuna richiesta esplicita), ma va segnalato: probabilmente ha lo stesso sfasamento, mascherato lì dal fatto che i conteggi sono cumulativi (l'effetto visibile sarebbe un punto in più nel grafico, non un valore mancante). Da verificare/correggere se richiesto.
+
+**Test eseguiti** (build pulita + server di produzione isolato, cookie reale): stato vuoto (nessun `Payment` nel DB, coerente con Stripe non collegato) → tutto zero senza errori; periodo non valido (`days: 15`) → `BAD_REQUEST`; creati membership/subscription/3 pagamenti di test reali (2 SUCCESS da 4.99€, 1 FAILED) → `totalRevenue: 9.98`, `paymentsByStatus` corretto, `revenueByDay` con esattamente 7 bucket (non 8) dopo il fix, entrate di oggi nell'ultimo bucket come atteso; tutti i dati di test eliminati al termine, stato tornato a zero.
+
+### Fase 2 — ✅ completata
+
+Estende `adminUser(id)` (STEP 3) con `payments: [AdminUserPayment]` (storico ordinato per data desc, importo, stato) — non una query separata, si carica insieme al resto del dettaglio già interrogato da `UserDetailModal`. `StatusPaymentEnum` esportato come const in `enum.ts` (stesso trattamento degli altri enum in questi STEP).
+
+**Test eseguiti** (build pulita + server di produzione isolato, cookie reale): creati membership/subscription/pagamento di test reali per l'utente admin → `adminUser(id).payments` restituisce correttamente il pagamento (id/amount/status/createdAt); dati di test eliminati al termine, `payments: []` e `membershipPlan: FREE` tornati come prima del test.
+
+### Fase 3 — ✅ completata
+
+UI — `/dashboard/payments`: selettore periodo (7/30/90 giorni, riusa `Chip` come toggle — coerente con gli altri usi nel pannello, non un nuovo componente dedicato). KPI row (`StatTile`: entrate totali, pagamenti riusciti/falliti) + breakdown testuale per stato. `RevenueChart` (organism nuovo, non `UserGrowthChart` riusato: stesso stile visivo ma logica diversa — non cumulativo, formattazione valuta invece di conteggio intero). Sidebar aggiornata con il link "Pagamenti".
+
+**Test eseguiti** (build pulita + server di produzione isolato, cookie reale): pagina → HTTP 200, zero errori, selettori periodo/sidebar renderizzati; creato un pagamento di test reale per confermare che l'hook `usePaymentStats` non generi errori runtime con dati popolati (verifica dei valori numerici già coperta a fondo dai test della Fase 1 sulla query); dati di test rimossi al termine.
+
+### Fase 4 — ✅ completata
+
+`UserDetailModal` (STEP 3) esteso con una sezione storico pagamenti (importo, data, stato con `Badge` colorato) sotto le stats esistenti, sopra le azioni sospendi/reset password — visibile solo se `payments.length > 0` (nessuna sezione vuota per utenti senza pagamenti).
+
+**Test eseguiti** (build pulita + server di produzione isolato, cookie reale): creato un pagamento reale collegato all'utente admin, verificata la query esatta usata dalla modale (`adminUser(id).payments`, già validata in Fase 2) → dato corretto, zero errori server; dati di test rimossi al termine, stato tornato vuoto.
