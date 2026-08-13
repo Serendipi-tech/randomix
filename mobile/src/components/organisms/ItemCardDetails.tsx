@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Image, Platform, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Check, Pencil, Plus, Trash2, X } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
-import { PLACEHOLDER_ITEM_IMAGE } from '@/constants/placeholders';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { BottomSheet } from '@/components/organisms/BottomSheet';
@@ -109,8 +108,8 @@ export function ItemCardDetails({
         <View style={styles.body}>
           {/* Header: copertina "book cover" + titolo, allineati in alto */}
           <View style={styles.header}>
-            {/* Placeholder statico temporaneo quando manca imageUri (in attesa della gestione immagini) */}
-            <Image source={imageUri ? { uri: imageUri } : PLACEHOLDER_ITEM_IMAGE} style={styles.cover} resizeMode="cover" />
+            {/* Cover solo se c'è un'immagine reale: niente placeholder */}
+            {imageUri && <Image source={{ uri: imageUri }} style={styles.cover} resizeMode="cover" />}
             <View style={styles.headerText}>
               {category && <Text style={[styles.category, { color: colors.textColor }]}>{category}</Text>}
               <Text style={[styles.name, { color: colors.textColor }]} numberOfLines={3}>

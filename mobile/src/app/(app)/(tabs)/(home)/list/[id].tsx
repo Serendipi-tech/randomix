@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dices, Pencil, Plus } from 'lucide-react-native';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Spacing } from '@/constants/theme';
 import { resolveListIcon } from '@/constants/list-icons';
@@ -18,10 +18,9 @@ import { CardShell } from '@/components/cards/CardShell';
 import { Button } from '@/components/atoms/Button';
 import { useItemMutations } from '@/utils/useItemMutations';
 import { useListDetail, type ListItemEntry } from '@/utils/useListDetail';
+import { useNavbarClearance } from '@/utils/useNavbarClearance';
 
 const SKELETON_COUNT = 5;
-// altezza della pillola navbar (app-tabs.tsx, BAR_HEIGHT): duplicato qui per non toccare quel componente
-const NAVBAR_HEIGHT = 68;
 
 export default function ListDetailScreen() {
   const { t } = useTranslation('lists');
@@ -32,9 +31,8 @@ export default function ListDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { list, loading, error } = useListDetail(id);
   const { removeItemFromList, updateUserItem, rateItem } = useItemMutations();
-  const insets = useSafeAreaInsets();
-  // spazio in fondo alla lista scrollabile pari alla navbar + inset di sistema, così l'ultimo item non finisce sotto la pillola
-  const listBottomPadding = NAVBAR_HEIGHT + insets.bottom + Spacing.three;
+  // clearance in fondo alla lista per non finire sotto la pillola-navbar (regola condivisa)
+  const listBottomPadding = useNavbarClearance();
 
   const [entryToRemove, setEntryToRemove] = useState<ListItemEntry | null>(null);
 
@@ -128,6 +126,7 @@ export default function ListDetailScreen() {
                 }
                 rating={entry.userItem.item.myRating?.value ?? undefined}
                 tags={entry.userItem.tags}
+                imageUri={entry.userItem.item.imageUrl ?? undefined}
                 detail={{
                   imageUri: entry.userItem.item.imageUrl ?? undefined,
                   name: entry.userItem.item.name,
@@ -162,13 +161,14 @@ export default function ListDetailScreen() {
             }
             />
             {/* Fade in cima alla lista: gli item scrollati svaniscono sotto l'header fisso. Nascosto se la lista è vuota */}
+            {/* Temporaneamente rimosso su richiesta:
             {list.items.length > 0 ? (
               <LinearGradient
                 pointerEvents="none"
                 colors={[colors.background, hexToRgba(colors.background, 0)]}
                 style={styles.topFade}
               />
-            ) : null}
+            ) : null} */}
           </View>
         </>
       )}

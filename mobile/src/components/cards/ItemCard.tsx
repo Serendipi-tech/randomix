@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { Star } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
-import { PLACEHOLDER_ITEM_IMAGE } from '@/constants/placeholders';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { CardShell } from '@/components/cards/CardShell';
 import { StatusBadge } from '@/components/atoms/StatusBadge';
@@ -45,7 +44,7 @@ function resolveStatusColor(status: string, colors: ThemeColors): string {
 }
 
 /** Card di item: categoria + stato, titolo ad altezza fissa e footer con tag e rating (stella frazionaria + valore).
- *  Colonna immagine full-bleed a destra (placeholder se senza `imageUri`). Shell condivisa (CardShell); tap gestito dal chiamante. */
+ *  Colonna immagine full-bleed a destra solo se c'è `imageUri` (altrimenti nessuna immagine). Shell condivisa (CardShell); tap gestito dal chiamante. */
 export function ItemCard({ title, category, status, statusColor, imageUri, rating, tags, detail, onPress }: ItemCardProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
@@ -62,7 +61,7 @@ export function ItemCard({ title, category, status, statusColor, imageUri, ratin
       <CardShell onPress={handlePress}>
       {/* Margine negativo per annullare il padding del guscio e ottenere il layout full-bleed */}
       <View style={styles.fullBleed}>
-        <View style={styles.body}>
+        <View style={[styles.body, !imageUri && styles.bodyNoImage]}>
           <View style={styles.topGroup}>
             <View style={styles.header}>
               {category && (
@@ -102,10 +101,12 @@ export function ItemCard({ title, category, status, statusColor, imageUri, ratin
           )}
         </View>
 
-        <View style={styles.imageWrap}>
-          {/* Placeholder statico temporaneo quando manca imageUri (in attesa della gestione immagini) */}
-          <Image source={imageUri ? { uri: imageUri } : PLACEHOLDER_ITEM_IMAGE} style={styles.image} resizeMode="cover" />
-        </View>
+        {/* Colonna immagine solo se c'è una cover reale: niente placeholder */}
+        {imageUri && (
+          <View style={styles.imageWrap}>
+            <Image source={{ uri: imageUri }} style={styles.image} resizeMode="cover" />
+          </View>
+        )}
       </View>
       </CardShell>
 
@@ -127,6 +128,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
     paddingLeft: 16,
+  },
+  // senza colonna immagine il testo ha bisogno del padding destro (come showcase-colors)
+  bodyNoImage: {
+    paddingRight: 16,
   },
   topGroup: {
     gap: 4,

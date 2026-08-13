@@ -7,6 +7,7 @@ import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-n
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 import { Colors, Spacing } from '@/constants/theme';
+import { useNavbarClearance } from '@/utils/useNavbarClearance';
 import { resolveListIcon } from '@/constants/list-icons';
 import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -32,6 +33,7 @@ export default function GroupListScreen() {
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
   const router = useRouter();
+  const listBottomPadding = useNavbarClearance();
 
   const { groupListId, listName } = useLocalSearchParams<{
     groupListId: string;
@@ -234,7 +236,7 @@ export default function GroupListScreen() {
               showsVerticalScrollIndicator={false}
               data={items}
               keyExtractor={(item: GroupListItem) => item.id}
-              contentContainerStyle={styles.itemList}
+              contentContainerStyle={[styles.itemList, { paddingBottom: listBottomPadding }]}
               renderItem={({ item }) => (
                 <ItemCard
                   title={item.name}
@@ -316,7 +318,6 @@ const styles = StyleSheet.create({
   },
   itemList: {
     paddingHorizontal: Spacing.four,
-    paddingBottom: Spacing.six ?? 48,
     gap: Spacing.two,
   },
   empty: {

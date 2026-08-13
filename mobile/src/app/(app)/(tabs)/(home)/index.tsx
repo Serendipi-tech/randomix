@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { Home, List, Plus, Shuffle } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Spacing } from '@/constants/theme';
 import { resolveListIcon } from '@/constants/list-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -13,10 +13,9 @@ import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ListCard } from '@/components/cards/ListCard';
 import { ContentCard } from '@/components/cards/ContentCard';
 import { useMyLists } from '@/utils/useLists';
+import { useNavbarClearance } from '@/utils/useNavbarClearance';
 
 const SKELETON_COUNT = 6;
-// altezza della pillola navbar (app-tabs.tsx, BAR_HEIGHT): duplicato qui per non toccare quel componente
-const NAVBAR_HEIGHT = 68;
 
 export default function HomeScreen() {
   const { t } = useTranslation('home');
@@ -24,9 +23,8 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const { lists, loading, error, loadMore } = useMyLists();
-  const insets = useSafeAreaInsets();
-  // spazio riservato in fondo alla lista pari all'altezza reale della navbar + inset di sistema, così l'ultimo elemento non resta nascosto dietro la pillola
-  const listBottomPadding = NAVBAR_HEIGHT + insets.bottom + Spacing.three;
+  // clearance in fondo alla lista per non finire sotto la pillola-navbar (regola condivisa)
+  const listBottomPadding = useNavbarClearance();
 
   // skeleton solo al primo caricamento, quando non c'è ancora nulla in cache
   const showSkeleton = loading && lists.length === 0;
