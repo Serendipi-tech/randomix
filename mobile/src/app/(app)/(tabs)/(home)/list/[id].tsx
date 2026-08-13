@@ -83,13 +83,14 @@ export default function ListDetailScreen() {
                 </Text>
               </CardShell>
             ) : null}
-            <View style={styles.itemsBar}>
+            <View style={[styles.itemsBar, list.description ? styles.itemsBarSpaced : null]}>
               <View style={styles.itemsActions}>
                 <View style={styles.randomizeFill}>
                   <Button
                     variant="primary"
                     icon={Dices}
                     label={t('detail.randomize')}
+                    disabled={list.items.length === 0}
                     onPress={() =>
                       router.push({
                         pathname: '/draw',
@@ -160,12 +161,14 @@ export default function ListDetailScreen() {
               </View>
             }
             />
-            {/* Fade in cima alla lista: gli item scrollati svaniscono sotto l'header fisso */}
-            <LinearGradient
-              pointerEvents="none"
-              colors={[colors.background, hexToRgba(colors.background, 0)]}
-              style={styles.topFade}
-            />
+            {/* Fade in cima alla lista: gli item scrollati svaniscono sotto l'header fisso. Nascosto se la lista è vuota */}
+            {list.items.length > 0 ? (
+              <LinearGradient
+                pointerEvents="none"
+                colors={[colors.background, hexToRgba(colors.background, 0)]}
+                style={styles.topFade}
+              />
+            ) : null}
           </View>
         </>
       )}
@@ -191,7 +194,6 @@ const styles = StyleSheet.create({
   fixedHeader: {
     paddingHorizontal: Spacing.four,
     paddingBottom: Spacing.three,
-    gap: Spacing.two,
   },
   listWrap: {
     flex: 1,
@@ -216,7 +218,10 @@ const styles = StyleSheet.create({
   itemsBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: Spacing.three,
+  },
+  // Con descrizione: metà dello spazio (30px) che il PageHeader lascia sotto di sé; senza descrizione i pulsanti restano a ridosso dell'header
+  itemsBarSpaced: {
+    paddingTop: 15,
   },
   itemsActions: {
     flex: 1,

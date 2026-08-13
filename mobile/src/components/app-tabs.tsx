@@ -41,8 +41,9 @@ const SIDE_TAB_ICONS = {
   groups: LayoutGrid,
 } as const;
 
-// La pillola si mostra solo sulle schermate "root" delle tab; sulle pagine pushed (form, dettagli) resta nascosta
-const ROOT_PATHS = ['/', '/notifications', '/profile', '/friends', '/groups'];
+// La pillola resta visibile ovunque (root + navigazione gerarchica: dettagli lista/amico/gruppo);
+// si nasconde solo nei task focalizzati: form di creazione/modifica e flussi immersivi a schermo pieno
+const HIDDEN_PATHS = ['/list-form', '/item-form', '/draw', '/randomizer'];
 
 type SideTabName = keyof typeof SIDE_TAB_ICONS;
 
@@ -190,8 +191,8 @@ function TabBar(props: TabListProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   const pathname = usePathname();
-  // Nasconde la pillola (senza smontare le tab) sulle pagine pushed: display none mantiene i trigger montati
-  const barVisible = ROOT_PATHS.includes(pathname);
+  // Nasconde la pillola (senza smontare le tab) solo nei task focalizzati: display none mantiene i trigger montati
+  const barVisible = !HIDDEN_PATHS.includes(pathname);
   const fill = hexToRgba(colors.primary, 0.2);
   const [width, setWidth] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
