@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Tag as TagIcon, X } from 'lucide-react-native';
+import { Pencil, Tag as TagIcon, X } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { hexToRgba } from '@/utils/color';
@@ -8,11 +8,12 @@ type TagProps = {
   name: string;
   color: string;
   compact?: boolean;
+  onEdit?: () => void;
   onRemove?: () => void;
 };
 
 /** Tag/etichetta con icona: sfondo tinto dal colore passato, testo dal tema. La variante compatta è uppercase. */
-export function Tag({ name, color, compact = false, onRemove }: TagProps) {
+export function Tag({ name, color, compact = false, onEdit, onRemove }: TagProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
@@ -42,6 +43,11 @@ export function Tag({ name, color, compact = false, onRemove }: TagProps) {
       >
         {name}
       </Text>
+      {onEdit && (
+        <Pressable onPress={onEdit} hitSlop={8}>
+          <Pencil size={compact ? 11 : 13} color={colors.textColor} strokeWidth={2.5} />
+        </Pressable>
+      )}
       {onRemove && (
         <Pressable onPress={onRemove} hitSlop={8}>
           <X size={compact ? 11 : 13} color={colors.textColor} strokeWidth={2.5} />

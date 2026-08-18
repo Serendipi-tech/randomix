@@ -9,6 +9,9 @@ import { Input } from '@/components/molecules/Input';
 import { OptionRow } from '@/components/molecules/OptionRow';
 import type { ListCategory } from '@/utils/useListCategories';
 
+// Sotto questa soglia la ricerca è superflua: poche opzioni si scorrono a colpo d'occhio
+const SEARCH_MIN_OPTIONS = 10;
+
 type ListCategoryPickerSheetProps = {
   visible: boolean;
   onClose: () => void;
@@ -42,10 +45,13 @@ export function ListCategoryPickerSheet({
   }, [categories, search]);
 
   const previewOf = (included: string[]) => included.map((c) => t(`categories.${c}`)).join(' · ');
+  const showSearch = categories.length >= SEARCH_MIN_OPTIONS;
 
   return (
     <BottomSheet visible={visible} onClose={onClose}>
-      <Input variant="text" value={search} onChangeText={setSearch} placeholder={searchPlaceholder} style={styles.search} />
+      {showSearch && (
+        <Input variant="text" value={search} onChangeText={setSearch} placeholder={searchPlaceholder} style={styles.search} />
+      )}
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {filtered.length === 0 ? (
           <Text style={[styles.empty, { color: colors.disabled }]}>{emptyLabel}</Text>

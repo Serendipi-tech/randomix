@@ -1,12 +1,17 @@
-import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
-import { Check } from 'lucide-react-native';
+import { useMemo, useState } from 'react';
+import { ScrollView, StyleSheet, Text } from 'react-native';
+import { LayoutGrid } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
-import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { BottomSheet } from '@/components/organisms/BottomSheet';
+import { Input } from '@/components/molecules/Input';
+import { OptionRow } from '@/components/molecules/OptionRow';
 import type { Category } from '@/utils/useListCategories';
 
 export type CategoryOption = { value: Category; label: string };
+
+// Sotto questa soglia la ricerca è superflua: poche opzioni si scorrono a colpo d'occhio
+const SEARCH_MIN_OPTIONS = 10;
 
 type CategoryPickerSheetProps = {
   visible: boolean;
@@ -15,37 +20,55 @@ type CategoryPickerSheetProps = {
   options: CategoryOption[];
   selected: Category | null;
   onSelect: (value: Category) => void;
+  searchPlaceholder: string;
   /** Messaggio mostrato quando non ci sono opzioni. */
   emptyLabel: string;
 };
 
-/** Bottomsheet di scelta categoria: dumb, elenca le opzioni ricevute e segnala la selezione. */
-export function CategoryPickerSheet({ visible, onClose, options, selected, onSelect, emptyLabel }: CategoryPickerSheetProps) {
+/** Bottomsheet di scelta categoria: dumb, elenca le opzioni ricevute e segnala la selezione.
+ *  Stessa struttura (ricerca + OptionRow) di ListCategoryPickerSheet, per coerenza visiva. */
+export function CategoryPickerSheet({
+  visible,
+  onClose,
+  options,
+  selected,
+  onSelect,
+  searchPlaceholder,
+  emptyLabel,
+}: CategoryPickerSheetProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
+  const [search, setSearch] = useState('');
+
+  const filtered = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return options;
+    return options.filter((o) => o.label.toLowerCase().includes(query));
+  }, [options, search]);
+
+  const showSearch = options.length >= SEARCH_MIN_OPTIONS;
 
   return (
     <BottomSheet visible={visible} onClose={onClose}>
+      {showSearch && (
+        <Input variant="text" value={search} onChangeText={setSearch} placeholder={searchPlaceholder} style={styles.search} />
+      )}
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {options.length === 0 ? (
+        {filtered.length === 0 ? (
           <Text style={[styles.empty, { color: colors.disabled }]}>{emptyLabel}</Text>
         ) : (
-          options.map((option) => {
-            const isSelected = selected === option.value;
-            return (
-              <Pressable
-                key={option.value}
-                onPress={() => {
-                  onSelect(option.value);
-                  onClose();
-                }}
-                style={[styles.row, isSelected && { backgroundColor: hexToRgba(colors.primary, 0.12) }]}
-              >
-                <Text style={[styles.label, { color: colors.textColor }]}>{option.label}</Text>
-                {isSelected && <Check size={18} color={colors.primary} />}
-              </Pressable>
-            );
-          })
+          filtered.map((option) => (
+            <OptionRow
+              key={option.value}
+              icon={LayoutGrid}
+              title={option.label}
+              active={selected === option.value}
+              onPress={() => {
+                onSelect(option.value);
+                onClose();
+              }}
+            />
+          ))
         )}
       </ScrollView>
     </BottomSheet>
@@ -53,21 +76,14 @@ export function CategoryPickerSheet({ visible, onClose, options, selected, onSel
 }
 
 const styles = StyleSheet.create({
+  search: {
+    paddingHorizontal: 16,
+    marginBottom: 8,
+  },
   content: {
     paddingHorizontal: 16,
     paddingBottom: 24,
     gap: 4,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    minHeight: 48,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-  },
-  label: {
-    fontSize: 16,
   },
   empty: {
     fontSize: 14,

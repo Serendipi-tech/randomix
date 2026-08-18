@@ -22,9 +22,13 @@ export interface UpdateUserItemInput {
   tagIds?: string[];
 }
 
+interface AddItemToListResult {
+  addItemToList: { id: string; userItem: { id: string } };
+}
+
 export function useItemMutations() {
   // ListDetail va ricaricata: cambia l'elenco items della lista aperta
-  const [addMutation, { loading: adding, error: addError }] = useMutation(ADD_ITEM_TO_LIST, {
+  const [addMutation, { loading: adding, error: addError }] = useMutation<AddItemToListResult>(ADD_ITEM_TO_LIST, {
     refetchQueries: ['ListDetail'],
   });
 
@@ -43,7 +47,8 @@ export function useItemMutations() {
   });
 
   const addItemToList = async (input: AddItemInput) => {
-    await addMutation({ variables: { input } });
+    const { data } = await addMutation({ variables: { input } });
+    return data?.addItemToList.userItem.id ?? null;
   };
 
   const updateUserItem = async (id: string, input: UpdateUserItemInput) => {

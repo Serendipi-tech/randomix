@@ -1,6 +1,15 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Modal, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
-import Animated, { Easing, Extrapolation, interpolate, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, {
+  Easing,
+  Extrapolation,
+  interpolate,
+  runOnJS,
+  useAnimatedKeyboard,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
@@ -30,6 +39,8 @@ export function BottomSheet({ visible, onClose, children, height }: BottomSheetP
   // Posizione verticale in px: 0 = aperto, screenHeight = chiuso (fuori schermo sotto). Un solo valore guida
   // slide-in/out, drag e fade del backdrop: nessuna coppia di animazioni che si combatte.
   const translateY = useSharedValue(screenHeight);
+  // Altezza tastiera in tempo reale (sincronizzata con l'animazione nativa): la sheet risale di questo tanto
+  const keyboard = useAnimatedKeyboard();
 
   useEffect(() => {
     if (visible) {
@@ -46,7 +57,8 @@ export function BottomSheet({ visible, onClose, children, height }: BottomSheetP
     opacity: interpolate(translateY.value, [0, screenHeight], [1, 0], Extrapolation.CLAMP),
   }));
   // Slide via marginBottom (NON transform): su web il transform sfoca il testo a DPI frazionarie. translateY down = marginBottom più negativo = sheet giù.
-  const sheetStyle = useAnimatedStyle(() => ({ marginBottom: -translateY.value }));
+  // + keyboard.height: quando la tastiera si apre la sheet risale della stessa quantità, restando sempre sopra.
+  const sheetStyle = useAnimatedStyle(() => ({ marginBottom: -translateY.value + keyboard.height.value }));
 
   // Drag sull'handle: segue il dito verso il basso; al rilascio chiude o torna su in base all'ULTIMO gesto (velocità)
   const dragGesture = Gesture.Pan()

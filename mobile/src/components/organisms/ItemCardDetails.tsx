@@ -115,6 +115,9 @@ export function ItemCardDetails({
               <Text style={[styles.name, { color: colors.textColor }]} numberOfLines={3}>
                 {name}
               </Text>
+              {showTags && (
+                <TagList tags={tags ?? []} expandable maxLines={2} onRemoveTag={onRemoveTag} onAddTag={onAddTag} />
+              )}
             </View>
           </View>
 
@@ -130,13 +133,6 @@ export function ItemCardDetails({
                   activeColor: resolveStatusColor(key, colors),
                 }))}
               />
-            </View>
-          )}
-
-          {showTags && (
-            <View style={styles.section}>
-              <SectionLabel>{t('itemDetail.tags')}</SectionLabel>
-              <TagList tags={tags ?? []} expandable onRemoveTag={onRemoveTag} onAddTag={onAddTag} />
             </View>
           )}
 
