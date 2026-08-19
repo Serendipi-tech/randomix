@@ -19,6 +19,7 @@ import { Button } from '@/components/atoms/Button';
 import { useItemMutations } from '@/utils/useItemMutations';
 import { useListDetail, type ListItemEntry } from '@/utils/useListDetail';
 import { useNavbarClearance } from '@/utils/useNavbarClearance';
+import { useTags, type Tag as TagData } from '@/utils/useTags';
 
 const SKELETON_COUNT = 5;
 
@@ -31,10 +32,28 @@ export default function ListDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { list, loading, error } = useListDetail(id);
   const { removeItemFromList, updateUserItem, rateItem } = useItemMutations();
+  const {
+    tags: availableTags,
+    createTag,
+    updateTag,
+    deleteTag,
+    creating: creatingTag,
+    updating: updatingTag,
+    deleting: deletingTag,
+  } = useTags();
   // clearance in fondo alla lista per non finire sotto la pillola-navbar (regola condivisa)
   const listBottomPadding = useNavbarClearance();
 
   const [entryToRemove, setEntryToRemove] = useState<ListItemEntry | null>(null);
+
+  // Aggiunge/rimuove un tag dall'item corrente in base alla selezione fatta nella TagPickerSheet
+  const toggleEntryTag = (entry: ListItemEntry, tag: TagData) => {
+    const currentIds = entry.userItem.tags.map((t) => t.id);
+    const nextIds = currentIds.includes(tag.id)
+      ? currentIds.filter((tagId) => tagId !== tag.id)
+      : [...currentIds, tag.id];
+    updateUserItem(entry.userItem.id, { tagIds: nextIds });
+  };
 
   const showSkeleton = loading && !list;
 
@@ -140,12 +159,17 @@ export default function ListDetailScreen() {
                   tags: entry.userItem.tags,
                   onChangeStatus: (status) => updateUserItem(entry.userItem.id, { status }),
                   onChangeRating: (value) => rateItem(entry.userItem.item.id, value),
-                  onRemoveTag: (index) =>
-                    updateUserItem(entry.userItem.id, {
-                      tagIds: entry.userItem.tags.filter((_, i) => i !== index).map((tg) => tg.id),
-                    }),
                   onChangeNote: (note) => updateUserItem(entry.userItem.id, { note: note || null }),
                   onRemoveFromList: () => setEntryToRemove(entry),
+                  availableTags,
+                  onSelectTag: (tag) => toggleEntryTag(entry, tag),
+                  onCreateTag: createTag,
+                  onUpdateTag: updateTag,
+                  onDeleteTag: async (tag) => {
+                    await deleteTag(tag.id);
+                  },
+                  savingTag: creatingTag || updatingTag,
+                  deletingTag,
                 }}
               />
             )}

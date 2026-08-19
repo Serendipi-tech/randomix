@@ -85,13 +85,20 @@ export function TagCreateSheet({
           <Button variant="soft" swatchColor={color} label={t('form.color')} onPress={() => setShowColorPicker(true)} />
         </View>
 
-        <Button
-          variant="primary"
-          label={editingTag ? saveLabel : addLabel}
-          onPress={handleSubmit}
-          loading={saving}
-          disabled={!trimmed}
-        />
+        <View style={styles.actions}>
+          <View style={styles.action}>
+            <Button variant="secondary" label={t('itemForm.cancel')} onPress={onClose} />
+          </View>
+          <View style={styles.action}>
+            <Button
+              variant="primary"
+              label={editingTag ? saveLabel : addLabel}
+              onPress={handleSubmit}
+              loading={saving}
+              disabled={!trimmed}
+            />
+          </View>
+        </View>
       </View>
 
       <ColorPickerSheet
@@ -121,6 +128,13 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   nameInput: {
+    flex: 1,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+  },
+  action: {
     flex: 1,
   },
 });

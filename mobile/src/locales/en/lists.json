@@ -67,8 +67,10 @@
     "titleEdit": "Edit item",
     "name": "Name",
     "namePlaceholder": "Item name",
+    "nameRequired": "Name is required.",
     "category": "Category",
     "categoryPlaceholder": "Choose a category",
+    "categoryRequired": "Category is required.",
     "categorySearch": "Search category…",
     "noCategories": "This list has no categories to choose from.",
     "description": "Personal description",
@@ -94,7 +96,7 @@
     "add": "Add",
     "save": "Save",
     "cancel": "Cancel",
-    "missingFields": "Name and category are required."
+    "missingFields": "Something went wrong. Please try again."
   },
   "itemDetail": {
     "status": "Status",

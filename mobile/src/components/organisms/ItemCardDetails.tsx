@@ -1,16 +1,33 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Platform, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
-import { Check, Pencil, Plus, Trash2, X } from 'lucide-react-native';
-import { Colors } from '@/constants/theme';
+import {
+  Image,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  type LayoutChangeEvent,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
+import { Info, Pencil, Tag as TagIcon, Trash2 } from 'lucide-react-native';
+import { Colors, Spacing } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { BottomSheet } from '@/components/organisms/BottomSheet';
 import { SectionLabel } from '@/components/atoms/SectionLabel';
 import { SegmentedControl } from '@/components/atoms/SegmentedControl';
 import { RatingStar } from '@/components/atoms/RatingStar';
+import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
 import { TagList } from '@/components/molecules/TagList';
+import { TagPickerSheet } from '@/components/organisms/TagPickerSheet';
+import type { Tag as TagData } from '@/utils/useTags';
+
+// Tag già collegati all'item: qui basta id/name/color, non serve isSystem (solo la picker lo usa)
+type AttachedTag = { id: string; name: string; color: string };
 
 export type ItemCardDetailsProps = {
   visible: boolean;
@@ -24,19 +41,28 @@ export type ItemCardDetailsProps = {
   status?: string;
   ratingValue?: number;
   ratingNote?: string;
-  tags?: Array<{ name: string; color: string }>;
+  tags?: AttachedTag[];
   completedAt?: string;
   onChangeStatus?: (status: ItemStatus) => void;
   onChangeRating?: (value: number) => void;
-  onRemoveTag?: (index: number) => void;
-  onAddTag?: () => void;
   /** Salva la nota personale; stringa vuota = cancella la nota. */
   onChangeNote?: (note: string) => void;
-  /** Rimuove l'item dalla lista corrente (l'azione ✕ vive qui, non sulla card). */
+  /** Rimuove l'item dalla lista corrente (icona cestino in alto a destra). */
   onRemoveFromList?: () => void;
+  /** Tag disponibili (personali + di sistema): se presente insieme a onSelectTag, mostra l'icona tag in alto a destra. */
+  availableTags?: TagData[];
+  onSelectTag?: (tag: TagData) => void;
+  onCreateTag?: (name: string, color: string) => Promise<TagData | null>;
+  onUpdateTag?: (id: string, name: string, color: string) => Promise<TagData | null>;
+  onDeleteTag?: (tag: TagData) => Promise<void>;
+  savingTag?: boolean;
+  deletingTag?: boolean;
 };
 
 const RATING_STARS = [1, 2, 3, 4, 5] as const;
+const NAME_MAX_LINES = 2;
+// Deve combaciare con User_Item.note @db.VarChar(500) nello schema Prisma
+const NOTE_MAX_LENGTH = 500;
 
 type ItemStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
 // Stati mostrati nel segmented control, in ordine di avanzamento
@@ -74,29 +100,45 @@ export function ItemCardDetails({
   completedAt,
   onChangeStatus,
   onChangeRating,
-  onRemoveTag,
-  onAddTag,
   onChangeNote,
   onRemoveFromList,
+  availableTags,
+  onSelectTag,
+  onCreateTag,
+  onUpdateTag,
+  onDeleteTag,
+  savingTag,
+  deletingTag,
 }: ItemCardDetailsProps) {
   const { t } = useTranslation('lists');
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
-  const showTags = Boolean(tags?.length) || Boolean(onAddTag);
+  const canPickTags = Boolean(availableTags && onSelectTag);
+  const showTags = Boolean(tags?.length);
+  const [showTagPicker, setShowTagPicker] = useState(false);
+  const selectedTagIds = (tags ?? []).map((tag) => tag.id);
 
-  // Editing inline della nota personale
-  const [noteEditing, setNoteEditing] = useState(false);
+  // Rileva il troncamento confrontando l'altezza del titolo visibile (numberOfLines) con quella di una
+  // copia invisibile senza limite, stessa larghezza: se la seconda è più alta, il testo è stato tagliato.
+  // Uso onLayout (non onTextLayout/lines: meno affidabile sulla nuova architettura RN) per entrambe.
+  const [showFullName, setShowFullName] = useState(false);
+  const [headerTextWidth, setHeaderTextWidth] = useState(0);
+  const [visibleNameHeight, setVisibleNameHeight] = useState(0);
+  const [fullNameHeight, setFullNameHeight] = useState(0);
+  const nameTruncated = fullNameHeight > visibleNameHeight + 2;
+
+  // Modifica della nota personale: bottomsheet dedicata, non più inline
+  const [showNoteEditor, setShowNoteEditor] = useState(false);
   const [noteDraft, setNoteDraft] = useState('');
-  const startNoteEdit = () => {
+  const openNoteEditor = () => {
     setNoteDraft(note ?? '');
-    setNoteEditing(true);
+    setShowNoteEditor(true);
   };
   const confirmNote = () => {
     onChangeNote?.(noteDraft.trim());
-    setNoteEditing(false);
+    setShowNoteEditor(false);
   };
-  const cancelNote = () => setNoteEditing(false);
 
   return (
     <BottomSheet visible={visible} onClose={onClose}>
@@ -106,18 +148,61 @@ export function ItemCardDetails({
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.body}>
+          {/* Categoria + azioni: riga a piena larghezza, sopra copertina/titolo */}
+          {(category || canPickTags || onRemoveFromList) && (
+            <View style={styles.categoryRow}>
+              {category ? (
+                <Text style={[styles.category, { color: colors.textColor }]}>{category}</Text>
+              ) : (
+                <View />
+              )}
+              {(canPickTags || onRemoveFromList) && (
+                <View style={styles.headerActions}>
+                  {canPickTags && (
+                    <Pressable onPress={() => setShowTagPicker(true)} hitSlop={4} style={styles.headerActionButton}>
+                      <TagIcon size={18} color={colors.textColor} />
+                    </Pressable>
+                  )}
+                  {onRemoveFromList && (
+                    <Pressable onPress={onRemoveFromList} hitSlop={4} style={styles.headerActionButton}>
+                      <Trash2 size={18} color={colors.error} />
+                    </Pressable>
+                  )}
+                </View>
+              )}
+            </View>
+          )}
+
           {/* Header: copertina "book cover" + titolo, allineati in alto */}
           <View style={styles.header}>
             {/* Cover solo se c'è un'immagine reale: niente placeholder */}
             {imageUri && <Image source={{ uri: imageUri }} style={styles.cover} resizeMode="cover" />}
-            <View style={styles.headerText}>
-              {category && <Text style={[styles.category, { color: colors.textColor }]}>{category}</Text>}
-              <Text style={[styles.name, { color: colors.textColor }]} numberOfLines={3}>
-                {name}
-              </Text>
-              {showTags && (
-                <TagList tags={tags ?? []} expandable maxLines={2} onRemoveTag={onRemoveTag} onAddTag={onAddTag} />
+            <View style={styles.headerText} onLayout={(e: LayoutChangeEvent) => setHeaderTextWidth(e.nativeEvent.layout.width)}>
+              <View style={styles.nameRow}>
+                <Text
+                  style={[styles.name, { color: colors.textColor }]}
+                  numberOfLines={NAME_MAX_LINES}
+                  onLayout={(e: LayoutChangeEvent) => setVisibleNameHeight(e.nativeEvent.layout.height)}
+                >
+                  {name}
+                </Text>
+                {nameTruncated && (
+                  <Pressable onPress={() => setShowFullName(true)} hitSlop={8} style={styles.infoButton}>
+                    <Info size={16} color={colors.primary} />
+                  </Pressable>
+                )}
+              </View>
+              {/* Copia invisibile senza limite di righe (stessa larghezza del contenitore), solo per misurare l'altezza reale del titolo */}
+              {headerTextWidth > 0 && (
+                <Text
+                  style={[styles.name, styles.nameMeasure, { width: headerTextWidth }]}
+                  onLayout={(e: LayoutChangeEvent) => setFullNameHeight(e.nativeEvent.layout.height)}
+                >
+                  {name}
+                </Text>
               )}
+              {/* Sola lettura: aggiunta/rimozione tag avvengono solo dalla TagPickerSheet (icona qui sopra) */}
+              {showTags && <TagList tags={tags ?? []} maxLines={2} />}
             </View>
           </View>
 
@@ -150,31 +235,23 @@ export function ItemCardDetails({
             </View>
           )}
 
-          {/* Nota personale: editing inline — +/matita per aprire, ✓/✗ per confermare/annullare */}
-          <View style={[styles.notePanel, { backgroundColor: hexToRgba(colors.primary, 0.07) }]}>
+          {/* Nota personale: sola lettura qui, la modifica avviene nella bottomsheet dedicata */}
+          <View
+            style={[
+              styles.notePanel,
+              { backgroundColor: hexToRgba(colors.primary, 0.07) },
+              !note && styles.notePanelEmpty,
+            ]}
+          >
             <View style={styles.noteHeader}>
               <SectionLabel>{t('itemDetail.note')}</SectionLabel>
-              {onChangeNote &&
-                (noteEditing ? (
-                  <View style={styles.noteActions}>
-                    <Pressable onPress={confirmNote} hitSlop={8} style={styles.iconButton}>
-                      <Check size={22} color={colors.success} />
-                    </Pressable>
-                    <Pressable onPress={cancelNote} hitSlop={8} style={styles.iconButton}>
-                      <X size={22} color={colors.error} />
-                    </Pressable>
-                  </View>
-                ) : (
-                  <Pressable onPress={startNoteEdit} hitSlop={8} style={styles.iconButton}>
-                    {note ? <Pencil size={20} color={colors.primary} /> : <Plus size={24} color={colors.primary} />}
-                  </Pressable>
-                ))}
+              {onChangeNote && (
+                <Pressable onPress={openNoteEditor} hitSlop={4} style={styles.noteEditButton}>
+                  <Pencil size={16} color={colors.primary} />
+                </Pressable>
+              )}
             </View>
-            {noteEditing ? (
-              <Input value={noteDraft} onChangeText={setNoteDraft} placeholder={t('itemDetail.notePlaceholder')} variant="textarea" />
-            ) : note ? (
-              <Text style={[styles.paragraph, { color: colors.textColor }]}>{note}</Text>
-            ) : null}
+            {note ? <Text style={[styles.paragraph, { color: colors.textColor }]}>{note}</Text> : null}
           </View>
 
           {completedAt && (
@@ -203,15 +280,62 @@ export function ItemCardDetails({
               <Text style={[styles.ratingNote, { color: colors.textColor }]}>“{ratingNote}”</Text>
             ) : null}
           </View>
-
-          {onRemoveFromList && (
-            <Pressable onPress={onRemoveFromList} hitSlop={8} style={styles.removeRow}>
-              <Trash2 size={16} color={colors.error} />
-              <Text style={[styles.removeText, { color: colors.error }]}>{t('itemDetail.remove')}</Text>
-            </Pressable>
-          )}
         </View>
       </ScrollView>
+
+      {canPickTags && onCreateTag && onUpdateTag && onDeleteTag && (
+        <TagPickerSheet
+          visible={showTagPicker}
+          onClose={() => setShowTagPicker(false)}
+          tags={availableTags ?? []}
+          selectedIds={selectedTagIds}
+          onSelect={(tag) => onSelectTag?.(tag)}
+          onCreate={onCreateTag}
+          onUpdate={onUpdateTag}
+          saving={Boolean(savingTag)}
+          onDelete={onDeleteTag}
+          deleting={Boolean(deletingTag)}
+          newTagTitle={t('itemForm.newTag')}
+          editTagTitle={t('itemForm.editTag')}
+          newTagPlaceholder={t('itemForm.newTagPlaceholder')}
+          addLabel={t('itemForm.addTag')}
+          saveLabel={t('itemForm.save')}
+          searchPlaceholder={t('itemForm.tagSearchPlaceholder')}
+          emptyLabel={t('itemForm.tagsEmpty')}
+        />
+      )}
+
+      {nameTruncated && (
+        <BottomSheet visible={showFullName} onClose={() => setShowFullName(false)}>
+          <View style={styles.fullNameContent}>
+            <Text style={[styles.fullNameText, { color: colors.textColor }]}>{name}</Text>
+          </View>
+        </BottomSheet>
+      )}
+
+      {onChangeNote && (
+        <BottomSheet visible={showNoteEditor} onClose={() => setShowNoteEditor(false)}>
+          <View style={styles.noteEditContent}>
+            <Input
+              label={t('itemDetail.note')}
+              value={noteDraft}
+              onChangeText={setNoteDraft}
+              placeholder={t('itemDetail.notePlaceholder')}
+              variant="textarea"
+              maxLength={NOTE_MAX_LENGTH}
+              autoFocus
+            />
+            <View style={styles.noteEditActions}>
+              <View style={styles.noteEditAction}>
+                <Button variant="secondary" label={t('itemForm.cancel')} onPress={() => setShowNoteEditor(false)} />
+              </View>
+              <View style={styles.noteEditAction}>
+                <Button variant="primary" label={t('itemForm.save')} onPress={confirmNote} />
+              </View>
+            </View>
+          </View>
+        </BottomSheet>
+      )}
     </BottomSheet>
   );
 }
@@ -224,11 +348,16 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   body: {
-    padding: 16,
+    // Niente paddingTop: la maniglia della BottomSheet ha già il suo spazio sotto, non serve aggiungerne altro
+    paddingTop: 0,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
     gap: 18,
   },
   header: {
     flexDirection: 'row',
+    // Centra l'intero blocco (categoria+azioni, titolo, tag) rispetto all'altezza della copertina
+    alignItems: 'center',
     gap: 14,
   },
   cover: {
@@ -239,7 +368,13 @@ const styles = StyleSheet.create({
   headerText: {
     flex: 1,
     gap: 6,
-    paddingTop: 2,
+  },
+  categoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    // Riduce lo spazio verso il blocco immagine+titolo sotto, senza toccare il gap tra le altre sezioni del body
+    marginBottom: -16,
   },
   category: {
     opacity: 0.55,
@@ -248,10 +383,41 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
+  headerActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  // Box reale ~34px, simmetrico: niente paddingTop extra da compensare più in alto
+  headerActionButton: {
+    padding: 8,
+  },
   name: {
     fontWeight: '700',
     fontSize: 20,
     lineHeight: 25,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 6,
+  },
+  infoButton: {
+    marginTop: 3,
+  },
+  // Copia fuori schermo, stesso stile del titolo ma senza limite righe: serve solo a onTextLayout per contare le righe reali
+  nameMeasure: {
+    position: 'absolute',
+    opacity: 0,
+    left: -9999,
+  },
+  fullNameContent: {
+    paddingHorizontal: Spacing.four,
+    paddingBottom: Spacing.four,
+  },
+  fullNameText: {
+    fontSize: 18,
+    fontWeight: '700',
+    lineHeight: 24,
   },
   section: {
     gap: 6,
@@ -264,26 +430,38 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   notePanel: {
-    gap: 8,
+    // Ridotto da 8: il bottone matita (reale ~34px) lascia già ~9px "invisibili" sotto la riga header
+    gap: 2,
     borderRadius: 12,
-    padding: 12,
+    // paddingTop ridotto: il bottone matita (reale ~34px) è più alto della label "Note", stesso motivo della categoryRow
+    paddingTop: 6,
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+  },
+  // Senza nota non c'è testo sotto la riga: il paddingBottom pieno lascerebbe troppo spazio vuoto
+  notePanelEmpty: {
+    paddingBottom: 6,
   },
   noteHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  noteActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  // Box reale ~34px (16px icona + 9px padding), non minHeight:44 come prima
+  noteEditButton: {
+    padding: 9,
   },
-  // Area tattile comoda per le icone d'azione (+/matita/✓/✗)
-  iconButton: {
-    minWidth: 44,
-    minHeight: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
+  noteEditContent: {
+    paddingHorizontal: Spacing.four,
+    paddingBottom: Spacing.four,
+    gap: Spacing.three,
+  },
+  noteEditActions: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+  },
+  noteEditAction: {
+    flex: 1,
   },
   completedAt: {
     fontSize: 12,
@@ -302,16 +480,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     fontStyle: 'italic',
-  },
-  removeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    minHeight: 44,
-  },
-  removeText: {
-    fontSize: 14,
-    fontWeight: '600',
   },
 });

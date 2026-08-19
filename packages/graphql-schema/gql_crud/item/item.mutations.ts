@@ -28,6 +28,11 @@ export const UPDATE_USER_ITEM: DocumentNode = parse(`
       note
       status
       isHidden
+      tags {
+        id
+        name
+        color
+      }
     }
   }
 `);

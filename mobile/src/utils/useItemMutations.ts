@@ -32,10 +32,9 @@ export function useItemMutations() {
     refetchQueries: ['ListDetail'],
   });
 
-  const [updateMutation, { loading: updating, error: updateError }] = useMutation(
-    UPDATE_USER_ITEM,
-    { refetchQueries: ['ListDetail'] },
-  );
+  // Niente refetchQueries: la mutation ora restituisce tutti i campi che ListDetail usa (tags incluso),
+  // la cache normalizzata di Apollo aggiorna da sola l'User_Item già in cache — molto più veloce di un refetch completo
+  const [updateMutation, { loading: updating, error: updateError }] = useMutation(UPDATE_USER_ITEM);
 
   const [removeMutation, { loading: removing, error: removeError }] = useMutation(
     REMOVE_ITEM_FROM_LIST,

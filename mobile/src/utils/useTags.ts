@@ -31,11 +31,12 @@ export function useTags() {
   const [createMutation, { loading: creating, error: createError }] =
     useMutation<CreateTagMutation>(CREATE_TAG, { refetchQueries: ['MyTags'] });
 
+  // ListDetail va ricaricata anche qui: rinominare/eliminare un tag ne cambia la visualizzazione sugli item già in lista
   const [updateMutation, { loading: updating, error: updateError }] =
-    useMutation<UpdateTagMutation>(UPDATE_TAG, { refetchQueries: ['MyTags'] });
+    useMutation<UpdateTagMutation>(UPDATE_TAG, { refetchQueries: ['MyTags', 'ListDetail'] });
 
   const [deleteMutation, { loading: deleting, error: deleteError }] = useMutation(DELETE_TAG, {
-    refetchQueries: ['MyTags'],
+    refetchQueries: ['MyTags', 'ListDetail'],
   });
 
   const createTag = async (name: string, color: string) => {

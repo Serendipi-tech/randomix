@@ -22,6 +22,9 @@ type ItemFormParams = {
   listId?: string;
 };
 
+// Deve combaciare con User_Item.description @db.VarChar(500) nello schema Prisma
+const DESCRIPTION_MAX_LENGTH = 500;
+
 /** Schermata di sola creazione item: nome, categoria (dalla lista padre) e descrizione personale.
  *  Ogni modifica successiva avviene nel bottomsheet ItemCardDetails, non qui. */
 export default function ItemFormScreen() {
@@ -84,7 +87,15 @@ export default function ItemFormScreen() {
 
   const save = async () => {
     setLocalError(null);
-    if (!name.trim() || !category || !params.listId) {
+    if (!name.trim()) {
+      setLocalError(t('itemForm.nameRequired'));
+      return;
+    }
+    if (!category) {
+      setLocalError(t('itemForm.categoryRequired'));
+      return;
+    }
+    if (!params.listId) {
       setLocalError(t('itemForm.missingFields'));
       return;
     }
@@ -134,6 +145,7 @@ export default function ItemFormScreen() {
           value={description}
           onChangeText={setDescription}
           variant="textarea"
+          maxLength={DESCRIPTION_MAX_LENGTH}
         />
 
         <View>
