@@ -144,6 +144,7 @@ export default function ListDetailScreen() {
                       : colors.border
                 }
                 rating={entry.userItem.item.myRating?.value ?? undefined}
+                itemId={entry.userItem.item.id}
                 tags={entry.userItem.tags}
                 imageUri={entry.userItem.item.imageUrl ?? undefined}
                 detail={{
@@ -158,8 +159,10 @@ export default function ListDetailScreen() {
                   ratingNote: entry.userItem.item.myRating?.note ?? undefined,
                   tags: entry.userItem.tags,
                   onChangeStatus: (status) => updateUserItem(entry.userItem.id, { status }),
-                  onChangeRating: (value) => rateItem(entry.userItem.item.id, value),
+                  onChangeRating: (value, note) => rateItem(entry.userItem.item.id, value, note ?? null),
                   onChangeNote: (note) => updateUserItem(entry.userItem.id, { note: note || null }),
+                  onChangeDescription: (description) =>
+                    updateUserItem(entry.userItem.id, { description: description || null }),
                   onRemoveFromList: () => setEntryToRemove(entry),
                   availableTags,
                   onSelectTag: (tag) => toggleEntryTag(entry, tag),

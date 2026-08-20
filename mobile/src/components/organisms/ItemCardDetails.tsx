@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Image,
@@ -12,19 +12,22 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { Info, Pencil, Tag as TagIcon, Trash2 } from 'lucide-react-native';
+import { ChevronDown, ChevronUp, Info, Pencil, Tag as TagIcon, Trash2 } from 'lucide-react-native';
 import { Colors, Spacing } from '@/constants/theme';
-import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { BottomSheet } from '@/components/organisms/BottomSheet';
 import { SectionLabel } from '@/components/atoms/SectionLabel';
 import { SegmentedControl } from '@/components/atoms/SegmentedControl';
-import { RatingStar } from '@/components/atoms/RatingStar';
+import { Rating } from '@/components/atoms/Rating';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
 import { TagList } from '@/components/molecules/TagList';
+import { ExpandableText } from '@/components/molecules/ExpandableText';
+import { DescriptionTabs } from '@/components/molecules/DescriptionTabs';
 import { TagPickerSheet } from '@/components/organisms/TagPickerSheet';
+import { RatingSheet } from '@/components/organisms/RatingSheet';
 import type { Tag as TagData } from '@/utils/useTags';
+import type { Review } from '@/utils/useItemRatings';
 
 // Tag già collegati all'item: qui basta id/name/color, non serve isSystem (solo la picker lo usa)
 type AttachedTag = { id: string; name: string; color: string };
@@ -44,9 +47,22 @@ export type ItemCardDetailsProps = {
   tags?: AttachedTag[];
   completedAt?: string;
   onChangeStatus?: (status: ItemStatus) => void;
-  onChangeRating?: (value: number) => void;
+  /** Imposta/modifica il voto. Non è previsto cancellare il rating: una volta impostato si può solo
+   *  aumentare/diminuire. Il testo del giudizio resta invece sempre facoltativo. */
+  onChangeRating?: (value: number, note?: string) => void;
+  /** Apertura/chiusura della sheet di rating controllata dal chiamante: la query di media/recensioni
+   *  (dati collettivi, non solo miei) deve partire solo quando questa sheet è aperta, e vive fuori da
+   *  questo componente (niente GraphQL nelle UI component). */
+  ratingEditorVisible?: boolean;
+  onRatingEditorVisibleChange?: (visible: boolean) => void;
+  averageRating?: number | null;
+  ratingsCount?: number;
+  reviews?: Review[];
+  reviewsLoading?: boolean;
   /** Salva la nota personale; stringa vuota = cancella la nota. */
   onChangeNote?: (note: string) => void;
+  /** Salva la descrizione personale; stringa vuota = cancella la descrizione. */
+  onChangeDescription?: (description: string) => void;
   /** Rimuove l'item dalla lista corrente (icona cestino in alto a destra). */
   onRemoveFromList?: () => void;
   /** Tag disponibili (personali + di sistema): se presente insieme a onSelectTag, mostra l'icona tag in alto a destra. */
@@ -59,10 +75,11 @@ export type ItemCardDetailsProps = {
   deletingTag?: boolean;
 };
 
-const RATING_STARS = [1, 2, 3, 4, 5] as const;
 const NAME_MAX_LINES = 2;
 // Deve combaciare con User_Item.note @db.VarChar(500) nello schema Prisma
 const NOTE_MAX_LENGTH = 500;
+// Deve combaciare con User_Item.description @db.VarChar(500) nello schema Prisma
+const DESCRIPTION_MAX_LENGTH = 500;
 
 type ItemStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
 // Stati mostrati nel segmented control, in ordine di avanzamento
@@ -100,7 +117,14 @@ export function ItemCardDetails({
   completedAt,
   onChangeStatus,
   onChangeRating,
+  ratingEditorVisible,
+  onRatingEditorVisibleChange,
+  averageRating,
+  ratingsCount,
+  reviews,
+  reviewsLoading,
   onChangeNote,
+  onChangeDescription,
   onRemoveFromList,
   availableTags,
   onSelectTag,
@@ -128,6 +152,11 @@ export function ItemCardDetails({
   const [fullNameHeight, setFullNameHeight] = useState(0);
   const nameTruncated = fullNameHeight > visibleNameHeight + 2;
 
+  // Espansione della nota personale (max 3 righe di default, freccia accanto alla matita)
+  const [noteExpanded, setNoteExpanded] = useState(false);
+  const [noteTruncated, setNoteTruncated] = useState(false);
+  useEffect(() => setNoteExpanded(false), [note]);
+
   // Modifica della nota personale: bottomsheet dedicata, non più inline
   const [showNoteEditor, setShowNoteEditor] = useState(false);
   const [noteDraft, setNoteDraft] = useState('');
@@ -140,6 +169,18 @@ export function ItemCardDetails({
     setShowNoteEditor(false);
   };
 
+  // Modifica della descrizione personale: stessa bottomsheet dedicata della nota
+  const [showDescriptionEditor, setShowDescriptionEditor] = useState(false);
+  const [descriptionDraft, setDescriptionDraft] = useState('');
+  const openDescriptionEditor = () => {
+    setDescriptionDraft(userDescription ?? '');
+    setShowDescriptionEditor(true);
+  };
+  const confirmDescription = () => {
+    onChangeDescription?.(descriptionDraft.trim());
+    setShowDescriptionEditor(false);
+  };
+
   return (
     <BottomSheet visible={visible} onClose={onClose}>
       <ScrollView
@@ -148,26 +189,37 @@ export function ItemCardDetails({
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.body}>
-          {/* Categoria + azioni: riga a piena larghezza, sopra copertina/titolo */}
-          {(category || canPickTags || onRemoveFromList) && (
+          {/* Categoria + rating compatto + azioni: riga a piena larghezza, sopra copertina/titolo */}
+          {(category || canPickTags || onRemoveFromList || onChangeRating) && (
             <View style={styles.categoryRow}>
               {category ? (
                 <Text style={[styles.category, { color: colors.textColor }]}>{category}</Text>
               ) : (
                 <View />
               )}
-              {(canPickTags || onRemoveFromList) && (
-                <View style={styles.headerActions}>
-                  {canPickTags && (
-                    <Pressable onPress={() => setShowTagPicker(true)} hitSlop={4} style={styles.headerActionButton}>
-                      <TagIcon size={18} color={colors.textColor} />
-                    </Pressable>
+              {(canPickTags || onRemoveFromList || onChangeRating) && (
+                <View style={styles.headerRight}>
+                  {onChangeRating && (
+                    <Rating
+                      variant="medium"
+                      value={ratingValue}
+                      color={colors.warning}
+                      inactiveColor={colors.border}
+                      onPress={() => onRatingEditorVisibleChange?.(true)}
+                    />
                   )}
-                  {onRemoveFromList && (
-                    <Pressable onPress={onRemoveFromList} hitSlop={4} style={styles.headerActionButton}>
-                      <Trash2 size={18} color={colors.error} />
-                    </Pressable>
-                  )}
+                  <View style={styles.headerActions}>
+                    {canPickTags && (
+                      <Pressable onPress={() => setShowTagPicker(true)} hitSlop={4} style={styles.headerActionButton}>
+                        <TagIcon size={18} color={colors.textColor} />
+                      </Pressable>
+                    )}
+                    {onRemoveFromList && (
+                      <Pressable onPress={onRemoveFromList} hitSlop={4} style={styles.headerActionButton}>
+                        <Trash2 size={18} color={colors.error} />
+                      </Pressable>
+                    )}
+                  </View>
                 </View>
               )}
             </View>
@@ -206,9 +258,27 @@ export function ItemCardDetails({
             </View>
           </View>
 
+          {(description || userDescription || onChangeDescription) && (
+            <View
+              style={[
+                styles.textSection,
+                styles.descriptionSection,
+                !description && !userDescription && styles.descriptionSectionEmpty,
+              ]}
+            >
+              <DescriptionTabs
+                generalLabel={t('itemDetail.description')}
+                personalLabel={t('itemDetail.yourDescription')}
+                generalText={description}
+                personalText={userDescription}
+                onEditPersonal={onChangeDescription ? openDescriptionEditor : undefined}
+                textStyle={[styles.paragraph, { color: colors.textColor }]}
+              />
+            </View>
+          )}
+
           {status && (
             <View style={styles.section}>
-              <SectionLabel>{t('itemDetail.status')}</SectionLabel>
               <SegmentedControl
                 value={status as ItemStatus}
                 onChange={(next) => onChangeStatus?.(next)}
@@ -221,37 +291,36 @@ export function ItemCardDetails({
             </View>
           )}
 
-          {description && (
-            <View style={styles.textSection}>
-              <SectionLabel>{t('itemDetail.description')}</SectionLabel>
-              <Text style={[styles.paragraph, { color: colors.textColor }]}>{description}</Text>
-            </View>
-          )}
-
-          {userDescription && (
-            <View style={styles.textSection}>
-              <SectionLabel>{t('itemDetail.yourDescription')}</SectionLabel>
-              <Text style={[styles.paragraph, { color: colors.textColor }]}>{userDescription}</Text>
-            </View>
-          )}
-
-          {/* Nota personale: sola lettura qui, la modifica avviene nella bottomsheet dedicata */}
-          <View
-            style={[
-              styles.notePanel,
-              { backgroundColor: hexToRgba(colors.primary, 0.07) },
-              !note && styles.notePanelEmpty,
-            ]}
-          >
+          {/* Nota personale: stesso stile della descrizione (niente sfondo/padding dedicati), sola lettura
+              qui, la modifica avviene nella bottomsheet dedicata */}
+          <View style={[styles.textSection, styles.noteSection]}>
             <View style={styles.noteHeader}>
               <SectionLabel>{t('itemDetail.note')}</SectionLabel>
-              {onChangeNote && (
-                <Pressable onPress={openNoteEditor} hitSlop={4} style={styles.noteEditButton}>
-                  <Pencil size={16} color={colors.primary} />
-                </Pressable>
-              )}
+              <View style={styles.noteHeaderActions}>
+                {noteTruncated && (
+                  <Pressable onPress={() => setNoteExpanded((v) => !v)} hitSlop={4} style={styles.noteEditButton}>
+                    {noteExpanded ? (
+                      <ChevronUp size={16} color={colors.primary} />
+                    ) : (
+                      <ChevronDown size={16} color={colors.primary} />
+                    )}
+                  </Pressable>
+                )}
+                {onChangeNote && (
+                  <Pressable onPress={openNoteEditor} hitSlop={4} style={styles.noteEditButton}>
+                    <Pencil size={16} color={colors.primary} />
+                  </Pressable>
+                )}
+              </View>
             </View>
-            {note ? <Text style={[styles.paragraph, { color: colors.textColor }]}>{note}</Text> : null}
+            {note ? (
+              <ExpandableText
+                text={note}
+                style={[styles.paragraph, { color: colors.textColor }]}
+                expanded={noteExpanded}
+                onTruncatedChange={setNoteTruncated}
+              />
+            ) : null}
           </View>
 
           {completedAt && (
@@ -259,27 +328,6 @@ export function ItemCardDetails({
               {t('itemDetail.completedAt', { date: completedAt })}
             </Text>
           )}
-
-          {/* Rating: label e stelle in space-between, il giudizio sotto */}
-          <View style={styles.section}>
-            <View style={styles.ratingHeader}>
-              <SectionLabel>{t('itemDetail.rating')}</SectionLabel>
-              <View style={styles.starsRow}>
-                {RATING_STARS.map((n) => (
-                  <RatingStar
-                    key={n}
-                    active={n <= Math.round(ratingValue ?? 0)}
-                    color={colors.warning}
-                    inactiveColor={colors.border}
-                    onPress={() => onChangeRating?.(n)}
-                  />
-                ))}
-              </View>
-            </View>
-            {ratingNote ? (
-              <Text style={[styles.ratingNote, { color: colors.textColor }]}>“{ratingNote}”</Text>
-            ) : null}
-          </View>
         </View>
       </ScrollView>
 
@@ -336,6 +384,44 @@ export function ItemCardDetails({
           </View>
         </BottomSheet>
       )}
+
+      {onChangeDescription && (
+        <BottomSheet visible={showDescriptionEditor} onClose={() => setShowDescriptionEditor(false)}>
+          <View style={styles.noteEditContent}>
+            <Input
+              label={t('itemDetail.yourDescription')}
+              value={descriptionDraft}
+              onChangeText={setDescriptionDraft}
+              placeholder={t('itemDetail.descriptionPlaceholder')}
+              variant="textarea"
+              maxLength={DESCRIPTION_MAX_LENGTH}
+              autoFocus
+            />
+            <View style={styles.noteEditActions}>
+              <View style={styles.noteEditAction}>
+                <Button variant="secondary" label={t('itemForm.cancel')} onPress={() => setShowDescriptionEditor(false)} />
+              </View>
+              <View style={styles.noteEditAction}>
+                <Button variant="primary" label={t('itemForm.save')} onPress={confirmDescription} />
+              </View>
+            </View>
+          </View>
+        </BottomSheet>
+      )}
+
+      {onChangeRating && (
+        <RatingSheet
+          visible={Boolean(ratingEditorVisible)}
+          onClose={() => onRatingEditorVisibleChange?.(false)}
+          ratingValue={ratingValue}
+          ratingNote={ratingNote}
+          onChangeRating={onChangeRating}
+          averageRating={averageRating ?? null}
+          ratingsCount={ratingsCount ?? 0}
+          reviews={reviews ?? []}
+          reviewsLoading={Boolean(reviewsLoading)}
+        />
+      )}
     </BottomSheet>
   );
 }
@@ -383,6 +469,12 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
+  // Stelle compatte (rating) + bottoni azione, ravvicinati fra loro come un unico gruppo a destra
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
   headerActions: {
     flexDirection: 'row',
     gap: 12,
@@ -425,26 +517,36 @@ const styles = StyleSheet.create({
   textSection: {
     gap: 4,
   },
+  // Il titolo di DescriptionTabs ha bottoni reali (~34px) più alti della label: senza compenso lo
+  // spazio verso il blocco sopra sembra maggiore che altrove, stesso motivo di noteSection sotto
+  descriptionSection: {
+    marginTop: -8,
+  },
+  // Senza testo (né generale né personale) resta solo la riga del titolo: stesso bottone che gonfia
+  // l'altezza sotto la label, quindi senza testo che lo assorba lo spazio verso lo status sotto sembra doppio
+  descriptionSectionEmpty: {
+    marginBottom: -8,
+  },
+  // L'header (freccia+matita, box reale ~34px) è più alto della label: senza compenso il gap dal
+  // divider sopra sembra maggiore che dall'altra parte, dove non c'è nessun bottone appena sotto.
+  // gap:0 sovrascrive quello di textSection: DescriptionTabs non ha alcun gap esplicito fra titolo
+  // e testo (solo l'inflazione del bottone), qui deve valere la stessa cosa per restare simmetrico
+  noteSection: {
+    marginTop: -8,
+    gap: 0,
+  },
   paragraph: {
     fontSize: 14,
     lineHeight: 20,
   },
-  notePanel: {
-    // Ridotto da 8: il bottone matita (reale ~34px) lascia già ~9px "invisibili" sotto la riga header
-    gap: 2,
-    borderRadius: 12,
-    // paddingTop ridotto: il bottone matita (reale ~34px) è più alto della label "Note", stesso motivo della categoryRow
-    paddingTop: 6,
-    paddingHorizontal: 12,
-    paddingBottom: 12,
-  },
-  // Senza nota non c'è testo sotto la riga: il paddingBottom pieno lascerebbe troppo spazio vuoto
-  notePanelEmpty: {
-    paddingBottom: 6,
-  },
   noteHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  // Niente gap: freccia e matita ravvicinate, come le icone nell'header di DescriptionTabs
+  noteHeaderActions: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
   // Box reale ~34px (16px icona + 9px padding), non minHeight:44 come prima
@@ -466,19 +568,5 @@ const styles = StyleSheet.create({
   completedAt: {
     fontSize: 12,
     opacity: 0.5,
-  },
-  ratingHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  starsRow: {
-    flexDirection: 'row',
-    gap: 4,
-  },
-  ratingNote: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontStyle: 'italic',
   },
 });

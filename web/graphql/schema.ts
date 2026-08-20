@@ -13,6 +13,7 @@ import './models/listCategory/index';
 import './models/listCategory/listCategory.queries';
 import './models/listCategory/listCategory.mutations';
 import './models/item/index';
+import './models/item/item.queries';
 import './models/item/item.mutations';
 import './models/tag/index';
 import './models/tag/tag.queries';

@@ -7,6 +7,7 @@ export * as ListMutations from './gql_crud/list/list.mutations';
 export * as ListCategoryQueries from './gql_crud/listCategory/listCategory.queries';
 export * as ListCategoryMutations from './gql_crud/listCategory/listCategory.mutations';
 export * as ItemMutations from './gql_crud/item/item.mutations';
+export * as ItemQueries from './gql_crud/item/item.queries';
 export * as TagQueries from './gql_crud/tag/tag.queries';
 export * as TagMutations from './gql_crud/tag/tag.mutations';
 export * as AdminTagQueries from './gql_crud/tag/adminTag.queries';

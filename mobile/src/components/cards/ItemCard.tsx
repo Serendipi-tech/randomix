@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
-import { Star } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { CardShell } from '@/components/cards/CardShell';
 import { StatusBadge } from '@/components/atoms/StatusBadge';
+import { Rating } from '@/components/atoms/Rating';
 import { TagList } from '@/components/molecules/TagList';
 import { ItemCardDetails, type ItemCardDetailsProps } from '@/components/organisms/ItemCardDetails';
+import { useItemRatings } from '@/utils/useItemRatings';
 
 type ThemeColors = (typeof Colors)[keyof typeof Colors];
 
@@ -20,6 +21,8 @@ type ItemCardProps = {
   statusColor?: string;
   imageUri?: string;
   rating?: number;
+  /** Necessario solo per caricare media/recensioni quando si apre la sheet del rating generale. */
+  itemId?: string;
   tags?: ItemTag[];
   /** Dati/azioni del bottomsheet di dettaglio: se presente, il tap sulla card lo apre SEMPRE. */
   detail?: Omit<ItemCardDetailsProps, 'visible' | 'onClose'>;
@@ -29,7 +32,6 @@ type ItemCardProps = {
 
 const IMAGE_WIDTH = 72;
 const TITLE_HEIGHT = 44;
-const MAX_RATING = 5;
 
 // Mappa neutra nome-stato -> colore del tema, nessun enum di dominio: fallback su info
 function resolveStatusColor(status: string, colors: ThemeColors): string {
@@ -45,14 +47,15 @@ function resolveStatusColor(status: string, colors: ThemeColors): string {
 
 /** Card di item: categoria + stato, titolo ad altezza fissa e footer con tag e rating (stella frazionaria + valore).
  *  Colonna immagine full-bleed a destra solo se c'è `imageUri` (altrimenti nessuna immagine). Shell condivisa (CardShell); tap gestito dal chiamante. */
-export function ItemCard({ title, category, status, statusColor, imageUri, rating, tags, detail, onPress }: ItemCardProps) {
+export function ItemCard({ title, category, status, statusColor, imageUri, rating, itemId, tags, detail, onPress }: ItemCardProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   const [detailOpen, setDetailOpen] = useState(false);
+  // Query pigra: parte solo quando la sheet del rating generale è davvero aperta, non per ogni item della lista
+  const [ratingEditorVisible, setRatingEditorVisible] = useState(false);
+  const { averageRating, ratingsCount, reviews, loading: reviewsLoading } = useItemRatings(itemId, ratingEditorVisible);
 
   const hasFooter = (tags && tags.length > 0) || rating !== undefined;
-  // Percentuale di riempimento della stella singola in base al rating (0..MAX_RATING)
-  const fillPercent = rating !== undefined ? Math.min(rating / MAX_RATING, 1) * 100 : 0;
   // Regola fissa: con un dettaglio il tap apre sempre il bottomsheet; altrimenti resta il tap del chiamante
   const handlePress = detail ? () => setDetailOpen(true) : onPress;
 
@@ -87,15 +90,7 @@ export function ItemCard({ title, category, status, statusColor, imageUri, ratin
                 </View>
               )}
               {rating !== undefined && (
-                <View style={styles.rating}>
-                  <View style={styles.starWrap}>
-                    <Star size={14} color={colors.border} fill={colors.border} strokeWidth={0} style={styles.starBase} />
-                    <View style={[styles.starClip, { width: `${fillPercent}%` }]}>
-                      <Star size={14} color={colors.warning} fill={colors.warning} strokeWidth={0} />
-                    </View>
-                  </View>
-                  <Text style={[styles.ratingValue, { color: colors.textColor }]}>{rating.toFixed(1)}</Text>
-                </View>
+                <Rating variant="compact" value={rating} color={colors.warning} inactiveColor={colors.border} />
               )}
             </View>
           )}
@@ -110,7 +105,19 @@ export function ItemCard({ title, category, status, statusColor, imageUri, ratin
       </View>
       </CardShell>
 
-      {detail && <ItemCardDetails visible={detailOpen} onClose={() => setDetailOpen(false)} {...detail} />}
+      {detail && (
+        <ItemCardDetails
+          visible={detailOpen}
+          onClose={() => setDetailOpen(false)}
+          {...detail}
+          ratingEditorVisible={ratingEditorVisible}
+          onRatingEditorVisibleChange={setRatingEditorVisible}
+          averageRating={averageRating}
+          ratingsCount={ratingsCount}
+          reviews={reviews}
+          reviewsLoading={reviewsLoading}
+        />
+      )}
     </>
   );
 }
@@ -164,27 +171,6 @@ const styles = StyleSheet.create({
   },
   tags: {
     flex: 1,
-  },
-  rating: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  starWrap: {
-    width: 14,
-    height: 14,
-  },
-  starBase: {
-    position: 'absolute',
-  },
-  starClip: {
-    position: 'absolute',
-    height: 14,
-    overflow: 'hidden',
-  },
-  ratingValue: {
-    fontSize: 14,
-    fontWeight: '600',
   },
   imageWrap: {
     width: IMAGE_WIDTH,
