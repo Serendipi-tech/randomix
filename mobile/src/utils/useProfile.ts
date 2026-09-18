@@ -12,6 +12,8 @@ export interface Profile {
   language: string | null;
   role: 'USER' | 'ADMIN';
   createdAt: string;
+  listsCount: number;
+  completedItemsCount: number;
 }
 
 interface MeQuery {

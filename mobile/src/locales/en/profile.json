@@ -6,5 +6,10 @@
   "usernamePlaceholder": "Username",
   "usernameTooShort": "Username must be at least 3 characters.",
   "avatarLabel": "Profile image",
-  "logout": "Log out"
+  "logout": "Log out",
+  "stats": {
+    "lists": "Lists",
+    "completedItems": "Completed",
+    "friends": "Friends"
+  }
 }

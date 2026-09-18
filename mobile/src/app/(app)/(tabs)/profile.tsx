@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { User } from 'lucide-react-native';
+import { CheckCircle2, List as ListIcon, User, Users } from 'lucide-react-native';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
@@ -13,8 +13,10 @@ import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ProfileHeader } from '@/components/molecules/profile-header';
+import { StatTile } from '@/components/atoms/stat-tile';
 import { useAuth } from '@/utils/useAuth';
 import { useProfile } from '@/utils/useProfile';
+import { useMyFriends } from '@/utils/useFriends';
 
 const USERNAME_MIN_LENGTH = 3;
 
@@ -26,6 +28,7 @@ export default function ProfileScreen() {
   const { logout } = useAuth();
 
   const { profile, loading: loadingProfile, updateProfile, saving, saveError } = useProfile();
+  const { friends } = useMyFriends();
 
   const [editing, setEditing] = useState(false);
   const [username, setUsername] = useState('');
@@ -63,14 +66,26 @@ export default function ProfileScreen() {
         {loadingProfile && !profile ? (
           <ListCardSkeleton colorScheme={colorScheme} />
         ) : profile && !editing ? (
-          <ProfileHeader
-            username={profile.username}
-            email={profile.email}
-            avatarUrl={profile.avatarUrl}
-            colorScheme={colorScheme}
-            editLabel={t('edit')}
-            onEditPress={startEditing}
-          />
+          <>
+            <ProfileHeader
+              username={profile.username}
+              email={profile.email}
+              avatarUrl={profile.avatarUrl}
+              colorScheme={colorScheme}
+              editLabel={t('edit')}
+              onEditPress={startEditing}
+            />
+            <View style={styles.statsRow}>
+              <StatTile icon={ListIcon} value={profile.listsCount} label={t('stats.lists')} accentColor={colors.primary} />
+              <StatTile
+                icon={CheckCircle2}
+                value={profile.completedItemsCount}
+                label={t('stats.completedItems')}
+                accentColor={colors.success}
+              />
+              <StatTile icon={Users} value={friends.length} label={t('stats.friends')} accentColor={colors.secondary} />
+            </View>
+          </>
         ) : profile ? (
           <View style={[styles.editCard, { backgroundColor: colors.foreground }]}>
             <Input
@@ -119,6 +134,10 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: Spacing.four,
     gap: Spacing.two + Spacing.one,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    gap: Spacing.two,
   },
   editCard: {
     borderRadius: 20,

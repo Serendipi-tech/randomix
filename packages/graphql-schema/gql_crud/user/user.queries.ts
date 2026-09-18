@@ -11,6 +11,8 @@ export const ME: DocumentNode = parse(`
       language
       role
       createdAt
+      listsCount
+      completedItemsCount
     }
   }
 `);
