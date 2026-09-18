@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { createHash, randomBytes } from 'crypto';
-import { sendPasswordResetEmail } from '../../../src/lib/email';
+import { sendPasswordResetEmail, sendEmailChangeVerification } from '../../../src/lib/email';
 import { GraphQLError } from 'graphql';
 import { Prisma, User } from '../../../prisma/generated/prisma/client';
 import { builder, prisma } from '../../builder';
@@ -16,6 +16,12 @@ async function makeAuthPayload(user: User) {
   const accessToken = await signToken(user.id, user.email);
   const refreshToken = await signToken(user.id, user.email);
   return { accessToken, refreshToken, user };
+}
+
+function requireAuth(userId: string | null): asserts userId is string {
+  if (!userId) {
+    throw new GraphQLError('Non autenticato.', { extensions: { code: 'UNAUTHENTICATED' } });
+  }
 }
 
 builder.mutationField('registerWithCredentials', (t) =>
@@ -157,6 +163,95 @@ builder.mutationField('resetPassword', (t) =>
       });
 
       return true;
+    },
+  }),
+);
+
+builder.mutationField('changePassword', (t) =>
+  t.field({
+    type: 'Boolean',
+    args: {
+      oldPassword: t.arg.string({ required: true }),
+      newPassword: t.arg.string({ required: true }),
+    },
+    resolve: async (_root, { oldPassword, newPassword }, ctx) => {
+      requireAuth(ctx.userId);
+      const user = await prisma.user.findUnique({ where: { id: ctx.userId } });
+      if (!user?.passwordHash) {
+        throw new GraphQLError('Invalid current password.', { extensions: { code: 'INVALID_CREDENTIALS' } });
+      }
+      const valid = await bcrypt.compare(oldPassword, user.passwordHash);
+      if (!valid) {
+        throw new GraphQLError('Invalid current password.', { extensions: { code: 'INVALID_CREDENTIALS' } });
+      }
+      const passwordHash = await bcrypt.hash(newPassword, 12);
+      await prisma.user.update({ where: { id: ctx.userId }, data: { passwordHash } });
+      return true;
+    },
+  }),
+);
+
+builder.mutationField('requestEmailChange', (t) =>
+  t.field({
+    type: 'Boolean',
+    args: {
+      newEmail: t.arg.string({ required: true }),
+    },
+    resolve: async (_root, { newEmail }, ctx) => {
+      requireAuth(ctx.userId);
+      const existing = await prisma.user.findUnique({ where: { email: newEmail } });
+      if (existing && existing.id !== ctx.userId) {
+        throw new GraphQLError('Email already in use.', { extensions: { code: 'EMAIL_TAKEN' } });
+      }
+
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const tokenHash = createHash('sha256').update(otp).digest('hex');
+      const expiry = new Date(Date.now() + 60 * 60 * 1000);
+
+      const user = await prisma.user.update({
+        where: { id: ctx.userId },
+        data: { pendingEmail: newEmail, emailChangeToken: tokenHash, emailChangeTokenExpiry: expiry },
+      });
+
+      await sendEmailChangeVerification(newEmail, otp, user.language);
+      return true;
+    },
+  }),
+);
+
+builder.mutationField('confirmEmailChange', (t) =>
+  t.prismaField({
+    type: 'User',
+    args: {
+      otp: t.arg.string({ required: true }),
+    },
+    resolve: async (query, _root, { otp }, ctx) => {
+      requireAuth(ctx.userId);
+      const user = await prisma.user.findUnique({ where: { id: ctx.userId } });
+      const tokenHash = createHash('sha256').update(otp).digest('hex');
+
+      if (
+        !user?.pendingEmail ||
+        !user.emailChangeToken ||
+        !user.emailChangeTokenExpiry ||
+        user.emailChangeTokenExpiry < new Date() ||
+        tokenHash !== user.emailChangeToken
+      ) {
+        throw new GraphQLError('Invalid or expired code.', {
+          extensions: { code: 'INVALID_OTP' },
+        });
+      }
+
+      return prisma.user.update({
+        ...query,
+        where: { id: ctx.userId },
+        data: {
+          email: user.pendingEmail,
+          pendingEmail: null,
+          emailChangeToken: null,
+          emailChangeTokenExpiry: null,
+        },
+      });
     },
   }),
 );

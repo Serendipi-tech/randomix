@@ -15,6 +15,7 @@ export const UserRef = builder.prismaObject('User', {
     }),
     createdAt: t.expose('createdAt', { type: 'DateTime' }),
     listsCount: t.relationCount('lists'),
+    totalItemsCount: t.relationCount('userItems'),
     completedItemsCount: t.int({
       resolve: (user) => prisma.user_Item.count({ where: { userId: user.id, status: 'COMPLETED' } }),
     }),

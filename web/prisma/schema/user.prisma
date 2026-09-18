@@ -8,6 +8,10 @@ model User {
     resetPasswordToken       String?
     resetPasswordTokenExpiry DateTime?
 
+    pendingEmail           String?
+    emailChangeToken       String?
+    emailChangeTokenExpiry DateTime?
+
     avatarUrl String?
     language  String? @default("en")
 

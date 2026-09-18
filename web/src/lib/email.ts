@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { getPasswordResetEmailContent } from './emailTemplates/passwordReset';
+import { getEmailChangeEmailContent } from './emailTemplates/emailChange';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST ?? 'smtp.gmail.com',
@@ -17,6 +18,20 @@ export async function sendPasswordResetEmail(
   language: string | null,
 ): Promise<void> {
   const { subject, html } = getPasswordResetEmailContent(language);
+  await transporter.sendMail({
+    from: `"RandoMIX" <${process.env.SMTP_USER}>`,
+    to,
+    subject,
+    html: html(otp),
+  });
+}
+
+export async function sendEmailChangeVerification(
+  to: string,
+  otp: string,
+  language: string | null,
+): Promise<void> {
+  const { subject, html } = getEmailChangeEmailContent(language);
   await transporter.sendMail({
     from: `"RandoMIX" <${process.env.SMTP_USER}>`,
     to,
