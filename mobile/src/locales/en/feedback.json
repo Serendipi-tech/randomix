@@ -1,0 +1,30 @@
+{
+  "title": "Feedback",
+  "cancel": "Cancel",
+  "banner": "You can remove a feedback only until our team starts reviewing it.",
+  "send": "Send feedback",
+  "empty": {
+    "title": "No feedback yet",
+    "subtitle": "Tell us what you think — bugs, ideas, anything."
+  },
+  "type": {
+    "bug": "Bug",
+    "suggestion": "Suggestion",
+    "comment": "Comment"
+  },
+  "status": {
+    "sent": "Received",
+    "progress": "In review",
+    "done": "Reviewed"
+  },
+  "form": {
+    "titlePlaceholder": "Short summary (optional)",
+    "messagePlaceholder": "Tell us more...",
+    "submit": "Send"
+  },
+  "deleteConfirm": {
+    "title": "Delete feedback",
+    "message": "This feedback will be permanently removed.",
+    "confirm": "Delete"
+  }
+}

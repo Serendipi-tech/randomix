@@ -177,6 +177,10 @@ const styles = StyleSheet.create({
   field: {
     flex: 1,
     fontSize: 16,
+    // Su web il TextInput è un <input> reale: senza questo eredita lo sfondo bianco di
+    // default del browser invece di lasciar vedere il container tintato sotto (su nativo
+    // è già trasparente di default, nessun impatto lì).
+    backgroundColor: 'transparent',
   },
   textarea: {
     minHeight: 80,

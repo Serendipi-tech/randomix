@@ -9,7 +9,41 @@
   "logout": "Log out",
   "stats": {
     "lists": "Lists",
+    "itemsDetail": "{{count}} items · {{avg}}/list",
     "completedItems": "Completed",
     "friends": "Friends"
+  },
+  "logoutConfirm": {
+    "title": "Log out",
+    "message": "Are you sure you want to log out?",
+    "confirm": "Log out"
+  },
+  "settings": {
+    "title": "Settings",
+    "email": {
+      "heading": "Email",
+      "current": "Current email",
+      "newPlaceholder": "New email",
+      "sendCode": "Send code",
+      "otpPlaceholder": "Verification code",
+      "confirm": "Confirm"
+    },
+    "password": {
+      "heading": "Password",
+      "oldPlaceholder": "Current password",
+      "newPlaceholder": "New password",
+      "confirmPlaceholder": "Confirm new password",
+      "mismatch": "Passwords don't match",
+      "submit": "Update password"
+    },
+    "payments": {
+      "heading": "Payments",
+      "description": "Subscription plans and billing.",
+      "cta": "Learn more",
+      "comingSoon": {
+        "title": "Coming soon",
+        "subtitle": "Payments and subscription plans aren't available yet."
+      }
+    }
   }
 }

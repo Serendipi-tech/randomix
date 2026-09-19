@@ -13,6 +13,7 @@ export interface Profile {
   role: 'USER' | 'ADMIN';
   createdAt: string;
   listsCount: number;
+  totalItemsCount: number;
   completedItemsCount: number;
 }
 

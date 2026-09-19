@@ -1,7 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pencil } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
-import { hexToRgba } from '@/utils/color';
 import { Avatar } from '@/components/atoms/Avatar';
+
+const AVATAR_SIZE = 96;
 
 interface ProfileHeaderProps {
   username: string;
@@ -12,7 +14,8 @@ interface ProfileHeaderProps {
   onEditPress: () => void;
 }
 
-/** Intestazione profilo: avatar, username, email e pulsante di modifica. */
+/** Hero del profilo: avatar grande che sfonda il bordo superiore della card, username/email
+ *  centrati sotto. Il trigger di modifica è la matita in overlay sull'avatar, non un bottone testuale. */
 export function ProfileHeader({
   username,
   email,
@@ -24,9 +27,9 @@ export function ProfileHeader({
   const colors = Colors[colorScheme];
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.foreground }]}>
-      <Avatar uri={avatarUrl ?? undefined} fallbackColor={colors.primary} />
-      <View style={styles.textZone}>
+    <View style={styles.wrap}>
+      <View style={[styles.card, { backgroundColor: colors.foreground }]}>
+        <View style={styles.avatarSpacer} />
         <Text style={[styles.username, { color: colors.textColor }]} numberOfLines={1}>
           {username}
         </Text>
@@ -34,39 +37,63 @@ export function ProfileHeader({
           {email}
         </Text>
       </View>
-      <Pressable onPress={onEditPress} style={styles.editButton}>
-        <Text style={styles.editLabel}>{editLabel}</Text>
-      </Pressable>
+
+      <View style={styles.avatarOverlay} pointerEvents="box-none">
+        <View>
+          <Avatar uri={avatarUrl ?? undefined} fallbackColor={colors.primary} size={AVATAR_SIZE} />
+          <Pressable
+            onPress={onEditPress}
+            hitSlop={8}
+            accessibilityLabel={editLabel}
+            style={[styles.editBadge, { backgroundColor: colors.primary, borderColor: colors.background }]}
+          >
+            <Pencil size={14} color={colors.textColor} />
+          </Pressable>
+        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    borderRadius: 20,
-    padding: 16,
+  wrap: {
+    // ancora di posizionamento per l'avatar assoluto sotto
+    position: 'relative',
   },
-  textZone: {
-    flex: 1,
+  card: {
+    borderRadius: 24,
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+    alignItems: 'center',
     gap: 2,
   },
+  avatarSpacer: {
+    height: AVATAR_SIZE / 2,
+  },
+  avatarOverlay: {
+    position: 'absolute',
+    top: -(AVATAR_SIZE / 2),
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  editBadge: {
+    position: 'absolute',
+    right: -2,
+    bottom: 4,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   username: {
-    fontSize: 18,
+    fontSize: 20,
+    fontWeight: '700',
+    marginTop: 6,
   },
   email: {
     fontSize: 14,
-  },
-  editButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 14,
-    backgroundColor: hexToRgba(Colors.light.primary, 0.14),
-  },
-  editLabel: {
-    fontSize: 14,
-    color: Colors.light.primary,
   },
 });

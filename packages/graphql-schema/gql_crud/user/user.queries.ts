@@ -12,6 +12,7 @@ export const ME: DocumentNode = parse(`
       role
       createdAt
       listsCount
+      totalItemsCount
       completedItemsCount
     }
   }

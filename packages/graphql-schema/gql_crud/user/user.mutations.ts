@@ -77,3 +77,27 @@ export const UPDATE_PROFILE: DocumentNode = parse(`
     }
   }
 `);
+
+export const CHANGE_PASSWORD: DocumentNode = parse(`
+  mutation ChangePassword($oldPassword: String!, $newPassword: String!) {
+    changePassword(oldPassword: $oldPassword, newPassword: $newPassword)
+  }
+`);
+
+export const REQUEST_EMAIL_CHANGE: DocumentNode = parse(`
+  mutation RequestEmailChange($newEmail: String!) {
+    requestEmailChange(newEmail: $newEmail)
+  }
+`);
+
+export const CONFIRM_EMAIL_CHANGE: DocumentNode = parse(`
+  mutation ConfirmEmailChange($otp: String!) {
+    confirmEmailChange(otp: $otp) {
+      id
+      username
+      email
+      avatarUrl
+      language
+    }
+  }
+`);
