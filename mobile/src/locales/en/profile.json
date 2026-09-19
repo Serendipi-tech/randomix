@@ -6,6 +6,7 @@
   "usernamePlaceholder": "Username",
   "usernameTooShort": "Username must be at least 3 characters.",
   "avatarLabel": "Profile image",
+  "memberSince": "Member since {{date}}",
   "logout": "Log out",
   "stats": {
     "lists": "Lists",

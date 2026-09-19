@@ -3,6 +3,7 @@
   "cancel": "Cancel",
   "banner": "You can remove a feedback only until our team starts reviewing it.",
   "send": "Send feedback",
+  "history": "Your feedback",
   "empty": {
     "title": "No feedback yet",
     "subtitle": "Tell us what you think — bugs, ideas, anything."

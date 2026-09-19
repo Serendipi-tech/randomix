@@ -92,6 +92,9 @@ export default function ProfileScreen() {
                 colorScheme={colorScheme}
                 editLabel={t('edit')}
                 onEditPress={startEditing}
+                memberSinceLabel={t('memberSince', {
+                  date: new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+                })}
               />
             </Animated.View>
             <Animated.View entering={FadeInDown.delay(120).duration(400)}>

@@ -12,6 +12,8 @@ interface ProfileHeaderProps {
   colorScheme: 'light' | 'dark';
   editLabel: string;
   onEditPress: () => void;
+  /** Riga opzionale sotto l'email, es. "Member since March 2025" — già formattata dal chiamante. */
+  memberSinceLabel?: string;
 }
 
 /** Hero del profilo: avatar grande che sfonda il bordo superiore della card, username/email
@@ -23,6 +25,7 @@ export function ProfileHeader({
   colorScheme,
   editLabel,
   onEditPress,
+  memberSinceLabel,
 }: ProfileHeaderProps) {
   const colors = Colors[colorScheme];
 
@@ -36,6 +39,11 @@ export function ProfileHeader({
         <Text style={[styles.email, { color: colors.disabled }]} numberOfLines={1}>
           {email}
         </Text>
+        {memberSinceLabel && (
+          <Text style={[styles.memberSince, { color: colors.disabled }]} numberOfLines={1}>
+            {memberSinceLabel}
+          </Text>
+        )}
       </View>
 
       <View style={styles.avatarOverlay} pointerEvents="box-none">
@@ -95,5 +103,10 @@ const styles = StyleSheet.create({
   },
   email: {
     fontSize: 14,
+  },
+  memberSince: {
+    fontSize: 12,
+    marginTop: 4,
+    opacity: 0.7,
   },
 });
