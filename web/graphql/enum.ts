@@ -65,3 +65,11 @@ builder.enumType('STATUS_CHALLENGE', {
 builder.enumType('CHALLENGE_TIMEFRAME', {
   values: ['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'] as const,
 });
+
+export const FeedbackTypeEnum = builder.enumType('FEEDBACK_TYPE', {
+  values: ['BUG', 'SUGGESTION', 'COMMENT'] as const,
+});
+
+export const FeedbackStatusEnum = builder.enumType('FEEDBACK_STATUS', {
+  values: ['SENT', 'PROGRESS', 'DONE', 'REJECTED'] as const,
+});

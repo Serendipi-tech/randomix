@@ -491,6 +491,40 @@ export type EnumSTATUS_FRIENDSHIPWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumSTATUS_FRIENDSHIPFilter<$PrismaModel>
 }
 
+export type EnumFEEDBACK_TYPEFilter<$PrismaModel = never> = {
+  equals?: $Enums.FEEDBACK_TYPE | Prisma.EnumFEEDBACK_TYPEFieldRefInput<$PrismaModel>
+  in?: $Enums.FEEDBACK_TYPE[] | Prisma.ListEnumFEEDBACK_TYPEFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FEEDBACK_TYPE[] | Prisma.ListEnumFEEDBACK_TYPEFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFEEDBACK_TYPEFilter<$PrismaModel> | $Enums.FEEDBACK_TYPE
+}
+
+export type EnumFEEDBACK_STATUSFilter<$PrismaModel = never> = {
+  equals?: $Enums.FEEDBACK_STATUS | Prisma.EnumFEEDBACK_STATUSFieldRefInput<$PrismaModel>
+  in?: $Enums.FEEDBACK_STATUS[] | Prisma.ListEnumFEEDBACK_STATUSFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FEEDBACK_STATUS[] | Prisma.ListEnumFEEDBACK_STATUSFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFEEDBACK_STATUSFilter<$PrismaModel> | $Enums.FEEDBACK_STATUS
+}
+
+export type EnumFEEDBACK_TYPEWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FEEDBACK_TYPE | Prisma.EnumFEEDBACK_TYPEFieldRefInput<$PrismaModel>
+  in?: $Enums.FEEDBACK_TYPE[] | Prisma.ListEnumFEEDBACK_TYPEFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FEEDBACK_TYPE[] | Prisma.ListEnumFEEDBACK_TYPEFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFEEDBACK_TYPEWithAggregatesFilter<$PrismaModel> | $Enums.FEEDBACK_TYPE
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFEEDBACK_TYPEFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFEEDBACK_TYPEFilter<$PrismaModel>
+}
+
+export type EnumFEEDBACK_STATUSWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FEEDBACK_STATUS | Prisma.EnumFEEDBACK_STATUSFieldRefInput<$PrismaModel>
+  in?: $Enums.FEEDBACK_STATUS[] | Prisma.ListEnumFEEDBACK_STATUSFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FEEDBACK_STATUS[] | Prisma.ListEnumFEEDBACK_STATUSFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFEEDBACK_STATUSWithAggregatesFilter<$PrismaModel> | $Enums.FEEDBACK_STATUS
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFEEDBACK_STATUSFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFEEDBACK_STATUSFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -941,6 +975,40 @@ export type NestedEnumSTATUS_FRIENDSHIPWithAggregatesFilter<$PrismaModel = never
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumSTATUS_FRIENDSHIPFilter<$PrismaModel>
   _max?: Prisma.NestedEnumSTATUS_FRIENDSHIPFilter<$PrismaModel>
+}
+
+export type NestedEnumFEEDBACK_TYPEFilter<$PrismaModel = never> = {
+  equals?: $Enums.FEEDBACK_TYPE | Prisma.EnumFEEDBACK_TYPEFieldRefInput<$PrismaModel>
+  in?: $Enums.FEEDBACK_TYPE[] | Prisma.ListEnumFEEDBACK_TYPEFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FEEDBACK_TYPE[] | Prisma.ListEnumFEEDBACK_TYPEFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFEEDBACK_TYPEFilter<$PrismaModel> | $Enums.FEEDBACK_TYPE
+}
+
+export type NestedEnumFEEDBACK_STATUSFilter<$PrismaModel = never> = {
+  equals?: $Enums.FEEDBACK_STATUS | Prisma.EnumFEEDBACK_STATUSFieldRefInput<$PrismaModel>
+  in?: $Enums.FEEDBACK_STATUS[] | Prisma.ListEnumFEEDBACK_STATUSFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FEEDBACK_STATUS[] | Prisma.ListEnumFEEDBACK_STATUSFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFEEDBACK_STATUSFilter<$PrismaModel> | $Enums.FEEDBACK_STATUS
+}
+
+export type NestedEnumFEEDBACK_TYPEWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FEEDBACK_TYPE | Prisma.EnumFEEDBACK_TYPEFieldRefInput<$PrismaModel>
+  in?: $Enums.FEEDBACK_TYPE[] | Prisma.ListEnumFEEDBACK_TYPEFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FEEDBACK_TYPE[] | Prisma.ListEnumFEEDBACK_TYPEFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFEEDBACK_TYPEWithAggregatesFilter<$PrismaModel> | $Enums.FEEDBACK_TYPE
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFEEDBACK_TYPEFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFEEDBACK_TYPEFilter<$PrismaModel>
+}
+
+export type NestedEnumFEEDBACK_STATUSWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FEEDBACK_STATUS | Prisma.EnumFEEDBACK_STATUSFieldRefInput<$PrismaModel>
+  in?: $Enums.FEEDBACK_STATUS[] | Prisma.ListEnumFEEDBACK_STATUSFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FEEDBACK_STATUS[] | Prisma.ListEnumFEEDBACK_STATUSFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFEEDBACK_STATUSWithAggregatesFilter<$PrismaModel> | $Enums.FEEDBACK_STATUS
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFEEDBACK_STATUSFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFEEDBACK_STATUSFilter<$PrismaModel>
 }
 
 

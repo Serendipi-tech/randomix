@@ -141,3 +141,8 @@ export type User = Prisma.UserModel
  * 
  */
 export type Friendship = Prisma.FriendshipModel
+/**
+ * Model UserFeedback
+ * 
+ */
+export type UserFeedback = Prisma.UserFeedbackModel

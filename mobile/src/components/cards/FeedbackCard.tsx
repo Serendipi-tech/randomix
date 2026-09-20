@@ -6,7 +6,7 @@ import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { CardShell } from '@/components/cards/CardShell';
 import { StatusBadge } from '@/components/atoms/StatusBadge';
-import type { FeedbackItem } from '@/utils/useFeedbackMock';
+import type { FeedbackItem } from '@/utils/useFeedbacks';
 
 const TYPE_ICON = { BUG: Bug, SUGGESTION: Lightbulb, COMMENT: MessageCircle } as const;
 

@@ -17,8 +17,10 @@ import { BottomSheet } from '@/components/organisms/BottomSheet';
 import { SegmentedControl } from '@/components/atoms/SegmentedControl';
 import { SectionLabel } from '@/components/atoms/SectionLabel';
 import { CardShell } from '@/components/cards/CardShell';
+import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
+import { FormError } from '@/components/molecules/form-error';
 import { FeedbackCard } from '@/components/cards/FeedbackCard';
-import { useFeedbackMock, type FeedbackType } from '@/utils/useFeedbackMock';
+import { useFeedbacks, type FeedbackType } from '@/utils/useFeedbacks';
 
 export default function FeedbackScreen() {
   const router = useRouter();
@@ -26,28 +28,35 @@ export default function FeedbackScreen() {
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
 
-  const { items, createFeedback, deleteFeedback, canDelete } = useFeedbackMock();
+  const { items, loading, creating, createFeedback, deleteFeedback, canDelete } = useFeedbacks();
 
   const [formOpen, setFormOpen] = useState(false);
   const [type, setType] = useState<FeedbackType>('COMMENT');
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const resetForm = () => {
     setType('COMMENT');
     setTitle('');
     setText('');
+    setSubmitError(null);
   };
 
-  const submitFeedback = () => {
-    createFeedback({ type, title, text });
-    resetForm();
-    setFormOpen(false);
+  const submitFeedback = async () => {
+    setSubmitError(null);
+    try {
+      await createFeedback({ type, title, text });
+      resetForm();
+      setFormOpen(false);
+    } catch (e) {
+      setSubmitError((e as Error).message);
+    }
   };
 
-  const confirmDelete = () => {
-    if (pendingDeleteId) deleteFeedback(pendingDeleteId);
+  const confirmDelete = async () => {
+    if (pendingDeleteId) await deleteFeedback(pendingDeleteId);
     setPendingDeleteId(null);
   };
 
@@ -67,21 +76,25 @@ export default function FeedbackScreen() {
 
         <Animated.View entering={FadeInDown.delay(120).duration(400)} style={styles.listWrap}>
           <SectionLabel>{t('history')}</SectionLabel>
-          <FlatList
-            data={items}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.list}
-            ListEmptyComponent={
-              <EmptyState icon={MessageSquare} title={t('empty.title')} subtitle={t('empty.subtitle')} />
-            }
-            renderItem={({ item }) => (
-              <FeedbackCard
-                item={item}
-                deletable={canDelete(item)}
-                onDelete={() => setPendingDeleteId(item.id)}
-              />
-            )}
-          />
+          {loading && items.length === 0 ? (
+            <ListCardSkeleton colorScheme={colorScheme} />
+          ) : (
+            <FlatList
+              data={items}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.list}
+              ListEmptyComponent={
+                <EmptyState icon={MessageSquare} title={t('empty.title')} subtitle={t('empty.subtitle')} />
+              }
+              renderItem={({ item }) => (
+                <FeedbackCard
+                  item={item}
+                  deletable={canDelete(item)}
+                  onDelete={() => setPendingDeleteId(item.id)}
+                />
+              )}
+            />
+          )}
         </Animated.View>
       </View>
 
@@ -104,7 +117,13 @@ export default function FeedbackScreen() {
             onChangeText={setText}
             maxLength={3000}
           />
-          <Button label={t('form.submit')} onPress={submitFeedback} disabled={text.trim().length === 0} />
+          {submitError && <FormError message={submitError} />}
+          <Button
+            label={t('form.submit')}
+            onPress={submitFeedback}
+            loading={creating}
+            disabled={text.trim().length === 0}
+          />
         </View>
       </BottomSheet>
 

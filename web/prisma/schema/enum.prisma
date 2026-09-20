@@ -124,3 +124,16 @@ enum CHALLENGE_TIMEFRAME {
     MONTHLY
     YEARLY
 }
+
+enum FEEDBACK_TYPE {
+    BUG
+    SUGGESTION
+    COMMENT
+}
+
+enum FEEDBACK_STATUS {
+    SENT
+    PROGRESS
+    DONE
+    REJECTED // mai mostrato all'utente: collassato in DONE lato resolver
+}

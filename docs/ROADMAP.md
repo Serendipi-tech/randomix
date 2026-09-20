@@ -186,7 +186,7 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
     - [x] 2.2.2.3 Note/descrizione personale, tag custom su elemento
   - [x] 2.2.3 UI randomizzatore (schermata generatori da Home + sorteggio lista con Rigenera/Accetta dal dettaglio)
   - [x] 2.2.4 UI rating a stelline (1-5 + nota opzionale)
-  - [x] 2.2.5 Profilo utente base (vista + modifica username nella tab Social)
+  - [x] 2.2.5 Profilo utente (vista + modifica username, hero avatar, statistiche, Impostazioni con cambio email/password — vedi `docs/PLANES/PROFILO.md` per il dettaglio, molto oltre la base originale)
 - [ ] 2.3 Sync point: `gql_crud/` condiviso aggiornato ad ogni nuova query/mutation
 
 ### Test
@@ -285,7 +285,7 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
     - [ ] 4.1.1.2 Plus: 15 liste, 100 elementi/lista, 10 gruppi, max 30 partecipazioni
     - [ ] 4.1.1.3 Unlimited: illimitato, max 100 membri gruppo proprio
   - [ ] 4.1.2 Logica "congelamento" liste oltre il limite (downgrade/mancato rinnovo)
-- [ ] 4.2 **Dev B**: UI upgrade/paywall, integrazione pagamenti in-app (store), ads (Free)
+- [ ] 4.2 **Dev B**: UI upgrade/paywall, integrazione pagamenti in-app (store), ads (Free) — 🟡 entry point + placeholder "in arrivo" già in `settings.tsx` (bottom sheet), nessun confronto piani/integrazione reale ancora
 
 ### Test
 
@@ -312,7 +312,7 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
 
 ## Fase 5 — Rifinitura & Lancio
 
-- [ ] 5.1 `Report` (moderazione/bug/feedback): resolver + UI invio segnalazione
+- [ ] 5.1 `Report` (moderazione utenti/contenuti) + `UserFeedback` (bug/suggerimento/commento): resolver + UI invio segnalazione. **Sono due model separati**, non uno solo come scritto qui in origine — vedi `docs/features/user_feedback/` per la spec di `UserFeedback`. 🟡 UI mobile del feedback già pronta con dati mock (`mobile/src/app/(app)/feedback.tsx`, `useFeedbackMock.ts`), resolver reali (`createUserFeedback`/`myFeedbacks`) e `Report` ancora da fare
 - [ ] 5.2 Sorteggio live/realtime (canale dedicato, non GraphQL subscription)
 - [ ] 5.3 Admin dashboard (web) per gestione contenuti/utenti/report
 - [ ] 5.4 Testing end-to-end, bug fix

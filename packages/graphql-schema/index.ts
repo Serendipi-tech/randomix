@@ -27,3 +27,5 @@ export * as AdminMembershipMutations from './gql_crud/membership/adminMembership
 export * as AdminReportQueries from './gql_crud/report/adminReport.queries';
 export * as AdminReportMutations from './gql_crud/report/adminReport.mutations';
 export * as AdminPaymentQueries from './gql_crud/payment/adminPayment.queries';
+export * as UserFeedbackQueries from './gql_crud/userFeedback/userFeedback.queries';
+export * as UserFeedbackMutations from './gql_crud/userFeedback/userFeedback.mutations';

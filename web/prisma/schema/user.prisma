@@ -37,6 +37,7 @@ model User {
     tags      Tag[]
     userItems User_Item[]
     ratings   Rating[]
+    feedbacks UserFeedback[]
 
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
