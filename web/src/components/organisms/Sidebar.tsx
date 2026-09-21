@@ -16,6 +16,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard/notifications', label: 'Notifiche' },
   { href: '/dashboard/memberships', label: 'Membership' },
   { href: '/dashboard/reports', label: 'Segnalazioni' },
+  { href: '/dashboard/feedback', label: 'Feedback' },
   { href: '/dashboard/payments', label: 'Pagamenti' },
 ];
 

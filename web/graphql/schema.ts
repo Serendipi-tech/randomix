@@ -45,6 +45,8 @@ import './models/payment/adminPayment.queries';
 import './models/userFeedback/index';
 import './models/userFeedback/userFeedback.queries';
 import './models/userFeedback/userFeedback.mutations';
+import './models/userFeedback/adminUserFeedback.queries';
+import './models/userFeedback/adminUserFeedback.mutations';
 
 builder.queryType({});
 builder.mutationType({});
