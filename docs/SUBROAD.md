@@ -8,21 +8,21 @@
 - [x] Profilo
 - [ ] Randomizzatore singolo
 - [ ] Randomizzatore liste
-- [ ] Inserire sistema feedback e bug — 🟡 UI mobile fatta (mock, vedi Pagina Profilo sotto), backend (`UserFeedback`, `createUserFeedback`/`myFeedbacks`) da fare
+- [x] Inserire sistema feedback e bug — backend (`UserFeedback`), mobile reale (invio/lista/cancellazione) e dashboard admin di triage (`/dashboard/feedback`) completi
 - [ ] Pagamenti — 🟡 entry point + placeholder "in arrivo" fatti, nessun backend (Fase 4)
 - [ ] Amici
 - [ ] Copia dagli amici
 - [ ] Notifiche
 
 ### MICRO
-- [x] Pagina Profilo — nucleo pagina completo; feedback e pagamenti restano 🟡 (solo mockup, vedi sotto)
+- [x] Pagina Profilo — nucleo pagina e feedback completi; pagamenti resta 🟡 (solo mockup, vedi sotto)
     - [x] Togliere Colors
     - [x] Spostare Logout — icona in alto a destra + conferma
     - [x] Modifica avatar — resta nel Profilo (editing inline)
     - [x] Far sparire il page title "profile"
     - [x] Rendere la pagina bellì — direzione "Hero verticale" (avatar che sfonda la card, pannello statistiche a righe con bordo a gradiente)
     - [x] Aggiungere statistiche account — liste / completati / amici
-    - [ ] Aggiungere sezione feedback e bug — 🟡 MOCKUP: schermata `mobile/src/app/(app)/feedback.tsx` con lista e form, dati finti in memoria (`useFeedbackMock.ts`), nessuna persistenza. Non è la feature, solo lo scaffolding UI — backend vero ancora da fare, vedi `docs/features/user_feedback/`
+    - [x] Aggiungere sezione feedback e bug — schermata `mobile/src/app/(app)/feedback.tsx` collegata al backend reale (`useFeedbacks.ts`: create/list/delete via GraphQL), triage admin in `web/src/app/(admin)/dashboard/feedback/`
     - [x] Pagina Impostazioni → `mobile/src/app/(app)/settings.tsx`
         - [x] Modifica nome utente — già nel Profilo, non duplicata qui
         - [x] Modifica email — OTP di verifica sulla nuova casella

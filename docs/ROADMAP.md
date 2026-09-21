@@ -312,7 +312,7 @@ mutation UpdateProfile($input: UpdateProfileInput!) {
 
 ## Fase 5 — Rifinitura & Lancio
 
-- [ ] 5.1 `Report` (moderazione utenti/contenuti) + `UserFeedback` (bug/suggerimento/commento): resolver + UI invio segnalazione. **Sono due model separati**, non uno solo come scritto qui in origine — vedi `docs/features/user_feedback/` per la spec di `UserFeedback`. 🟡 UI mobile del feedback già pronta con dati mock (`mobile/src/app/(app)/feedback.tsx`, `useFeedbackMock.ts`), resolver reali (`createUserFeedback`/`myFeedbacks`) e `Report` ancora da fare
+- [/] 5.1 `Report` (moderazione utenti/contenuti) + `UserFeedback` (bug/suggerimento/commento): resolver + UI invio segnalazione. **Sono due model separati** — vedi `docs/features/user_feedback/` per la spec di `UserFeedback`. `UserFeedback` completo (mobile reale `mobile/src/app/(app)/feedback.tsx`/`useFeedbacks.ts` + admin triage `web/src/app/(admin)/dashboard/feedback/`); `Report` ancora da fare
 - [ ] 5.2 Sorteggio live/realtime (canale dedicato, non GraphQL subscription)
 - [ ] 5.3 Admin dashboard (web) per gestione contenuti/utenti/report
 - [ ] 5.4 Testing end-to-end, bug fix
