@@ -15,8 +15,8 @@ model GroupChallenge {
     timeframe   CHALLENGE_TIMEFRAME @default(MONTHLY) // entro quando (entro un mese)
 
     // A SCELTA, MA OBBLIGATORIO ALMENO UNO FRA:
-    item         Item[] // item specifici per completare la lista
-    category     CATEGORY[] // categoria di item da completare
+    // item Item[] // disabilitato insieme a Item, vedi item.prisma
+    category     Category[] // categoria di item da completare
     allowedLists GroupList[] // liste del gruppo da cui pescare gli item per la sfida
     allowedTags  Tag[] // considerare front-end SOLO i tag di sistema, non personali
 

@@ -6,9 +6,8 @@ import { useAppTheme } from '@/utils/useAppTheme';
 import { BottomSheet } from '@/components/organisms/BottomSheet';
 import { Input } from '@/components/molecules/Input';
 import { OptionRow } from '@/components/molecules/OptionRow';
-import type { Category } from '@/utils/useListCategories';
 
-export type CategoryOption = { value: Category; label: string };
+export type CategoryOption = { value: string; label: string };
 
 // Sotto questa soglia la ricerca è superflua: poche opzioni si scorrono a colpo d'occhio
 const SEARCH_MIN_OPTIONS = 10;
@@ -16,10 +15,10 @@ const SEARCH_MIN_OPTIONS = 10;
 type CategoryPickerSheetProps = {
   visible: boolean;
   onClose: () => void;
-  /** Opzioni selezionabili (valore + label già tradotta), passate dall'esterno. */
+  /** Opzioni selezionabili (id categoria + nome), passate dall'esterno. */
   options: CategoryOption[];
-  selected: Category | null;
-  onSelect: (value: Category) => void;
+  selected: string | null;
+  onSelect: (value: string) => void;
   searchPlaceholder: string;
   /** Messaggio mostrato quando non ci sono opzioni. */
   emptyLabel: string;

@@ -1,0 +1,16 @@
+model Category {
+    id String @id @default(cuid())
+
+    name String // testo mostrato direttamente (nessuna chiave i18n, come ListCategory)
+    icon String
+
+    items                User_Item[] // item personali con questa categoria
+    includedInCategories ListCategory[] // macro-categorie che includono questa categoria
+    challenges           GroupChallenge[] // sfide che richiedono questa categoria
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([name])
+    @@index([name])
+}

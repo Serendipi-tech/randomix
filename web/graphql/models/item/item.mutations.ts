@@ -1,13 +1,13 @@
 import { GraphQLError } from 'graphql';
 import { builder, prisma } from '../../builder';
-import { CategoryEnum, StatusCompletionEnum } from '../../enum';
+import { StatusCompletionEnum } from '../../enum';
 import './index';
 
 const AddItemToListInput = builder.inputType('AddItemToListInput', {
   fields: (t) => ({
     listId: t.id({ required: true }),
     name: t.string({ required: true }),
-    category: t.field({ type: CategoryEnum, required: true }),
+    categoryId: t.id({ required: true }),
     description: t.string({ required: false }),
     note: t.string({ required: false }),
   }),
@@ -41,19 +41,21 @@ builder.mutationField('addItemToList', (t) =>
         throw new GraphQLError('Lista non trovata.', { extensions: { code: 'NOT_FOUND' } });
       }
 
-      // riuso l'Item globale se esiste già (unique su name+category)
-      const item = await prisma.item.upsert({
-        where: { name_category: { name: input.name.trim(), category: input.category } },
-        create: { name: input.name.trim(), category: input.category },
-        update: {},
-      });
+      const categoryId = String(input.categoryId);
+      const category = await prisma.category.findUnique({ where: { id: categoryId } });
+      if (!category) {
+        throw new GraphQLError('Categoria non trovata.', { extensions: { code: 'NOT_FOUND' } });
+      }
 
-      // riuso il record personale dell'utente se l'item è già nella sua collezione
+      // riuso il record personale dell'utente se l'item (stesso nome+categoria) è già nella sua collezione
       const userItem = await prisma.user_Item.upsert({
-        where: { userId_itemId: { userId: ctx.userId, itemId: item.id } },
+        where: {
+          userId_name_categoryId: { userId: ctx.userId, name: input.name.trim(), categoryId },
+        },
         create: {
           userId: ctx.userId,
-          itemId: item.id,
+          name: input.name.trim(),
+          categoryId,
           description: input.description ?? null,
           note: input.note ?? null,
         },

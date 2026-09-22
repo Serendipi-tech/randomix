@@ -18,18 +18,22 @@ export function useListCategoryForm({ initial, onSaved, onDeleted }: UseListCate
   const [name, setName] = useState(initial?.name ?? '');
   const [description, setDescription] = useState(initial?.description ?? '');
   const [icon, setIcon] = useState(initial?.icon ?? '');
-  const [includedCategories, setIncludedCategories] = useState<string[]>(initial?.includedCategories ?? []);
+  const [includedCategoryIds, setIncludedCategoryIds] = useState<string[]>(
+    initial?.includedCategories.map((c) => c.id) ?? [],
+  );
 
   const [createCategory, { loading: creating, error: createError }] = useMutation(ADMIN_CREATE_LIST_CATEGORY);
   const [updateCategory, { loading: updating, error: updateError }] = useMutation(ADMIN_UPDATE_LIST_CATEGORY);
   const [deleteCategory, { loading: deleting, error: deleteError }] = useMutation(ADMIN_DELETE_LIST_CATEGORY);
 
-  const toggleCategory = (category: string) => {
-    setIncludedCategories((prev) => (prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]));
+  const toggleCategory = (categoryId: string) => {
+    setIncludedCategoryIds((prev) =>
+      prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId],
+    );
   };
 
   const save = async () => {
-    const input = { name, description: description || null, icon, includedCategories };
+    const input = { name, description: description || null, icon, includedCategoryIds };
     if (initial) {
       await updateCategory({ variables: { id: initial.id, input } });
     } else {
@@ -51,7 +55,7 @@ export function useListCategoryForm({ initial, onSaved, onDeleted }: UseListCate
     setDescription,
     icon,
     setIcon,
-    includedCategories,
+    includedCategoryIds,
     toggleCategory,
     save,
     saving: creating || updating,

@@ -18,6 +18,11 @@ export { Prisma }
 export * as $Enums from './enums'
 export * from './enums';
 /**
+ * Model Category
+ * 
+ */
+export type Category = Prisma.CategoryModel
+/**
  * Model Group
  * 
  */
@@ -33,11 +38,6 @@ export type Group_User = Prisma.Group_UserModel
  */
 export type GroupList = Prisma.GroupListModel
 /**
- * Model GroupList_AcceptedItemHistory
- * 
- */
-export type GroupList_AcceptedItemHistory = Prisma.GroupList_AcceptedItemHistoryModel
-/**
  * Model GroupChallenge
  * 
  */
@@ -47,11 +47,6 @@ export type GroupChallenge = Prisma.GroupChallengeModel
  * 
  */
 export type GroupUser_Challenge = Prisma.GroupUser_ChallengeModel
-/**
- * Model Item
- * 
- */
-export type Item = Prisma.ItemModel
 /**
  * Model User_Item
  * 

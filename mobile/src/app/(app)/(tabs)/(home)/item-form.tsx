@@ -14,7 +14,7 @@ import { TagList } from '@/components/molecules/TagList';
 import { CategoryPickerSheet, type CategoryOption } from '@/components/organisms/CategoryPickerSheet';
 import { TagPickerSheet } from '@/components/organisms/TagPickerSheet';
 import { useItemMutations } from '@/utils/useItemMutations';
-import { useListCategories, type Category } from '@/utils/useListCategories';
+import { useListCategories } from '@/utils/useListCategories';
 import { useListDetail } from '@/utils/useListDetail';
 import { useTags, type Tag as TagData } from '@/utils/useTags';
 
@@ -51,15 +51,17 @@ export default function ItemFormScreen() {
   // Categorie sceglibili = unione degli includedCategories delle macro-categorie della lista padre
   const categoryOptions = useMemo<CategoryOption[]>(() => {
     const listMacroIds = new Set((list?.categories ?? []).map((c) => c.id));
-    const values = new Set<Category>();
+    const seen = new Map<string, CategoryOption>();
     allMacroCategories
       .filter((macro) => listMacroIds.has(macro.id))
-      .forEach((macro) => macro.includedCategories.forEach((value) => values.add(value)));
-    return Array.from(values).map((value) => ({ value, label: t(`categories.${value}`) }));
-  }, [allMacroCategories, list, t]);
+      .forEach((macro) =>
+        macro.includedCategories.forEach((cat) => seen.set(cat.id, { value: cat.id, label: cat.name })),
+      );
+    return Array.from(seen.values());
+  }, [allMacroCategories, list]);
 
   const [name, setName] = useState('');
-  const [category, setCategory] = useState<Category | null>(null);
+  const [category, setCategory] = useState<string | null>(null);
   const [description, setDescription] = useState('');
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -103,7 +105,7 @@ export default function ItemFormScreen() {
       const userItemId = await addItemToList({
         listId: params.listId,
         name: name.trim(),
-        category,
+        categoryId: category,
         description: description.trim() || null,
       });
       if (userItemId && selectedTags.length > 0) {
@@ -134,7 +136,11 @@ export default function ItemFormScreen() {
           <Text style={[styles.fieldLabel, { color: colors.textColor }]}>{t('itemForm.category')}</Text>
           <Button
             variant="soft"
-            label={category ? t(`categories.${category}`) : t('itemForm.categoryPlaceholder')}
+            label={
+              category
+                ? (categoryOptions.find((option) => option.value === category)?.label ?? t('itemForm.categoryPlaceholder'))
+                : t('itemForm.categoryPlaceholder')
+            }
             onPress={() => setShowCategoryPicker(true)}
           />
         </View>

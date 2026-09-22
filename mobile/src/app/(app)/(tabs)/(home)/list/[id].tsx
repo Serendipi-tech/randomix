@@ -133,8 +133,8 @@ export default function ListDetailScreen() {
               contentContainerStyle={[styles.content, { paddingBottom: listBottomPadding }]}
               renderItem={({ item: entry }) => (
               <ItemCard
-                title={entry.userItem.item.name}
-                category={t(`categories.${entry.userItem.item.category}`)}
+                title={entry.userItem.name}
+                category={entry.userItem.category.name}
                 status={t(`status.${entry.userItem.status}`)}
                 statusColor={
                   entry.userItem.status === 'IN_PROGRESS'
@@ -143,23 +143,19 @@ export default function ListDetailScreen() {
                       ? colors.success
                       : colors.border
                 }
-                rating={entry.userItem.item.myRating?.value ?? undefined}
-                itemId={entry.userItem.item.id}
+                rating={entry.userItem.rating?.value ?? undefined}
                 tags={entry.userItem.tags}
-                imageUri={entry.userItem.item.imageUrl ?? undefined}
                 detail={{
-                  imageUri: entry.userItem.item.imageUrl ?? undefined,
-                  name: entry.userItem.item.name,
-                  category: t(`categories.${entry.userItem.item.category}`),
-                  description: entry.userItem.item.description ?? undefined,
+                  name: entry.userItem.name,
+                  category: entry.userItem.category.name,
                   userDescription: entry.userItem.description ?? undefined,
                   note: entry.userItem.note ?? undefined,
                   status: entry.userItem.status,
-                  ratingValue: entry.userItem.item.myRating?.value ?? undefined,
-                  ratingNote: entry.userItem.item.myRating?.note ?? undefined,
+                  ratingValue: entry.userItem.rating?.value ?? undefined,
+                  ratingNote: entry.userItem.rating?.note ?? undefined,
                   tags: entry.userItem.tags,
                   onChangeStatus: (status) => updateUserItem(entry.userItem.id, { status }),
-                  onChangeRating: (value, note) => rateItem(entry.userItem.item.id, value, note ?? null),
+                  onChangeRating: (value, note) => rateItem(entry.userItem.id, value, note ?? null),
                   onChangeNote: (note) => updateUserItem(entry.userItem.id, { note: note || null }),
                   onChangeDescription: (description) =>
                     updateUserItem(entry.userItem.id, { description: description || null }),

@@ -384,13 +384,12 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 
 export const ModelName = {
+  Category: 'Category',
   Group: 'Group',
   Group_User: 'Group_User',
   GroupList: 'GroupList',
-  GroupList_AcceptedItemHistory: 'GroupList_AcceptedItemHistory',
   GroupChallenge: 'GroupChallenge',
   GroupUser_Challenge: 'GroupUser_Challenge',
-  Item: 'Item',
   User_Item: 'User_Item',
   List: 'List',
   List_UserItem: 'List_UserItem',
@@ -420,10 +419,84 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "group" | "group_User" | "groupList" | "groupList_AcceptedItemHistory" | "groupChallenge" | "groupUser_Challenge" | "item" | "user_Item" | "list" | "list_UserItem" | "listCategory" | "membership" | "notification" | "payment" | "rating" | "report" | "subscription" | "tag" | "user" | "friendship" | "userFeedback"
+    modelProps: "category" | "group" | "group_User" | "groupList" | "groupChallenge" | "groupUser_Challenge" | "user_Item" | "list" | "list_UserItem" | "listCategory" | "membership" | "notification" | "payment" | "rating" | "report" | "subscription" | "tag" | "user" | "friendship" | "userFeedback"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
+    Category: {
+      payload: Prisma.$CategoryPayload<ExtArgs>
+      fields: Prisma.CategoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CategoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CategoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
+        }
+        findFirst: {
+          args: Prisma.CategoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CategoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
+        }
+        findMany: {
+          args: Prisma.CategoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>[]
+        }
+        create: {
+          args: Prisma.CategoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
+        }
+        createMany: {
+          args: Prisma.CategoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CategoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>[]
+        }
+        delete: {
+          args: Prisma.CategoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
+        }
+        update: {
+          args: Prisma.CategoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.CategoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CategoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CategoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.CategoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
+        }
+        aggregate: {
+          args: Prisma.CategoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCategory>
+        }
+        groupBy: {
+          args: Prisma.CategoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CategoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CategoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CategoryCountAggregateOutputType> | number
+        }
+      }
+    }
     Group: {
       payload: Prisma.$GroupPayload<ExtArgs>
       fields: Prisma.GroupFieldRefs
@@ -646,80 +719,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    GroupList_AcceptedItemHistory: {
-      payload: Prisma.$GroupList_AcceptedItemHistoryPayload<ExtArgs>
-      fields: Prisma.GroupList_AcceptedItemHistoryFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.GroupList_AcceptedItemHistoryFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$GroupList_AcceptedItemHistoryPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.GroupList_AcceptedItemHistoryFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$GroupList_AcceptedItemHistoryPayload>
-        }
-        findFirst: {
-          args: Prisma.GroupList_AcceptedItemHistoryFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$GroupList_AcceptedItemHistoryPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.GroupList_AcceptedItemHistoryFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$GroupList_AcceptedItemHistoryPayload>
-        }
-        findMany: {
-          args: Prisma.GroupList_AcceptedItemHistoryFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$GroupList_AcceptedItemHistoryPayload>[]
-        }
-        create: {
-          args: Prisma.GroupList_AcceptedItemHistoryCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$GroupList_AcceptedItemHistoryPayload>
-        }
-        createMany: {
-          args: Prisma.GroupList_AcceptedItemHistoryCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.GroupList_AcceptedItemHistoryCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$GroupList_AcceptedItemHistoryPayload>[]
-        }
-        delete: {
-          args: Prisma.GroupList_AcceptedItemHistoryDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$GroupList_AcceptedItemHistoryPayload>
-        }
-        update: {
-          args: Prisma.GroupList_AcceptedItemHistoryUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$GroupList_AcceptedItemHistoryPayload>
-        }
-        deleteMany: {
-          args: Prisma.GroupList_AcceptedItemHistoryDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.GroupList_AcceptedItemHistoryUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.GroupList_AcceptedItemHistoryUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$GroupList_AcceptedItemHistoryPayload>[]
-        }
-        upsert: {
-          args: Prisma.GroupList_AcceptedItemHistoryUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$GroupList_AcceptedItemHistoryPayload>
-        }
-        aggregate: {
-          args: Prisma.GroupList_AcceptedItemHistoryAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateGroupList_AcceptedItemHistory>
-        }
-        groupBy: {
-          args: Prisma.GroupList_AcceptedItemHistoryGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.GroupList_AcceptedItemHistoryGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.GroupList_AcceptedItemHistoryCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.GroupList_AcceptedItemHistoryCountAggregateOutputType> | number
-        }
-      }
-    }
     GroupChallenge: {
       payload: Prisma.$GroupChallengePayload<ExtArgs>
       fields: Prisma.GroupChallengeFieldRefs
@@ -865,80 +864,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.GroupUser_ChallengeCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.GroupUser_ChallengeCountAggregateOutputType> | number
-        }
-      }
-    }
-    Item: {
-      payload: Prisma.$ItemPayload<ExtArgs>
-      fields: Prisma.ItemFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.ItemFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.ItemFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>
-        }
-        findFirst: {
-          args: Prisma.ItemFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.ItemFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>
-        }
-        findMany: {
-          args: Prisma.ItemFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>[]
-        }
-        create: {
-          args: Prisma.ItemCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>
-        }
-        createMany: {
-          args: Prisma.ItemCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.ItemCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>[]
-        }
-        delete: {
-          args: Prisma.ItemDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>
-        }
-        update: {
-          args: Prisma.ItemUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>
-        }
-        deleteMany: {
-          args: Prisma.ItemDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.ItemUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.ItemUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>[]
-        }
-        upsert: {
-          args: Prisma.ItemUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ItemPayload>
-        }
-        aggregate: {
-          args: Prisma.ItemAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateItem>
-        }
-        groupBy: {
-          args: Prisma.ItemGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.ItemGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.ItemCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.ItemCountAggregateOutputType> | number
         }
       }
     }
@@ -2017,6 +1942,17 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const CategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  icon: 'icon',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
+
+
 export const GroupScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -2059,16 +1995,6 @@ export const GroupListScalarFieldEnum = {
 export type GroupListScalarFieldEnum = (typeof GroupListScalarFieldEnum)[keyof typeof GroupListScalarFieldEnum]
 
 
-export const GroupList_AcceptedItemHistoryScalarFieldEnum = {
-  id: 'id',
-  groupListId: 'groupListId',
-  itemId: 'itemId',
-  randomizedAt: 'randomizedAt'
-} as const
-
-export type GroupList_AcceptedItemHistoryScalarFieldEnum = (typeof GroupList_AcceptedItemHistoryScalarFieldEnum)[keyof typeof GroupList_AcceptedItemHistoryScalarFieldEnum]
-
-
 export const GroupChallengeScalarFieldEnum = {
   id: 'id',
   groupId: 'groupId',
@@ -2079,7 +2005,6 @@ export const GroupChallengeScalarFieldEnum = {
   status: 'status',
   numericGoal: 'numericGoal',
   timeframe: 'timeframe',
-  category: 'category',
   manualAdvancement: 'manualAdvancement',
   allowCompleted: 'allowCompleted',
   startDate: 'startDate',
@@ -2104,28 +2029,16 @@ export const GroupUser_ChallengeScalarFieldEnum = {
 export type GroupUser_ChallengeScalarFieldEnum = (typeof GroupUser_ChallengeScalarFieldEnum)[keyof typeof GroupUser_ChallengeScalarFieldEnum]
 
 
-export const ItemScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  description: 'description',
-  imageUrl: 'imageUrl',
-  category: 'category',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type ItemScalarFieldEnum = (typeof ItemScalarFieldEnum)[keyof typeof ItemScalarFieldEnum]
-
-
 export const User_ItemScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  itemId: 'itemId',
+  name: 'name',
   description: 'description',
   note: 'note',
   status: 'status',
   completedAt: 'completedAt',
   isHidden: 'isHidden',
+  categoryId: 'categoryId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2166,7 +2079,6 @@ export const ListCategoryScalarFieldEnum = {
   name: 'name',
   description: 'description',
   icon: 'icon',
-  includedCategories: 'includedCategories',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2225,7 +2137,7 @@ export const RatingScalarFieldEnum = {
   value: 'value',
   note: 'note',
   userId: 'userId',
-  itemId: 'itemId',
+  userItemId: 'userItemId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2391,20 +2303,6 @@ export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
 
 
 /**
- * Reference to a field of type 'ROLES_GROUP[]'
- */
-export type ListEnumROLES_GROUPFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ROLES_GROUP[]'>
-    
-
-
-/**
- * Reference to a field of type 'ROLES_GROUP'
- */
-export type EnumROLES_GROUPFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ROLES_GROUP'>
-    
-
-
-/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -2415,6 +2313,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ROLES_GROUP[]'
+ */
+export type ListEnumROLES_GROUPFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ROLES_GROUP[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ROLES_GROUP'
+ */
+export type EnumROLES_GROUPFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ROLES_GROUP'>
     
 
 
@@ -2464,20 +2376,6 @@ export type EnumCHALLENGE_TIMEFRAMEFieldRefInput<$PrismaModel> = FieldRefInputTy
  * Reference to a field of type 'CHALLENGE_TIMEFRAME[]'
  */
 export type ListEnumCHALLENGE_TIMEFRAMEFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CHALLENGE_TIMEFRAME[]'>
-    
-
-
-/**
- * Reference to a field of type 'CATEGORY[]'
- */
-export type ListEnumCATEGORYFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CATEGORY[]'>
-    
-
-
-/**
- * Reference to a field of type 'CATEGORY'
- */
-export type EnumCATEGORYFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CATEGORY'>
     
 
 
@@ -2786,13 +2684,12 @@ export type PrismaClientOptions = ({
   queryPlanCacheMaxSize?: number
 }
 export type GlobalOmitConfig = {
+  category?: Prisma.CategoryOmit
   group?: Prisma.GroupOmit
   group_User?: Prisma.Group_UserOmit
   groupList?: Prisma.GroupListOmit
-  groupList_AcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryOmit
   groupChallenge?: Prisma.GroupChallengeOmit
   groupUser_Challenge?: Prisma.GroupUser_ChallengeOmit
-  item?: Prisma.ItemOmit
   user_Item?: Prisma.User_ItemOmit
   list?: Prisma.ListOmit
   list_UserItem?: Prisma.List_UserItemOmit

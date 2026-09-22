@@ -51,13 +51,12 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  Category: 'Category',
   Group: 'Group',
   Group_User: 'Group_User',
   GroupList: 'GroupList',
-  GroupList_AcceptedItemHistory: 'GroupList_AcceptedItemHistory',
   GroupChallenge: 'GroupChallenge',
   GroupUser_Challenge: 'GroupUser_Challenge',
-  Item: 'Item',
   User_Item: 'User_Item',
   List: 'List',
   List_UserItem: 'List_UserItem',
@@ -88,6 +87,17 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+export const CategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  icon: 'icon',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
 
 
 export const GroupScalarFieldEnum = {
@@ -132,16 +142,6 @@ export const GroupListScalarFieldEnum = {
 export type GroupListScalarFieldEnum = (typeof GroupListScalarFieldEnum)[keyof typeof GroupListScalarFieldEnum]
 
 
-export const GroupList_AcceptedItemHistoryScalarFieldEnum = {
-  id: 'id',
-  groupListId: 'groupListId',
-  itemId: 'itemId',
-  randomizedAt: 'randomizedAt'
-} as const
-
-export type GroupList_AcceptedItemHistoryScalarFieldEnum = (typeof GroupList_AcceptedItemHistoryScalarFieldEnum)[keyof typeof GroupList_AcceptedItemHistoryScalarFieldEnum]
-
-
 export const GroupChallengeScalarFieldEnum = {
   id: 'id',
   groupId: 'groupId',
@@ -152,7 +152,6 @@ export const GroupChallengeScalarFieldEnum = {
   status: 'status',
   numericGoal: 'numericGoal',
   timeframe: 'timeframe',
-  category: 'category',
   manualAdvancement: 'manualAdvancement',
   allowCompleted: 'allowCompleted',
   startDate: 'startDate',
@@ -177,28 +176,16 @@ export const GroupUser_ChallengeScalarFieldEnum = {
 export type GroupUser_ChallengeScalarFieldEnum = (typeof GroupUser_ChallengeScalarFieldEnum)[keyof typeof GroupUser_ChallengeScalarFieldEnum]
 
 
-export const ItemScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  description: 'description',
-  imageUrl: 'imageUrl',
-  category: 'category',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type ItemScalarFieldEnum = (typeof ItemScalarFieldEnum)[keyof typeof ItemScalarFieldEnum]
-
-
 export const User_ItemScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  itemId: 'itemId',
+  name: 'name',
   description: 'description',
   note: 'note',
   status: 'status',
   completedAt: 'completedAt',
   isHidden: 'isHidden',
+  categoryId: 'categoryId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -239,7 +226,6 @@ export const ListCategoryScalarFieldEnum = {
   name: 'name',
   description: 'description',
   icon: 'icon',
-  includedCategories: 'includedCategories',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -298,7 +284,7 @@ export const RatingScalarFieldEnum = {
   value: 'value',
   note: 'note',
   userId: 'userId',
-  itemId: 'itemId',
+  userItemId: 'userItemId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

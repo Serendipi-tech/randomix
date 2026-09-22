@@ -47,7 +47,6 @@ export type ListCategoryCountAggregateOutputType = {
   name: number
   description: number
   icon: number
-  includedCategories: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -77,7 +76,6 @@ export type ListCategoryCountAggregateInputType = {
   name?: true
   description?: true
   icon?: true
-  includedCategories?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -160,7 +158,6 @@ export type ListCategoryGroupByOutputType = {
   name: string
   description: string | null
   icon: string
-  includedCategories: $Enums.CATEGORY[]
   createdAt: Date
   updatedAt: Date
   _count: ListCategoryCountAggregateOutputType | null
@@ -191,9 +188,9 @@ export type ListCategoryWhereInput = {
   name?: Prisma.StringFilter<"ListCategory"> | string
   description?: Prisma.StringNullableFilter<"ListCategory"> | string | null
   icon?: Prisma.StringFilter<"ListCategory"> | string
-  includedCategories?: Prisma.EnumCATEGORYNullableListFilter<"ListCategory">
   createdAt?: Prisma.DateTimeFilter<"ListCategory"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ListCategory"> | Date | string
+  includedCategories?: Prisma.CategoryListRelationFilter
   lists?: Prisma.ListListRelationFilter
   groupLists?: Prisma.GroupListListRelationFilter
 }
@@ -203,9 +200,9 @@ export type ListCategoryOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   icon?: Prisma.SortOrder
-  includedCategories?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  includedCategories?: Prisma.CategoryOrderByRelationAggregateInput
   lists?: Prisma.ListOrderByRelationAggregateInput
   groupLists?: Prisma.GroupListOrderByRelationAggregateInput
 }
@@ -218,9 +215,9 @@ export type ListCategoryWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"ListCategory"> | string
   description?: Prisma.StringNullableFilter<"ListCategory"> | string | null
   icon?: Prisma.StringFilter<"ListCategory"> | string
-  includedCategories?: Prisma.EnumCATEGORYNullableListFilter<"ListCategory">
   createdAt?: Prisma.DateTimeFilter<"ListCategory"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ListCategory"> | Date | string
+  includedCategories?: Prisma.CategoryListRelationFilter
   lists?: Prisma.ListListRelationFilter
   groupLists?: Prisma.GroupListListRelationFilter
 }, "id">
@@ -230,7 +227,6 @@ export type ListCategoryOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   icon?: Prisma.SortOrder
-  includedCategories?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ListCategoryCountOrderByAggregateInput
@@ -246,7 +242,6 @@ export type ListCategoryScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"ListCategory"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"ListCategory"> | string | null
   icon?: Prisma.StringWithAggregatesFilter<"ListCategory"> | string
-  includedCategories?: Prisma.EnumCATEGORYNullableListFilter<"ListCategory">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ListCategory"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ListCategory"> | Date | string
 }
@@ -256,9 +251,9 @@ export type ListCategoryCreateInput = {
   name: string
   description?: string | null
   icon: string
-  includedCategories?: Prisma.ListCategoryCreateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Date | string
   updatedAt?: Date | string
+  includedCategories?: Prisma.CategoryCreateNestedManyWithoutIncludedInCategoriesInput
   lists?: Prisma.ListCreateNestedManyWithoutCategoriesInput
   groupLists?: Prisma.GroupListCreateNestedManyWithoutListCategoriesInput
 }
@@ -268,9 +263,9 @@ export type ListCategoryUncheckedCreateInput = {
   name: string
   description?: string | null
   icon: string
-  includedCategories?: Prisma.ListCategoryCreateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Date | string
   updatedAt?: Date | string
+  includedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutIncludedInCategoriesInput
   lists?: Prisma.ListUncheckedCreateNestedManyWithoutCategoriesInput
   groupLists?: Prisma.GroupListUncheckedCreateNestedManyWithoutListCategoriesInput
 }
@@ -280,9 +275,9 @@ export type ListCategoryUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
-  includedCategories?: Prisma.ListCategoryUpdateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  includedCategories?: Prisma.CategoryUpdateManyWithoutIncludedInCategoriesNestedInput
   lists?: Prisma.ListUpdateManyWithoutCategoriesNestedInput
   groupLists?: Prisma.GroupListUpdateManyWithoutListCategoriesNestedInput
 }
@@ -292,9 +287,9 @@ export type ListCategoryUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
-  includedCategories?: Prisma.ListCategoryUpdateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  includedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutIncludedInCategoriesNestedInput
   lists?: Prisma.ListUncheckedUpdateManyWithoutCategoriesNestedInput
   groupLists?: Prisma.GroupListUncheckedUpdateManyWithoutListCategoriesNestedInput
 }
@@ -304,7 +299,6 @@ export type ListCategoryCreateManyInput = {
   name: string
   description?: string | null
   icon: string
-  includedCategories?: Prisma.ListCategoryCreateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -314,7 +308,6 @@ export type ListCategoryUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
-  includedCategories?: Prisma.ListCategoryUpdateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -324,7 +317,6 @@ export type ListCategoryUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
-  includedCategories?: Prisma.ListCategoryUpdateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -344,7 +336,6 @@ export type ListCategoryCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
   icon?: Prisma.SortOrder
-  includedCategories?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -365,6 +356,44 @@ export type ListCategoryMinOrderByAggregateInput = {
   icon?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type ListCategoryCreateNestedManyWithoutIncludedCategoriesInput = {
+  create?: Prisma.XOR<Prisma.ListCategoryCreateWithoutIncludedCategoriesInput, Prisma.ListCategoryUncheckedCreateWithoutIncludedCategoriesInput> | Prisma.ListCategoryCreateWithoutIncludedCategoriesInput[] | Prisma.ListCategoryUncheckedCreateWithoutIncludedCategoriesInput[]
+  connectOrCreate?: Prisma.ListCategoryCreateOrConnectWithoutIncludedCategoriesInput | Prisma.ListCategoryCreateOrConnectWithoutIncludedCategoriesInput[]
+  connect?: Prisma.ListCategoryWhereUniqueInput | Prisma.ListCategoryWhereUniqueInput[]
+}
+
+export type ListCategoryUncheckedCreateNestedManyWithoutIncludedCategoriesInput = {
+  create?: Prisma.XOR<Prisma.ListCategoryCreateWithoutIncludedCategoriesInput, Prisma.ListCategoryUncheckedCreateWithoutIncludedCategoriesInput> | Prisma.ListCategoryCreateWithoutIncludedCategoriesInput[] | Prisma.ListCategoryUncheckedCreateWithoutIncludedCategoriesInput[]
+  connectOrCreate?: Prisma.ListCategoryCreateOrConnectWithoutIncludedCategoriesInput | Prisma.ListCategoryCreateOrConnectWithoutIncludedCategoriesInput[]
+  connect?: Prisma.ListCategoryWhereUniqueInput | Prisma.ListCategoryWhereUniqueInput[]
+}
+
+export type ListCategoryUpdateManyWithoutIncludedCategoriesNestedInput = {
+  create?: Prisma.XOR<Prisma.ListCategoryCreateWithoutIncludedCategoriesInput, Prisma.ListCategoryUncheckedCreateWithoutIncludedCategoriesInput> | Prisma.ListCategoryCreateWithoutIncludedCategoriesInput[] | Prisma.ListCategoryUncheckedCreateWithoutIncludedCategoriesInput[]
+  connectOrCreate?: Prisma.ListCategoryCreateOrConnectWithoutIncludedCategoriesInput | Prisma.ListCategoryCreateOrConnectWithoutIncludedCategoriesInput[]
+  upsert?: Prisma.ListCategoryUpsertWithWhereUniqueWithoutIncludedCategoriesInput | Prisma.ListCategoryUpsertWithWhereUniqueWithoutIncludedCategoriesInput[]
+  set?: Prisma.ListCategoryWhereUniqueInput | Prisma.ListCategoryWhereUniqueInput[]
+  disconnect?: Prisma.ListCategoryWhereUniqueInput | Prisma.ListCategoryWhereUniqueInput[]
+  delete?: Prisma.ListCategoryWhereUniqueInput | Prisma.ListCategoryWhereUniqueInput[]
+  connect?: Prisma.ListCategoryWhereUniqueInput | Prisma.ListCategoryWhereUniqueInput[]
+  update?: Prisma.ListCategoryUpdateWithWhereUniqueWithoutIncludedCategoriesInput | Prisma.ListCategoryUpdateWithWhereUniqueWithoutIncludedCategoriesInput[]
+  updateMany?: Prisma.ListCategoryUpdateManyWithWhereWithoutIncludedCategoriesInput | Prisma.ListCategoryUpdateManyWithWhereWithoutIncludedCategoriesInput[]
+  deleteMany?: Prisma.ListCategoryScalarWhereInput | Prisma.ListCategoryScalarWhereInput[]
+}
+
+export type ListCategoryUncheckedUpdateManyWithoutIncludedCategoriesNestedInput = {
+  create?: Prisma.XOR<Prisma.ListCategoryCreateWithoutIncludedCategoriesInput, Prisma.ListCategoryUncheckedCreateWithoutIncludedCategoriesInput> | Prisma.ListCategoryCreateWithoutIncludedCategoriesInput[] | Prisma.ListCategoryUncheckedCreateWithoutIncludedCategoriesInput[]
+  connectOrCreate?: Prisma.ListCategoryCreateOrConnectWithoutIncludedCategoriesInput | Prisma.ListCategoryCreateOrConnectWithoutIncludedCategoriesInput[]
+  upsert?: Prisma.ListCategoryUpsertWithWhereUniqueWithoutIncludedCategoriesInput | Prisma.ListCategoryUpsertWithWhereUniqueWithoutIncludedCategoriesInput[]
+  set?: Prisma.ListCategoryWhereUniqueInput | Prisma.ListCategoryWhereUniqueInput[]
+  disconnect?: Prisma.ListCategoryWhereUniqueInput | Prisma.ListCategoryWhereUniqueInput[]
+  delete?: Prisma.ListCategoryWhereUniqueInput | Prisma.ListCategoryWhereUniqueInput[]
+  connect?: Prisma.ListCategoryWhereUniqueInput | Prisma.ListCategoryWhereUniqueInput[]
+  update?: Prisma.ListCategoryUpdateWithWhereUniqueWithoutIncludedCategoriesInput | Prisma.ListCategoryUpdateWithWhereUniqueWithoutIncludedCategoriesInput[]
+  updateMany?: Prisma.ListCategoryUpdateManyWithWhereWithoutIncludedCategoriesInput | Prisma.ListCategoryUpdateManyWithWhereWithoutIncludedCategoriesInput[]
+  deleteMany?: Prisma.ListCategoryScalarWhereInput | Prisma.ListCategoryScalarWhereInput[]
 }
 
 export type ListCategoryCreateNestedManyWithoutGroupListsInput = {
@@ -443,13 +472,59 @@ export type ListCategoryUncheckedUpdateManyWithoutListsNestedInput = {
   deleteMany?: Prisma.ListCategoryScalarWhereInput | Prisma.ListCategoryScalarWhereInput[]
 }
 
-export type ListCategoryCreateincludedCategoriesInput = {
-  set: $Enums.CATEGORY[]
+export type ListCategoryCreateWithoutIncludedCategoriesInput = {
+  id?: string
+  name: string
+  description?: string | null
+  icon: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lists?: Prisma.ListCreateNestedManyWithoutCategoriesInput
+  groupLists?: Prisma.GroupListCreateNestedManyWithoutListCategoriesInput
 }
 
-export type ListCategoryUpdateincludedCategoriesInput = {
-  set?: $Enums.CATEGORY[]
-  push?: $Enums.CATEGORY | $Enums.CATEGORY[]
+export type ListCategoryUncheckedCreateWithoutIncludedCategoriesInput = {
+  id?: string
+  name: string
+  description?: string | null
+  icon: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lists?: Prisma.ListUncheckedCreateNestedManyWithoutCategoriesInput
+  groupLists?: Prisma.GroupListUncheckedCreateNestedManyWithoutListCategoriesInput
+}
+
+export type ListCategoryCreateOrConnectWithoutIncludedCategoriesInput = {
+  where: Prisma.ListCategoryWhereUniqueInput
+  create: Prisma.XOR<Prisma.ListCategoryCreateWithoutIncludedCategoriesInput, Prisma.ListCategoryUncheckedCreateWithoutIncludedCategoriesInput>
+}
+
+export type ListCategoryUpsertWithWhereUniqueWithoutIncludedCategoriesInput = {
+  where: Prisma.ListCategoryWhereUniqueInput
+  update: Prisma.XOR<Prisma.ListCategoryUpdateWithoutIncludedCategoriesInput, Prisma.ListCategoryUncheckedUpdateWithoutIncludedCategoriesInput>
+  create: Prisma.XOR<Prisma.ListCategoryCreateWithoutIncludedCategoriesInput, Prisma.ListCategoryUncheckedCreateWithoutIncludedCategoriesInput>
+}
+
+export type ListCategoryUpdateWithWhereUniqueWithoutIncludedCategoriesInput = {
+  where: Prisma.ListCategoryWhereUniqueInput
+  data: Prisma.XOR<Prisma.ListCategoryUpdateWithoutIncludedCategoriesInput, Prisma.ListCategoryUncheckedUpdateWithoutIncludedCategoriesInput>
+}
+
+export type ListCategoryUpdateManyWithWhereWithoutIncludedCategoriesInput = {
+  where: Prisma.ListCategoryScalarWhereInput
+  data: Prisma.XOR<Prisma.ListCategoryUpdateManyMutationInput, Prisma.ListCategoryUncheckedUpdateManyWithoutIncludedCategoriesInput>
+}
+
+export type ListCategoryScalarWhereInput = {
+  AND?: Prisma.ListCategoryScalarWhereInput | Prisma.ListCategoryScalarWhereInput[]
+  OR?: Prisma.ListCategoryScalarWhereInput[]
+  NOT?: Prisma.ListCategoryScalarWhereInput | Prisma.ListCategoryScalarWhereInput[]
+  id?: Prisma.StringFilter<"ListCategory"> | string
+  name?: Prisma.StringFilter<"ListCategory"> | string
+  description?: Prisma.StringNullableFilter<"ListCategory"> | string | null
+  icon?: Prisma.StringFilter<"ListCategory"> | string
+  createdAt?: Prisma.DateTimeFilter<"ListCategory"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ListCategory"> | Date | string
 }
 
 export type ListCategoryCreateWithoutGroupListsInput = {
@@ -457,9 +532,9 @@ export type ListCategoryCreateWithoutGroupListsInput = {
   name: string
   description?: string | null
   icon: string
-  includedCategories?: Prisma.ListCategoryCreateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Date | string
   updatedAt?: Date | string
+  includedCategories?: Prisma.CategoryCreateNestedManyWithoutIncludedInCategoriesInput
   lists?: Prisma.ListCreateNestedManyWithoutCategoriesInput
 }
 
@@ -468,9 +543,9 @@ export type ListCategoryUncheckedCreateWithoutGroupListsInput = {
   name: string
   description?: string | null
   icon: string
-  includedCategories?: Prisma.ListCategoryCreateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Date | string
   updatedAt?: Date | string
+  includedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutIncludedInCategoriesInput
   lists?: Prisma.ListUncheckedCreateNestedManyWithoutCategoriesInput
 }
 
@@ -495,27 +570,14 @@ export type ListCategoryUpdateManyWithWhereWithoutGroupListsInput = {
   data: Prisma.XOR<Prisma.ListCategoryUpdateManyMutationInput, Prisma.ListCategoryUncheckedUpdateManyWithoutGroupListsInput>
 }
 
-export type ListCategoryScalarWhereInput = {
-  AND?: Prisma.ListCategoryScalarWhereInput | Prisma.ListCategoryScalarWhereInput[]
-  OR?: Prisma.ListCategoryScalarWhereInput[]
-  NOT?: Prisma.ListCategoryScalarWhereInput | Prisma.ListCategoryScalarWhereInput[]
-  id?: Prisma.StringFilter<"ListCategory"> | string
-  name?: Prisma.StringFilter<"ListCategory"> | string
-  description?: Prisma.StringNullableFilter<"ListCategory"> | string | null
-  icon?: Prisma.StringFilter<"ListCategory"> | string
-  includedCategories?: Prisma.EnumCATEGORYNullableListFilter<"ListCategory">
-  createdAt?: Prisma.DateTimeFilter<"ListCategory"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"ListCategory"> | Date | string
-}
-
 export type ListCategoryCreateWithoutListsInput = {
   id?: string
   name: string
   description?: string | null
   icon: string
-  includedCategories?: Prisma.ListCategoryCreateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Date | string
   updatedAt?: Date | string
+  includedCategories?: Prisma.CategoryCreateNestedManyWithoutIncludedInCategoriesInput
   groupLists?: Prisma.GroupListCreateNestedManyWithoutListCategoriesInput
 }
 
@@ -524,9 +586,9 @@ export type ListCategoryUncheckedCreateWithoutListsInput = {
   name: string
   description?: string | null
   icon: string
-  includedCategories?: Prisma.ListCategoryCreateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Date | string
   updatedAt?: Date | string
+  includedCategories?: Prisma.CategoryUncheckedCreateNestedManyWithoutIncludedInCategoriesInput
   groupLists?: Prisma.GroupListUncheckedCreateNestedManyWithoutListCategoriesInput
 }
 
@@ -551,14 +613,45 @@ export type ListCategoryUpdateManyWithWhereWithoutListsInput = {
   data: Prisma.XOR<Prisma.ListCategoryUpdateManyMutationInput, Prisma.ListCategoryUncheckedUpdateManyWithoutListsInput>
 }
 
+export type ListCategoryUpdateWithoutIncludedCategoriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lists?: Prisma.ListUpdateManyWithoutCategoriesNestedInput
+  groupLists?: Prisma.GroupListUpdateManyWithoutListCategoriesNestedInput
+}
+
+export type ListCategoryUncheckedUpdateWithoutIncludedCategoriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lists?: Prisma.ListUncheckedUpdateManyWithoutCategoriesNestedInput
+  groupLists?: Prisma.GroupListUncheckedUpdateManyWithoutListCategoriesNestedInput
+}
+
+export type ListCategoryUncheckedUpdateManyWithoutIncludedCategoriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icon?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type ListCategoryUpdateWithoutGroupListsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
-  includedCategories?: Prisma.ListCategoryUpdateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  includedCategories?: Prisma.CategoryUpdateManyWithoutIncludedInCategoriesNestedInput
   lists?: Prisma.ListUpdateManyWithoutCategoriesNestedInput
 }
 
@@ -567,9 +660,9 @@ export type ListCategoryUncheckedUpdateWithoutGroupListsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
-  includedCategories?: Prisma.ListCategoryUpdateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  includedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutIncludedInCategoriesNestedInput
   lists?: Prisma.ListUncheckedUpdateManyWithoutCategoriesNestedInput
 }
 
@@ -578,7 +671,6 @@ export type ListCategoryUncheckedUpdateManyWithoutGroupListsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
-  includedCategories?: Prisma.ListCategoryUpdateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -588,9 +680,9 @@ export type ListCategoryUpdateWithoutListsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
-  includedCategories?: Prisma.ListCategoryUpdateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  includedCategories?: Prisma.CategoryUpdateManyWithoutIncludedInCategoriesNestedInput
   groupLists?: Prisma.GroupListUpdateManyWithoutListCategoriesNestedInput
 }
 
@@ -599,9 +691,9 @@ export type ListCategoryUncheckedUpdateWithoutListsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
-  includedCategories?: Prisma.ListCategoryUpdateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  includedCategories?: Prisma.CategoryUncheckedUpdateManyWithoutIncludedInCategoriesNestedInput
   groupLists?: Prisma.GroupListUncheckedUpdateManyWithoutListCategoriesNestedInput
 }
 
@@ -610,7 +702,6 @@ export type ListCategoryUncheckedUpdateManyWithoutListsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
-  includedCategories?: Prisma.ListCategoryUpdateincludedCategoriesInput | $Enums.CATEGORY[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -621,11 +712,13 @@ export type ListCategoryUncheckedUpdateManyWithoutListsInput = {
  */
 
 export type ListCategoryCountOutputType = {
+  includedCategories: number
   lists: number
   groupLists: number
 }
 
 export type ListCategoryCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  includedCategories?: boolean | ListCategoryCountOutputTypeCountIncludedCategoriesArgs
   lists?: boolean | ListCategoryCountOutputTypeCountListsArgs
   groupLists?: boolean | ListCategoryCountOutputTypeCountGroupListsArgs
 }
@@ -638,6 +731,13 @@ export type ListCategoryCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types
    * Select specific fields to fetch from the ListCategoryCountOutputType
    */
   select?: Prisma.ListCategoryCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ListCategoryCountOutputType without action
+ */
+export type ListCategoryCountOutputTypeCountIncludedCategoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CategoryWhereInput
 }
 
 /**
@@ -660,9 +760,9 @@ export type ListCategorySelect<ExtArgs extends runtime.Types.Extensions.Internal
   name?: boolean
   description?: boolean
   icon?: boolean
-  includedCategories?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  includedCategories?: boolean | Prisma.ListCategory$includedCategoriesArgs<ExtArgs>
   lists?: boolean | Prisma.ListCategory$listsArgs<ExtArgs>
   groupLists?: boolean | Prisma.ListCategory$groupListsArgs<ExtArgs>
   _count?: boolean | Prisma.ListCategoryCountOutputTypeDefaultArgs<ExtArgs>
@@ -673,7 +773,6 @@ export type ListCategorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   name?: boolean
   description?: boolean
   icon?: boolean
-  includedCategories?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["listCategory"]>
@@ -683,7 +782,6 @@ export type ListCategorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   name?: boolean
   description?: boolean
   icon?: boolean
-  includedCategories?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["listCategory"]>
@@ -693,13 +791,13 @@ export type ListCategorySelectScalar = {
   name?: boolean
   description?: boolean
   icon?: boolean
-  includedCategories?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ListCategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "icon" | "includedCategories" | "createdAt" | "updatedAt", ExtArgs["result"]["listCategory"]>
+export type ListCategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "icon" | "createdAt" | "updatedAt", ExtArgs["result"]["listCategory"]>
 export type ListCategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  includedCategories?: boolean | Prisma.ListCategory$includedCategoriesArgs<ExtArgs>
   lists?: boolean | Prisma.ListCategory$listsArgs<ExtArgs>
   groupLists?: boolean | Prisma.ListCategory$groupListsArgs<ExtArgs>
   _count?: boolean | Prisma.ListCategoryCountOutputTypeDefaultArgs<ExtArgs>
@@ -710,6 +808,7 @@ export type ListCategoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types
 export type $ListCategoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ListCategory"
   objects: {
+    includedCategories: Prisma.$CategoryPayload<ExtArgs>[]
     lists: Prisma.$ListPayload<ExtArgs>[]
     groupLists: Prisma.$GroupListPayload<ExtArgs>[]
   }
@@ -718,7 +817,6 @@ export type $ListCategoryPayload<ExtArgs extends runtime.Types.Extensions.Intern
     name: string
     description: string | null
     icon: string
-    includedCategories: $Enums.CATEGORY[]
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["listCategory"]>
@@ -1115,6 +1213,7 @@ readonly fields: ListCategoryFieldRefs;
  */
 export interface Prisma__ListCategoryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  includedCategories<T extends Prisma.ListCategory$includedCategoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ListCategory$includedCategoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   lists<T extends Prisma.ListCategory$listsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ListCategory$listsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ListPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   groupLists<T extends Prisma.ListCategory$groupListsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ListCategory$groupListsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GroupListPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1150,7 +1249,6 @@ export interface ListCategoryFieldRefs {
   readonly name: Prisma.FieldRef<"ListCategory", 'String'>
   readonly description: Prisma.FieldRef<"ListCategory", 'String'>
   readonly icon: Prisma.FieldRef<"ListCategory", 'String'>
-  readonly includedCategories: Prisma.FieldRef<"ListCategory", 'CATEGORY[]'>
   readonly createdAt: Prisma.FieldRef<"ListCategory", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ListCategory", 'DateTime'>
 }
@@ -1543,6 +1641,30 @@ export type ListCategoryDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Limit how many ListCategories to delete.
    */
   limit?: number
+}
+
+/**
+ * ListCategory.includedCategories
+ */
+export type ListCategory$includedCategoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Category
+   */
+  select?: Prisma.CategorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Category
+   */
+  omit?: Prisma.CategoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CategoryInclude<ExtArgs> | null
+  where?: Prisma.CategoryWhereInput
+  orderBy?: Prisma.CategoryOrderByWithRelationInput | Prisma.CategoryOrderByWithRelationInput[]
+  cursor?: Prisma.CategoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CategoryScalarFieldEnum | Prisma.CategoryScalarFieldEnum[]
 }
 
 /**

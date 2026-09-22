@@ -11,6 +11,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/dashboard/users', label: 'Utenti' },
+  { href: '/dashboard/categories', label: 'Categorie item' },
   { href: '/dashboard/list-categories', label: 'Categorie liste' },
   { href: '/dashboard/tags', label: 'Tag' },
   { href: '/dashboard/notifications', label: 'Notifiche' },

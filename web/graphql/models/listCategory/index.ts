@@ -1,5 +1,4 @@
 import { builder } from '../../builder';
-import { CategoryEnum } from '../../enum';
 
 export const ListCategoryRef = builder.prismaObject('ListCategory', {
   fields: (t) => ({
@@ -7,10 +6,7 @@ export const ListCategoryRef = builder.prismaObject('ListCategory', {
     name: t.exposeString('name'),
     description: t.exposeString('description', { nullable: true }),
     icon: t.exposeString('icon'),
-    includedCategories: t.field({
-      type: [CategoryEnum],
-      resolve: (category) => category.includedCategories,
-    }),
+    includedCategories: t.relation('includedCategories'),
     listsCount: t.relationCount('lists'),
     groupListsCount: t.relationCount('groupLists'),
   }),

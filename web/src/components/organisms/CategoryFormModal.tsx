@@ -1,45 +1,32 @@
 'use client';
 
 import { useState } from 'react';
-import { useListCategoryForm } from '@/utils/useListCategoryForm';
-import type { ListCategory } from '@/utils/useListCategories';
-import { useCategories, type Category } from '@/utils/useCategories';
+import { useCategoryForm } from '@/utils/useCategoryForm';
+import type { Category } from '@/utils/useCategories';
 import { getLucideIcon } from '@/utils/lucideIconRegistry';
 import { Input } from '@/components/molecules/Input';
-import { Chip } from '@/components/atoms/Chip';
 import { Button } from '@/components/atoms/Button';
 import { FormError } from '@/components/molecules/FormError';
 import { IconPickerSheet } from '@/components/organisms/IconPickerSheet';
 
-interface ListCategoryFormModalProps {
-  category: ListCategory | null;
+interface CategoryFormModalProps {
+  category: Category | null;
   onClose: () => void;
 }
 
-export function ListCategoryFormModal({ category, onClose }: ListCategoryFormModalProps) {
+export function CategoryFormModal({ category, onClose }: CategoryFormModalProps) {
   const [iconPickerOpen, setIconPickerOpen] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
-  const { categories: allCategories } = useCategories();
 
-  const {
-    name,
-    setName,
-    description,
-    setDescription,
-    icon,
-    setIcon,
-    includedCategoryIds,
-    toggleCategory,
-    save,
-    saving,
-    saveError,
-    remove,
-    deleting,
-    deleteError,
-  } = useListCategoryForm({ initial: category, onSaved: onClose, onDeleted: onClose });
+  const { name, setName, icon, setIcon, save, saving, saveError, remove, deleting, deleteError } = useCategoryForm({
+    initial: category,
+    onSaved: onClose,
+    onDeleted: onClose,
+  });
 
   const SelectedIcon = icon ? getLucideIcon(icon) : null;
   const canSave = name.trim().length > 0 && icon.length > 0;
+  const inUse = category ? category.itemsCount + category.listCategoriesCount > 0 : false;
 
   return (
     <div
@@ -61,7 +48,6 @@ export function ListCategoryFormModal({ category, onClose }: ListCategoryFormMod
         </div>
 
         <Input name="name" label="Nome" value={name} onChangeText={setName} required />
-        <Input name="description" label="Descrizione" value={description} onChangeText={setDescription} />
 
         <div className="flex flex-col gap-1.5">
           <span className="text-sm font-semibold text-text-color">
@@ -77,20 +63,6 @@ export function ListCategoryFormModal({ category, onClose }: ListCategoryFormMod
           </button>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-semibold text-text-color">Categorie incluse</span>
-          <div className="flex flex-wrap gap-2">
-            {allCategories.map((cat: Category) => (
-              <Chip
-                key={cat.id}
-                label={cat.name}
-                selected={includedCategoryIds.includes(cat.id)}
-                onClick={() => toggleCategory(cat.id)}
-              />
-            ))}
-          </div>
-        </div>
-
         {saveError && <FormError message={saveError.message} />}
         {deleteError && <FormError message={deleteError.message} />}
 
@@ -102,7 +74,7 @@ export function ListCategoryFormModal({ category, onClose }: ListCategoryFormMod
               {confirmingDelete ? (
                 <div className="flex flex-col gap-2">
                   <p className="text-sm text-text-color">
-                    Confermi l&apos;eliminazione? {category.listsCount + category.groupListsCount > 0 && 'Non è possibile: è in uso.'}
+                    Confermi l&apos;eliminazione? {inUse && 'Non è possibile: è in uso.'}
                   </p>
                   <div className="flex gap-2">
                     <Button

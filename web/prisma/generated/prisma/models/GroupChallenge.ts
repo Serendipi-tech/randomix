@@ -80,7 +80,6 @@ export type GroupChallengeCountAggregateOutputType = {
   status: number
   numericGoal: number
   timeframe: number
-  category: number
   manualAdvancement: number
   allowCompleted: number
   startDate: number
@@ -145,7 +144,6 @@ export type GroupChallengeCountAggregateInputType = {
   status?: true
   numericGoal?: true
   timeframe?: true
-  category?: true
   manualAdvancement?: true
   allowCompleted?: true
   startDate?: true
@@ -251,7 +249,6 @@ export type GroupChallengeGroupByOutputType = {
   status: $Enums.STATUS_CHALLENGE
   numericGoal: number
   timeframe: $Enums.CHALLENGE_TIMEFRAME
-  category: $Enums.CATEGORY[]
   manualAdvancement: boolean
   allowCompleted: boolean
   startDate: Date
@@ -293,7 +290,6 @@ export type GroupChallengeWhereInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFilter<"GroupChallenge"> | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFilter<"GroupChallenge"> | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFilter<"GroupChallenge"> | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.EnumCATEGORYNullableListFilter<"GroupChallenge">
   manualAdvancement?: Prisma.BoolFilter<"GroupChallenge"> | boolean
   allowCompleted?: Prisma.BoolFilter<"GroupChallenge"> | boolean
   startDate?: Prisma.DateTimeFilter<"GroupChallenge"> | Date | string
@@ -301,7 +297,7 @@ export type GroupChallengeWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"GroupChallenge"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"GroupChallenge"> | Date | string
   group?: Prisma.XOR<Prisma.GroupScalarRelationFilter, Prisma.GroupWhereInput>
-  item?: Prisma.ItemListRelationFilter
+  category?: Prisma.CategoryListRelationFilter
   allowedLists?: Prisma.GroupListListRelationFilter
   allowedTags?: Prisma.TagListRelationFilter
   groupUserProgression?: Prisma.GroupUser_ChallengeListRelationFilter
@@ -319,7 +315,6 @@ export type GroupChallengeOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   numericGoal?: Prisma.SortOrder
   timeframe?: Prisma.SortOrder
-  category?: Prisma.SortOrder
   manualAdvancement?: Prisma.SortOrder
   allowCompleted?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
@@ -327,7 +322,7 @@ export type GroupChallengeOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   group?: Prisma.GroupOrderByWithRelationInput
-  item?: Prisma.ItemOrderByRelationAggregateInput
+  category?: Prisma.CategoryOrderByRelationAggregateInput
   allowedLists?: Prisma.GroupListOrderByRelationAggregateInput
   allowedTags?: Prisma.TagOrderByRelationAggregateInput
   groupUserProgression?: Prisma.GroupUser_ChallengeOrderByRelationAggregateInput
@@ -348,7 +343,6 @@ export type GroupChallengeWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumSTATUS_CHALLENGEFilter<"GroupChallenge"> | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFilter<"GroupChallenge"> | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFilter<"GroupChallenge"> | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.EnumCATEGORYNullableListFilter<"GroupChallenge">
   manualAdvancement?: Prisma.BoolFilter<"GroupChallenge"> | boolean
   allowCompleted?: Prisma.BoolFilter<"GroupChallenge"> | boolean
   startDate?: Prisma.DateTimeFilter<"GroupChallenge"> | Date | string
@@ -356,7 +350,7 @@ export type GroupChallengeWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"GroupChallenge"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"GroupChallenge"> | Date | string
   group?: Prisma.XOR<Prisma.GroupScalarRelationFilter, Prisma.GroupWhereInput>
-  item?: Prisma.ItemListRelationFilter
+  category?: Prisma.CategoryListRelationFilter
   allowedLists?: Prisma.GroupListListRelationFilter
   allowedTags?: Prisma.TagListRelationFilter
   groupUserProgression?: Prisma.GroupUser_ChallengeListRelationFilter
@@ -374,7 +368,6 @@ export type GroupChallengeOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   numericGoal?: Prisma.SortOrder
   timeframe?: Prisma.SortOrder
-  category?: Prisma.SortOrder
   manualAdvancement?: Prisma.SortOrder
   allowCompleted?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
@@ -401,7 +394,6 @@ export type GroupChallengeScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEWithAggregatesFilter<"GroupChallenge"> | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntWithAggregatesFilter<"GroupChallenge"> | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEWithAggregatesFilter<"GroupChallenge"> | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.EnumCATEGORYNullableListFilter<"GroupChallenge">
   manualAdvancement?: Prisma.BoolWithAggregatesFilter<"GroupChallenge"> | boolean
   allowCompleted?: Prisma.BoolWithAggregatesFilter<"GroupChallenge"> | boolean
   startDate?: Prisma.DateTimeWithAggregatesFilter<"GroupChallenge"> | Date | string
@@ -419,7 +411,6 @@ export type GroupChallengeCreateInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
@@ -427,7 +418,7 @@ export type GroupChallengeCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   group: Prisma.GroupCreateNestedOneWithoutGroupChallengesInput
-  item?: Prisma.ItemCreateNestedManyWithoutChallengesInput
+  category?: Prisma.CategoryCreateNestedManyWithoutChallengesInput
   allowedLists?: Prisma.GroupListCreateNestedManyWithoutConnectedChallengesInput
   allowedTags?: Prisma.TagCreateNestedManyWithoutConnectedChallengesInput
   groupUserProgression?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutChallengeInput
@@ -445,14 +436,13 @@ export type GroupChallengeUncheckedCreateInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
   endDate: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  item?: Prisma.ItemUncheckedCreateNestedManyWithoutChallengesInput
+  category?: Prisma.CategoryUncheckedCreateNestedManyWithoutChallengesInput
   allowedLists?: Prisma.GroupListUncheckedCreateNestedManyWithoutConnectedChallengesInput
   allowedTags?: Prisma.TagUncheckedCreateNestedManyWithoutConnectedChallengesInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutChallengeInput
@@ -469,7 +459,6 @@ export type GroupChallengeUpdateInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -477,7 +466,7 @@ export type GroupChallengeUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   group?: Prisma.GroupUpdateOneRequiredWithoutGroupChallengesNestedInput
-  item?: Prisma.ItemUpdateManyWithoutChallengesNestedInput
+  category?: Prisma.CategoryUpdateManyWithoutChallengesNestedInput
   allowedLists?: Prisma.GroupListUpdateManyWithoutConnectedChallengesNestedInput
   allowedTags?: Prisma.TagUpdateManyWithoutConnectedChallengesNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUpdateManyWithoutChallengeNestedInput
@@ -495,14 +484,13 @@ export type GroupChallengeUncheckedUpdateInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  item?: Prisma.ItemUncheckedUpdateManyWithoutChallengesNestedInput
+  category?: Prisma.CategoryUncheckedUpdateManyWithoutChallengesNestedInput
   allowedLists?: Prisma.GroupListUncheckedUpdateManyWithoutConnectedChallengesNestedInput
   allowedTags?: Prisma.TagUncheckedUpdateManyWithoutConnectedChallengesNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutChallengeNestedInput
@@ -520,7 +508,6 @@ export type GroupChallengeCreateManyInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
@@ -538,7 +525,6 @@ export type GroupChallengeUpdateManyMutationInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -557,7 +543,6 @@ export type GroupChallengeUncheckedUpdateManyInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -576,14 +561,6 @@ export type GroupChallengeOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type EnumCATEGORYNullableListFilter<$PrismaModel = never> = {
-  equals?: $Enums.CATEGORY[] | Prisma.ListEnumCATEGORYFieldRefInput<$PrismaModel> | null
-  has?: $Enums.CATEGORY | Prisma.EnumCATEGORYFieldRefInput<$PrismaModel> | null
-  hasEvery?: $Enums.CATEGORY[] | Prisma.ListEnumCATEGORYFieldRefInput<$PrismaModel>
-  hasSome?: $Enums.CATEGORY[] | Prisma.ListEnumCATEGORYFieldRefInput<$PrismaModel>
-  isEmpty?: boolean
-}
-
 export type GroupChallengeCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   groupId?: Prisma.SortOrder
@@ -594,7 +571,6 @@ export type GroupChallengeCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   numericGoal?: Prisma.SortOrder
   timeframe?: Prisma.SortOrder
-  category?: Prisma.SortOrder
   manualAdvancement?: Prisma.SortOrder
   allowCompleted?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
@@ -655,6 +631,44 @@ export type GroupChallengeScalarRelationFilter = {
 export type GroupChallengeNullableScalarRelationFilter = {
   is?: Prisma.GroupChallengeWhereInput | null
   isNot?: Prisma.GroupChallengeWhereInput | null
+}
+
+export type GroupChallengeCreateNestedManyWithoutCategoryInput = {
+  create?: Prisma.XOR<Prisma.GroupChallengeCreateWithoutCategoryInput, Prisma.GroupChallengeUncheckedCreateWithoutCategoryInput> | Prisma.GroupChallengeCreateWithoutCategoryInput[] | Prisma.GroupChallengeUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.GroupChallengeCreateOrConnectWithoutCategoryInput | Prisma.GroupChallengeCreateOrConnectWithoutCategoryInput[]
+  connect?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
+}
+
+export type GroupChallengeUncheckedCreateNestedManyWithoutCategoryInput = {
+  create?: Prisma.XOR<Prisma.GroupChallengeCreateWithoutCategoryInput, Prisma.GroupChallengeUncheckedCreateWithoutCategoryInput> | Prisma.GroupChallengeCreateWithoutCategoryInput[] | Prisma.GroupChallengeUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.GroupChallengeCreateOrConnectWithoutCategoryInput | Prisma.GroupChallengeCreateOrConnectWithoutCategoryInput[]
+  connect?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
+}
+
+export type GroupChallengeUpdateManyWithoutCategoryNestedInput = {
+  create?: Prisma.XOR<Prisma.GroupChallengeCreateWithoutCategoryInput, Prisma.GroupChallengeUncheckedCreateWithoutCategoryInput> | Prisma.GroupChallengeCreateWithoutCategoryInput[] | Prisma.GroupChallengeUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.GroupChallengeCreateOrConnectWithoutCategoryInput | Prisma.GroupChallengeCreateOrConnectWithoutCategoryInput[]
+  upsert?: Prisma.GroupChallengeUpsertWithWhereUniqueWithoutCategoryInput | Prisma.GroupChallengeUpsertWithWhereUniqueWithoutCategoryInput[]
+  set?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
+  disconnect?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
+  delete?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
+  connect?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
+  update?: Prisma.GroupChallengeUpdateWithWhereUniqueWithoutCategoryInput | Prisma.GroupChallengeUpdateWithWhereUniqueWithoutCategoryInput[]
+  updateMany?: Prisma.GroupChallengeUpdateManyWithWhereWithoutCategoryInput | Prisma.GroupChallengeUpdateManyWithWhereWithoutCategoryInput[]
+  deleteMany?: Prisma.GroupChallengeScalarWhereInput | Prisma.GroupChallengeScalarWhereInput[]
+}
+
+export type GroupChallengeUncheckedUpdateManyWithoutCategoryNestedInput = {
+  create?: Prisma.XOR<Prisma.GroupChallengeCreateWithoutCategoryInput, Prisma.GroupChallengeUncheckedCreateWithoutCategoryInput> | Prisma.GroupChallengeCreateWithoutCategoryInput[] | Prisma.GroupChallengeUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.GroupChallengeCreateOrConnectWithoutCategoryInput | Prisma.GroupChallengeCreateOrConnectWithoutCategoryInput[]
+  upsert?: Prisma.GroupChallengeUpsertWithWhereUniqueWithoutCategoryInput | Prisma.GroupChallengeUpsertWithWhereUniqueWithoutCategoryInput[]
+  set?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
+  disconnect?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
+  delete?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
+  connect?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
+  update?: Prisma.GroupChallengeUpdateWithWhereUniqueWithoutCategoryInput | Prisma.GroupChallengeUpdateWithWhereUniqueWithoutCategoryInput[]
+  updateMany?: Prisma.GroupChallengeUpdateManyWithWhereWithoutCategoryInput | Prisma.GroupChallengeUpdateManyWithWhereWithoutCategoryInput[]
+  deleteMany?: Prisma.GroupChallengeScalarWhereInput | Prisma.GroupChallengeScalarWhereInput[]
 }
 
 export type GroupChallengeCreateNestedManyWithoutGroupInput = {
@@ -737,10 +751,6 @@ export type GroupChallengeUncheckedUpdateManyWithoutAllowedListsNestedInput = {
   deleteMany?: Prisma.GroupChallengeScalarWhereInput | Prisma.GroupChallengeScalarWhereInput[]
 }
 
-export type GroupChallengeCreatecategoryInput = {
-  set: $Enums.CATEGORY[]
-}
-
 export type EnumSTATUS_CHALLENGEFieldUpdateOperationsInput = {
   set?: $Enums.STATUS_CHALLENGE
 }
@@ -757,11 +767,6 @@ export type EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput = {
   set?: $Enums.CHALLENGE_TIMEFRAME
 }
 
-export type GroupChallengeUpdatecategoryInput = {
-  set?: $Enums.CATEGORY[]
-  push?: $Enums.CATEGORY | $Enums.CATEGORY[]
-}
-
 export type GroupChallengeCreateNestedOneWithoutGroupUserProgressionInput = {
   create?: Prisma.XOR<Prisma.GroupChallengeCreateWithoutGroupUserProgressionInput, Prisma.GroupChallengeUncheckedCreateWithoutGroupUserProgressionInput>
   connectOrCreate?: Prisma.GroupChallengeCreateOrConnectWithoutGroupUserProgressionInput
@@ -774,44 +779,6 @@ export type GroupChallengeUpdateOneRequiredWithoutGroupUserProgressionNestedInpu
   upsert?: Prisma.GroupChallengeUpsertWithoutGroupUserProgressionInput
   connect?: Prisma.GroupChallengeWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.GroupChallengeUpdateToOneWithWhereWithoutGroupUserProgressionInput, Prisma.GroupChallengeUpdateWithoutGroupUserProgressionInput>, Prisma.GroupChallengeUncheckedUpdateWithoutGroupUserProgressionInput>
-}
-
-export type GroupChallengeCreateNestedManyWithoutItemInput = {
-  create?: Prisma.XOR<Prisma.GroupChallengeCreateWithoutItemInput, Prisma.GroupChallengeUncheckedCreateWithoutItemInput> | Prisma.GroupChallengeCreateWithoutItemInput[] | Prisma.GroupChallengeUncheckedCreateWithoutItemInput[]
-  connectOrCreate?: Prisma.GroupChallengeCreateOrConnectWithoutItemInput | Prisma.GroupChallengeCreateOrConnectWithoutItemInput[]
-  connect?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
-}
-
-export type GroupChallengeUncheckedCreateNestedManyWithoutItemInput = {
-  create?: Prisma.XOR<Prisma.GroupChallengeCreateWithoutItemInput, Prisma.GroupChallengeUncheckedCreateWithoutItemInput> | Prisma.GroupChallengeCreateWithoutItemInput[] | Prisma.GroupChallengeUncheckedCreateWithoutItemInput[]
-  connectOrCreate?: Prisma.GroupChallengeCreateOrConnectWithoutItemInput | Prisma.GroupChallengeCreateOrConnectWithoutItemInput[]
-  connect?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
-}
-
-export type GroupChallengeUpdateManyWithoutItemNestedInput = {
-  create?: Prisma.XOR<Prisma.GroupChallengeCreateWithoutItemInput, Prisma.GroupChallengeUncheckedCreateWithoutItemInput> | Prisma.GroupChallengeCreateWithoutItemInput[] | Prisma.GroupChallengeUncheckedCreateWithoutItemInput[]
-  connectOrCreate?: Prisma.GroupChallengeCreateOrConnectWithoutItemInput | Prisma.GroupChallengeCreateOrConnectWithoutItemInput[]
-  upsert?: Prisma.GroupChallengeUpsertWithWhereUniqueWithoutItemInput | Prisma.GroupChallengeUpsertWithWhereUniqueWithoutItemInput[]
-  set?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
-  disconnect?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
-  delete?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
-  connect?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
-  update?: Prisma.GroupChallengeUpdateWithWhereUniqueWithoutItemInput | Prisma.GroupChallengeUpdateWithWhereUniqueWithoutItemInput[]
-  updateMany?: Prisma.GroupChallengeUpdateManyWithWhereWithoutItemInput | Prisma.GroupChallengeUpdateManyWithWhereWithoutItemInput[]
-  deleteMany?: Prisma.GroupChallengeScalarWhereInput | Prisma.GroupChallengeScalarWhereInput[]
-}
-
-export type GroupChallengeUncheckedUpdateManyWithoutItemNestedInput = {
-  create?: Prisma.XOR<Prisma.GroupChallengeCreateWithoutItemInput, Prisma.GroupChallengeUncheckedCreateWithoutItemInput> | Prisma.GroupChallengeCreateWithoutItemInput[] | Prisma.GroupChallengeUncheckedCreateWithoutItemInput[]
-  connectOrCreate?: Prisma.GroupChallengeCreateOrConnectWithoutItemInput | Prisma.GroupChallengeCreateOrConnectWithoutItemInput[]
-  upsert?: Prisma.GroupChallengeUpsertWithWhereUniqueWithoutItemInput | Prisma.GroupChallengeUpsertWithWhereUniqueWithoutItemInput[]
-  set?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
-  disconnect?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
-  delete?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
-  connect?: Prisma.GroupChallengeWhereUniqueInput | Prisma.GroupChallengeWhereUniqueInput[]
-  update?: Prisma.GroupChallengeUpdateWithWhereUniqueWithoutItemInput | Prisma.GroupChallengeUpdateWithWhereUniqueWithoutItemInput[]
-  updateMany?: Prisma.GroupChallengeUpdateManyWithWhereWithoutItemInput | Prisma.GroupChallengeUpdateManyWithWhereWithoutItemInput[]
-  deleteMany?: Prisma.GroupChallengeScalarWhereInput | Prisma.GroupChallengeScalarWhereInput[]
 }
 
 export type GroupChallengeCreateNestedOneWithoutNotificationInput = {
@@ -884,6 +851,94 @@ export type GroupChallengeUncheckedUpdateManyWithoutAllowedTagsNestedInput = {
   deleteMany?: Prisma.GroupChallengeScalarWhereInput | Prisma.GroupChallengeScalarWhereInput[]
 }
 
+export type GroupChallengeCreateWithoutCategoryInput = {
+  id?: string
+  name: string
+  icon: string
+  color: string
+  description?: string | null
+  status?: $Enums.STATUS_CHALLENGE
+  numericGoal?: number
+  timeframe?: $Enums.CHALLENGE_TIMEFRAME
+  manualAdvancement?: boolean
+  allowCompleted?: boolean
+  startDate: Date | string
+  endDate: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  group: Prisma.GroupCreateNestedOneWithoutGroupChallengesInput
+  allowedLists?: Prisma.GroupListCreateNestedManyWithoutConnectedChallengesInput
+  allowedTags?: Prisma.TagCreateNestedManyWithoutConnectedChallengesInput
+  groupUserProgression?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutChallengeInput
+  notification?: Prisma.NotificationCreateNestedManyWithoutChallengeInput
+  report?: Prisma.ReportCreateNestedManyWithoutChallengeInput
+}
+
+export type GroupChallengeUncheckedCreateWithoutCategoryInput = {
+  id?: string
+  groupId: string
+  name: string
+  icon: string
+  color: string
+  description?: string | null
+  status?: $Enums.STATUS_CHALLENGE
+  numericGoal?: number
+  timeframe?: $Enums.CHALLENGE_TIMEFRAME
+  manualAdvancement?: boolean
+  allowCompleted?: boolean
+  startDate: Date | string
+  endDate: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  allowedLists?: Prisma.GroupListUncheckedCreateNestedManyWithoutConnectedChallengesInput
+  allowedTags?: Prisma.TagUncheckedCreateNestedManyWithoutConnectedChallengesInput
+  groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutChallengeInput
+  notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutChallengeInput
+  report?: Prisma.ReportUncheckedCreateNestedManyWithoutChallengeInput
+}
+
+export type GroupChallengeCreateOrConnectWithoutCategoryInput = {
+  where: Prisma.GroupChallengeWhereUniqueInput
+  create: Prisma.XOR<Prisma.GroupChallengeCreateWithoutCategoryInput, Prisma.GroupChallengeUncheckedCreateWithoutCategoryInput>
+}
+
+export type GroupChallengeUpsertWithWhereUniqueWithoutCategoryInput = {
+  where: Prisma.GroupChallengeWhereUniqueInput
+  update: Prisma.XOR<Prisma.GroupChallengeUpdateWithoutCategoryInput, Prisma.GroupChallengeUncheckedUpdateWithoutCategoryInput>
+  create: Prisma.XOR<Prisma.GroupChallengeCreateWithoutCategoryInput, Prisma.GroupChallengeUncheckedCreateWithoutCategoryInput>
+}
+
+export type GroupChallengeUpdateWithWhereUniqueWithoutCategoryInput = {
+  where: Prisma.GroupChallengeWhereUniqueInput
+  data: Prisma.XOR<Prisma.GroupChallengeUpdateWithoutCategoryInput, Prisma.GroupChallengeUncheckedUpdateWithoutCategoryInput>
+}
+
+export type GroupChallengeUpdateManyWithWhereWithoutCategoryInput = {
+  where: Prisma.GroupChallengeScalarWhereInput
+  data: Prisma.XOR<Prisma.GroupChallengeUpdateManyMutationInput, Prisma.GroupChallengeUncheckedUpdateManyWithoutCategoryInput>
+}
+
+export type GroupChallengeScalarWhereInput = {
+  AND?: Prisma.GroupChallengeScalarWhereInput | Prisma.GroupChallengeScalarWhereInput[]
+  OR?: Prisma.GroupChallengeScalarWhereInput[]
+  NOT?: Prisma.GroupChallengeScalarWhereInput | Prisma.GroupChallengeScalarWhereInput[]
+  id?: Prisma.StringFilter<"GroupChallenge"> | string
+  groupId?: Prisma.StringFilter<"GroupChallenge"> | string
+  name?: Prisma.StringFilter<"GroupChallenge"> | string
+  icon?: Prisma.StringFilter<"GroupChallenge"> | string
+  color?: Prisma.StringFilter<"GroupChallenge"> | string
+  description?: Prisma.StringNullableFilter<"GroupChallenge"> | string | null
+  status?: Prisma.EnumSTATUS_CHALLENGEFilter<"GroupChallenge"> | $Enums.STATUS_CHALLENGE
+  numericGoal?: Prisma.IntFilter<"GroupChallenge"> | number
+  timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFilter<"GroupChallenge"> | $Enums.CHALLENGE_TIMEFRAME
+  manualAdvancement?: Prisma.BoolFilter<"GroupChallenge"> | boolean
+  allowCompleted?: Prisma.BoolFilter<"GroupChallenge"> | boolean
+  startDate?: Prisma.DateTimeFilter<"GroupChallenge"> | Date | string
+  endDate?: Prisma.DateTimeFilter<"GroupChallenge"> | Date | string
+  createdAt?: Prisma.DateTimeFilter<"GroupChallenge"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"GroupChallenge"> | Date | string
+}
+
 export type GroupChallengeCreateWithoutGroupInput = {
   id?: string
   name: string
@@ -893,14 +948,13 @@ export type GroupChallengeCreateWithoutGroupInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
   endDate: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  item?: Prisma.ItemCreateNestedManyWithoutChallengesInput
+  category?: Prisma.CategoryCreateNestedManyWithoutChallengesInput
   allowedLists?: Prisma.GroupListCreateNestedManyWithoutConnectedChallengesInput
   allowedTags?: Prisma.TagCreateNestedManyWithoutConnectedChallengesInput
   groupUserProgression?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutChallengeInput
@@ -917,14 +971,13 @@ export type GroupChallengeUncheckedCreateWithoutGroupInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
   endDate: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  item?: Prisma.ItemUncheckedCreateNestedManyWithoutChallengesInput
+  category?: Prisma.CategoryUncheckedCreateNestedManyWithoutChallengesInput
   allowedLists?: Prisma.GroupListUncheckedCreateNestedManyWithoutConnectedChallengesInput
   allowedTags?: Prisma.TagUncheckedCreateNestedManyWithoutConnectedChallengesInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutChallengeInput
@@ -958,28 +1011,6 @@ export type GroupChallengeUpdateManyWithWhereWithoutGroupInput = {
   data: Prisma.XOR<Prisma.GroupChallengeUpdateManyMutationInput, Prisma.GroupChallengeUncheckedUpdateManyWithoutGroupInput>
 }
 
-export type GroupChallengeScalarWhereInput = {
-  AND?: Prisma.GroupChallengeScalarWhereInput | Prisma.GroupChallengeScalarWhereInput[]
-  OR?: Prisma.GroupChallengeScalarWhereInput[]
-  NOT?: Prisma.GroupChallengeScalarWhereInput | Prisma.GroupChallengeScalarWhereInput[]
-  id?: Prisma.StringFilter<"GroupChallenge"> | string
-  groupId?: Prisma.StringFilter<"GroupChallenge"> | string
-  name?: Prisma.StringFilter<"GroupChallenge"> | string
-  icon?: Prisma.StringFilter<"GroupChallenge"> | string
-  color?: Prisma.StringFilter<"GroupChallenge"> | string
-  description?: Prisma.StringNullableFilter<"GroupChallenge"> | string | null
-  status?: Prisma.EnumSTATUS_CHALLENGEFilter<"GroupChallenge"> | $Enums.STATUS_CHALLENGE
-  numericGoal?: Prisma.IntFilter<"GroupChallenge"> | number
-  timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFilter<"GroupChallenge"> | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.EnumCATEGORYNullableListFilter<"GroupChallenge">
-  manualAdvancement?: Prisma.BoolFilter<"GroupChallenge"> | boolean
-  allowCompleted?: Prisma.BoolFilter<"GroupChallenge"> | boolean
-  startDate?: Prisma.DateTimeFilter<"GroupChallenge"> | Date | string
-  endDate?: Prisma.DateTimeFilter<"GroupChallenge"> | Date | string
-  createdAt?: Prisma.DateTimeFilter<"GroupChallenge"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"GroupChallenge"> | Date | string
-}
-
 export type GroupChallengeCreateWithoutAllowedListsInput = {
   id?: string
   name: string
@@ -989,7 +1020,6 @@ export type GroupChallengeCreateWithoutAllowedListsInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
@@ -997,7 +1027,7 @@ export type GroupChallengeCreateWithoutAllowedListsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   group: Prisma.GroupCreateNestedOneWithoutGroupChallengesInput
-  item?: Prisma.ItemCreateNestedManyWithoutChallengesInput
+  category?: Prisma.CategoryCreateNestedManyWithoutChallengesInput
   allowedTags?: Prisma.TagCreateNestedManyWithoutConnectedChallengesInput
   groupUserProgression?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutChallengeInput
   notification?: Prisma.NotificationCreateNestedManyWithoutChallengeInput
@@ -1014,14 +1044,13 @@ export type GroupChallengeUncheckedCreateWithoutAllowedListsInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
   endDate: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  item?: Prisma.ItemUncheckedCreateNestedManyWithoutChallengesInput
+  category?: Prisma.CategoryUncheckedCreateNestedManyWithoutChallengesInput
   allowedTags?: Prisma.TagUncheckedCreateNestedManyWithoutConnectedChallengesInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutChallengeInput
   notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutChallengeInput
@@ -1058,7 +1087,6 @@ export type GroupChallengeCreateWithoutGroupUserProgressionInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
@@ -1066,7 +1094,7 @@ export type GroupChallengeCreateWithoutGroupUserProgressionInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   group: Prisma.GroupCreateNestedOneWithoutGroupChallengesInput
-  item?: Prisma.ItemCreateNestedManyWithoutChallengesInput
+  category?: Prisma.CategoryCreateNestedManyWithoutChallengesInput
   allowedLists?: Prisma.GroupListCreateNestedManyWithoutConnectedChallengesInput
   allowedTags?: Prisma.TagCreateNestedManyWithoutConnectedChallengesInput
   notification?: Prisma.NotificationCreateNestedManyWithoutChallengeInput
@@ -1083,14 +1111,13 @@ export type GroupChallengeUncheckedCreateWithoutGroupUserProgressionInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
   endDate: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  item?: Prisma.ItemUncheckedCreateNestedManyWithoutChallengesInput
+  category?: Prisma.CategoryUncheckedCreateNestedManyWithoutChallengesInput
   allowedLists?: Prisma.GroupListUncheckedCreateNestedManyWithoutConnectedChallengesInput
   allowedTags?: Prisma.TagUncheckedCreateNestedManyWithoutConnectedChallengesInput
   notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutChallengeInput
@@ -1122,7 +1149,6 @@ export type GroupChallengeUpdateWithoutGroupUserProgressionInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1130,7 +1156,7 @@ export type GroupChallengeUpdateWithoutGroupUserProgressionInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   group?: Prisma.GroupUpdateOneRequiredWithoutGroupChallengesNestedInput
-  item?: Prisma.ItemUpdateManyWithoutChallengesNestedInput
+  category?: Prisma.CategoryUpdateManyWithoutChallengesNestedInput
   allowedLists?: Prisma.GroupListUpdateManyWithoutConnectedChallengesNestedInput
   allowedTags?: Prisma.TagUpdateManyWithoutConnectedChallengesNestedInput
   notification?: Prisma.NotificationUpdateManyWithoutChallengeNestedInput
@@ -1147,87 +1173,17 @@ export type GroupChallengeUncheckedUpdateWithoutGroupUserProgressionInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  item?: Prisma.ItemUncheckedUpdateManyWithoutChallengesNestedInput
+  category?: Prisma.CategoryUncheckedUpdateManyWithoutChallengesNestedInput
   allowedLists?: Prisma.GroupListUncheckedUpdateManyWithoutConnectedChallengesNestedInput
   allowedTags?: Prisma.TagUncheckedUpdateManyWithoutConnectedChallengesNestedInput
   notification?: Prisma.NotificationUncheckedUpdateManyWithoutChallengeNestedInput
   report?: Prisma.ReportUncheckedUpdateManyWithoutChallengeNestedInput
-}
-
-export type GroupChallengeCreateWithoutItemInput = {
-  id?: string
-  name: string
-  icon: string
-  color: string
-  description?: string | null
-  status?: $Enums.STATUS_CHALLENGE
-  numericGoal?: number
-  timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
-  manualAdvancement?: boolean
-  allowCompleted?: boolean
-  startDate: Date | string
-  endDate: Date | string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  group: Prisma.GroupCreateNestedOneWithoutGroupChallengesInput
-  allowedLists?: Prisma.GroupListCreateNestedManyWithoutConnectedChallengesInput
-  allowedTags?: Prisma.TagCreateNestedManyWithoutConnectedChallengesInput
-  groupUserProgression?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutChallengeInput
-  notification?: Prisma.NotificationCreateNestedManyWithoutChallengeInput
-  report?: Prisma.ReportCreateNestedManyWithoutChallengeInput
-}
-
-export type GroupChallengeUncheckedCreateWithoutItemInput = {
-  id?: string
-  groupId: string
-  name: string
-  icon: string
-  color: string
-  description?: string | null
-  status?: $Enums.STATUS_CHALLENGE
-  numericGoal?: number
-  timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
-  manualAdvancement?: boolean
-  allowCompleted?: boolean
-  startDate: Date | string
-  endDate: Date | string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  allowedLists?: Prisma.GroupListUncheckedCreateNestedManyWithoutConnectedChallengesInput
-  allowedTags?: Prisma.TagUncheckedCreateNestedManyWithoutConnectedChallengesInput
-  groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutChallengeInput
-  notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutChallengeInput
-  report?: Prisma.ReportUncheckedCreateNestedManyWithoutChallengeInput
-}
-
-export type GroupChallengeCreateOrConnectWithoutItemInput = {
-  where: Prisma.GroupChallengeWhereUniqueInput
-  create: Prisma.XOR<Prisma.GroupChallengeCreateWithoutItemInput, Prisma.GroupChallengeUncheckedCreateWithoutItemInput>
-}
-
-export type GroupChallengeUpsertWithWhereUniqueWithoutItemInput = {
-  where: Prisma.GroupChallengeWhereUniqueInput
-  update: Prisma.XOR<Prisma.GroupChallengeUpdateWithoutItemInput, Prisma.GroupChallengeUncheckedUpdateWithoutItemInput>
-  create: Prisma.XOR<Prisma.GroupChallengeCreateWithoutItemInput, Prisma.GroupChallengeUncheckedCreateWithoutItemInput>
-}
-
-export type GroupChallengeUpdateWithWhereUniqueWithoutItemInput = {
-  where: Prisma.GroupChallengeWhereUniqueInput
-  data: Prisma.XOR<Prisma.GroupChallengeUpdateWithoutItemInput, Prisma.GroupChallengeUncheckedUpdateWithoutItemInput>
-}
-
-export type GroupChallengeUpdateManyWithWhereWithoutItemInput = {
-  where: Prisma.GroupChallengeScalarWhereInput
-  data: Prisma.XOR<Prisma.GroupChallengeUpdateManyMutationInput, Prisma.GroupChallengeUncheckedUpdateManyWithoutItemInput>
 }
 
 export type GroupChallengeCreateWithoutNotificationInput = {
@@ -1239,7 +1195,6 @@ export type GroupChallengeCreateWithoutNotificationInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
@@ -1247,7 +1202,7 @@ export type GroupChallengeCreateWithoutNotificationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   group: Prisma.GroupCreateNestedOneWithoutGroupChallengesInput
-  item?: Prisma.ItemCreateNestedManyWithoutChallengesInput
+  category?: Prisma.CategoryCreateNestedManyWithoutChallengesInput
   allowedLists?: Prisma.GroupListCreateNestedManyWithoutConnectedChallengesInput
   allowedTags?: Prisma.TagCreateNestedManyWithoutConnectedChallengesInput
   groupUserProgression?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutChallengeInput
@@ -1264,14 +1219,13 @@ export type GroupChallengeUncheckedCreateWithoutNotificationInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
   endDate: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  item?: Prisma.ItemUncheckedCreateNestedManyWithoutChallengesInput
+  category?: Prisma.CategoryUncheckedCreateNestedManyWithoutChallengesInput
   allowedLists?: Prisma.GroupListUncheckedCreateNestedManyWithoutConnectedChallengesInput
   allowedTags?: Prisma.TagUncheckedCreateNestedManyWithoutConnectedChallengesInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutChallengeInput
@@ -1303,7 +1257,6 @@ export type GroupChallengeUpdateWithoutNotificationInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1311,7 +1264,7 @@ export type GroupChallengeUpdateWithoutNotificationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   group?: Prisma.GroupUpdateOneRequiredWithoutGroupChallengesNestedInput
-  item?: Prisma.ItemUpdateManyWithoutChallengesNestedInput
+  category?: Prisma.CategoryUpdateManyWithoutChallengesNestedInput
   allowedLists?: Prisma.GroupListUpdateManyWithoutConnectedChallengesNestedInput
   allowedTags?: Prisma.TagUpdateManyWithoutConnectedChallengesNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUpdateManyWithoutChallengeNestedInput
@@ -1328,14 +1281,13 @@ export type GroupChallengeUncheckedUpdateWithoutNotificationInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  item?: Prisma.ItemUncheckedUpdateManyWithoutChallengesNestedInput
+  category?: Prisma.CategoryUncheckedUpdateManyWithoutChallengesNestedInput
   allowedLists?: Prisma.GroupListUncheckedUpdateManyWithoutConnectedChallengesNestedInput
   allowedTags?: Prisma.TagUncheckedUpdateManyWithoutConnectedChallengesNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutChallengeNestedInput
@@ -1351,7 +1303,6 @@ export type GroupChallengeCreateWithoutReportInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
@@ -1359,7 +1310,7 @@ export type GroupChallengeCreateWithoutReportInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   group: Prisma.GroupCreateNestedOneWithoutGroupChallengesInput
-  item?: Prisma.ItemCreateNestedManyWithoutChallengesInput
+  category?: Prisma.CategoryCreateNestedManyWithoutChallengesInput
   allowedLists?: Prisma.GroupListCreateNestedManyWithoutConnectedChallengesInput
   allowedTags?: Prisma.TagCreateNestedManyWithoutConnectedChallengesInput
   groupUserProgression?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutChallengeInput
@@ -1376,14 +1327,13 @@ export type GroupChallengeUncheckedCreateWithoutReportInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
   endDate: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  item?: Prisma.ItemUncheckedCreateNestedManyWithoutChallengesInput
+  category?: Prisma.CategoryUncheckedCreateNestedManyWithoutChallengesInput
   allowedLists?: Prisma.GroupListUncheckedCreateNestedManyWithoutConnectedChallengesInput
   allowedTags?: Prisma.TagUncheckedCreateNestedManyWithoutConnectedChallengesInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutChallengeInput
@@ -1415,7 +1365,6 @@ export type GroupChallengeUpdateWithoutReportInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1423,7 +1372,7 @@ export type GroupChallengeUpdateWithoutReportInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   group?: Prisma.GroupUpdateOneRequiredWithoutGroupChallengesNestedInput
-  item?: Prisma.ItemUpdateManyWithoutChallengesNestedInput
+  category?: Prisma.CategoryUpdateManyWithoutChallengesNestedInput
   allowedLists?: Prisma.GroupListUpdateManyWithoutConnectedChallengesNestedInput
   allowedTags?: Prisma.TagUpdateManyWithoutConnectedChallengesNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUpdateManyWithoutChallengeNestedInput
@@ -1440,14 +1389,13 @@ export type GroupChallengeUncheckedUpdateWithoutReportInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  item?: Prisma.ItemUncheckedUpdateManyWithoutChallengesNestedInput
+  category?: Prisma.CategoryUncheckedUpdateManyWithoutChallengesNestedInput
   allowedLists?: Prisma.GroupListUncheckedUpdateManyWithoutConnectedChallengesNestedInput
   allowedTags?: Prisma.TagUncheckedUpdateManyWithoutConnectedChallengesNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutChallengeNestedInput
@@ -1463,7 +1411,6 @@ export type GroupChallengeCreateWithoutAllowedTagsInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
@@ -1471,7 +1418,7 @@ export type GroupChallengeCreateWithoutAllowedTagsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   group: Prisma.GroupCreateNestedOneWithoutGroupChallengesInput
-  item?: Prisma.ItemCreateNestedManyWithoutChallengesInput
+  category?: Prisma.CategoryCreateNestedManyWithoutChallengesInput
   allowedLists?: Prisma.GroupListCreateNestedManyWithoutConnectedChallengesInput
   groupUserProgression?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutChallengeInput
   notification?: Prisma.NotificationCreateNestedManyWithoutChallengeInput
@@ -1488,14 +1435,13 @@ export type GroupChallengeUncheckedCreateWithoutAllowedTagsInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
   endDate: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  item?: Prisma.ItemUncheckedCreateNestedManyWithoutChallengesInput
+  category?: Prisma.CategoryUncheckedCreateNestedManyWithoutChallengesInput
   allowedLists?: Prisma.GroupListUncheckedCreateNestedManyWithoutConnectedChallengesInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutChallengeInput
   notification?: Prisma.NotificationUncheckedCreateNestedManyWithoutChallengeInput
@@ -1523,6 +1469,70 @@ export type GroupChallengeUpdateManyWithWhereWithoutAllowedTagsInput = {
   data: Prisma.XOR<Prisma.GroupChallengeUpdateManyMutationInput, Prisma.GroupChallengeUncheckedUpdateManyWithoutAllowedTagsInput>
 }
 
+export type GroupChallengeUpdateWithoutCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  icon?: Prisma.StringFieldUpdateOperationsInput | string
+  color?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
+  numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
+  timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
+  manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  group?: Prisma.GroupUpdateOneRequiredWithoutGroupChallengesNestedInput
+  allowedLists?: Prisma.GroupListUpdateManyWithoutConnectedChallengesNestedInput
+  allowedTags?: Prisma.TagUpdateManyWithoutConnectedChallengesNestedInput
+  groupUserProgression?: Prisma.GroupUser_ChallengeUpdateManyWithoutChallengeNestedInput
+  notification?: Prisma.NotificationUpdateManyWithoutChallengeNestedInput
+  report?: Prisma.ReportUpdateManyWithoutChallengeNestedInput
+}
+
+export type GroupChallengeUncheckedUpdateWithoutCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  groupId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  icon?: Prisma.StringFieldUpdateOperationsInput | string
+  color?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
+  numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
+  timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
+  manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  allowedLists?: Prisma.GroupListUncheckedUpdateManyWithoutConnectedChallengesNestedInput
+  allowedTags?: Prisma.TagUncheckedUpdateManyWithoutConnectedChallengesNestedInput
+  groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutChallengeNestedInput
+  notification?: Prisma.NotificationUncheckedUpdateManyWithoutChallengeNestedInput
+  report?: Prisma.ReportUncheckedUpdateManyWithoutChallengeNestedInput
+}
+
+export type GroupChallengeUncheckedUpdateManyWithoutCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  groupId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  icon?: Prisma.StringFieldUpdateOperationsInput | string
+  color?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
+  numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
+  timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
+  manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type GroupChallengeCreateManyGroupInput = {
   id?: string
   name: string
@@ -1532,7 +1542,6 @@ export type GroupChallengeCreateManyGroupInput = {
   status?: $Enums.STATUS_CHALLENGE
   numericGoal?: number
   timeframe?: $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeCreatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate: Date | string
@@ -1550,14 +1559,13 @@ export type GroupChallengeUpdateWithoutGroupInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  item?: Prisma.ItemUpdateManyWithoutChallengesNestedInput
+  category?: Prisma.CategoryUpdateManyWithoutChallengesNestedInput
   allowedLists?: Prisma.GroupListUpdateManyWithoutConnectedChallengesNestedInput
   allowedTags?: Prisma.TagUpdateManyWithoutConnectedChallengesNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUpdateManyWithoutChallengeNestedInput
@@ -1574,14 +1582,13 @@ export type GroupChallengeUncheckedUpdateWithoutGroupInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  item?: Prisma.ItemUncheckedUpdateManyWithoutChallengesNestedInput
+  category?: Prisma.CategoryUncheckedUpdateManyWithoutChallengesNestedInput
   allowedLists?: Prisma.GroupListUncheckedUpdateManyWithoutConnectedChallengesNestedInput
   allowedTags?: Prisma.TagUncheckedUpdateManyWithoutConnectedChallengesNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutChallengeNestedInput
@@ -1598,7 +1605,6 @@ export type GroupChallengeUncheckedUpdateManyWithoutGroupInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1616,7 +1622,6 @@ export type GroupChallengeUpdateWithoutAllowedListsInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1624,7 +1629,7 @@ export type GroupChallengeUpdateWithoutAllowedListsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   group?: Prisma.GroupUpdateOneRequiredWithoutGroupChallengesNestedInput
-  item?: Prisma.ItemUpdateManyWithoutChallengesNestedInput
+  category?: Prisma.CategoryUpdateManyWithoutChallengesNestedInput
   allowedTags?: Prisma.TagUpdateManyWithoutConnectedChallengesNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUpdateManyWithoutChallengeNestedInput
   notification?: Prisma.NotificationUpdateManyWithoutChallengeNestedInput
@@ -1641,14 +1646,13 @@ export type GroupChallengeUncheckedUpdateWithoutAllowedListsInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  item?: Prisma.ItemUncheckedUpdateManyWithoutChallengesNestedInput
+  category?: Prisma.CategoryUncheckedUpdateManyWithoutChallengesNestedInput
   allowedTags?: Prisma.TagUncheckedUpdateManyWithoutConnectedChallengesNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutChallengeNestedInput
   notification?: Prisma.NotificationUncheckedUpdateManyWithoutChallengeNestedInput
@@ -1665,74 +1669,6 @@ export type GroupChallengeUncheckedUpdateManyWithoutAllowedListsInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
-  manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type GroupChallengeUpdateWithoutItemInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.StringFieldUpdateOperationsInput | string
-  color?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
-  numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
-  timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
-  manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  group?: Prisma.GroupUpdateOneRequiredWithoutGroupChallengesNestedInput
-  allowedLists?: Prisma.GroupListUpdateManyWithoutConnectedChallengesNestedInput
-  allowedTags?: Prisma.TagUpdateManyWithoutConnectedChallengesNestedInput
-  groupUserProgression?: Prisma.GroupUser_ChallengeUpdateManyWithoutChallengeNestedInput
-  notification?: Prisma.NotificationUpdateManyWithoutChallengeNestedInput
-  report?: Prisma.ReportUpdateManyWithoutChallengeNestedInput
-}
-
-export type GroupChallengeUncheckedUpdateWithoutItemInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  groupId?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.StringFieldUpdateOperationsInput | string
-  color?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
-  numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
-  timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
-  manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  allowedLists?: Prisma.GroupListUncheckedUpdateManyWithoutConnectedChallengesNestedInput
-  allowedTags?: Prisma.TagUncheckedUpdateManyWithoutConnectedChallengesNestedInput
-  groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutChallengeNestedInput
-  notification?: Prisma.NotificationUncheckedUpdateManyWithoutChallengeNestedInput
-  report?: Prisma.ReportUncheckedUpdateManyWithoutChallengeNestedInput
-}
-
-export type GroupChallengeUncheckedUpdateManyWithoutItemInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  groupId?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.StringFieldUpdateOperationsInput | string
-  color?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
-  numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
-  timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1750,7 +1686,6 @@ export type GroupChallengeUpdateWithoutAllowedTagsInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1758,7 +1693,7 @@ export type GroupChallengeUpdateWithoutAllowedTagsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   group?: Prisma.GroupUpdateOneRequiredWithoutGroupChallengesNestedInput
-  item?: Prisma.ItemUpdateManyWithoutChallengesNestedInput
+  category?: Prisma.CategoryUpdateManyWithoutChallengesNestedInput
   allowedLists?: Prisma.GroupListUpdateManyWithoutConnectedChallengesNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUpdateManyWithoutChallengeNestedInput
   notification?: Prisma.NotificationUpdateManyWithoutChallengeNestedInput
@@ -1775,14 +1710,13 @@ export type GroupChallengeUncheckedUpdateWithoutAllowedTagsInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  item?: Prisma.ItemUncheckedUpdateManyWithoutChallengesNestedInput
+  category?: Prisma.CategoryUncheckedUpdateManyWithoutChallengesNestedInput
   allowedLists?: Prisma.GroupListUncheckedUpdateManyWithoutConnectedChallengesNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutChallengeNestedInput
   notification?: Prisma.NotificationUncheckedUpdateManyWithoutChallengeNestedInput
@@ -1799,7 +1733,6 @@ export type GroupChallengeUncheckedUpdateManyWithoutAllowedTagsInput = {
   status?: Prisma.EnumSTATUS_CHALLENGEFieldUpdateOperationsInput | $Enums.STATUS_CHALLENGE
   numericGoal?: Prisma.IntFieldUpdateOperationsInput | number
   timeframe?: Prisma.EnumCHALLENGE_TIMEFRAMEFieldUpdateOperationsInput | $Enums.CHALLENGE_TIMEFRAME
-  category?: Prisma.GroupChallengeUpdatecategoryInput | $Enums.CATEGORY[]
   manualAdvancement?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1814,7 +1747,7 @@ export type GroupChallengeUncheckedUpdateManyWithoutAllowedTagsInput = {
  */
 
 export type GroupChallengeCountOutputType = {
-  item: number
+  category: number
   allowedLists: number
   allowedTags: number
   groupUserProgression: number
@@ -1823,7 +1756,7 @@ export type GroupChallengeCountOutputType = {
 }
 
 export type GroupChallengeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  item?: boolean | GroupChallengeCountOutputTypeCountItemArgs
+  category?: boolean | GroupChallengeCountOutputTypeCountCategoryArgs
   allowedLists?: boolean | GroupChallengeCountOutputTypeCountAllowedListsArgs
   allowedTags?: boolean | GroupChallengeCountOutputTypeCountAllowedTagsArgs
   groupUserProgression?: boolean | GroupChallengeCountOutputTypeCountGroupUserProgressionArgs
@@ -1844,8 +1777,8 @@ export type GroupChallengeCountOutputTypeDefaultArgs<ExtArgs extends runtime.Typ
 /**
  * GroupChallengeCountOutputType without action
  */
-export type GroupChallengeCountOutputTypeCountItemArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ItemWhereInput
+export type GroupChallengeCountOutputTypeCountCategoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CategoryWhereInput
 }
 
 /**
@@ -1894,7 +1827,6 @@ export type GroupChallengeSelect<ExtArgs extends runtime.Types.Extensions.Intern
   status?: boolean
   numericGoal?: boolean
   timeframe?: boolean
-  category?: boolean
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate?: boolean
@@ -1902,7 +1834,7 @@ export type GroupChallengeSelect<ExtArgs extends runtime.Types.Extensions.Intern
   createdAt?: boolean
   updatedAt?: boolean
   group?: boolean | Prisma.GroupDefaultArgs<ExtArgs>
-  item?: boolean | Prisma.GroupChallenge$itemArgs<ExtArgs>
+  category?: boolean | Prisma.GroupChallenge$categoryArgs<ExtArgs>
   allowedLists?: boolean | Prisma.GroupChallenge$allowedListsArgs<ExtArgs>
   allowedTags?: boolean | Prisma.GroupChallenge$allowedTagsArgs<ExtArgs>
   groupUserProgression?: boolean | Prisma.GroupChallenge$groupUserProgressionArgs<ExtArgs>
@@ -1921,7 +1853,6 @@ export type GroupChallengeSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   status?: boolean
   numericGoal?: boolean
   timeframe?: boolean
-  category?: boolean
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate?: boolean
@@ -1941,7 +1872,6 @@ export type GroupChallengeSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   status?: boolean
   numericGoal?: boolean
   timeframe?: boolean
-  category?: boolean
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate?: boolean
@@ -1961,7 +1891,6 @@ export type GroupChallengeSelectScalar = {
   status?: boolean
   numericGoal?: boolean
   timeframe?: boolean
-  category?: boolean
   manualAdvancement?: boolean
   allowCompleted?: boolean
   startDate?: boolean
@@ -1970,10 +1899,10 @@ export type GroupChallengeSelectScalar = {
   updatedAt?: boolean
 }
 
-export type GroupChallengeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "groupId" | "name" | "icon" | "color" | "description" | "status" | "numericGoal" | "timeframe" | "category" | "manualAdvancement" | "allowCompleted" | "startDate" | "endDate" | "createdAt" | "updatedAt", ExtArgs["result"]["groupChallenge"]>
+export type GroupChallengeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "groupId" | "name" | "icon" | "color" | "description" | "status" | "numericGoal" | "timeframe" | "manualAdvancement" | "allowCompleted" | "startDate" | "endDate" | "createdAt" | "updatedAt", ExtArgs["result"]["groupChallenge"]>
 export type GroupChallengeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   group?: boolean | Prisma.GroupDefaultArgs<ExtArgs>
-  item?: boolean | Prisma.GroupChallenge$itemArgs<ExtArgs>
+  category?: boolean | Prisma.GroupChallenge$categoryArgs<ExtArgs>
   allowedLists?: boolean | Prisma.GroupChallenge$allowedListsArgs<ExtArgs>
   allowedTags?: boolean | Prisma.GroupChallenge$allowedTagsArgs<ExtArgs>
   groupUserProgression?: boolean | Prisma.GroupChallenge$groupUserProgressionArgs<ExtArgs>
@@ -1992,7 +1921,7 @@ export type $GroupChallengePayload<ExtArgs extends runtime.Types.Extensions.Inte
   name: "GroupChallenge"
   objects: {
     group: Prisma.$GroupPayload<ExtArgs>
-    item: Prisma.$ItemPayload<ExtArgs>[]
+    category: Prisma.$CategoryPayload<ExtArgs>[]
     allowedLists: Prisma.$GroupListPayload<ExtArgs>[]
     allowedTags: Prisma.$TagPayload<ExtArgs>[]
     groupUserProgression: Prisma.$GroupUser_ChallengePayload<ExtArgs>[]
@@ -2009,7 +1938,6 @@ export type $GroupChallengePayload<ExtArgs extends runtime.Types.Extensions.Inte
     status: $Enums.STATUS_CHALLENGE
     numericGoal: number
     timeframe: $Enums.CHALLENGE_TIMEFRAME
-    category: $Enums.CATEGORY[]
     manualAdvancement: boolean
     allowCompleted: boolean
     startDate: Date
@@ -2411,7 +2339,7 @@ readonly fields: GroupChallengeFieldRefs;
 export interface Prisma__GroupChallengeClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   group<T extends Prisma.GroupDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupDefaultArgs<ExtArgs>>): Prisma.Prisma__GroupClient<runtime.Types.Result.GetResult<Prisma.$GroupPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  item<T extends Prisma.GroupChallenge$itemArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupChallenge$itemArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  category<T extends Prisma.GroupChallenge$categoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupChallenge$categoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   allowedLists<T extends Prisma.GroupChallenge$allowedListsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupChallenge$allowedListsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GroupListPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   allowedTags<T extends Prisma.GroupChallenge$allowedTagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupChallenge$allowedTagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   groupUserProgression<T extends Prisma.GroupChallenge$groupUserProgressionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupChallenge$groupUserProgressionArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GroupUser_ChallengePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2455,7 +2383,6 @@ export interface GroupChallengeFieldRefs {
   readonly status: Prisma.FieldRef<"GroupChallenge", 'STATUS_CHALLENGE'>
   readonly numericGoal: Prisma.FieldRef<"GroupChallenge", 'Int'>
   readonly timeframe: Prisma.FieldRef<"GroupChallenge", 'CHALLENGE_TIMEFRAME'>
-  readonly category: Prisma.FieldRef<"GroupChallenge", 'CATEGORY[]'>
   readonly manualAdvancement: Prisma.FieldRef<"GroupChallenge", 'Boolean'>
   readonly allowCompleted: Prisma.FieldRef<"GroupChallenge", 'Boolean'>
   readonly startDate: Prisma.FieldRef<"GroupChallenge", 'DateTime'>
@@ -2863,27 +2790,27 @@ export type GroupChallengeDeleteManyArgs<ExtArgs extends runtime.Types.Extension
 }
 
 /**
- * GroupChallenge.item
+ * GroupChallenge.category
  */
-export type GroupChallenge$itemArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type GroupChallenge$categoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Item
+   * Select specific fields to fetch from the Category
    */
-  select?: Prisma.ItemSelect<ExtArgs> | null
+  select?: Prisma.CategorySelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Item
+   * Omit specific fields from the Category
    */
-  omit?: Prisma.ItemOmit<ExtArgs> | null
+  omit?: Prisma.CategoryOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ItemInclude<ExtArgs> | null
-  where?: Prisma.ItemWhereInput
-  orderBy?: Prisma.ItemOrderByWithRelationInput | Prisma.ItemOrderByWithRelationInput[]
-  cursor?: Prisma.ItemWhereUniqueInput
+  include?: Prisma.CategoryInclude<ExtArgs> | null
+  where?: Prisma.CategoryWhereInput
+  orderBy?: Prisma.CategoryOrderByWithRelationInput | Prisma.CategoryOrderByWithRelationInput[]
+  cursor?: Prisma.CategoryWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.ItemScalarFieldEnum | Prisma.ItemScalarFieldEnum[]
+  distinct?: Prisma.CategoryScalarFieldEnum | Prisma.CategoryScalarFieldEnum[]
 }
 
 /**

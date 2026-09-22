@@ -77,15 +77,13 @@ export default function DrawScreen() {
                 style={StyleSheet.absoluteFill}
               />
               <View style={styles.categoryBadge}>
-                <Text style={styles.categoryLabel}>
-                  {t(`categories.${entry.userItem.item.category}`, { ns: 'lists' })}
-                </Text>
+                <Text style={styles.categoryLabel}>{entry.userItem.category.name}</Text>
               </View>
-              <Text style={styles.itemName}>{entry.userItem.item.name}</Text>
-              {entry.userItem.item.myRating && (
+              <Text style={styles.itemName}>{entry.userItem.name}</Text>
+              {entry.userItem.rating && (
                 <Text style={styles.ratingText}>
-                  {'★'.repeat(entry.userItem.item.myRating.value)}
-                  {'☆'.repeat(5 - entry.userItem.item.myRating.value)}
+                  {'★'.repeat(entry.userItem.rating.value)}
+                  {'☆'.repeat(5 - entry.userItem.rating.value)}
                 </Text>
               )}
               {entry.userItem.tags.length > 0 && (

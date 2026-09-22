@@ -27,7 +27,6 @@ import { DescriptionTabs } from '@/components/molecules/DescriptionTabs';
 import { TagPickerSheet } from '@/components/organisms/TagPickerSheet';
 import { RatingSheet } from '@/components/organisms/RatingSheet';
 import type { Tag as TagData } from '@/utils/useTags';
-import type { Review } from '@/utils/useItemRatings';
 
 // Tag già collegati all'item: qui basta id/name/color, non serve isSystem (solo la picker lo usa)
 type AttachedTag = { id: string; name: string; color: string };
@@ -50,15 +49,9 @@ export type ItemCardDetailsProps = {
   /** Imposta/modifica il voto. Non è previsto cancellare il rating: una volta impostato si può solo
    *  aumentare/diminuire. Il testo del giudizio resta invece sempre facoltativo. */
   onChangeRating?: (value: number, note?: string) => void;
-  /** Apertura/chiusura della sheet di rating controllata dal chiamante: la query di media/recensioni
-   *  (dati collettivi, non solo miei) deve partire solo quando questa sheet è aperta, e vive fuori da
-   *  questo componente (niente GraphQL nelle UI component). */
+  /** Apertura/chiusura della sheet di rating controllata dal chiamante. */
   ratingEditorVisible?: boolean;
   onRatingEditorVisibleChange?: (visible: boolean) => void;
-  averageRating?: number | null;
-  ratingsCount?: number;
-  reviews?: Review[];
-  reviewsLoading?: boolean;
   /** Salva la nota personale; stringa vuota = cancella la nota. */
   onChangeNote?: (note: string) => void;
   /** Salva la descrizione personale; stringa vuota = cancella la descrizione. */
@@ -119,10 +112,6 @@ export function ItemCardDetails({
   onChangeRating,
   ratingEditorVisible,
   onRatingEditorVisibleChange,
-  averageRating,
-  ratingsCount,
-  reviews,
-  reviewsLoading,
   onChangeNote,
   onChangeDescription,
   onRemoveFromList,
@@ -416,10 +405,6 @@ export function ItemCardDetails({
           ratingValue={ratingValue}
           ratingNote={ratingNote}
           onChangeRating={onChangeRating}
-          averageRating={averageRating ?? null}
-          ratingsCount={ratingsCount ?? 0}
-          reviews={reviews ?? []}
-          reviewsLoading={Boolean(reviewsLoading)}
         />
       )}
     </BottomSheet>

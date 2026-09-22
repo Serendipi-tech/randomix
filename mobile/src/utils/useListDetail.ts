@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client';
 import { ListQueries } from '@randomix/graphql-schema';
-import type { Category, ListCategory } from './useListCategories';
+import type { ListCategory } from './useListCategories';
+import type { Category } from './useCategories';
 
 const { LIST_DETAIL } = ListQueries;
 
@@ -18,23 +19,16 @@ export interface TagInfo {
   color: string;
 }
 
-export interface ItemInfo {
-  id: string;
-  name: string;
-  description: string | null;
-  imageUrl: string | null;
-  category: Category;
-  myRating: RatingInfo | null;
-}
-
 export interface UserItem {
   id: string;
+  name: string;
   description: string | null;
   note: string | null;
   status: CompletionStatus;
   isHidden: boolean;
   tags: TagInfo[];
-  item: ItemInfo;
+  category: Category;
+  rating: RatingInfo | null;
 }
 
 export interface ListItemEntry {

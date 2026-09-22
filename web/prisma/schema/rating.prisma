@@ -4,14 +4,14 @@ model Rating {
     value Int // da 1 a 5
     note String? @db.VarChar(1000)
 
-    userId String?
-    itemId String
+    userId     String?
+    userItemId String
 
-    user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
-    item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+    user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+    userItem User_Item @relation(fields: [userItemId], references: [id], onDelete: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    @@unique([userId, itemId])
+    @@unique([userId, userItemId])
 }

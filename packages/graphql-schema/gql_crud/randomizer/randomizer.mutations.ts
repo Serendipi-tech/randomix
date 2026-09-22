@@ -10,6 +10,7 @@ export const DRAW_FROM_LIST: DocumentNode = parse(`
       acceptedCount
       userItem {
         id
+        name
         description
         note
         status
@@ -18,16 +19,14 @@ export const DRAW_FROM_LIST: DocumentNode = parse(`
           name
           color
         }
-        item {
+        category {
           id
           name
-          description
-          imageUrl
-          category
-          myRating {
-            id
-            value
-          }
+          icon
+        }
+        rating {
+          id
+          value
         }
       }
     }

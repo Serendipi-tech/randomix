@@ -21,7 +21,7 @@ async function resolveTargetLabel(report: ReportForResolution): Promise<string |
     return user ? `Utente: ${user.username}` : null;
   }
   if (report.itemId) {
-    const item = await prisma.item.findUnique({ where: { id: report.itemId }, select: { name: true } });
+    const item = await prisma.user_Item.findUnique({ where: { id: report.itemId }, select: { name: true } });
     return item ? `Item: ${item.name}` : null;
   }
   if (report.groupId) {

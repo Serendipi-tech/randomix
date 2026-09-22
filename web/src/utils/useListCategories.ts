@@ -2,6 +2,7 @@
 
 import { useQuery } from '@apollo/client';
 import { ListCategoryQueries } from '@randomix/graphql-schema';
+import type { Category } from './useCategories';
 
 const { LIST_CATEGORIES } = ListCategoryQueries;
 
@@ -10,7 +11,7 @@ export interface ListCategory {
   name: string;
   description: string | null;
   icon: string;
-  includedCategories: string[];
+  includedCategories: Category[];
   listsCount: number;
   groupListsCount: number;
 }
