@@ -103,8 +103,9 @@ function buildIconData(): { categories: IconCategory[]; searchable: SearchableIc
 
   const buckets = new Map<string, Set<string>>(CATEGORY_KEYWORDS.map((c) => [c.key, new Set<string>()]));
   const other = new Set<string>();
-  // indice di ricerca: TUTTE le icone deduplicate con la loro categoria, non solo le prime
-  // MAX_ICONS_PER_CATEGORY mostrate sfogliando — altrimenti la ricerca "perderebbe" le icone tagliate dal cap.
+  // Indice di ricerca = stesse icone sfogliabili: `getLucideIcon` (registry generato) conosce solo le
+  // ~424 icone effettivamente bundlate, quindi `validIcons` è già ristretto a quelle e la ricerca non
+  // può proporre icone non renderizzabili.
   const searchable: SearchableIcon[] = [];
 
   for (const { pascal, haystack } of dedupedIcons) {
@@ -134,6 +135,6 @@ function buildIconData(): { categories: IconCategory[]; searchable: SearchableIc
 const { categories: builtCategories, searchable: builtSearchable } = buildIconData();
 
 export const ICON_CATEGORIES: IconCategory[] = builtCategories;
-/** Tutte le icone deduplicate (non limitate a MAX_ICONS_PER_CATEGORY), per la ricerca: sfogliare
- *  le categorie mostra solo le prime N, ma cercare per nome deve poter trovare qualsiasi icona. */
+/** Indice per la ricerca: coincide con le icone sfogliabili (le ~424 realmente bundlate nel registry),
+ *  con l'aggiunta di slug/tag per il match testuale. Non contiene icone non renderizzabili. */
 export const SEARCHABLE_ICONS: SearchableIcon[] = builtSearchable;
