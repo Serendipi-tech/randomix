@@ -1,0 +1,25 @@
+model UserFeedback {
+    id String @id @default(cuid())
+
+    // Nullable + SetNull: il feedback sopravvive alla cancellazione dell'autore (storico per l'admin).
+    userId String?
+    user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+    type  FEEDBACK_TYPE
+    title String? // sempre opzionale
+    text  String  @db.VarChar(3000) // limite duro a livello DB
+    page  String // stringa libera: enum delle sezioni app vive solo lato client
+
+    isImportant Boolean         @default(false) // flag admin, blocca la delete utente se true
+    status      FEEDBACK_STATUS @default(SENT)
+    seen        Boolean         @default(false) // flag admin, mai esposto all'utente
+    adminNote   String? // nota interna, mai esposta all'utente
+
+    createdAt DateTime @default(now())
+
+    @@index([userId])
+    @@index([createdAt(sort: Desc)])
+    @@index([isImportant])
+    @@index([status])
+    @@index([seen])
+}

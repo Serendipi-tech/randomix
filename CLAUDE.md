@@ -173,6 +173,7 @@ Applies to **both** `web/` (Tailwind) and `mobile/` (NativeWind) — same design
 - **Tailwind utility-first** on web, **NativeWind** (Tailwind classes) on mobile
 - Avoid excessively long class strings — extract reusable components instead
 - Prefer `@apply` classes (web) / shared style presets (mobile) for repeated patterns
+- **Bottom navbar clearance (mobile)**: every page sits above a fixed bottom navbar. Any scrollable section must reserve empty space at the end (`paddingBottom`/`marginBottom` on the scroll content) equal to `navbar height + safe-area inset (+ a small gap)`, so the last element is never hidden or overlapped by the navbar. Read the real inset via `useSafeAreaInsets()` — never hardcode the bottom gap alone.
 
 ---
 

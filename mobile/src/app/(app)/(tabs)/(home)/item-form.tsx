@@ -1,44 +1,32 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Package } from 'lucide-react-native';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Package, Plus } from 'lucide-react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { RadialBackground } from '@/components/molecules/radial-background';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
 import { PageHeader } from '@/components/molecules/PageHeader';
-import { Chip } from '@/components/atoms/Chip';
-import { RatingInput } from '@/components/molecules/RatingInput';
+import { TagList } from '@/components/molecules/TagList';
+import { CategoryPickerSheet, type CategoryOption } from '@/components/organisms/CategoryPickerSheet';
+import { TagPickerSheet } from '@/components/organisms/TagPickerSheet';
 import { useItemMutations } from '@/utils/useItemMutations';
-import { ITEM_CATEGORIES, type Category } from '@/utils/useListCategories';
-import { useTags } from '@/utils/useTags';
-import type { CompletionStatus } from '@/utils/useListDetail';
-
-const STATUSES: CompletionStatus[] = ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED'];
-const TAG_COLORS = [
-  Colors.light.accent,
-  Colors.light.secondary,
-  Colors.light.warning,
-  Colors.light.success,
-  Colors.light.primary,
-];
+import { useListCategories, type Category } from '@/utils/useListCategories';
+import { useListDetail } from '@/utils/useListDetail';
+import { useTags, type Tag as TagData } from '@/utils/useTags';
 
 type ItemFormParams = {
   listId?: string;
-  userItemId?: string;
-  itemId?: string;
-  name?: string;
-  category?: string;
-  description?: string;
-  note?: string;
-  status?: string;
-  rating?: string;
-  ratingNote?: string;
-  tagIds?: string;
 };
 
+// Deve combaciare con User_Item.description @db.VarChar(500) nello schema Prisma
+const DESCRIPTION_MAX_LENGTH = 500;
+
+/** Schermata di sola creazione item: nome, categoria (dalla lista padre) e descrizione personale.
+ *  Ogni modifica successiva avviene nel bottomsheet ItemCardDetails, non qui. */
 export default function ItemFormScreen() {
   const { t } = useTranslation('lists');
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
@@ -46,71 +34,80 @@ export default function ItemFormScreen() {
   const router = useRouter();
 
   const params = useLocalSearchParams<ItemFormParams>();
-  const isEdit = Boolean(params.userItemId);
 
-  const { addItemToList, updateUserItem, rateItem, saving, error } = useItemMutations();
-  const { tags, createTag, creating } = useTags();
+  const { addItemToList, updateUserItem, saving, error } = useItemMutations();
+  const { list } = useListDetail(params.listId);
+  const { categories: allMacroCategories } = useListCategories();
+  const {
+    tags: existingTags,
+    createTag,
+    updateTag,
+    deleteTag,
+    creating: creatingTag,
+    updating: updatingTag,
+    deleting: deletingTag,
+  } = useTags();
 
-  const [name, setName] = useState(params.name ?? '');
-  const [category, setCategory] = useState<Category | null>(
-    (params.category as Category | undefined) ?? null,
-  );
-  const [description, setDescription] = useState(params.description ?? '');
-  const [note, setNote] = useState(params.note ?? '');
-  const [status, setStatus] = useState<CompletionStatus>(
-    (params.status as CompletionStatus | undefined) ?? 'NOT_STARTED',
-  );
-  const [ratingValue, setRatingValue] = useState(Number(params.rating ?? 0));
-  const [ratingNote, setRatingNote] = useState(params.ratingNote ?? '');
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
-    params.tagIds ? params.tagIds.split(',') : [],
-  );
-  const [newTagName, setNewTagName] = useState('');
+  // Categorie sceglibili = unione degli includedCategories delle macro-categorie della lista padre
+  const categoryOptions = useMemo<CategoryOption[]>(() => {
+    const listMacroIds = new Set((list?.categories ?? []).map((c) => c.id));
+    const values = new Set<Category>();
+    allMacroCategories
+      .filter((macro) => listMacroIds.has(macro.id))
+      .forEach((macro) => macro.includedCategories.forEach((value) => values.add(value)));
+    return Array.from(values).map((value) => ({ value, label: t(`categories.${value}`) }));
+  }, [allMacroCategories, list, t]);
+
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState<Category | null>(null);
+  const [description, setDescription] = useState('');
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
-  const toggleTag = (tagId: string) => {
-    setSelectedTagIds((prev) =>
-      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId],
-    );
+  const [selectedTags, setSelectedTags] = useState<TagData[]>([]);
+  const [showTagPicker, setShowTagPicker] = useState(false);
+
+  // Toggle: tap su un tag già selezionato lo rimuove, altrimenti lo aggiunge
+  const toggleTag = (tag: TagData) => {
+    setSelectedTags((prev) => (prev.some((t) => t.id === tag.id) ? prev.filter((t) => t.id !== tag.id) : [...prev, tag]));
   };
 
-  const handleCreateTag = async () => {
-    if (!newTagName.trim()) return;
-    setLocalError(null);
-    try {
-      const tag = await createTag(newTagName.trim(), TAG_COLORS[tags.length % TAG_COLORS.length]);
-      if (tag) setSelectedTagIds((prev) => [...prev, tag.id]);
-      setNewTagName('');
-    } catch (e) {
-      setLocalError((e as Error).message);
-    }
+  // Se il tag eliminato era selezionato per questo item, lo scollego anche da qui
+  const handleDeleteTag = async (tag: TagData) => {
+    await deleteTag(tag.id);
+    setSelectedTags((prev) => prev.filter((t) => t.id !== tag.id));
+  };
+
+  // Se il tag modificato era selezionato, aggiorno anche la chip mostrata qui
+  const handleUpdateTag = async (id: string, name: string, color: string) => {
+    const updated = await updateTag(id, name, color);
+    if (updated) setSelectedTags((prev) => prev.map((t) => (t.id === id ? updated : t)));
+    return updated;
   };
 
   const save = async () => {
     setLocalError(null);
+    if (!name.trim()) {
+      setLocalError(t('itemForm.nameRequired'));
+      return;
+    }
+    if (!category) {
+      setLocalError(t('itemForm.categoryRequired'));
+      return;
+    }
+    if (!params.listId) {
+      setLocalError(t('itemForm.missingFields'));
+      return;
+    }
     try {
-      if (isEdit && params.userItemId) {
-        await updateUserItem(params.userItemId, {
-          description: description.trim() || null,
-          note: note.trim() || null,
-          status,
-          tagIds: selectedTagIds,
-        });
-        if (ratingValue > 0 && params.itemId) {
-          await rateItem(params.itemId, ratingValue, ratingNote.trim() || null);
-        }
-      } else {
-        if (!name.trim() || !category || !params.listId) {
-          setLocalError(t('itemForm.missingFields'));
-          return;
-        }
-        await addItemToList({
-          listId: params.listId,
-          name: name.trim(),
-          category,
-          description: description.trim() || null,
-          note: note.trim() || null,
-        });
+      const userItemId = await addItemToList({
+        listId: params.listId,
+        name: name.trim(),
+        category,
+        description: description.trim() || null,
+      });
+      if (userItemId && selectedTags.length > 0) {
+        await updateUserItem(userItemId, { tagIds: selectedTags.map((tag) => tag.id) });
       }
       router.back();
     } catch (e) {
@@ -121,124 +118,92 @@ export default function ItemFormScreen() {
   const displayError = localError ?? error?.message ?? null;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <PageHeader
-        icon={Package}
-        title={isEdit ? t('itemForm.titleEdit') : t('itemForm.titleAdd')}
-        onBack={() => router.back()}
-      />
+    <SafeAreaView style={styles.safe}>
+      <RadialBackground colorScheme={colorScheme} />
+      <PageHeader icon={Package} title={t('itemForm.titleAdd')} onBack={() => router.back()} />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {isEdit ? (
-          <Text style={[styles.itemName, { color: colors.textColor }]}>{name}</Text>
-        ) : (
-          <Input
-            placeholder={t('itemForm.namePlaceholder')}
-            value={name}
-            onChangeText={setName}
-          />
-        )}
+        <Input
+          label={t('itemForm.name')}
+          required
+          placeholder={t('itemForm.namePlaceholder')}
+          value={name}
+          onChangeText={setName}
+        />
 
-        {!isEdit && (
-          <>
-            <Text style={[styles.sectionLabel, { color: colors.textColor }]}>
-              {t('itemForm.category')}
-            </Text>
-            <View style={styles.chipWrap}>
-              {ITEM_CATEGORIES.map((cat) => (
-                <Chip
-                  key={cat}
-                  label={t(`categories.${cat}`)}
-                  selected={category === cat}
-                  onPress={() => setCategory(cat)}
-                />
-              ))}
-            </View>
-          </>
-        )}
+        <View>
+          <Text style={[styles.fieldLabel, { color: colors.textColor }]}>{t('itemForm.category')}</Text>
+          <Button
+            variant="soft"
+            label={category ? t(`categories.${category}`) : t('itemForm.categoryPlaceholder')}
+            onPress={() => setShowCategoryPicker(true)}
+          />
+        </View>
 
         <Input
+          label={t('itemForm.description')}
           placeholder={t('itemForm.descriptionPlaceholder')}
           value={description}
           onChangeText={setDescription}
           variant="textarea"
-        />
-        <Input
-          placeholder={t('itemForm.notePlaceholder')}
-          value={note}
-          onChangeText={setNote}
-          variant="textarea"
+          maxLength={DESCRIPTION_MAX_LENGTH}
         />
 
-        {isEdit && (
-          <>
-            <Text style={[styles.sectionLabel, { color: colors.textColor }]}>
-              {t('itemForm.status')}
-            </Text>
-            <View style={styles.chipWrap}>
-              {STATUSES.map((s) => (
-                <Chip
-                  key={s}
-                  label={t(`status.${s}`)}
-                  selected={status === s}
-                  onPress={() => setStatus(s)}
-                />
-              ))}
-            </View>
-
-            <Text style={[styles.sectionLabel, { color: colors.textColor }]}>
-              {t('itemForm.rating')}
-            </Text>
-            <RatingInput value={ratingValue} onChange={setRatingValue} />
-            {ratingValue > 0 && (
-              <Input
-                placeholder={t('itemForm.ratingNotePlaceholder')}
-                value={ratingNote}
-                onChangeText={setRatingNote}
-                variant="textarea"
-              />
-            )}
-
-            <Text style={[styles.sectionLabel, { color: colors.textColor }]}>
-              {t('itemForm.tags')}
-            </Text>
-            {tags.length > 0 && (
-              <View style={styles.chipWrap}>
-                {tags.map((tag) => (
-                  <Chip
-                    key={tag.id}
-                    label={tag.name}
-                    selected={selectedTagIds.includes(tag.id)}
-                    onPress={() => toggleTag(tag.id)}
-                  />
-                ))}
-              </View>
-            )}
-            <View style={styles.newTagRow}>
-              <Input
-                placeholder={t('itemForm.newTagPlaceholder')}
-                value={newTagName}
-                onChangeText={setNewTagName}
-                style={styles.newTagInput}
-              />
-              <Button
-                variant="primary"
-                label={t('itemForm.addTag')}
-                onPress={handleCreateTag}
-                disabled={!newTagName.trim()}
-                loading={creating}
-              />
-            </View>
-          </>
-        )}
+        <View>
+          <View style={styles.tagsHeader}>
+            <Text style={[styles.fieldLabel, { color: colors.textColor, marginBottom: 0 }]}>{t('itemForm.tags')}</Text>
+            <Pressable onPress={() => setShowTagPicker(true)} style={styles.iconButton}>
+              <Plus size={24} color={colors.primary} />
+            </Pressable>
+          </View>
+          <TagList
+            tags={selectedTags}
+            maxLines={2}
+            onRemoveTag={(index) => setSelectedTags((prev) => prev.filter((_, i) => i !== index))}
+          />
+        </View>
 
         {displayError && <Text style={styles.error}>{displayError}</Text>}
-
-        <Button
-          label={isEdit ? t('itemForm.save') : t('itemForm.add')}
-          onPress={save}
-          loading={saving}
-        />
       </ScrollView>
+
+      {/* Azioni fisse in fondo alla pagina, stessa struttura di list-form */}
+      <View style={styles.footer}>
+        <View style={styles.actionItem}>
+          <Button variant="secondary" label={t('itemForm.cancel')} onPress={() => router.back()} />
+        </View>
+        <View style={styles.actionItem}>
+          <Button variant="primary" label={t('itemForm.add')} onPress={save} loading={saving} />
+        </View>
+      </View>
+
+      <CategoryPickerSheet
+        visible={showCategoryPicker}
+        onClose={() => setShowCategoryPicker(false)}
+        options={categoryOptions}
+        selected={category}
+        onSelect={setCategory}
+        searchPlaceholder={t('itemForm.categorySearch')}
+        emptyLabel={t('itemForm.noCategories')}
+      />
+
+      <TagPickerSheet
+        visible={showTagPicker}
+        onClose={() => setShowTagPicker(false)}
+        tags={existingTags}
+        selectedIds={selectedTags.map((tag) => tag.id)}
+        onSelect={toggleTag}
+        onCreate={createTag}
+        onUpdate={handleUpdateTag}
+        saving={creatingTag || updatingTag}
+        onDelete={handleDeleteTag}
+        deleting={deletingTag}
+        newTagTitle={t('itemForm.newTag')}
+        editTagTitle={t('itemForm.editTag')}
+        newTagPlaceholder={t('itemForm.newTagPlaceholder')}
+        addLabel={t('itemForm.addTag')}
+        saveLabel={t('itemForm.save')}
+        searchPlaceholder={t('itemForm.tagSearchPlaceholder')}
+        emptyLabel={t('itemForm.tagsEmpty')}
+      />
     </SafeAreaView>
   );
 }
@@ -248,44 +213,41 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: Spacing.four,
+    paddingHorizontal: Spacing.four,
+    paddingBottom: Spacing.four,
     gap: Spacing.three,
   },
-  itemName: {
-    fontSize: 20,
-  },
-  sectionLabel: {
+  fieldLabel: {
     fontSize: 16,
-  },
-  chipWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.two,
-  },
-  newTagRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.two,
-  },
-  newTagInput: {
-    flex: 1,
-  },
-  addTagButton: {
-    paddingVertical: 14,
-    paddingHorizontal: 18,
-    borderRadius: 14,
-    backgroundColor: Colors.light.primary,
-  },
-  addTagLabel: {
-    fontSize: 14,
-    color: Colors.light.border,
-  },
-  disabled: {
-    opacity: 0.5,
+    fontWeight: '600',
+    marginBottom: 6,
   },
   error: {
     fontSize: 14,
     color: Colors.light.error,
     textAlign: 'center',
+  },
+  tagsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  // Area tattile reale (non hitSlop): stesso pattern del "+" nota in ItemCardDetails
+  iconButton: {
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footer: {
+    flexDirection: 'row',
+    gap: Spacing.five,
+    paddingHorizontal: Spacing.four,
+    paddingTop: Spacing.two,
+    paddingBottom: Spacing.four,
+  },
+  actionItem: {
+    flex: 1,
   },
 });

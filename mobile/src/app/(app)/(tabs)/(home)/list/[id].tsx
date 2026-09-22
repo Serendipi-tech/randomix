@@ -1,19 +1,25 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pencil } from 'lucide-react-native';
+import { Dices, Pencil, Plus } from 'lucide-react-native';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Spacing } from '@/constants/theme';
 import { resolveListIcon } from '@/constants/list-icons';
+import { darkenColor, hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { RadialBackground } from '@/components/molecules/radial-background';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { PageHeader } from '@/components/molecules/PageHeader';
 import { ItemCard } from '@/components/cards/ItemCard';
+import { CardShell } from '@/components/cards/CardShell';
 import { Button } from '@/components/atoms/Button';
 import { useItemMutations } from '@/utils/useItemMutations';
 import { useListDetail, type ListItemEntry } from '@/utils/useListDetail';
+import { useNavbarClearance } from '@/utils/useNavbarClearance';
+import { useTags, type Tag as TagData } from '@/utils/useTags';
 
 const SKELETON_COUNT = 5;
 
@@ -25,29 +31,31 @@ export default function ListDetailScreen() {
 
   const { id } = useLocalSearchParams<{ id: string }>();
   const { list, loading, error } = useListDetail(id);
-  const { removeItemFromList } = useItemMutations();
+  const { removeItemFromList, updateUserItem, rateItem } = useItemMutations();
+  const {
+    tags: availableTags,
+    createTag,
+    updateTag,
+    deleteTag,
+    creating: creatingTag,
+    updating: updatingTag,
+    deleting: deletingTag,
+  } = useTags();
+  // clearance in fondo alla lista per non finire sotto la pillola-navbar (regola condivisa)
+  const listBottomPadding = useNavbarClearance();
 
   const [entryToRemove, setEntryToRemove] = useState<ListItemEntry | null>(null);
 
-  const showSkeleton = loading && !list;
-
-  const openItem = (entry: ListItemEntry) => {
-    router.push({
-      pathname: '/item-form',
-      params: {
-        userItemId: entry.userItem.id,
-        itemId: entry.userItem.item.id,
-        name: entry.userItem.item.name,
-        category: entry.userItem.item.category,
-        description: entry.userItem.description ?? '',
-        note: entry.userItem.note ?? '',
-        status: entry.userItem.status,
-        rating: String(entry.userItem.item.myRating?.value ?? 0),
-        ratingNote: entry.userItem.item.myRating?.note ?? '',
-        tagIds: entry.userItem.tags.map((tag) => tag.id).join(','),
-      },
-    });
+  // Aggiunge/rimuove un tag dall'item corrente in base alla selezione fatta nella TagPickerSheet
+  const toggleEntryTag = (entry: ListItemEntry, tag: TagData) => {
+    const currentIds = entry.userItem.tags.map((t) => t.id);
+    const nextIds = currentIds.includes(tag.id)
+      ? currentIds.filter((tagId) => tagId !== tag.id)
+      : [...currentIds, tag.id];
+    updateUserItem(entry.userItem.id, { tagIds: nextIds });
   };
+
+  const showSkeleton = loading && !list;
 
   const handleRemoveConfirmed = () => {
     if (entryToRemove) removeItemFromList(entryToRemove.id);
@@ -55,10 +63,12 @@ export default function ListDetailScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.safe}>
+      <RadialBackground colorScheme={colorScheme} />
       <PageHeader
         icon={resolveListIcon(list?.icon)}
         title={list?.name ?? ''}
+        iconGradient={list ? [list.color, darkenColor(list.color, 0.15)] : undefined}
         onBack={() => router.back()}
         action={
           list
@@ -80,44 +90,24 @@ export default function ListDetailScreen() {
           </Text>
         </View>
       ) : (
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={list.items}
-          keyExtractor={(entry) => entry.id}
-          contentContainerStyle={styles.content}
-          renderItem={({ item: entry }) => (
-            <ItemCard
-              title={entry.userItem.item.name}
-              category={t(`categories.${entry.userItem.item.category}`)}
-              status={t(`status.${entry.userItem.status}`)}
-              statusColor={
-                entry.userItem.status === 'IN_PROGRESS'
-                  ? colors.warning
-                  : entry.userItem.status === 'COMPLETED'
-                    ? colors.success
-                    : colors.border
-              }
-              rating={entry.userItem.item.myRating?.value ?? undefined}
-              tags={entry.userItem.tags}
-              onPress={() => openItem(entry)}
-              onRemove={() => setEntryToRemove(entry)}
-            />
-          )}
-          ListHeaderComponent={
-            <View style={styles.header}>
-              {list.description ? (
-                <Text style={[styles.description, { color: colors.disabled }]}>
+        <>
+          {/* Header fisso: descrizione e azioni non scrollano, solo la lista item sotto scorre */}
+          <View style={styles.fixedHeader}>
+            {list.description ? (
+              <CardShell variant="callout" borderColor={list.color}>
+                <Text style={[styles.description, { color: colors.textColor }]}>
                   {list.description}
                 </Text>
-              ) : null}
-              <View style={styles.itemsBar}>
-                <Text style={[styles.sectionTitle, { color: colors.textColor }]}>
-                  {t('detail.items')}
-                </Text>
-                <View style={styles.itemsActions}>
+              </CardShell>
+            ) : null}
+            <View style={[styles.itemsBar, list.description ? styles.itemsBarSpaced : null]}>
+              <View style={styles.itemsActions}>
+                <View style={styles.randomizeFill}>
                   <Button
                     variant="primary"
-                    label={t('detail.draw')}
+                    icon={Dices}
+                    label={t('detail.randomize')}
+                    disabled={list.items.length === 0}
                     onPress={() =>
                       router.push({
                         pathname: '/draw',
@@ -125,26 +115,89 @@ export default function ListDetailScreen() {
                       })
                     }
                   />
-                  <Button
-                    variant="secondary"
-                    label={t('detail.addItem')}
-                    onPress={() => router.push({ pathname: '/item-form', params: { listId: id } })}
-                  />
                 </View>
+                <Button
+                  variant="soft"
+                  icon={Plus}
+                  onPress={() => router.push({ pathname: '/item-form', params: { listId: id } })}
+                />
               </View>
             </View>
-          }
-          ListEmptyComponent={
-            <View style={styles.empty}>
-              <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
-                {t('detail.emptyTitle')}
-              </Text>
-              <Text style={[styles.emptySubtitle, { color: colors.disabled }]}>
-                {t('detail.emptySubtitle')}
-              </Text>
-            </View>
-          }
-        />
+          </View>
+
+          <View style={styles.listWrap}>
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              data={list.items}
+              keyExtractor={(entry) => entry.id}
+              contentContainerStyle={[styles.content, { paddingBottom: listBottomPadding }]}
+              renderItem={({ item: entry }) => (
+              <ItemCard
+                title={entry.userItem.item.name}
+                category={t(`categories.${entry.userItem.item.category}`)}
+                status={t(`status.${entry.userItem.status}`)}
+                statusColor={
+                  entry.userItem.status === 'IN_PROGRESS'
+                    ? colors.warning
+                    : entry.userItem.status === 'COMPLETED'
+                      ? colors.success
+                      : colors.border
+                }
+                rating={entry.userItem.item.myRating?.value ?? undefined}
+                itemId={entry.userItem.item.id}
+                tags={entry.userItem.tags}
+                imageUri={entry.userItem.item.imageUrl ?? undefined}
+                detail={{
+                  imageUri: entry.userItem.item.imageUrl ?? undefined,
+                  name: entry.userItem.item.name,
+                  category: t(`categories.${entry.userItem.item.category}`),
+                  description: entry.userItem.item.description ?? undefined,
+                  userDescription: entry.userItem.description ?? undefined,
+                  note: entry.userItem.note ?? undefined,
+                  status: entry.userItem.status,
+                  ratingValue: entry.userItem.item.myRating?.value ?? undefined,
+                  ratingNote: entry.userItem.item.myRating?.note ?? undefined,
+                  tags: entry.userItem.tags,
+                  onChangeStatus: (status) => updateUserItem(entry.userItem.id, { status }),
+                  onChangeRating: (value, note) => rateItem(entry.userItem.item.id, value, note ?? null),
+                  onChangeNote: (note) => updateUserItem(entry.userItem.id, { note: note || null }),
+                  onChangeDescription: (description) =>
+                    updateUserItem(entry.userItem.id, { description: description || null }),
+                  onRemoveFromList: () => setEntryToRemove(entry),
+                  availableTags,
+                  onSelectTag: (tag) => toggleEntryTag(entry, tag),
+                  onCreateTag: createTag,
+                  onUpdateTag: updateTag,
+                  onDeleteTag: async (tag) => {
+                    await deleteTag(tag.id);
+                  },
+                  savingTag: creatingTag || updatingTag,
+                  deletingTag,
+                }}
+              />
+            )}
+            ListEmptyComponent={
+              <View style={styles.empty}>
+                <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
+                  {t('detail.emptyTitle')}
+                </Text>
+                <Text style={[styles.emptySubtitle, { color: colors.disabled }]}>
+                  {t('detail.emptySubtitle')}
+                </Text>
+              </View>
+            }
+            />
+            {/* Fade in cima alla lista: gli item scrollati svaniscono sotto l'header fisso. Nascosto se la lista è vuota */}
+            {/* Temporaneamente rimosso su richiesta:
+            {list.items.length > 0 ? (
+              <LinearGradient
+                pointerEvents="none"
+                colors={[colors.background, hexToRgba(colors.background, 0)]}
+                style={styles.topFade}
+              />
+            ) : null} */}
+          </View>
+        </>
       )}
 
       <ConfirmSheet
@@ -165,37 +218,46 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
   },
-  content: {
-    padding: Spacing.four,
-    gap: Spacing.two + Spacing.one,
+  fixedHeader: {
+    paddingHorizontal: Spacing.four,
+    paddingBottom: Spacing.three,
   },
-  header: {
-    gap: Spacing.two,
+  listWrap: {
+    flex: 1,
+  },
+  topFade: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 24,
+  },
+  content: {
+    paddingHorizontal: Spacing.four,
+    paddingTop: Spacing.two,
+    gap: Spacing.two + Spacing.one,
   },
   description: {
     fontSize: 15,
+    lineHeight: 21,
+    opacity: 0.85,
   },
   itemsBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: Spacing.three,
   },
-  sectionTitle: {
-    fontSize: 20,
+  // Con descrizione: metà dello spazio (30px) che il PageHeader lascia sotto di sé; senza descrizione i pulsanti restano a ridosso dell'header
+  itemsBarSpaced: {
+    paddingTop: 15,
   },
   itemsActions: {
+    flex: 1,
     flexDirection: 'row',
+    alignItems: 'center',
     gap: Spacing.two,
   },
-  addButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 14,
-  },
-  addLabel: {
-    fontSize: 14,
-    color: Colors.light.border,
+  randomizeFill: {
+    flex: 1,
   },
   empty: {
     alignItems: 'center',

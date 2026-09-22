@@ -12,7 +12,7 @@ export function RadialBackground({ colorScheme }: RadialBackgroundProps) {
   const colors = Colors[colorScheme];
 
   return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+    <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.container]}>
       <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.background }]} />
       <Svg width="100%" height={450} viewBox="0 0 400 400" style={styles.glow}>
         <Defs>
@@ -28,6 +28,8 @@ export function RadialBackground({ colorScheme }: RadialBackgroundProps) {
 }
 
 const styles = StyleSheet.create({
+  // Clippa il glow che sborda (top: -200): su react-native-web l'overflow non è tagliato di default e allargherebbe la viewport
+  container: { overflow: 'hidden' },
   glow: {
     position: 'absolute',
     top: -200,

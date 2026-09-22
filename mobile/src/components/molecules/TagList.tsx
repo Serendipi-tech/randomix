@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
@@ -10,6 +11,8 @@ type TagListProps = {
   expandable?: boolean;
   onRemoveTag?: (index: number) => void;
   onAddTag?: () => void;
+  /** Numero massimo di righe prima del badge "+N" (default 1). */
+  maxLines?: number;
 };
 
 // Tag ordinati per lunghezza del nome: mantengo l'indice originale per rimozione via prop
@@ -20,7 +23,8 @@ const TAG_OVERFLOW_BADGE_WIDTH = 34;
 
 /** Riga di tag con troncamento automatico: misura le larghezze off-screen e mostra un badge "+N"
  *  per l'overflow. Se `expandable`, il badge espande la riga al tap. Logica di misura tutta interna. */
-export function TagList({ tags, expandable = false, onRemoveTag, onAddTag }: TagListProps) {
+export function TagList({ tags, expandable = false, onRemoveTag, onAddTag, maxLines = 1 }: TagListProps) {
+  const { t } = useTranslation('lists');
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
@@ -41,26 +45,43 @@ export function TagList({ tags, expandable = false, onRemoveTag, onAddTag }: Tag
   let overflowCount = 0;
 
   if (allMeasured && !expanded) {
-    let used = 0;
+    // Impacchetta i tag su un massimo di `maxLines` righe (stessa larghezza/gap del flexWrap reale)
+    const rows: IndexedTag[][] = [[]];
+    const rowWidths = [0];
     let count = 0;
-    for (let i = 0; i < sortedTags.length; i++) {
-      const width = measuredWidths[sortedTags[i].originalIndex];
-      const next = used + (count > 0 ? TAG_OVERFLOW_GAP : 0) + width;
-      if (next > containerWidth) break;
-      used = next;
-      count++;
+    for (; count < sortedTags.length; count++) {
+      const tag = sortedTags[count];
+      const width = measuredWidths[tag.originalIndex];
+      const rowIndex = rows.length - 1;
+      const gap = rows[rowIndex].length > 0 ? TAG_OVERFLOW_GAP : 0;
+      if (rowWidths[rowIndex] + gap + width <= containerWidth) {
+        rows[rowIndex].push(tag);
+        rowWidths[rowIndex] += gap + width;
+      } else if (rows.length < maxLines) {
+        rows.push([tag]);
+        rowWidths.push(width);
+      } else {
+        break;
+      }
     }
+
+    // Se c'è overflow, restringe l'ultima riga finché non entra anche il badge "+N"
     if (count < sortedTags.length) {
-      while (count > 0) {
-        const usedUpToCount = sortedTags
-          .slice(0, count)
-          .reduce((sum, tag, i) => sum + measuredWidths[tag.originalIndex] + (i > 0 ? TAG_OVERFLOW_GAP : 0), 0);
-        if (usedUpToCount + TAG_OVERFLOW_GAP + TAG_OVERFLOW_BADGE_WIDTH <= containerWidth) break;
+      const lastRowIndex = rows.length - 1;
+      while (rows[lastRowIndex].length > 0) {
+        const width = rows[lastRowIndex].reduce(
+          (sum, tag, i) => sum + measuredWidths[tag.originalIndex] + (i > 0 ? TAG_OVERFLOW_GAP : 0),
+          0,
+        );
+        const gap = rows[lastRowIndex].length > 0 ? TAG_OVERFLOW_GAP : 0;
+        if (width + gap + TAG_OVERFLOW_BADGE_WIDTH <= containerWidth) break;
+        rows[lastRowIndex].pop();
         count--;
       }
     }
-    visibleTags = sortedTags.slice(0, count);
-    overflowCount = sortedTags.length - count;
+
+    visibleTags = rows.flat();
+    overflowCount = sortedTags.length - visibleTags.length;
   }
 
   return (
@@ -77,7 +98,7 @@ export function TagList({ tags, expandable = false, onRemoveTag, onAddTag }: Tag
       </View>
 
       {allMeasured && (
-        <View style={[styles.visibleRow, { flexWrap: expanded ? 'wrap' : 'nowrap' }]}>
+        <View style={[styles.visibleRow, { flexWrap: expanded || maxLines > 1 ? 'wrap' : 'nowrap' }]}>
           {visibleTags.map((tag) => (
             <Tag
               key={tag.originalIndex}
@@ -101,13 +122,13 @@ export function TagList({ tags, expandable = false, onRemoveTag, onAddTag }: Tag
 
           {expanded && (
             <Pressable onPress={() => setExpanded(false)} hitSlop={6}>
-              <Text style={[styles.showLess, { color: colors.textColor }]}>Mostra meno</Text>
+              <Text style={[styles.showLess, { color: colors.textColor }]}>{t('itemDetail.showLess')}</Text>
             </Pressable>
           )}
 
           {onAddTag && (
             <Pressable onPress={onAddTag} style={[styles.addTag, { borderColor: hexToRgba(colors.textColor, 0.3) }]}>
-              <Text style={[styles.addTagText, { color: colors.textColor }]}>+ Tag</Text>
+              <Text style={[styles.addTagText, { color: colors.textColor }]}>{t('itemDetail.addTag')}</Text>
             </Pressable>
           )}
         </View>
@@ -144,14 +165,16 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   addTag: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 6,
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
     borderWidth: 1,
     borderStyle: 'dashed',
   },
   addTagText: {
-    fontSize: 11,
+    fontSize: 14,
     fontWeight: '700',
   },
 });

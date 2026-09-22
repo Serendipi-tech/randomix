@@ -5,8 +5,10 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LayoutGrid, List } from 'lucide-react-native';
 import { Colors, Spacing } from '@/constants/theme';
+import { useNavbarClearance } from '@/utils/useNavbarClearance';
 import { DEFAULT_LIST_ICON_KEY, resolveListIcon, type ListIconKey } from '@/constants/list-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { RadialBackground } from '@/components/molecules/radial-background';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
 import { PageHeader } from '@/components/molecules/PageHeader';
@@ -36,6 +38,7 @@ export default function GroupDetailScreen() {
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
   const router = useRouter();
+  const listBottomPadding = useNavbarClearance();
 
   const { id } = useLocalSearchParams<{ id: string }>();
   const { profile } = useProfile();
@@ -155,7 +158,8 @@ export default function GroupDetailScreen() {
   const showSkeleton = loading && !group;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.safe}>
+      <RadialBackground colorScheme={colorScheme} />
       <PageHeader icon={LayoutGrid} title={group?.name ?? ''} onBack={() => router.back()} />
 
       {showSkeleton ? (
@@ -169,7 +173,7 @@ export default function GroupDetailScreen() {
           <Text style={[styles.emptyTitle, { color: colors.textColor }]}>{t('detail.error')}</Text>
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView contentContainerStyle={[styles.content, { paddingBottom: listBottomPadding }]} showsVerticalScrollIndicator={false}>
           {group.description ? (
             <Text style={[styles.description, { color: colors.textColor }]}>
               {group.description}
@@ -389,7 +393,6 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   content: {
     paddingHorizontal: Spacing.four,
-    paddingBottom: 48,
     gap: Spacing.two + Spacing.one,
   },
   skeletonContainer: {

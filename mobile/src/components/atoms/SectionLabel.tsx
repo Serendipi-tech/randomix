@@ -17,7 +17,7 @@ export function SectionLabel({ children }: SectionLabelProps) {
 const styles = StyleSheet.create({
   label: {
     opacity: 0.55,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.5,

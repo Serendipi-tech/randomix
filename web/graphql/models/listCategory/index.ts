@@ -11,5 +11,7 @@ export const ListCategoryRef = builder.prismaObject('ListCategory', {
       type: [CategoryEnum],
       resolve: (category) => category.includedCategories,
     }),
+    listsCount: t.relationCount('lists'),
+    groupListsCount: t.relationCount('groupLists'),
   }),
 });

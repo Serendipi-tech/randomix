@@ -70,7 +70,8 @@ export const ModelName = {
   Subscription: 'Subscription',
   Tag: 'Tag',
   User: 'User',
-  Friendship: 'Friendship'
+  Friendship: 'Friendship',
+  UserFeedback: 'UserFeedback'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -358,6 +359,9 @@ export const UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   resetPasswordToken: 'resetPasswordToken',
   resetPasswordTokenExpiry: 'resetPasswordTokenExpiry',
+  pendingEmail: 'pendingEmail',
+  emailChangeToken: 'emailChangeToken',
+  emailChangeTokenExpiry: 'emailChangeTokenExpiry',
   avatarUrl: 'avatarUrl',
   language: 'language',
   role: 'role',
@@ -379,6 +383,23 @@ export const FriendshipScalarFieldEnum = {
 } as const
 
 export type FriendshipScalarFieldEnum = (typeof FriendshipScalarFieldEnum)[keyof typeof FriendshipScalarFieldEnum]
+
+
+export const UserFeedbackScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  title: 'title',
+  text: 'text',
+  page: 'page',
+  isImportant: 'isImportant',
+  status: 'status',
+  seen: 'seen',
+  adminNote: 'adminNote',
+  createdAt: 'createdAt'
+} as const
+
+export type UserFeedbackScalarFieldEnum = (typeof UserFeedbackScalarFieldEnum)[keyof typeof UserFeedbackScalarFieldEnum]
 
 
 export const SortOrder = {

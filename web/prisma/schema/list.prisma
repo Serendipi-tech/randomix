@@ -4,7 +4,7 @@ model List {
     name        String  @db.VarChar(20)
     icon        String
     color       String
-    description String? @db.VarChar(225)
+    description String? @db.VarChar(100)
 
     isHidden               Boolean @default(false) // nasconde o mostra la lista agli amici
     isGiftedAtRegistration Boolean @default(false) // se è "gratis" all'iscrizione

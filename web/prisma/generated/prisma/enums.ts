@@ -176,3 +176,22 @@ export const CHALLENGE_TIMEFRAME = {
 } as const
 
 export type CHALLENGE_TIMEFRAME = (typeof CHALLENGE_TIMEFRAME)[keyof typeof CHALLENGE_TIMEFRAME]
+
+
+export const FEEDBACK_TYPE = {
+  BUG: 'BUG',
+  SUGGESTION: 'SUGGESTION',
+  COMMENT: 'COMMENT'
+} as const
+
+export type FEEDBACK_TYPE = (typeof FEEDBACK_TYPE)[keyof typeof FEEDBACK_TYPE]
+
+
+export const FEEDBACK_STATUS = {
+  SENT: 'SENT',
+  PROGRESS: 'PROGRESS',
+  DONE: 'DONE',
+  REJECTED: 'REJECTED'
+} as const
+
+export type FEEDBACK_STATUS = (typeof FEEDBACK_STATUS)[keyof typeof FEEDBACK_STATUS]

@@ -11,6 +11,8 @@ export interface UserList {
   description: string | null;
   itemCount: number;
   updatedAt: string;
+  isHidden: boolean;
+  categories: { id: string; name: string }[];
 }
 
 interface MyListsPayload {

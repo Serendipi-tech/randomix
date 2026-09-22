@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -15,10 +15,29 @@
 
 :root {
   --font-display:
-    Inter, Spline Sans, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-    Segoe UI Symbol, Noto Color Emoji;
+    Inter, Spline Sans, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji,
+    Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
   --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
-  --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
-  --font-serif: Georgia, 'Times New Roman', serif;
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono,
+    Courier New, monospace;
+  --font-rounded:
+    "SF Pro Rounded", "Hiragino Maru Gothic ProN", Meiryo, "MS PGothic",
+    sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
+}
+
+/* L'autofill del browser (Chrome/Edge) ignora backgroundColor/color del TextInput e forza
+ * uno sfondo bianco proprio via pseudo-classe: si batte solo con questo box-shadow inset.
+ * Colori hardcoded su Colors.dark (foreground/textColor) — il tema dell'app parte sempre
+ * da dark (AppThemeProvider) e non è sincronizzato sul DOM, quindi un media query
+ * prefers-color-scheme non seguirebbe il toggle in-app. Da rivedere se il tema light
+ * diventa uso comune. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #261b3b inset;
+  -webkit-text-fill-color: #fdfcf5;
+  caret-color: #fdfcf5;
+  transition: background-color 9999s ease-in-out 0s;
 }

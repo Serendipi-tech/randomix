@@ -5,6 +5,8 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useNavbarClearance } from '@/utils/useNavbarClearance';
+import { RadialBackground } from '@/components/molecules/radial-background';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { Avatar } from '@/components/atoms/Avatar';
 import { PageHeader } from '@/components/molecules/PageHeader';
@@ -18,6 +20,7 @@ export default function FriendProfileScreen() {
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
   const router = useRouter();
+  const listBottomPadding = useNavbarClearance();
 
   const { id } = useLocalSearchParams<{ id: string }>();
   const { profile, loading, error } = useFriendProfile(id);
@@ -25,7 +28,8 @@ export default function FriendProfileScreen() {
   const showSkeleton = loading && !profile;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.safe}>
+      <RadialBackground colorScheme={colorScheme} />
       <PageHeader icon={Users} title={profile?.user.username ?? ''} onBack={() => router.back()} />
 
       {showSkeleton ? (
@@ -45,7 +49,7 @@ export default function FriendProfileScreen() {
           showsVerticalScrollIndicator={false}
           data={profile.lists}
           keyExtractor={(list) => list.id}
-          contentContainerStyle={styles.content}
+          contentContainerStyle={[styles.content, { paddingBottom: listBottomPadding }]}
           renderItem={({ item: list }) => (
             <ListCard
               title={list.name}

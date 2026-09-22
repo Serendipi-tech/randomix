@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { Users } from 'lucide-react-native';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useNavbarClearance } from '@/utils/useNavbarClearance';
 import { RadialBackground } from '@/components/molecules/radial-background';
 import { PageHeader } from '@/components/molecules/PageHeader';
 import { Input } from '@/components/molecules/Input';
@@ -25,6 +26,7 @@ export default function FriendsScreen() {
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
   const router = useRouter();
+  const listBottomPadding = useNavbarClearance();
 
   const { friends, loading: loadingFriends, error: friendsError } = useMyFriends();
   const { requests, acceptRequest, rejectRequest, answering } = useFriendRequests();
@@ -52,7 +54,7 @@ export default function FriendsScreen() {
         showsVerticalScrollIndicator={false}
         data={showFriendsSkeleton ? [] : friends}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={[styles.content, { paddingBottom: BottomTabInset + Spacing.four }]}
+        contentContainerStyle={[styles.content, { paddingBottom: listBottomPadding }]}
         renderItem={({ item }) => (
           <FriendCard
             username={item.username}

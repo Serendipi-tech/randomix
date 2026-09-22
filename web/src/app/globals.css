@@ -1,26 +1,80 @@
 @import "tailwindcss";
 
+/* Palette identica a Colors.dark in mobile/src/constants/theme.ts (fonte di verità unica, condivisa
+   tra web e mobile). Dark è l'unico tema del pannello admin: niente light, niente prefers-color-scheme.
+   Ruoli semantici, mai nomi di tinta: se cambia qui, aggiornare anche là. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #191024;
+  --background-radial: #7b2a86;
+  --foreground: #261b3b;
+  --primary: #7154e7;
+  --secondary: #f7c041;
+  --secondary-gradient: #ff6b6b;
+  --accent: #1dffe1;
+  --error: #eb3040;
+  --warning: #fda129;
+  --info: #39c3ff;
+  --success: #40fd79;
+  --shadow: #000000;
+  --border: #334155;
+  --disabled: #5c7597;
+  --text-color: #fdfcf5;
+  --extra-one: #e63d4b;
+  --extra-two: #e6c73d;
+  --extra-three: #3d56e6;
+  --extra-four: #59e63d;
+  --extra-five: #e6813d;
+  --extra-six: #943de6;
+  --extra-seven: #3de697;
+  --extra-eight: #e63db3;
+  --extra-nine: #3db6e6;
+  --extra-ten: #c1e63d;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-radial: var(--background-radial);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-secondary-gradient: var(--secondary-gradient);
+  --color-accent: var(--accent);
+  --color-error: var(--error);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-success: var(--success);
+  --color-shadow: var(--shadow);
+  --color-border: var(--border);
+  --color-disabled: var(--disabled);
+  --color-text-color: var(--text-color);
+  --color-extra-one: var(--extra-one);
+  --color-extra-two: var(--extra-two);
+  --color-extra-three: var(--extra-three);
+  --color-extra-four: var(--extra-four);
+  --color-extra-five: var(--extra-five);
+  --color-extra-six: var(--extra-six);
+  --color-extra-seven: var(--extra-seven);
+  --color-extra-eight: var(--extra-eight);
+  --color-extra-nine: var(--extra-nine);
+  --color-extra-ten: var(--extra-ten);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-color);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Chrome/Edge forzano uno sfondo chiaro sui campi autofillati (credenziali salvate) tramite uno
+   shadow interno che il background-color normale non batte: serve lo shadow inset come trucco. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-color);
+  -webkit-box-shadow: 0 0 0px 1000px var(--foreground) inset;
+  box-shadow: 0 0 0px 1000px var(--foreground) inset;
+  caret-color: var(--text-color);
+  transition: background-color 9999s ease-in-out 0s;
 }

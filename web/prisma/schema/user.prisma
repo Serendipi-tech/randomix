@@ -8,6 +8,10 @@ model User {
     resetPasswordToken       String?
     resetPasswordTokenExpiry DateTime?
 
+    pendingEmail           String?
+    emailChangeToken       String?
+    emailChangeTokenExpiry DateTime?
+
     avatarUrl String?
     language  String? @default("en")
 
@@ -33,6 +37,7 @@ model User {
     tags      Tag[]
     userItems User_Item[]
     ratings   Rating[]
+    feedbacks UserFeedback[]
 
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt

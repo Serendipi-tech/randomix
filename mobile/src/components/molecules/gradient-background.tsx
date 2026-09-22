@@ -14,7 +14,7 @@ export function GradientBackgroundView({ colorScheme }: GradientBackgroundViewPr
   const glows = GradientGlow[colorScheme];
 
   return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+    <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.container]}>
       <LinearGradient colors={stops} start={{ x: 0, y: 0 }} end={{ x: 0.7, y: 1 }} style={StyleSheet.absoluteFill} />
       {glows.map((glow, i) => (
         <LinearGradient
@@ -38,6 +38,8 @@ export function GradientBackgroundView({ colorScheme }: GradientBackgroundViewPr
 }
 
 const styles = StyleSheet.create({
+  // Clippa i glow che sbordano dai bordi: su react-native-web l'overflow non è tagliato di default e allargherebbe la viewport
+  container: { overflow: 'hidden' },
   glow: {
     position: 'absolute',
     width: GLOW_SIZE,

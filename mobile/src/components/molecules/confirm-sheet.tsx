@@ -1,6 +1,7 @@
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Colors } from '@/constants/theme';
-import { hexToRgba } from '@/utils/color';
+import { StyleSheet, Text, View } from 'react-native';
+import { Colors, Spacing } from '@/constants/theme';
+import { BottomSheet } from '@/components/organisms/BottomSheet';
+import { Button } from '@/components/atoms/Button';
 
 interface ConfirmSheetProps {
   visible: boolean;
@@ -13,7 +14,8 @@ interface ConfirmSheetProps {
   onCancel: () => void;
 }
 
-/** Bottom sheet di conferma per azioni distruttive: backdrop + pulsanti conferma/annulla. */
+/** Bottom sheet di conferma per azioni distruttive: usa la shell BottomSheet condivisa + i Button custom
+ *  (annulla secondary, conferma destructive). */
 export function ConfirmSheet({
   visible,
   title,
@@ -27,63 +29,42 @@ export function ConfirmSheet({
   const colors = Colors[colorScheme];
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onCancel}>
-      <Pressable style={styles.backdrop} onPress={onCancel} />
-      <View style={[styles.sheet, { backgroundColor: colors.background }]}>
+    <BottomSheet visible={visible} onClose={onCancel}>
+      <View style={styles.content}>
         <Text style={[styles.title, { color: colors.textColor }]}>{title}</Text>
         <Text style={[styles.message, { color: colors.disabled }]}>{message}</Text>
-
-        <Pressable onPress={onConfirm} style={styles.confirmButton}>
-          <Text style={styles.confirmLabel}>{confirmLabel}</Text>
-        </Pressable>
-        <Pressable
-          onPress={onCancel}
-          style={[styles.cancelButton, { backgroundColor: colors.foreground }]}>
-          <Text style={[styles.cancelLabel, { color: colors.textColor }]}>{cancelLabel}</Text>
-        </Pressable>
+        <View style={styles.actions}>
+          <View style={styles.action}>
+            <Button variant="secondary" label={cancelLabel} onPress={onCancel} />
+          </View>
+          <View style={styles.action}>
+            <Button variant="destructive" label={confirmLabel} onPress={onConfirm} />
+          </View>
+        </View>
       </View>
-    </Modal>
+    </BottomSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: hexToRgba(Colors.light.shadow, 0.45),
-  },
-  sheet: {
-    width: '100%',
-    maxWidth: 480,
-    alignSelf: 'center',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    padding: 24,
-    paddingBottom: 36,
-    gap: 12,
+  content: {
+    paddingHorizontal: Spacing.four,
+    paddingBottom: Spacing.four,
+    gap: Spacing.two,
   },
   title: {
     fontSize: 20,
+    fontWeight: '700',
   },
   message: {
     fontSize: 15,
-    marginBottom: 8,
+    marginBottom: Spacing.two,
   },
-  confirmButton: {
-    borderRadius: 18,
-    paddingVertical: 15,
-    alignItems: 'center',
-    backgroundColor: Colors.light.error,
+  actions: {
+    flexDirection: 'row',
+    gap: Spacing.three,
   },
-  confirmLabel: {
-    fontSize: 16,
-    color: Colors.light.border,
-  },
-  cancelButton: {
-    borderRadius: 18,
-    paddingVertical: 15,
-    alignItems: 'center',
-  },
-  cancelLabel: {
-    fontSize: 16,
+  action: {
+    flex: 1,
   },
 });

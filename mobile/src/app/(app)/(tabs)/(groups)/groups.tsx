@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { LayoutGrid } from 'lucide-react-native';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BottomTabInset, Colors, Spacing } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useNavbarClearance } from '@/utils/useNavbarClearance';
 import { RadialBackground } from '@/components/molecules/radial-background';
 import { PageHeader } from '@/components/molecules/PageHeader';
 import { Button } from '@/components/atoms/Button';
@@ -23,6 +24,7 @@ export default function GroupsScreen() {
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
   const router = useRouter();
+  const listBottomPadding = useNavbarClearance();
 
   const { groups, loading: loadingGroups, error: groupsError, refetch } = useMyGroups();
   const { invites, acceptInvite, rejectInvite } = useGroupInvites();
@@ -73,7 +75,7 @@ export default function GroupsScreen() {
         showsVerticalScrollIndicator={false}
         data={showSkeleton ? [] : groups}
         keyExtractor={(g: GroupSummary) => g.id}
-        contentContainerStyle={[styles.content, { paddingBottom: BottomTabInset + Spacing.four }]}
+        contentContainerStyle={[styles.content, { paddingBottom: listBottomPadding }]}
         onRefresh={refetch}
         refreshing={loadingGroups && groups.length > 0}
         renderItem={({ item }) => (

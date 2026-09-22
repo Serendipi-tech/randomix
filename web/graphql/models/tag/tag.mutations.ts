@@ -33,6 +33,38 @@ builder.mutationField('createTag', (t) =>
   }),
 );
 
+builder.mutationField('updateTag', (t) =>
+  t.prismaField({
+    type: 'Tag',
+    args: {
+      id: t.arg.id({ required: true }),
+      name: t.arg.string({ required: true }),
+      color: t.arg.string({ required: true }),
+    },
+    resolve: async (query, _root, { id, name, color }, ctx) => {
+      requireAuth(ctx.userId);
+      // solo i tag personali possono essere modificati
+      const tag = await prisma.tag.findFirst({ where: { id: String(id), userId: ctx.userId } });
+      if (!tag) {
+        throw new GraphQLError('Tag non trovato.', { extensions: { code: 'NOT_FOUND' } });
+      }
+      const trimmed = name.trim();
+      // evito duplicati tra i tag personali e quelli di sistema (escluso se stesso)
+      const duplicate = await prisma.tag.findFirst({
+        where: { name: trimmed, OR: [{ userId: ctx.userId }, { userId: null }], NOT: { id: String(id) } },
+      });
+      if (duplicate) {
+        throw new GraphQLError('Tag già esistente.', { extensions: { code: 'CONFLICT' } });
+      }
+      return prisma.tag.update({
+        ...query,
+        where: { id: String(id) },
+        data: { name: trimmed, color },
+      });
+    },
+  }),
+);
+
 builder.mutationField('deleteTag', (t) =>
   t.boolean({
     args: { id: t.arg.id({ required: true }) },

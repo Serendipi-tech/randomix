@@ -1,5 +1,5 @@
 import type { User } from '../../../prisma/generated/prisma/client';
-import { builder } from '../../builder';
+import { builder, prisma } from '../../builder';
 import { RolesEnum } from '../../enum';
 
 export const UserRef = builder.prismaObject('User', {
@@ -14,6 +14,11 @@ export const UserRef = builder.prismaObject('User', {
       resolve: (user) => user.role as 'ADMIN' | 'USER',
     }),
     createdAt: t.expose('createdAt', { type: 'DateTime' }),
+    listsCount: t.relationCount('lists'),
+    totalItemsCount: t.relationCount('userItems'),
+    completedItemsCount: t.int({
+      resolve: (user) => prisma.user_Item.count({ where: { userId: user.id, status: 'COMPLETED' } }),
+    }),
   }),
 });
 

@@ -25,7 +25,7 @@ const UpdateListInput = builder.inputType('UpdateListInput', {
 });
 
 const NAME_MAX_LENGTH = 20;
-const DESCRIPTION_MAX_LENGTH = 225;
+const DESCRIPTION_MAX_LENGTH = 100;
 
 function requireAuth(userId: string | null): asserts userId is string {
   if (!userId) {

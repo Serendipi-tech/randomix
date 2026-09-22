@@ -403,7 +403,8 @@ export const ModelName = {
   Subscription: 'Subscription',
   Tag: 'Tag',
   User: 'User',
-  Friendship: 'Friendship'
+  Friendship: 'Friendship',
+  UserFeedback: 'UserFeedback'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -419,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "group" | "group_User" | "groupList" | "groupList_AcceptedItemHistory" | "groupChallenge" | "groupUser_Challenge" | "item" | "user_Item" | "list" | "list_UserItem" | "listCategory" | "membership" | "notification" | "payment" | "rating" | "report" | "subscription" | "tag" | "user" | "friendship"
+    modelProps: "group" | "group_User" | "groupList" | "groupList_AcceptedItemHistory" | "groupChallenge" | "groupUser_Challenge" | "item" | "user_Item" | "list" | "list_UserItem" | "listCategory" | "membership" | "notification" | "payment" | "rating" | "report" | "subscription" | "tag" | "user" | "friendship" | "userFeedback"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1903,6 +1904,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    UserFeedback: {
+      payload: Prisma.$UserFeedbackPayload<ExtArgs>
+      fields: Prisma.UserFeedbackFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserFeedbackFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFeedbackPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserFeedbackFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFeedbackPayload>
+        }
+        findFirst: {
+          args: Prisma.UserFeedbackFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFeedbackPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserFeedbackFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFeedbackPayload>
+        }
+        findMany: {
+          args: Prisma.UserFeedbackFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFeedbackPayload>[]
+        }
+        create: {
+          args: Prisma.UserFeedbackCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFeedbackPayload>
+        }
+        createMany: {
+          args: Prisma.UserFeedbackCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserFeedbackCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFeedbackPayload>[]
+        }
+        delete: {
+          args: Prisma.UserFeedbackDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFeedbackPayload>
+        }
+        update: {
+          args: Prisma.UserFeedbackUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFeedbackPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserFeedbackDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserFeedbackUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserFeedbackUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFeedbackPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserFeedbackUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserFeedbackPayload>
+        }
+        aggregate: {
+          args: Prisma.UserFeedbackAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserFeedback>
+        }
+        groupBy: {
+          args: Prisma.UserFeedbackGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserFeedbackGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserFeedbackCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserFeedbackCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2211,6 +2286,9 @@ export const UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   resetPasswordToken: 'resetPasswordToken',
   resetPasswordTokenExpiry: 'resetPasswordTokenExpiry',
+  pendingEmail: 'pendingEmail',
+  emailChangeToken: 'emailChangeToken',
+  emailChangeTokenExpiry: 'emailChangeTokenExpiry',
   avatarUrl: 'avatarUrl',
   language: 'language',
   role: 'role',
@@ -2232,6 +2310,23 @@ export const FriendshipScalarFieldEnum = {
 } as const
 
 export type FriendshipScalarFieldEnum = (typeof FriendshipScalarFieldEnum)[keyof typeof FriendshipScalarFieldEnum]
+
+
+export const UserFeedbackScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  title: 'title',
+  text: 'text',
+  page: 'page',
+  isImportant: 'isImportant',
+  status: 'status',
+  seen: 'seen',
+  adminNote: 'adminNote',
+  createdAt: 'createdAt'
+} as const
+
+export type UserFeedbackScalarFieldEnum = (typeof UserFeedbackScalarFieldEnum)[keyof typeof UserFeedbackScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2553,6 +2648,34 @@ export type EnumSTATUS_FRIENDSHIPFieldRefInput<$PrismaModel> = FieldRefInputType
 export type ListEnumSTATUS_FRIENDSHIPFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'STATUS_FRIENDSHIP[]'>
     
 
+
+/**
+ * Reference to a field of type 'FEEDBACK_TYPE'
+ */
+export type EnumFEEDBACK_TYPEFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FEEDBACK_TYPE'>
+    
+
+
+/**
+ * Reference to a field of type 'FEEDBACK_TYPE[]'
+ */
+export type ListEnumFEEDBACK_TYPEFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FEEDBACK_TYPE[]'>
+    
+
+
+/**
+ * Reference to a field of type 'FEEDBACK_STATUS'
+ */
+export type EnumFEEDBACK_STATUSFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FEEDBACK_STATUS'>
+    
+
+
+/**
+ * Reference to a field of type 'FEEDBACK_STATUS[]'
+ */
+export type ListEnumFEEDBACK_STATUSFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FEEDBACK_STATUS[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2683,6 +2806,7 @@ export type GlobalOmitConfig = {
   tag?: Prisma.TagOmit
   user?: Prisma.UserOmit
   friendship?: Prisma.FriendshipOmit
+  userFeedback?: Prisma.UserFeedbackOmit
 }
 
 /* Types for Logging */

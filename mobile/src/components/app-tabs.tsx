@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { usePathname } from 'expo-router';
 import { Tabs, TabList, TabTrigger, TabSlot, type TabTriggerSlotProps, type TabListProps } from 'expo-router/ui';
 import { BlurView } from 'expo-blur';
 import { Platform, Pressable, StyleSheet, View, type LayoutChangeEvent, type ViewStyle } from 'react-native';
@@ -39,6 +40,10 @@ const SIDE_TAB_ICONS = {
   friends: Users,
   groups: LayoutGrid,
 } as const;
+
+// La pillola resta visibile ovunque (root + navigazione gerarchica: dettagli lista/amico/gruppo);
+// si nasconde solo nei task focalizzati: form di creazione/modifica e flussi immersivi a schermo pieno
+const HIDDEN_PATHS = ['/list-form', '/item-form', '/draw', '/randomizer'];
 
 type SideTabName = keyof typeof SIDE_TAB_ICONS;
 
@@ -185,6 +190,9 @@ function HomeButton({ isFocused, ...props }: TabTriggerSlotProps) {
 function TabBar(props: TabListProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
+  const pathname = usePathname();
+  // Nasconde la pillola (senza smontare le tab) solo nei task focalizzati: display none mantiene i trigger montati
+  const barVisible = !HIDDEN_PATHS.includes(pathname);
   const fill = hexToRgba(colors.primary, 0.2);
   const [width, setWidth] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -227,7 +235,7 @@ function TabBar(props: TabListProps) {
     );
 
   return (
-    <View pointerEvents="box-none" style={[styles.wrap, { paddingBottom: sideGap }]} onLayout={onWrapLayout}>
+    <View pointerEvents="box-none" style={[styles.wrap, { paddingBottom: sideGap, display: barVisible ? 'flex' : 'none' }]} onLayout={onWrapLayout}>
       <View style={styles.pillWrap} onLayout={onLayout}>
         {width > 0 && (
           <>
@@ -256,7 +264,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pillWrap: {
-    width: '96%',
+    width: '92%',
     maxWidth: 420,
     height: BAR_HEIGHT,
   },

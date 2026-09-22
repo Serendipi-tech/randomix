@@ -16,19 +16,22 @@ type PageHeaderProps = {
   onBack?: () => void;
   subtitle?: string;
   action?: PageHeaderAction;
+  /** Gradiente dell'icona: se assente usa il gradiente di default del tema. */
+  iconGradient?: readonly [string, string];
 };
 
 /** Intestazione di pagina: icona su gradient fisso + titolo, back e/o azione extra opzionali (icona e onPress passati dal chiamante) a destra, sottotitolo opzionale. */
-export function PageHeader({ icon: Icon, title, onBack, subtitle, action }: PageHeaderProps) {
+export function PageHeader({ icon: Icon, title, onBack, subtitle, action, iconGradient }: PageHeaderProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
+  const gradient: readonly [string, string] = iconGradient ?? [colors.secondary, colors.secondaryGradient];
 
   return (
     <View style={styles.wrapper}>
       <View style={styles.topRow}>
         <View style={styles.content}>
           <LinearGradient
-            colors={[colors.secondary, colors.secondaryGradient]}
+            colors={gradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.icon}
