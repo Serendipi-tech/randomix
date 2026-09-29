@@ -89,7 +89,7 @@ export default function ProfileScreen() {
       </View>
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={[styles.content, { paddingBottom: NAVBAR_HEIGHT + insets.bottom + Spacing.three }]}
+        contentContainerStyle={[styles.content, { paddingBottom: NAVBAR_HEIGHT + insets.bottom + Spacing.five }]}
         showsVerticalScrollIndicator={false}
       >
         {loadingProfile && !profile ? (
