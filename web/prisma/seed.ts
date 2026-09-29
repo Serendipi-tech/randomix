@@ -1,6 +1,8 @@
 import { PrismaClient } from './generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const prisma = new PrismaClient({ adapter });
 
 // Valori dell'ex enum CATEGORY, migrati come righe iniziali del model Category.
 // Da eseguire una tantum dopo il primo `prisma db push` con Category attivo.
