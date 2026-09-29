@@ -26,7 +26,11 @@ export function Sidebar() {
 
   return (
     <aside className="flex h-screen w-56 shrink-0 flex-col gap-1 border-r border-border bg-foreground p-4">
-      <p className="mb-4 px-2 text-lg font-semibold text-text-color">Randomix Admin</p>
+      <div className="mb-4 flex items-center gap-2 px-2">
+        {/* eslint-disable-next-line @next/next/no-img-element -- SVG statico, non richiede l'ottimizzatore immagini di Next */}
+        <img src="/logo.svg" alt="" width={28} height={28} />
+        <p className="text-lg font-semibold text-text-color">Randomix Admin</p>
+      </div>
       {NAV_ITEMS.map((item) => {
         const isActive = item.href === '/dashboard' ? pathname === item.href : pathname.startsWith(item.href);
         return (
