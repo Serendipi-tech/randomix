@@ -46,8 +46,10 @@ export function DonutChart({ segments, trackColor, size = 96, strokeWidth = 14 }
             strokeDasharray={`${dash} ${circumference - dash}`}
             strokeLinecap="round"
             fill="none"
-            rotation={rotation}
-            origin={`${size / 2}, ${size / 2}`}
+            // `transform` (stringa SVG) invece di rotation+origin: su web, react-native-svg
+            // inoltra rotation/origin come attributo DOM "transform-origin" non camelCase,
+            // React lo segnala come invalido — transform è un attributo SVG standard su entrambi.
+            transform={`rotate(${rotation} ${size / 2} ${size / 2})`}
           />
         );
       })}
