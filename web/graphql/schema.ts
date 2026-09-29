@@ -49,6 +49,8 @@ import './models/userFeedback/userFeedback.queries';
 import './models/userFeedback/userFeedback.mutations';
 import './models/userFeedback/adminUserFeedback.queries';
 import './models/userFeedback/adminUserFeedback.mutations';
+import './models/profileStats/index';
+import './models/profileStats/profileStats.queries';
 
 builder.queryType({});
 builder.mutationType({});

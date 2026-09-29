@@ -17,9 +17,13 @@ import { CardShell } from '@/components/cards/CardShell';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ProfileHeader } from '@/components/molecules/profile-header';
 import { ProfileStatsPanel } from '@/components/molecules/profile-stats-panel';
+import { ProfileCategoryStats } from '@/components/molecules/profile-category-stats';
+import { ProfileCompletionDonut } from '@/components/molecules/profile-completion-donut';
+import { ProfileDrawAcceptance } from '@/components/molecules/profile-draw-acceptance';
 import { useAuth } from '@/utils/useAuth';
 import { useProfile } from '@/utils/useProfile';
 import { useMyFriends } from '@/utils/useFriends';
+import { useProfileStats } from '@/utils/useProfileStats';
 
 const USERNAME_MIN_LENGTH = 3;
 // Deve combaciare con AVATAR_SIZE/2 di ProfileHeader: spazio per l'avatar che sfonda la card.
@@ -34,6 +38,7 @@ export default function ProfileScreen() {
 
   const { profile, loading: loadingProfile, updateProfile, saving, saveError } = useProfile();
   const { friends } = useMyFriends();
+  const { categoryStats, completionBreakdown, drawAcceptance } = useProfileStats();
 
   const [editing, setEditing] = useState(false);
   const [username, setUsername] = useState('');
@@ -97,13 +102,16 @@ export default function ProfileScreen() {
                 })}
               />
             </Animated.View>
-            <Animated.View entering={FadeInDown.delay(120).duration(400)}>
+            <Animated.View entering={FadeInDown.delay(120).duration(400)} style={styles.statsGap}>
               <ProfileStatsPanel
                 listsCount={profile.listsCount}
                 totalItemsCount={profile.totalItemsCount}
                 completedItemsCount={profile.completedItemsCount}
                 friendsCount={friends.length}
               />
+              <ProfileCategoryStats categoryStats={categoryStats} />
+              {completionBreakdown && <ProfileCompletionDonut breakdown={completionBreakdown} />}
+              {drawAcceptance && <ProfileDrawAcceptance acceptance={drawAcceptance} />}
             </Animated.View>
           </>
         ) : profile ? (
@@ -176,6 +184,9 @@ const styles = StyleSheet.create({
   },
   heroSpace: {
     marginTop: HERO_TOP_SPACE,
+  },
+  statsGap: {
+    gap: Spacing.two + Spacing.one,
   },
   editSection: {
     gap: 12,

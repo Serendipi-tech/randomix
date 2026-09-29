@@ -32,3 +32,4 @@ export * as UserFeedbackQueries from './gql_crud/userFeedback/userFeedback.queri
 export * as UserFeedbackMutations from './gql_crud/userFeedback/userFeedback.mutations';
 export * as AdminUserFeedbackQueries from './gql_crud/userFeedback/adminUserFeedback.queries';
 export * as AdminUserFeedbackMutations from './gql_crud/userFeedback/adminUserFeedback.mutations';
+export * as ProfileStatsQueries from './gql_crud/profileStats/profileStats.queries';

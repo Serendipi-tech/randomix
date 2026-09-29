@@ -14,6 +14,28 @@
     "completedItems": "Completed",
     "friends": "Friends"
   },
+  "charts": {
+    "categories": {
+      "title": "Categories",
+      "used": "Most used",
+      "drawn": "Most drawn",
+      "other": "Other",
+      "empty": "No items yet"
+    },
+    "completion": {
+      "title": "Completion status",
+      "notStarted": "Not started",
+      "inProgress": "In progress",
+      "completed": "Completed",
+      "empty": "No items yet"
+    },
+    "drawAcceptance": {
+      "title": "Randomizer acceptance",
+      "accepted": "Accepted",
+      "skipped": "Re-rolled",
+      "empty": "No draws yet"
+    }
+  },
   "logoutConfirm": {
     "title": "Log out",
     "message": "Are you sure you want to log out?",
