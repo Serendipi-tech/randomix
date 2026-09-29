@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useListCategories, type ListCategory } from '@/utils/useListCategories';
 import { getLucideIcon } from '@/utils/lucideIconRegistry';
-import { CATEGORY_LABELS } from '@/utils/categoryLabels';
 import { Button } from '@/components/atoms/Button';
 import { Badge } from '@/components/atoms/Badge';
 import { Card } from '@/components/molecules/Card';
@@ -40,7 +39,7 @@ export default function ListCategoriesPage() {
               {category.description && <p className="truncate text-xs text-disabled">{category.description}</p>}
               <div className="flex flex-wrap gap-1">
                 {category.includedCategories.slice(0, 3).map((cat) => (
-                  <Badge key={cat} label={CATEGORY_LABELS[cat] ?? cat} color="var(--accent)" />
+                  <Badge key={cat.id} label={cat.name} color="var(--accent)" />
                 ))}
                 {category.includedCategories.length > 3 && (
                   <Badge label={`+${category.includedCategories.length - 3}`} color="var(--disabled)" />

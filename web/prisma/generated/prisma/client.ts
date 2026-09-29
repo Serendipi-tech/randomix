@@ -31,8 +31,8 @@ export * from "./enums"
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more Groups
- * const groups = await prisma.group.findMany()
+ * // Fetch zero or more Categories
+ * const categories = await prisma.category.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -41,6 +41,11 @@ export const PrismaClient = $Class.getPrismaClientClass()
 export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts extends Prisma.PrismaClientOptions["omit"] = Prisma.PrismaClientOptions["omit"], ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = $Class.PrismaClient<LogOpts, OmitOpts, ExtArgs>
 export { Prisma }
 
+/**
+ * Model Category
+ * 
+ */
+export type Category = Prisma.CategoryModel
 /**
  * Model Group
  * 
@@ -57,11 +62,6 @@ export type Group_User = Prisma.Group_UserModel
  */
 export type GroupList = Prisma.GroupListModel
 /**
- * Model GroupList_AcceptedItemHistory
- * 
- */
-export type GroupList_AcceptedItemHistory = Prisma.GroupList_AcceptedItemHistoryModel
-/**
  * Model GroupChallenge
  * 
  */
@@ -71,11 +71,6 @@ export type GroupChallenge = Prisma.GroupChallengeModel
  * 
  */
 export type GroupUser_Challenge = Prisma.GroupUser_ChallengeModel
-/**
- * Model Item
- * 
- */
-export type Item = Prisma.ItemModel
 /**
  * Model User_Item
  * 

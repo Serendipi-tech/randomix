@@ -17,41 +17,43 @@ enum BILLING {
     YEARLY
 }
 
-enum CATEGORY {
-    APPS
-    ART
-    BOOKS
-    NOVELS
-    COMICS
-    MANGA
-    SUBJECTS
-    MOVIES
-    TV_SHOWS
-    MUSIC
-    OTHER_GAMES
-    VIDEOGAMES
-    BOARDGAMES
-    CARDGAMES
-    SHOPS
-    RESTAURANTS
-    ACTIVITIES
-    SERVICES
-    FOOD
-    CUISINE
-    TRAVEL
-    FANFICTIONS
-    VIDEOS
-    PODCASTS
-    MAGAZINES
-    SPORTS
-    EVENTS
-    EDUCATION
-    CINEMA
-    THEATRE
-    EXPERIENCES
-    BEVERAGES
-    CUSTOM // tutto ciò che non rientra nelle altre categorie
-}
+// Sostituito dal model Category (web/prisma/schema/categories.prisma): le categorie item
+// sono ora righe gestibili da admin, non più valori fissi a livello di schema.
+// enum CATEGORY {
+//     APPS
+//     ART
+//     BOOKS
+//     NOVELS
+//     COMICS
+//     MANGA
+//     SUBJECTS
+//     MOVIES
+//     TV_SHOWS
+//     MUSIC
+//     OTHER_GAMES
+//     VIDEOGAMES
+//     BOARDGAMES
+//     CARDGAMES
+//     SHOPS
+//     RESTAURANTS
+//     ACTIVITIES
+//     SERVICES
+//     FOOD
+//     CUISINE
+//     TRAVEL
+//     FANFICTIONS
+//     VIDEOS
+//     PODCASTS
+//     MAGAZINES
+//     SPORTS
+//     EVENTS
+//     EDUCATION
+//     CINEMA
+//     THEATRE
+//     EXPERIENCES
+//     BEVERAGES
+//     CUSTOM // tutto ciò che non rientra nelle altre categorie
+// }
 
 enum MEMBERSHIP_PLAN {
     FREE

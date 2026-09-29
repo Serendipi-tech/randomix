@@ -434,10 +434,6 @@ export type GroupCreaterandomizingRolesInput = {
   set: $Enums.ROLES_GROUP[]
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
-}
-
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
@@ -445,10 +441,6 @@ export type NullableStringFieldUpdateOperationsInput = {
 export type GroupUpdaterandomizingRolesInput = {
   set?: $Enums.ROLES_GROUP[]
   push?: $Enums.ROLES_GROUP | $Enums.ROLES_GROUP[]
-}
-
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
 }
 
 export type NullableDateTimeFieldUpdateOperationsInput = {

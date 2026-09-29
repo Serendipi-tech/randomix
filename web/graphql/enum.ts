@@ -12,16 +12,7 @@ export const BillingEnum = builder.enumType('BILLING', {
   values: ['NEVER', 'MONTHLY', 'YEARLY'] as const,
 });
 
-export const CategoryEnum = builder.enumType('CATEGORY', {
-  values: [
-    'APPS', 'ART', 'BOOKS', 'NOVELS', 'COMICS', 'MANGA', 'SUBJECTS',
-    'MOVIES', 'TV_SHOWS', 'MUSIC', 'OTHER_GAMES', 'VIDEOGAMES', 'BOARDGAMES',
-    'CARDGAMES', 'SHOPS', 'RESTAURANTS', 'ACTIVITIES', 'SERVICES', 'FOOD',
-    'CUISINE', 'TRAVEL', 'FANFICTIONS', 'VIDEOS', 'PODCASTS', 'MAGAZINES',
-    'SPORTS', 'EVENTS', 'EDUCATION', 'CINEMA', 'THEATRE', 'EXPERIENCES',
-    'BEVERAGES', 'CUSTOM',
-  ] as const,
-});
+// CategoryEnum rimosso: le categorie sono ora il model Category (web/graphql/models/category).
 
 export const MembershipPlanEnum = builder.enumType('MEMBERSHIP_PLAN', {
   values: ['FREE', 'PREMIUM', 'UNLIMITED', 'FREE_TRIAL', 'FULL_ACCESS'] as const,

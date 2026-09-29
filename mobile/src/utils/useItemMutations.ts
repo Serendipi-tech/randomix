@@ -1,6 +1,5 @@
 import { useMutation } from '@apollo/client';
 import { ItemMutations, RatingMutations } from '@randomix/graphql-schema';
-import type { Category } from './useListCategories';
 import type { CompletionStatus } from './useListDetail';
 
 const { ADD_ITEM_TO_LIST, UPDATE_USER_ITEM, REMOVE_ITEM_FROM_LIST } = ItemMutations;
@@ -9,7 +8,7 @@ const { RATE_ITEM } = RatingMutations;
 export interface AddItemInput {
   listId: string;
   name: string;
-  category: Category;
+  categoryId: string;
   description?: string | null;
   note?: string | null;
 }
@@ -58,8 +57,8 @@ export function useItemMutations() {
     await removeMutation({ variables: { id } });
   };
 
-  const rateItem = async (itemId: string, value: number, note?: string | null) => {
-    await rateMutation({ variables: { itemId, value, note } });
+  const rateItem = async (userItemId: string, value: number, note?: string | null) => {
+    await rateMutation({ variables: { userItemId, value, note } });
   };
 
   return {

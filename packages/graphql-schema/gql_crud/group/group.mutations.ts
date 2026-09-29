@@ -119,20 +119,23 @@ export const REMOVE_LIST_FROM_GROUP_LIST: DocumentNode = parse(`
   }
 `);
 
-export const DRAW_FROM_GROUP_LIST: DocumentNode = parse(`
-  mutation DrawFromGroupList($groupListId: ID!, $previousItemId: ID) {
-    drawFromGroupList(groupListId: $groupListId, previousItemId: $previousItemId) {
-      id
-      name
-      description
-      imageUrl
-      category
-    }
-  }
-`);
-
-export const ACCEPT_GROUP_DRAW: DocumentNode = parse(`
-  mutation AcceptGroupDraw($groupListId: ID!, $itemId: ID!) {
-    acceptGroupDraw(groupListId: $groupListId, itemId: $itemId)
-  }
-`);
+// Disabilitato insieme a Item lato server (drawFromGroupList/acceptGroupDraw commentati in
+// group.mutations.ts): pescavano da un catalogo condiviso tra i membri, concetto che non esiste
+// più con item personali.
+// export const DRAW_FROM_GROUP_LIST: DocumentNode = parse(`
+//   mutation DrawFromGroupList($groupListId: ID!, $previousItemId: ID) {
+//     drawFromGroupList(groupListId: $groupListId, previousItemId: $previousItemId) {
+//       id
+//       name
+//       description
+//       imageUrl
+//       category
+//     }
+//   }
+// `);
+//
+// export const ACCEPT_GROUP_DRAW: DocumentNode = parse(`
+//   mutation AcceptGroupDraw($groupListId: ID!, $itemId: ID!) {
+//     acceptGroupDraw(groupListId: $groupListId, itemId: $itemId)
+//   }
+// `);

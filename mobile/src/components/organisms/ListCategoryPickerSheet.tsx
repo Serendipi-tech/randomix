@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Colors } from '@/constants/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
@@ -8,6 +7,7 @@ import { BottomSheet } from '@/components/organisms/BottomSheet';
 import { Input } from '@/components/molecules/Input';
 import { OptionRow } from '@/components/molecules/OptionRow';
 import type { ListCategory } from '@/utils/useListCategories';
+import type { Category } from '@/utils/useCategories';
 
 // Sotto questa soglia la ricerca è superflua: poche opzioni si scorrono a colpo d'occhio
 const SEARCH_MIN_OPTIONS = 10;
@@ -33,7 +33,6 @@ export function ListCategoryPickerSheet({
   searchPlaceholder,
   emptyLabel,
 }: ListCategoryPickerSheetProps) {
-  const { t } = useTranslation('lists');
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   const [search, setSearch] = useState('');
@@ -44,7 +43,7 @@ export function ListCategoryPickerSheet({
     return categories.filter((c) => c.name.toLowerCase().includes(query));
   }, [categories, search]);
 
-  const previewOf = (included: string[]) => included.map((c) => t(`categories.${c}`)).join(' · ');
+  const previewOf = (included: Category[]) => included.map((c) => c.name).join(' · ');
   const showSearch = categories.length >= SEARCH_MIN_OPTIONS;
 
   return (

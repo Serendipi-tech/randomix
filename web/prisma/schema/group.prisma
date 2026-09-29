@@ -37,8 +37,8 @@ model Group_User {
     group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
     user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    groupUserProgression         GroupUser_Challenge[]
-    groupListAcceptedItemHistory GroupList_AcceptedItemHistory[]
+    groupUserProgression GroupUser_Challenge[]
+    // groupListAcceptedItemHistory GroupList_AcceptedItemHistory[] // disabilitato insieme a Item, vedi item.prisma
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -64,28 +64,30 @@ model GroupList {
     group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
     memberLists         List[] // liste dei membri del gruppo
-    items               Item[] // items del gruppo non collegati a liste condivise dagli utenti
+    // items Item[] // disabilitato insieme a Item, vedi item.prisma — Gruppi/Challenge non attivi (SUBROAD)
     listCategories      ListCategory[] // categorie di item del gruppo
     connectedChallenges GroupChallenge[] // sfide del gruppo a cui partecipare
 
-    acceptedItemsHistory GroupList_AcceptedItemHistory[] // storico degli item accettati per la lista
+    // acceptedItemsHistory GroupList_AcceptedItemHistory[] // disabilitato insieme a Item
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
-model GroupList_AcceptedItemHistory {
-    id String @id @default(cuid())
-
-    groupListId String
-    groupList   GroupList @relation(fields: [groupListId], references: [id], onDelete: Cascade)
-
-    randomizingFor Group_User[] // di default devono essere tutti i membri attualmente nel gruppo
-
-    itemId String
-    item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
-
-    randomizedAt DateTime @default(now())
-
-    @@index([groupListId])
-}
+// Disabilitato insieme a Item: lo storico riguardava solo item condivisi tra i membri del gruppo,
+// concetto che non esiste più con item personali. Gruppi/Challenge sono comunque da rifare (SUBROAD).
+// model GroupList_AcceptedItemHistory {
+//     id String @id @default(cuid())
+//
+//     groupListId String
+//     groupList   GroupList @relation(fields: [groupListId], references: [id], onDelete: Cascade)
+//
+//     randomizingFor Group_User[] // di default devono essere tutti i membri attualmente nel gruppo
+//
+//     itemId String
+//     item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+//
+//     randomizedAt DateTime @default(now())
+//
+//     @@index([groupListId])
+// }

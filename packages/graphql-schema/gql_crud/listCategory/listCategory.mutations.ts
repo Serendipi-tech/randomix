@@ -8,7 +8,11 @@ export const ADMIN_CREATE_LIST_CATEGORY: DocumentNode = parse(`
       name
       description
       icon
-      includedCategories
+      includedCategories {
+        id
+        name
+        icon
+      }
       listsCount
       groupListsCount
     }
@@ -22,7 +26,11 @@ export const ADMIN_UPDATE_LIST_CATEGORY: DocumentNode = parse(`
       name
       description
       icon
-      includedCategories
+      includedCategories {
+        id
+        name
+        icon
+      }
       listsCount
       groupListsCount
     }

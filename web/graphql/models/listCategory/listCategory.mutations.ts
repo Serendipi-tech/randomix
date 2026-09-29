@@ -1,7 +1,6 @@
 import { GraphQLError } from 'graphql';
 import { builder, prisma } from '../../builder';
 import { requireAdmin } from '../../auth';
-import { CategoryEnum } from '../../enum';
 import './index';
 
 const ListCategoryInput = builder.inputType('ListCategoryInput', {
@@ -9,7 +8,7 @@ const ListCategoryInput = builder.inputType('ListCategoryInput', {
     name: t.string({ required: true }),
     description: t.string({ required: false }),
     icon: t.string({ required: true }),
-    includedCategories: t.field({ type: [CategoryEnum], required: true }),
+    includedCategoryIds: t.idList({ required: true }),
   }),
 });
 
@@ -25,7 +24,7 @@ builder.mutationField('adminCreateListCategory', (t) =>
           name: input.name,
           description: input.description ?? null,
           icon: input.icon,
-          includedCategories: input.includedCategories,
+          includedCategories: { connect: input.includedCategoryIds.map((id) => ({ id: String(id) })) },
         },
       });
     },
@@ -48,7 +47,7 @@ builder.mutationField('adminUpdateListCategory', (t) =>
           name: input.name,
           description: input.description ?? null,
           icon: input.icon,
-          includedCategories: input.includedCategories,
+          includedCategories: { set: input.includedCategoryIds.map((id) => ({ id: String(id) })) },
         },
       });
     },

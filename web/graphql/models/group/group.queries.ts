@@ -1,6 +1,5 @@
 import { GraphQLError } from 'graphql';
 import { builder, prisma } from '../../builder';
-import { ItemRef } from '../item/index';
 import { GroupDetailRef, GroupInviteRef, GroupSummaryRef } from './index';
 
 function requireAuth(userId: string | null): asserts userId is string {
@@ -106,43 +105,46 @@ builder.queryField('myGroupInvites', (t) =>
   }),
 );
 
-builder.queryField('groupListMergedItems', (t) =>
-  t.field({
-    type: [ItemRef],
-    args: { groupListId: t.arg.id({ required: true }) },
-    resolve: async (_root, { groupListId }, ctx) => {
-      requireAuth(ctx.userId);
-      const glId = String(groupListId);
-      const groupList = await prisma.groupList.findUnique({
-        where: { id: glId },
-        select: { groupId: true },
-      });
-      if (!groupList) {
-        throw new GraphQLError('Lista gruppo non trovata.', { extensions: { code: 'NOT_FOUND' } });
-      }
-      const membership = await prisma.group_User.findUnique({
-        where: { groupId_userId: { groupId: groupList.groupId, userId: ctx.userId } },
-      });
-      if (!membership) {
-        throw new GraphQLError('Non sei membro di questo gruppo.', { extensions: { code: 'FORBIDDEN' } });
-      }
-      const listUserItems = await prisma.list_UserItem.findMany({
-        where: { list: { groupLists: { some: { id: glId } } } },
-        include: { userItem: { include: { item: true } } },
-      });
-      const seen = new Set<string>();
-      const items = [];
-      for (const lui of listUserItems) {
-        const item = lui.userItem.item;
-        if (!seen.has(item.id)) {
-          seen.add(item.id);
-          items.push(item);
-        }
-      }
-      return items;
-    },
-  }),
-);
+// Disabilitato insieme a Item: il merge deduplicava gli item condivisi tra i membri, concetto che
+// non esiste più con item personali (vedi item.prisma). Gruppi/Challenge sono comunque da rifare (SUBROAD).
+//
+// builder.queryField('groupListMergedItems', (t) =>
+//   t.field({
+//     type: [ItemRef],
+//     args: { groupListId: t.arg.id({ required: true }) },
+//     resolve: async (_root, { groupListId }, ctx) => {
+//       requireAuth(ctx.userId);
+//       const glId = String(groupListId);
+//       const groupList = await prisma.groupList.findUnique({
+//         where: { id: glId },
+//         select: { groupId: true },
+//       });
+//       if (!groupList) {
+//         throw new GraphQLError('Lista gruppo non trovata.', { extensions: { code: 'NOT_FOUND' } });
+//       }
+//       const membership = await prisma.group_User.findUnique({
+//         where: { groupId_userId: { groupId: groupList.groupId, userId: ctx.userId } },
+//       });
+//       if (!membership) {
+//         throw new GraphQLError('Non sei membro di questo gruppo.', { extensions: { code: 'FORBIDDEN' } });
+//       }
+//       const listUserItems = await prisma.list_UserItem.findMany({
+//         where: { list: { groupLists: { some: { id: glId } } } },
+//         include: { userItem: { include: { item: true } } },
+//       });
+//       const seen = new Set<string>();
+//       const items = [];
+//       for (const lui of listUserItems) {
+//         const item = lui.userItem.item;
+//         if (!seen.has(item.id)) {
+//           seen.add(item.id);
+//           items.push(item);
+//         }
+//       }
+//       return items;
+//     },
+//   }),
+// );
 
 // ID delle liste dell'utente corrente già condivise in questa GroupList (per i toggle condividi/rimuovi)
 builder.queryField('groupListSharedListIds', (t) =>

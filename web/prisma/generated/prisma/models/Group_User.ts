@@ -201,7 +201,6 @@ export type Group_UserWhereInput = {
   group?: Prisma.XOR<Prisma.GroupScalarRelationFilter, Prisma.GroupWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   groupUserProgression?: Prisma.GroupUser_ChallengeListRelationFilter
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryListRelationFilter
 }
 
 export type Group_UserOrderByWithRelationInput = {
@@ -215,7 +214,6 @@ export type Group_UserOrderByWithRelationInput = {
   group?: Prisma.GroupOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
   groupUserProgression?: Prisma.GroupUser_ChallengeOrderByRelationAggregateInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryOrderByRelationAggregateInput
 }
 
 export type Group_UserWhereUniqueInput = Prisma.AtLeast<{
@@ -233,7 +231,6 @@ export type Group_UserWhereUniqueInput = Prisma.AtLeast<{
   group?: Prisma.XOR<Prisma.GroupScalarRelationFilter, Prisma.GroupWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   groupUserProgression?: Prisma.GroupUser_ChallengeListRelationFilter
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryListRelationFilter
 }, "id" | "groupId_userId">
 
 export type Group_UserOrderByWithAggregationInput = {
@@ -271,7 +268,6 @@ export type Group_UserCreateInput = {
   group: Prisma.GroupCreateNestedOneWithoutMembersInput
   user: Prisma.UserCreateNestedOneWithoutGroupMembershipsInput
   groupUserProgression?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutGroupInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryCreateNestedManyWithoutRandomizingForInput
 }
 
 export type Group_UserUncheckedCreateInput = {
@@ -283,7 +279,6 @@ export type Group_UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutGroupInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedCreateNestedManyWithoutRandomizingForInput
 }
 
 export type Group_UserUpdateInput = {
@@ -295,7 +290,6 @@ export type Group_UserUpdateInput = {
   group?: Prisma.GroupUpdateOneRequiredWithoutMembersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutGroupMembershipsNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUpdateManyWithoutGroupNestedInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryUpdateManyWithoutRandomizingForNestedInput
 }
 
 export type Group_UserUncheckedUpdateInput = {
@@ -307,7 +301,6 @@ export type Group_UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutGroupNestedInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedUpdateManyWithoutRandomizingForNestedInput
 }
 
 export type Group_UserCreateManyInput = {
@@ -438,44 +431,6 @@ export type EnumROLES_GROUPFieldUpdateOperationsInput = {
   set?: $Enums.ROLES_GROUP
 }
 
-export type Group_UserCreateNestedManyWithoutGroupListAcceptedItemHistoryInput = {
-  create?: Prisma.XOR<Prisma.Group_UserCreateWithoutGroupListAcceptedItemHistoryInput, Prisma.Group_UserUncheckedCreateWithoutGroupListAcceptedItemHistoryInput> | Prisma.Group_UserCreateWithoutGroupListAcceptedItemHistoryInput[] | Prisma.Group_UserUncheckedCreateWithoutGroupListAcceptedItemHistoryInput[]
-  connectOrCreate?: Prisma.Group_UserCreateOrConnectWithoutGroupListAcceptedItemHistoryInput | Prisma.Group_UserCreateOrConnectWithoutGroupListAcceptedItemHistoryInput[]
-  connect?: Prisma.Group_UserWhereUniqueInput | Prisma.Group_UserWhereUniqueInput[]
-}
-
-export type Group_UserUncheckedCreateNestedManyWithoutGroupListAcceptedItemHistoryInput = {
-  create?: Prisma.XOR<Prisma.Group_UserCreateWithoutGroupListAcceptedItemHistoryInput, Prisma.Group_UserUncheckedCreateWithoutGroupListAcceptedItemHistoryInput> | Prisma.Group_UserCreateWithoutGroupListAcceptedItemHistoryInput[] | Prisma.Group_UserUncheckedCreateWithoutGroupListAcceptedItemHistoryInput[]
-  connectOrCreate?: Prisma.Group_UserCreateOrConnectWithoutGroupListAcceptedItemHistoryInput | Prisma.Group_UserCreateOrConnectWithoutGroupListAcceptedItemHistoryInput[]
-  connect?: Prisma.Group_UserWhereUniqueInput | Prisma.Group_UserWhereUniqueInput[]
-}
-
-export type Group_UserUpdateManyWithoutGroupListAcceptedItemHistoryNestedInput = {
-  create?: Prisma.XOR<Prisma.Group_UserCreateWithoutGroupListAcceptedItemHistoryInput, Prisma.Group_UserUncheckedCreateWithoutGroupListAcceptedItemHistoryInput> | Prisma.Group_UserCreateWithoutGroupListAcceptedItemHistoryInput[] | Prisma.Group_UserUncheckedCreateWithoutGroupListAcceptedItemHistoryInput[]
-  connectOrCreate?: Prisma.Group_UserCreateOrConnectWithoutGroupListAcceptedItemHistoryInput | Prisma.Group_UserCreateOrConnectWithoutGroupListAcceptedItemHistoryInput[]
-  upsert?: Prisma.Group_UserUpsertWithWhereUniqueWithoutGroupListAcceptedItemHistoryInput | Prisma.Group_UserUpsertWithWhereUniqueWithoutGroupListAcceptedItemHistoryInput[]
-  set?: Prisma.Group_UserWhereUniqueInput | Prisma.Group_UserWhereUniqueInput[]
-  disconnect?: Prisma.Group_UserWhereUniqueInput | Prisma.Group_UserWhereUniqueInput[]
-  delete?: Prisma.Group_UserWhereUniqueInput | Prisma.Group_UserWhereUniqueInput[]
-  connect?: Prisma.Group_UserWhereUniqueInput | Prisma.Group_UserWhereUniqueInput[]
-  update?: Prisma.Group_UserUpdateWithWhereUniqueWithoutGroupListAcceptedItemHistoryInput | Prisma.Group_UserUpdateWithWhereUniqueWithoutGroupListAcceptedItemHistoryInput[]
-  updateMany?: Prisma.Group_UserUpdateManyWithWhereWithoutGroupListAcceptedItemHistoryInput | Prisma.Group_UserUpdateManyWithWhereWithoutGroupListAcceptedItemHistoryInput[]
-  deleteMany?: Prisma.Group_UserScalarWhereInput | Prisma.Group_UserScalarWhereInput[]
-}
-
-export type Group_UserUncheckedUpdateManyWithoutGroupListAcceptedItemHistoryNestedInput = {
-  create?: Prisma.XOR<Prisma.Group_UserCreateWithoutGroupListAcceptedItemHistoryInput, Prisma.Group_UserUncheckedCreateWithoutGroupListAcceptedItemHistoryInput> | Prisma.Group_UserCreateWithoutGroupListAcceptedItemHistoryInput[] | Prisma.Group_UserUncheckedCreateWithoutGroupListAcceptedItemHistoryInput[]
-  connectOrCreate?: Prisma.Group_UserCreateOrConnectWithoutGroupListAcceptedItemHistoryInput | Prisma.Group_UserCreateOrConnectWithoutGroupListAcceptedItemHistoryInput[]
-  upsert?: Prisma.Group_UserUpsertWithWhereUniqueWithoutGroupListAcceptedItemHistoryInput | Prisma.Group_UserUpsertWithWhereUniqueWithoutGroupListAcceptedItemHistoryInput[]
-  set?: Prisma.Group_UserWhereUniqueInput | Prisma.Group_UserWhereUniqueInput[]
-  disconnect?: Prisma.Group_UserWhereUniqueInput | Prisma.Group_UserWhereUniqueInput[]
-  delete?: Prisma.Group_UserWhereUniqueInput | Prisma.Group_UserWhereUniqueInput[]
-  connect?: Prisma.Group_UserWhereUniqueInput | Prisma.Group_UserWhereUniqueInput[]
-  update?: Prisma.Group_UserUpdateWithWhereUniqueWithoutGroupListAcceptedItemHistoryInput | Prisma.Group_UserUpdateWithWhereUniqueWithoutGroupListAcceptedItemHistoryInput[]
-  updateMany?: Prisma.Group_UserUpdateManyWithWhereWithoutGroupListAcceptedItemHistoryInput | Prisma.Group_UserUpdateManyWithWhereWithoutGroupListAcceptedItemHistoryInput[]
-  deleteMany?: Prisma.Group_UserScalarWhereInput | Prisma.Group_UserScalarWhereInput[]
-}
-
 export type Group_UserCreateNestedOneWithoutGroupUserProgressionInput = {
   create?: Prisma.XOR<Prisma.Group_UserCreateWithoutGroupUserProgressionInput, Prisma.Group_UserUncheckedCreateWithoutGroupUserProgressionInput>
   connectOrCreate?: Prisma.Group_UserCreateOrConnectWithoutGroupUserProgressionInput
@@ -540,7 +495,6 @@ export type Group_UserCreateWithoutGroupInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutGroupMembershipsInput
   groupUserProgression?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutGroupInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryCreateNestedManyWithoutRandomizingForInput
 }
 
 export type Group_UserUncheckedCreateWithoutGroupInput = {
@@ -551,7 +505,6 @@ export type Group_UserUncheckedCreateWithoutGroupInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutGroupInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedCreateNestedManyWithoutRandomizingForInput
 }
 
 export type Group_UserCreateOrConnectWithoutGroupInput = {
@@ -593,49 +546,6 @@ export type Group_UserScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Group_User"> | Date | string
 }
 
-export type Group_UserCreateWithoutGroupListAcceptedItemHistoryInput = {
-  id?: string
-  autoUpdateItems?: boolean
-  role?: $Enums.ROLES_GROUP
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  group: Prisma.GroupCreateNestedOneWithoutMembersInput
-  user: Prisma.UserCreateNestedOneWithoutGroupMembershipsInput
-  groupUserProgression?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutGroupInput
-}
-
-export type Group_UserUncheckedCreateWithoutGroupListAcceptedItemHistoryInput = {
-  id?: string
-  groupId: string
-  userId: string
-  autoUpdateItems?: boolean
-  role?: $Enums.ROLES_GROUP
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutGroupInput
-}
-
-export type Group_UserCreateOrConnectWithoutGroupListAcceptedItemHistoryInput = {
-  where: Prisma.Group_UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.Group_UserCreateWithoutGroupListAcceptedItemHistoryInput, Prisma.Group_UserUncheckedCreateWithoutGroupListAcceptedItemHistoryInput>
-}
-
-export type Group_UserUpsertWithWhereUniqueWithoutGroupListAcceptedItemHistoryInput = {
-  where: Prisma.Group_UserWhereUniqueInput
-  update: Prisma.XOR<Prisma.Group_UserUpdateWithoutGroupListAcceptedItemHistoryInput, Prisma.Group_UserUncheckedUpdateWithoutGroupListAcceptedItemHistoryInput>
-  create: Prisma.XOR<Prisma.Group_UserCreateWithoutGroupListAcceptedItemHistoryInput, Prisma.Group_UserUncheckedCreateWithoutGroupListAcceptedItemHistoryInput>
-}
-
-export type Group_UserUpdateWithWhereUniqueWithoutGroupListAcceptedItemHistoryInput = {
-  where: Prisma.Group_UserWhereUniqueInput
-  data: Prisma.XOR<Prisma.Group_UserUpdateWithoutGroupListAcceptedItemHistoryInput, Prisma.Group_UserUncheckedUpdateWithoutGroupListAcceptedItemHistoryInput>
-}
-
-export type Group_UserUpdateManyWithWhereWithoutGroupListAcceptedItemHistoryInput = {
-  where: Prisma.Group_UserScalarWhereInput
-  data: Prisma.XOR<Prisma.Group_UserUpdateManyMutationInput, Prisma.Group_UserUncheckedUpdateManyWithoutGroupListAcceptedItemHistoryInput>
-}
-
 export type Group_UserCreateWithoutGroupUserProgressionInput = {
   id?: string
   autoUpdateItems?: boolean
@@ -644,7 +554,6 @@ export type Group_UserCreateWithoutGroupUserProgressionInput = {
   updatedAt?: Date | string
   group: Prisma.GroupCreateNestedOneWithoutMembersInput
   user: Prisma.UserCreateNestedOneWithoutGroupMembershipsInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryCreateNestedManyWithoutRandomizingForInput
 }
 
 export type Group_UserUncheckedCreateWithoutGroupUserProgressionInput = {
@@ -655,7 +564,6 @@ export type Group_UserUncheckedCreateWithoutGroupUserProgressionInput = {
   role?: $Enums.ROLES_GROUP
   createdAt?: Date | string
   updatedAt?: Date | string
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedCreateNestedManyWithoutRandomizingForInput
 }
 
 export type Group_UserCreateOrConnectWithoutGroupUserProgressionInput = {
@@ -682,7 +590,6 @@ export type Group_UserUpdateWithoutGroupUserProgressionInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   group?: Prisma.GroupUpdateOneRequiredWithoutMembersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutGroupMembershipsNestedInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryUpdateManyWithoutRandomizingForNestedInput
 }
 
 export type Group_UserUncheckedUpdateWithoutGroupUserProgressionInput = {
@@ -693,7 +600,6 @@ export type Group_UserUncheckedUpdateWithoutGroupUserProgressionInput = {
   role?: Prisma.EnumROLES_GROUPFieldUpdateOperationsInput | $Enums.ROLES_GROUP
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedUpdateManyWithoutRandomizingForNestedInput
 }
 
 export type Group_UserCreateWithoutUserInput = {
@@ -704,7 +610,6 @@ export type Group_UserCreateWithoutUserInput = {
   updatedAt?: Date | string
   group: Prisma.GroupCreateNestedOneWithoutMembersInput
   groupUserProgression?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutGroupInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryCreateNestedManyWithoutRandomizingForInput
 }
 
 export type Group_UserUncheckedCreateWithoutUserInput = {
@@ -715,7 +620,6 @@ export type Group_UserUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutGroupInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedCreateNestedManyWithoutRandomizingForInput
 }
 
 export type Group_UserCreateOrConnectWithoutUserInput = {
@@ -761,7 +665,6 @@ export type Group_UserUpdateWithoutGroupInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutGroupMembershipsNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUpdateManyWithoutGroupNestedInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryUpdateManyWithoutRandomizingForNestedInput
 }
 
 export type Group_UserUncheckedUpdateWithoutGroupInput = {
@@ -772,43 +675,10 @@ export type Group_UserUncheckedUpdateWithoutGroupInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutGroupNestedInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedUpdateManyWithoutRandomizingForNestedInput
 }
 
 export type Group_UserUncheckedUpdateManyWithoutGroupInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  autoUpdateItems?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  role?: Prisma.EnumROLES_GROUPFieldUpdateOperationsInput | $Enums.ROLES_GROUP
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type Group_UserUpdateWithoutGroupListAcceptedItemHistoryInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  autoUpdateItems?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  role?: Prisma.EnumROLES_GROUPFieldUpdateOperationsInput | $Enums.ROLES_GROUP
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  group?: Prisma.GroupUpdateOneRequiredWithoutMembersNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutGroupMembershipsNestedInput
-  groupUserProgression?: Prisma.GroupUser_ChallengeUpdateManyWithoutGroupNestedInput
-}
-
-export type Group_UserUncheckedUpdateWithoutGroupListAcceptedItemHistoryInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  groupId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  autoUpdateItems?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  role?: Prisma.EnumROLES_GROUPFieldUpdateOperationsInput | $Enums.ROLES_GROUP
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutGroupNestedInput
-}
-
-export type Group_UserUncheckedUpdateManyWithoutGroupListAcceptedItemHistoryInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  groupId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   autoUpdateItems?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumROLES_GROUPFieldUpdateOperationsInput | $Enums.ROLES_GROUP
@@ -833,7 +703,6 @@ export type Group_UserUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   group?: Prisma.GroupUpdateOneRequiredWithoutMembersNestedInput
   groupUserProgression?: Prisma.GroupUser_ChallengeUpdateManyWithoutGroupNestedInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryUpdateManyWithoutRandomizingForNestedInput
 }
 
 export type Group_UserUncheckedUpdateWithoutUserInput = {
@@ -844,7 +713,6 @@ export type Group_UserUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   groupUserProgression?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutGroupNestedInput
-  groupListAcceptedItemHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedUpdateManyWithoutRandomizingForNestedInput
 }
 
 export type Group_UserUncheckedUpdateManyWithoutUserInput = {
@@ -863,12 +731,10 @@ export type Group_UserUncheckedUpdateManyWithoutUserInput = {
 
 export type Group_UserCountOutputType = {
   groupUserProgression: number
-  groupListAcceptedItemHistory: number
 }
 
 export type Group_UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   groupUserProgression?: boolean | Group_UserCountOutputTypeCountGroupUserProgressionArgs
-  groupListAcceptedItemHistory?: boolean | Group_UserCountOutputTypeCountGroupListAcceptedItemHistoryArgs
 }
 
 /**
@@ -888,13 +754,6 @@ export type Group_UserCountOutputTypeCountGroupUserProgressionArgs<ExtArgs exten
   where?: Prisma.GroupUser_ChallengeWhereInput
 }
 
-/**
- * Group_UserCountOutputType without action
- */
-export type Group_UserCountOutputTypeCountGroupListAcceptedItemHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.GroupList_AcceptedItemHistoryWhereInput
-}
-
 
 export type Group_UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -907,7 +766,6 @@ export type Group_UserSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   group?: boolean | Prisma.GroupDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   groupUserProgression?: boolean | Prisma.Group_User$groupUserProgressionArgs<ExtArgs>
-  groupListAcceptedItemHistory?: boolean | Prisma.Group_User$groupListAcceptedItemHistoryArgs<ExtArgs>
   _count?: boolean | Prisma.Group_UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["group_User"]>
 
@@ -950,7 +808,6 @@ export type Group_UserInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   group?: boolean | Prisma.GroupDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   groupUserProgression?: boolean | Prisma.Group_User$groupUserProgressionArgs<ExtArgs>
-  groupListAcceptedItemHistory?: boolean | Prisma.Group_User$groupListAcceptedItemHistoryArgs<ExtArgs>
   _count?: boolean | Prisma.Group_UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type Group_UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -968,7 +825,6 @@ export type $Group_UserPayload<ExtArgs extends runtime.Types.Extensions.Internal
     group: Prisma.$GroupPayload<ExtArgs>
     user: Prisma.$UserPayload<ExtArgs>
     groupUserProgression: Prisma.$GroupUser_ChallengePayload<ExtArgs>[]
-    groupListAcceptedItemHistory: Prisma.$GroupList_AcceptedItemHistoryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1375,7 +1231,6 @@ export interface Prisma__Group_UserClient<T, Null = never, ExtArgs extends runti
   group<T extends Prisma.GroupDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupDefaultArgs<ExtArgs>>): Prisma.Prisma__GroupClient<runtime.Types.Result.GetResult<Prisma.$GroupPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   groupUserProgression<T extends Prisma.Group_User$groupUserProgressionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Group_User$groupUserProgressionArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GroupUser_ChallengePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  groupListAcceptedItemHistory<T extends Prisma.Group_User$groupListAcceptedItemHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Group_User$groupListAcceptedItemHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GroupList_AcceptedItemHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1834,30 +1689,6 @@ export type Group_User$groupUserProgressionArgs<ExtArgs extends runtime.Types.Ex
   take?: number
   skip?: number
   distinct?: Prisma.GroupUser_ChallengeScalarFieldEnum | Prisma.GroupUser_ChallengeScalarFieldEnum[]
-}
-
-/**
- * Group_User.groupListAcceptedItemHistory
- */
-export type Group_User$groupListAcceptedItemHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the GroupList_AcceptedItemHistory
-   */
-  select?: Prisma.GroupList_AcceptedItemHistorySelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the GroupList_AcceptedItemHistory
-   */
-  omit?: Prisma.GroupList_AcceptedItemHistoryOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.GroupList_AcceptedItemHistoryInclude<ExtArgs> | null
-  where?: Prisma.GroupList_AcceptedItemHistoryWhereInput
-  orderBy?: Prisma.GroupList_AcceptedItemHistoryOrderByWithRelationInput | Prisma.GroupList_AcceptedItemHistoryOrderByWithRelationInput[]
-  cursor?: Prisma.GroupList_AcceptedItemHistoryWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.GroupList_AcceptedItemHistoryScalarFieldEnum | Prisma.GroupList_AcceptedItemHistoryScalarFieldEnum[]
 }
 
 /**

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useListCategoryForm } from '@/utils/useListCategoryForm';
 import type { ListCategory } from '@/utils/useListCategories';
-import { ALL_CATEGORIES, CATEGORY_LABELS } from '@/utils/categoryLabels';
+import { useCategories, type Category } from '@/utils/useCategories';
 import { getLucideIcon } from '@/utils/lucideIconRegistry';
 import { Input } from '@/components/molecules/Input';
 import { Chip } from '@/components/atoms/Chip';
@@ -19,6 +19,7 @@ interface ListCategoryFormModalProps {
 export function ListCategoryFormModal({ category, onClose }: ListCategoryFormModalProps) {
   const [iconPickerOpen, setIconPickerOpen] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const { categories: allCategories } = useCategories();
 
   const {
     name,
@@ -27,7 +28,7 @@ export function ListCategoryFormModal({ category, onClose }: ListCategoryFormMod
     setDescription,
     icon,
     setIcon,
-    includedCategories,
+    includedCategoryIds,
     toggleCategory,
     save,
     saving,
@@ -79,12 +80,12 @@ export function ListCategoryFormModal({ category, onClose }: ListCategoryFormMod
         <div className="flex flex-col gap-1.5">
           <span className="text-sm font-semibold text-text-color">Categorie incluse</span>
           <div className="flex flex-wrap gap-2">
-            {ALL_CATEGORIES.map((cat) => (
+            {allCategories.map((cat: Category) => (
               <Chip
-                key={cat}
-                label={CATEGORY_LABELS[cat]}
-                selected={includedCategories.includes(cat)}
-                onClick={() => toggleCategory(cat)}
+                key={cat.id}
+                label={cat.name}
+                selected={includedCategoryIds.includes(cat.id)}
+                onClick={() => toggleCategory(cat.id)}
               />
             ))}
           </div>

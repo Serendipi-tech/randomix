@@ -70,17 +70,19 @@ export const MY_GROUP_INVITES: DocumentNode = parse(`
   }
 `);
 
-export const GROUP_LIST_MERGED_ITEMS: DocumentNode = parse(`
-  query GroupListMergedItems($groupListId: ID!) {
-    groupListMergedItems(groupListId: $groupListId) {
-      id
-      name
-      description
-      imageUrl
-      category
-    }
-  }
-`);
+// Disabilitato insieme a Item lato server (groupListMergedItems commentato in group.queries.ts):
+// il merge deduplicava item condivisi tra membri, concetto che non esiste più con item personali.
+// export const GROUP_LIST_MERGED_ITEMS: DocumentNode = parse(`
+//   query GroupListMergedItems($groupListId: ID!) {
+//     groupListMergedItems(groupListId: $groupListId) {
+//       id
+//       name
+//       description
+//       imageUrl
+//       category
+//     }
+//   }
+// `);
 
 export const GROUP_LIST_SHARED_LIST_IDS: DocumentNode = parse(`
   query GroupListSharedListIds($groupListId: ID!) {

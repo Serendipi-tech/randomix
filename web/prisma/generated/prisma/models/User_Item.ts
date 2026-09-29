@@ -27,12 +27,13 @@ export type AggregateUser_Item = {
 export type User_ItemMinAggregateOutputType = {
   id: string | null
   userId: string | null
-  itemId: string | null
+  name: string | null
   description: string | null
   note: string | null
   status: $Enums.STATUS_COMPLETION | null
   completedAt: Date | null
   isHidden: boolean | null
+  categoryId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -40,12 +41,13 @@ export type User_ItemMinAggregateOutputType = {
 export type User_ItemMaxAggregateOutputType = {
   id: string | null
   userId: string | null
-  itemId: string | null
+  name: string | null
   description: string | null
   note: string | null
   status: $Enums.STATUS_COMPLETION | null
   completedAt: Date | null
   isHidden: boolean | null
+  categoryId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -53,12 +55,13 @@ export type User_ItemMaxAggregateOutputType = {
 export type User_ItemCountAggregateOutputType = {
   id: number
   userId: number
-  itemId: number
+  name: number
   description: number
   note: number
   status: number
   completedAt: number
   isHidden: number
+  categoryId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -68,12 +71,13 @@ export type User_ItemCountAggregateOutputType = {
 export type User_ItemMinAggregateInputType = {
   id?: true
   userId?: true
-  itemId?: true
+  name?: true
   description?: true
   note?: true
   status?: true
   completedAt?: true
   isHidden?: true
+  categoryId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -81,12 +85,13 @@ export type User_ItemMinAggregateInputType = {
 export type User_ItemMaxAggregateInputType = {
   id?: true
   userId?: true
-  itemId?: true
+  name?: true
   description?: true
   note?: true
   status?: true
   completedAt?: true
   isHidden?: true
+  categoryId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -94,12 +99,13 @@ export type User_ItemMaxAggregateInputType = {
 export type User_ItemCountAggregateInputType = {
   id?: true
   userId?: true
-  itemId?: true
+  name?: true
   description?: true
   note?: true
   status?: true
   completedAt?: true
   isHidden?: true
+  categoryId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -180,12 +186,13 @@ export type User_ItemGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 export type User_ItemGroupByOutputType = {
   id: string
   userId: string
-  itemId: string
+  name: string
   description: string | null
   note: string | null
   status: $Enums.STATUS_COMPLETION
   completedAt: Date | null
   isHidden: boolean
+  categoryId: string
   createdAt: Date
   updatedAt: Date
   _count: User_ItemCountAggregateOutputType | null
@@ -214,70 +221,77 @@ export type User_ItemWhereInput = {
   NOT?: Prisma.User_ItemWhereInput | Prisma.User_ItemWhereInput[]
   id?: Prisma.StringFilter<"User_Item"> | string
   userId?: Prisma.StringFilter<"User_Item"> | string
-  itemId?: Prisma.StringFilter<"User_Item"> | string
+  name?: Prisma.StringFilter<"User_Item"> | string
   description?: Prisma.StringNullableFilter<"User_Item"> | string | null
   note?: Prisma.StringNullableFilter<"User_Item"> | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFilter<"User_Item"> | $Enums.STATUS_COMPLETION
   completedAt?: Prisma.DateTimeNullableFilter<"User_Item"> | Date | string | null
   isHidden?: Prisma.BoolFilter<"User_Item"> | boolean
+  categoryId?: Prisma.StringFilter<"User_Item"> | string
   createdAt?: Prisma.DateTimeFilter<"User_Item"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User_Item"> | Date | string
   tags?: Prisma.TagListRelationFilter
   lists?: Prisma.List_UserItemListRelationFilter
+  category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   usedInChallenge?: Prisma.GroupUser_ChallengeListRelationFilter
+  ratings?: Prisma.RatingListRelationFilter
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  item?: Prisma.XOR<Prisma.ItemScalarRelationFilter, Prisma.ItemWhereInput>
 }
 
 export type User_ItemOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  itemId?: Prisma.SortOrder
+  name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   isHidden?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tags?: Prisma.TagOrderByRelationAggregateInput
   lists?: Prisma.List_UserItemOrderByRelationAggregateInput
+  category?: Prisma.CategoryOrderByWithRelationInput
   usedInChallenge?: Prisma.GroupUser_ChallengeOrderByRelationAggregateInput
+  ratings?: Prisma.RatingOrderByRelationAggregateInput
   user?: Prisma.UserOrderByWithRelationInput
-  item?: Prisma.ItemOrderByWithRelationInput
 }
 
 export type User_ItemWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  userId_itemId?: Prisma.User_ItemUserIdItemIdCompoundUniqueInput
+  userId_name_categoryId?: Prisma.User_ItemUserIdNameCategoryIdCompoundUniqueInput
   AND?: Prisma.User_ItemWhereInput | Prisma.User_ItemWhereInput[]
   OR?: Prisma.User_ItemWhereInput[]
   NOT?: Prisma.User_ItemWhereInput | Prisma.User_ItemWhereInput[]
   userId?: Prisma.StringFilter<"User_Item"> | string
-  itemId?: Prisma.StringFilter<"User_Item"> | string
+  name?: Prisma.StringFilter<"User_Item"> | string
   description?: Prisma.StringNullableFilter<"User_Item"> | string | null
   note?: Prisma.StringNullableFilter<"User_Item"> | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFilter<"User_Item"> | $Enums.STATUS_COMPLETION
   completedAt?: Prisma.DateTimeNullableFilter<"User_Item"> | Date | string | null
   isHidden?: Prisma.BoolFilter<"User_Item"> | boolean
+  categoryId?: Prisma.StringFilter<"User_Item"> | string
   createdAt?: Prisma.DateTimeFilter<"User_Item"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User_Item"> | Date | string
   tags?: Prisma.TagListRelationFilter
   lists?: Prisma.List_UserItemListRelationFilter
+  category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   usedInChallenge?: Prisma.GroupUser_ChallengeListRelationFilter
+  ratings?: Prisma.RatingListRelationFilter
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  item?: Prisma.XOR<Prisma.ItemScalarRelationFilter, Prisma.ItemWhereInput>
-}, "id" | "userId_itemId">
+}, "id" | "userId_name_categoryId">
 
 export type User_ItemOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  itemId?: Prisma.SortOrder
+  name?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   isHidden?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.User_ItemCountOrderByAggregateInput
@@ -291,18 +305,20 @@ export type User_ItemScalarWhereWithAggregatesInput = {
   NOT?: Prisma.User_ItemScalarWhereWithAggregatesInput | Prisma.User_ItemScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"User_Item"> | string
   userId?: Prisma.StringWithAggregatesFilter<"User_Item"> | string
-  itemId?: Prisma.StringWithAggregatesFilter<"User_Item"> | string
+  name?: Prisma.StringWithAggregatesFilter<"User_Item"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"User_Item"> | string | null
   note?: Prisma.StringNullableWithAggregatesFilter<"User_Item"> | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONWithAggregatesFilter<"User_Item"> | $Enums.STATUS_COMPLETION
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User_Item"> | Date | string | null
   isHidden?: Prisma.BoolWithAggregatesFilter<"User_Item"> | boolean
+  categoryId?: Prisma.StringWithAggregatesFilter<"User_Item"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User_Item"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User_Item"> | Date | string
 }
 
 export type User_ItemCreateInput = {
   id?: string
+  name: string
   description?: string | null
   note?: string | null
   status?: $Enums.STATUS_COMPLETION
@@ -312,29 +328,33 @@ export type User_ItemCreateInput = {
   updatedAt?: Date | string
   tags?: Prisma.TagCreateNestedManyWithoutUseItemsInput
   lists?: Prisma.List_UserItemCreateNestedManyWithoutUserItemInput
+  category: Prisma.CategoryCreateNestedOneWithoutItemsInput
   usedInChallenge?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutItemsForChallengeInput
+  ratings?: Prisma.RatingCreateNestedManyWithoutUserItemInput
   user: Prisma.UserCreateNestedOneWithoutUserItemsInput
-  item: Prisma.ItemCreateNestedOneWithoutUserItemsInput
 }
 
 export type User_ItemUncheckedCreateInput = {
   id?: string
   userId: string
-  itemId: string
+  name: string
   description?: string | null
   note?: string | null
   status?: $Enums.STATUS_COMPLETION
   completedAt?: Date | string | null
   isHidden?: boolean
+  categoryId: string
   createdAt?: Date | string
   updatedAt?: Date | string
   tags?: Prisma.TagUncheckedCreateNestedManyWithoutUseItemsInput
   lists?: Prisma.List_UserItemUncheckedCreateNestedManyWithoutUserItemInput
   usedInChallenge?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutItemsForChallengeInput
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserItemInput
 }
 
 export type User_ItemUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
@@ -344,42 +364,47 @@ export type User_ItemUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.TagUpdateManyWithoutUseItemsNestedInput
   lists?: Prisma.List_UserItemUpdateManyWithoutUserItemNestedInput
+  category?: Prisma.CategoryUpdateOneRequiredWithoutItemsNestedInput
   usedInChallenge?: Prisma.GroupUser_ChallengeUpdateManyWithoutItemsForChallengeNestedInput
+  ratings?: Prisma.RatingUpdateManyWithoutUserItemNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutUserItemsNestedInput
-  item?: Prisma.ItemUpdateOneRequiredWithoutUserItemsNestedInput
 }
 
 export type User_ItemUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  itemId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.TagUncheckedUpdateManyWithoutUseItemsNestedInput
   lists?: Prisma.List_UserItemUncheckedUpdateManyWithoutUserItemNestedInput
   usedInChallenge?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutItemsForChallengeNestedInput
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserItemNestedInput
 }
 
 export type User_ItemCreateManyInput = {
   id?: string
   userId: string
-  itemId: string
+  name: string
   description?: string | null
   note?: string | null
   status?: $Enums.STATUS_COMPLETION
   completedAt?: Date | string | null
   isHidden?: boolean
+  categoryId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type User_ItemUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
@@ -392,12 +417,13 @@ export type User_ItemUpdateManyMutationInput = {
 export type User_ItemUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  itemId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -412,20 +438,22 @@ export type User_ItemOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type User_ItemUserIdItemIdCompoundUniqueInput = {
+export type User_ItemUserIdNameCategoryIdCompoundUniqueInput = {
   userId: string
-  itemId: string
+  name: string
+  categoryId: string
 }
 
 export type User_ItemCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  itemId?: Prisma.SortOrder
+  name?: Prisma.SortOrder
   description?: Prisma.SortOrder
   note?: Prisma.SortOrder
   status?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   isHidden?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -433,12 +461,13 @@ export type User_ItemCountOrderByAggregateInput = {
 export type User_ItemMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  itemId?: Prisma.SortOrder
+  name?: Prisma.SortOrder
   description?: Prisma.SortOrder
   note?: Prisma.SortOrder
   status?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   isHidden?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -446,12 +475,13 @@ export type User_ItemMaxOrderByAggregateInput = {
 export type User_ItemMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  itemId?: Prisma.SortOrder
+  name?: Prisma.SortOrder
   description?: Prisma.SortOrder
   note?: Prisma.SortOrder
   status?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   isHidden?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -459,6 +489,48 @@ export type User_ItemMinOrderByAggregateInput = {
 export type User_ItemScalarRelationFilter = {
   is?: Prisma.User_ItemWhereInput
   isNot?: Prisma.User_ItemWhereInput
+}
+
+export type User_ItemCreateNestedManyWithoutCategoryInput = {
+  create?: Prisma.XOR<Prisma.User_ItemCreateWithoutCategoryInput, Prisma.User_ItemUncheckedCreateWithoutCategoryInput> | Prisma.User_ItemCreateWithoutCategoryInput[] | Prisma.User_ItemUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.User_ItemCreateOrConnectWithoutCategoryInput | Prisma.User_ItemCreateOrConnectWithoutCategoryInput[]
+  createMany?: Prisma.User_ItemCreateManyCategoryInputEnvelope
+  connect?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
+}
+
+export type User_ItemUncheckedCreateNestedManyWithoutCategoryInput = {
+  create?: Prisma.XOR<Prisma.User_ItemCreateWithoutCategoryInput, Prisma.User_ItemUncheckedCreateWithoutCategoryInput> | Prisma.User_ItemCreateWithoutCategoryInput[] | Prisma.User_ItemUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.User_ItemCreateOrConnectWithoutCategoryInput | Prisma.User_ItemCreateOrConnectWithoutCategoryInput[]
+  createMany?: Prisma.User_ItemCreateManyCategoryInputEnvelope
+  connect?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
+}
+
+export type User_ItemUpdateManyWithoutCategoryNestedInput = {
+  create?: Prisma.XOR<Prisma.User_ItemCreateWithoutCategoryInput, Prisma.User_ItemUncheckedCreateWithoutCategoryInput> | Prisma.User_ItemCreateWithoutCategoryInput[] | Prisma.User_ItemUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.User_ItemCreateOrConnectWithoutCategoryInput | Prisma.User_ItemCreateOrConnectWithoutCategoryInput[]
+  upsert?: Prisma.User_ItemUpsertWithWhereUniqueWithoutCategoryInput | Prisma.User_ItemUpsertWithWhereUniqueWithoutCategoryInput[]
+  createMany?: Prisma.User_ItemCreateManyCategoryInputEnvelope
+  set?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
+  disconnect?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
+  delete?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
+  connect?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
+  update?: Prisma.User_ItemUpdateWithWhereUniqueWithoutCategoryInput | Prisma.User_ItemUpdateWithWhereUniqueWithoutCategoryInput[]
+  updateMany?: Prisma.User_ItemUpdateManyWithWhereWithoutCategoryInput | Prisma.User_ItemUpdateManyWithWhereWithoutCategoryInput[]
+  deleteMany?: Prisma.User_ItemScalarWhereInput | Prisma.User_ItemScalarWhereInput[]
+}
+
+export type User_ItemUncheckedUpdateManyWithoutCategoryNestedInput = {
+  create?: Prisma.XOR<Prisma.User_ItemCreateWithoutCategoryInput, Prisma.User_ItemUncheckedCreateWithoutCategoryInput> | Prisma.User_ItemCreateWithoutCategoryInput[] | Prisma.User_ItemUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.User_ItemCreateOrConnectWithoutCategoryInput | Prisma.User_ItemCreateOrConnectWithoutCategoryInput[]
+  upsert?: Prisma.User_ItemUpsertWithWhereUniqueWithoutCategoryInput | Prisma.User_ItemUpsertWithWhereUniqueWithoutCategoryInput[]
+  createMany?: Prisma.User_ItemCreateManyCategoryInputEnvelope
+  set?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
+  disconnect?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
+  delete?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
+  connect?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
+  update?: Prisma.User_ItemUpdateWithWhereUniqueWithoutCategoryInput | Prisma.User_ItemUpdateWithWhereUniqueWithoutCategoryInput[]
+  updateMany?: Prisma.User_ItemUpdateManyWithWhereWithoutCategoryInput | Prisma.User_ItemUpdateManyWithWhereWithoutCategoryInput[]
+  deleteMany?: Prisma.User_ItemScalarWhereInput | Prisma.User_ItemScalarWhereInput[]
 }
 
 export type User_ItemCreateNestedManyWithoutUsedInChallengeInput = {
@@ -499,48 +571,6 @@ export type User_ItemUncheckedUpdateManyWithoutUsedInChallengeNestedInput = {
   deleteMany?: Prisma.User_ItemScalarWhereInput | Prisma.User_ItemScalarWhereInput[]
 }
 
-export type User_ItemCreateNestedManyWithoutItemInput = {
-  create?: Prisma.XOR<Prisma.User_ItemCreateWithoutItemInput, Prisma.User_ItemUncheckedCreateWithoutItemInput> | Prisma.User_ItemCreateWithoutItemInput[] | Prisma.User_ItemUncheckedCreateWithoutItemInput[]
-  connectOrCreate?: Prisma.User_ItemCreateOrConnectWithoutItemInput | Prisma.User_ItemCreateOrConnectWithoutItemInput[]
-  createMany?: Prisma.User_ItemCreateManyItemInputEnvelope
-  connect?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
-}
-
-export type User_ItemUncheckedCreateNestedManyWithoutItemInput = {
-  create?: Prisma.XOR<Prisma.User_ItemCreateWithoutItemInput, Prisma.User_ItemUncheckedCreateWithoutItemInput> | Prisma.User_ItemCreateWithoutItemInput[] | Prisma.User_ItemUncheckedCreateWithoutItemInput[]
-  connectOrCreate?: Prisma.User_ItemCreateOrConnectWithoutItemInput | Prisma.User_ItemCreateOrConnectWithoutItemInput[]
-  createMany?: Prisma.User_ItemCreateManyItemInputEnvelope
-  connect?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
-}
-
-export type User_ItemUpdateManyWithoutItemNestedInput = {
-  create?: Prisma.XOR<Prisma.User_ItemCreateWithoutItemInput, Prisma.User_ItemUncheckedCreateWithoutItemInput> | Prisma.User_ItemCreateWithoutItemInput[] | Prisma.User_ItemUncheckedCreateWithoutItemInput[]
-  connectOrCreate?: Prisma.User_ItemCreateOrConnectWithoutItemInput | Prisma.User_ItemCreateOrConnectWithoutItemInput[]
-  upsert?: Prisma.User_ItemUpsertWithWhereUniqueWithoutItemInput | Prisma.User_ItemUpsertWithWhereUniqueWithoutItemInput[]
-  createMany?: Prisma.User_ItemCreateManyItemInputEnvelope
-  set?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
-  disconnect?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
-  delete?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
-  connect?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
-  update?: Prisma.User_ItemUpdateWithWhereUniqueWithoutItemInput | Prisma.User_ItemUpdateWithWhereUniqueWithoutItemInput[]
-  updateMany?: Prisma.User_ItemUpdateManyWithWhereWithoutItemInput | Prisma.User_ItemUpdateManyWithWhereWithoutItemInput[]
-  deleteMany?: Prisma.User_ItemScalarWhereInput | Prisma.User_ItemScalarWhereInput[]
-}
-
-export type User_ItemUncheckedUpdateManyWithoutItemNestedInput = {
-  create?: Prisma.XOR<Prisma.User_ItemCreateWithoutItemInput, Prisma.User_ItemUncheckedCreateWithoutItemInput> | Prisma.User_ItemCreateWithoutItemInput[] | Prisma.User_ItemUncheckedCreateWithoutItemInput[]
-  connectOrCreate?: Prisma.User_ItemCreateOrConnectWithoutItemInput | Prisma.User_ItemCreateOrConnectWithoutItemInput[]
-  upsert?: Prisma.User_ItemUpsertWithWhereUniqueWithoutItemInput | Prisma.User_ItemUpsertWithWhereUniqueWithoutItemInput[]
-  createMany?: Prisma.User_ItemCreateManyItemInputEnvelope
-  set?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
-  disconnect?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
-  delete?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
-  connect?: Prisma.User_ItemWhereUniqueInput | Prisma.User_ItemWhereUniqueInput[]
-  update?: Prisma.User_ItemUpdateWithWhereUniqueWithoutItemInput | Prisma.User_ItemUpdateWithWhereUniqueWithoutItemInput[]
-  updateMany?: Prisma.User_ItemUpdateManyWithWhereWithoutItemInput | Prisma.User_ItemUpdateManyWithWhereWithoutItemInput[]
-  deleteMany?: Prisma.User_ItemScalarWhereInput | Prisma.User_ItemScalarWhereInput[]
-}
-
 export type EnumSTATUS_COMPLETIONFieldUpdateOperationsInput = {
   set?: $Enums.STATUS_COMPLETION
 }
@@ -557,6 +587,20 @@ export type User_ItemUpdateOneRequiredWithoutListsNestedInput = {
   upsert?: Prisma.User_ItemUpsertWithoutListsInput
   connect?: Prisma.User_ItemWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.User_ItemUpdateToOneWithWhereWithoutListsInput, Prisma.User_ItemUpdateWithoutListsInput>, Prisma.User_ItemUncheckedUpdateWithoutListsInput>
+}
+
+export type User_ItemCreateNestedOneWithoutRatingsInput = {
+  create?: Prisma.XOR<Prisma.User_ItemCreateWithoutRatingsInput, Prisma.User_ItemUncheckedCreateWithoutRatingsInput>
+  connectOrCreate?: Prisma.User_ItemCreateOrConnectWithoutRatingsInput
+  connect?: Prisma.User_ItemWhereUniqueInput
+}
+
+export type User_ItemUpdateOneRequiredWithoutRatingsNestedInput = {
+  create?: Prisma.XOR<Prisma.User_ItemCreateWithoutRatingsInput, Prisma.User_ItemUncheckedCreateWithoutRatingsInput>
+  connectOrCreate?: Prisma.User_ItemCreateOrConnectWithoutRatingsInput
+  upsert?: Prisma.User_ItemUpsertWithoutRatingsInput
+  connect?: Prisma.User_ItemWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.User_ItemUpdateToOneWithWhereWithoutRatingsInput, Prisma.User_ItemUpdateWithoutRatingsInput>, Prisma.User_ItemUncheckedUpdateWithoutRatingsInput>
 }
 
 export type User_ItemCreateNestedManyWithoutTagsInput = {
@@ -639,8 +683,9 @@ export type User_ItemUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.User_ItemScalarWhereInput | Prisma.User_ItemScalarWhereInput[]
 }
 
-export type User_ItemCreateWithoutUsedInChallengeInput = {
+export type User_ItemCreateWithoutCategoryInput = {
   id?: string
+  name: string
   description?: string | null
   note?: string | null
   status?: $Enums.STATUS_COMPLETION
@@ -650,14 +695,15 @@ export type User_ItemCreateWithoutUsedInChallengeInput = {
   updatedAt?: Date | string
   tags?: Prisma.TagCreateNestedManyWithoutUseItemsInput
   lists?: Prisma.List_UserItemCreateNestedManyWithoutUserItemInput
+  usedInChallenge?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutItemsForChallengeInput
+  ratings?: Prisma.RatingCreateNestedManyWithoutUserItemInput
   user: Prisma.UserCreateNestedOneWithoutUserItemsInput
-  item: Prisma.ItemCreateNestedOneWithoutUserItemsInput
 }
 
-export type User_ItemUncheckedCreateWithoutUsedInChallengeInput = {
+export type User_ItemUncheckedCreateWithoutCategoryInput = {
   id?: string
   userId: string
-  itemId: string
+  name: string
   description?: string | null
   note?: string | null
   status?: $Enums.STATUS_COMPLETION
@@ -667,6 +713,85 @@ export type User_ItemUncheckedCreateWithoutUsedInChallengeInput = {
   updatedAt?: Date | string
   tags?: Prisma.TagUncheckedCreateNestedManyWithoutUseItemsInput
   lists?: Prisma.List_UserItemUncheckedCreateNestedManyWithoutUserItemInput
+  usedInChallenge?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutItemsForChallengeInput
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserItemInput
+}
+
+export type User_ItemCreateOrConnectWithoutCategoryInput = {
+  where: Prisma.User_ItemWhereUniqueInput
+  create: Prisma.XOR<Prisma.User_ItemCreateWithoutCategoryInput, Prisma.User_ItemUncheckedCreateWithoutCategoryInput>
+}
+
+export type User_ItemCreateManyCategoryInputEnvelope = {
+  data: Prisma.User_ItemCreateManyCategoryInput | Prisma.User_ItemCreateManyCategoryInput[]
+  skipDuplicates?: boolean
+}
+
+export type User_ItemUpsertWithWhereUniqueWithoutCategoryInput = {
+  where: Prisma.User_ItemWhereUniqueInput
+  update: Prisma.XOR<Prisma.User_ItemUpdateWithoutCategoryInput, Prisma.User_ItemUncheckedUpdateWithoutCategoryInput>
+  create: Prisma.XOR<Prisma.User_ItemCreateWithoutCategoryInput, Prisma.User_ItemUncheckedCreateWithoutCategoryInput>
+}
+
+export type User_ItemUpdateWithWhereUniqueWithoutCategoryInput = {
+  where: Prisma.User_ItemWhereUniqueInput
+  data: Prisma.XOR<Prisma.User_ItemUpdateWithoutCategoryInput, Prisma.User_ItemUncheckedUpdateWithoutCategoryInput>
+}
+
+export type User_ItemUpdateManyWithWhereWithoutCategoryInput = {
+  where: Prisma.User_ItemScalarWhereInput
+  data: Prisma.XOR<Prisma.User_ItemUpdateManyMutationInput, Prisma.User_ItemUncheckedUpdateManyWithoutCategoryInput>
+}
+
+export type User_ItemScalarWhereInput = {
+  AND?: Prisma.User_ItemScalarWhereInput | Prisma.User_ItemScalarWhereInput[]
+  OR?: Prisma.User_ItemScalarWhereInput[]
+  NOT?: Prisma.User_ItemScalarWhereInput | Prisma.User_ItemScalarWhereInput[]
+  id?: Prisma.StringFilter<"User_Item"> | string
+  userId?: Prisma.StringFilter<"User_Item"> | string
+  name?: Prisma.StringFilter<"User_Item"> | string
+  description?: Prisma.StringNullableFilter<"User_Item"> | string | null
+  note?: Prisma.StringNullableFilter<"User_Item"> | string | null
+  status?: Prisma.EnumSTATUS_COMPLETIONFilter<"User_Item"> | $Enums.STATUS_COMPLETION
+  completedAt?: Prisma.DateTimeNullableFilter<"User_Item"> | Date | string | null
+  isHidden?: Prisma.BoolFilter<"User_Item"> | boolean
+  categoryId?: Prisma.StringFilter<"User_Item"> | string
+  createdAt?: Prisma.DateTimeFilter<"User_Item"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"User_Item"> | Date | string
+}
+
+export type User_ItemCreateWithoutUsedInChallengeInput = {
+  id?: string
+  name: string
+  description?: string | null
+  note?: string | null
+  status?: $Enums.STATUS_COMPLETION
+  completedAt?: Date | string | null
+  isHidden?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tags?: Prisma.TagCreateNestedManyWithoutUseItemsInput
+  lists?: Prisma.List_UserItemCreateNestedManyWithoutUserItemInput
+  category: Prisma.CategoryCreateNestedOneWithoutItemsInput
+  ratings?: Prisma.RatingCreateNestedManyWithoutUserItemInput
+  user: Prisma.UserCreateNestedOneWithoutUserItemsInput
+}
+
+export type User_ItemUncheckedCreateWithoutUsedInChallengeInput = {
+  id?: string
+  userId: string
+  name: string
+  description?: string | null
+  note?: string | null
+  status?: $Enums.STATUS_COMPLETION
+  completedAt?: Date | string | null
+  isHidden?: boolean
+  categoryId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tags?: Prisma.TagUncheckedCreateNestedManyWithoutUseItemsInput
+  lists?: Prisma.List_UserItemUncheckedCreateNestedManyWithoutUserItemInput
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserItemInput
 }
 
 export type User_ItemCreateOrConnectWithoutUsedInChallengeInput = {
@@ -690,80 +815,9 @@ export type User_ItemUpdateManyWithWhereWithoutUsedInChallengeInput = {
   data: Prisma.XOR<Prisma.User_ItemUpdateManyMutationInput, Prisma.User_ItemUncheckedUpdateManyWithoutUsedInChallengeInput>
 }
 
-export type User_ItemScalarWhereInput = {
-  AND?: Prisma.User_ItemScalarWhereInput | Prisma.User_ItemScalarWhereInput[]
-  OR?: Prisma.User_ItemScalarWhereInput[]
-  NOT?: Prisma.User_ItemScalarWhereInput | Prisma.User_ItemScalarWhereInput[]
-  id?: Prisma.StringFilter<"User_Item"> | string
-  userId?: Prisma.StringFilter<"User_Item"> | string
-  itemId?: Prisma.StringFilter<"User_Item"> | string
-  description?: Prisma.StringNullableFilter<"User_Item"> | string | null
-  note?: Prisma.StringNullableFilter<"User_Item"> | string | null
-  status?: Prisma.EnumSTATUS_COMPLETIONFilter<"User_Item"> | $Enums.STATUS_COMPLETION
-  completedAt?: Prisma.DateTimeNullableFilter<"User_Item"> | Date | string | null
-  isHidden?: Prisma.BoolFilter<"User_Item"> | boolean
-  createdAt?: Prisma.DateTimeFilter<"User_Item"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"User_Item"> | Date | string
-}
-
-export type User_ItemCreateWithoutItemInput = {
-  id?: string
-  description?: string | null
-  note?: string | null
-  status?: $Enums.STATUS_COMPLETION
-  completedAt?: Date | string | null
-  isHidden?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  tags?: Prisma.TagCreateNestedManyWithoutUseItemsInput
-  lists?: Prisma.List_UserItemCreateNestedManyWithoutUserItemInput
-  usedInChallenge?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutItemsForChallengeInput
-  user: Prisma.UserCreateNestedOneWithoutUserItemsInput
-}
-
-export type User_ItemUncheckedCreateWithoutItemInput = {
-  id?: string
-  userId: string
-  description?: string | null
-  note?: string | null
-  status?: $Enums.STATUS_COMPLETION
-  completedAt?: Date | string | null
-  isHidden?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  tags?: Prisma.TagUncheckedCreateNestedManyWithoutUseItemsInput
-  lists?: Prisma.List_UserItemUncheckedCreateNestedManyWithoutUserItemInput
-  usedInChallenge?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutItemsForChallengeInput
-}
-
-export type User_ItemCreateOrConnectWithoutItemInput = {
-  where: Prisma.User_ItemWhereUniqueInput
-  create: Prisma.XOR<Prisma.User_ItemCreateWithoutItemInput, Prisma.User_ItemUncheckedCreateWithoutItemInput>
-}
-
-export type User_ItemCreateManyItemInputEnvelope = {
-  data: Prisma.User_ItemCreateManyItemInput | Prisma.User_ItemCreateManyItemInput[]
-  skipDuplicates?: boolean
-}
-
-export type User_ItemUpsertWithWhereUniqueWithoutItemInput = {
-  where: Prisma.User_ItemWhereUniqueInput
-  update: Prisma.XOR<Prisma.User_ItemUpdateWithoutItemInput, Prisma.User_ItemUncheckedUpdateWithoutItemInput>
-  create: Prisma.XOR<Prisma.User_ItemCreateWithoutItemInput, Prisma.User_ItemUncheckedCreateWithoutItemInput>
-}
-
-export type User_ItemUpdateWithWhereUniqueWithoutItemInput = {
-  where: Prisma.User_ItemWhereUniqueInput
-  data: Prisma.XOR<Prisma.User_ItemUpdateWithoutItemInput, Prisma.User_ItemUncheckedUpdateWithoutItemInput>
-}
-
-export type User_ItemUpdateManyWithWhereWithoutItemInput = {
-  where: Prisma.User_ItemScalarWhereInput
-  data: Prisma.XOR<Prisma.User_ItemUpdateManyMutationInput, Prisma.User_ItemUncheckedUpdateManyWithoutItemInput>
-}
-
 export type User_ItemCreateWithoutListsInput = {
   id?: string
+  name: string
   description?: string | null
   note?: string | null
   status?: $Enums.STATUS_COMPLETION
@@ -772,24 +826,27 @@ export type User_ItemCreateWithoutListsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   tags?: Prisma.TagCreateNestedManyWithoutUseItemsInput
+  category: Prisma.CategoryCreateNestedOneWithoutItemsInput
   usedInChallenge?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutItemsForChallengeInput
+  ratings?: Prisma.RatingCreateNestedManyWithoutUserItemInput
   user: Prisma.UserCreateNestedOneWithoutUserItemsInput
-  item: Prisma.ItemCreateNestedOneWithoutUserItemsInput
 }
 
 export type User_ItemUncheckedCreateWithoutListsInput = {
   id?: string
   userId: string
-  itemId: string
+  name: string
   description?: string | null
   note?: string | null
   status?: $Enums.STATUS_COMPLETION
   completedAt?: Date | string | null
   isHidden?: boolean
+  categoryId: string
   createdAt?: Date | string
   updatedAt?: Date | string
   tags?: Prisma.TagUncheckedCreateNestedManyWithoutUseItemsInput
   usedInChallenge?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutItemsForChallengeInput
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserItemInput
 }
 
 export type User_ItemCreateOrConnectWithoutListsInput = {
@@ -810,6 +867,7 @@ export type User_ItemUpdateToOneWithWhereWithoutListsInput = {
 
 export type User_ItemUpdateWithoutListsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
@@ -818,15 +876,82 @@ export type User_ItemUpdateWithoutListsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.TagUpdateManyWithoutUseItemsNestedInput
+  category?: Prisma.CategoryUpdateOneRequiredWithoutItemsNestedInput
   usedInChallenge?: Prisma.GroupUser_ChallengeUpdateManyWithoutItemsForChallengeNestedInput
+  ratings?: Prisma.RatingUpdateManyWithoutUserItemNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutUserItemsNestedInput
-  item?: Prisma.ItemUpdateOneRequiredWithoutUserItemsNestedInput
 }
 
 export type User_ItemUncheckedUpdateWithoutListsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  itemId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tags?: Prisma.TagUncheckedUpdateManyWithoutUseItemsNestedInput
+  usedInChallenge?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutItemsForChallengeNestedInput
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserItemNestedInput
+}
+
+export type User_ItemCreateWithoutRatingsInput = {
+  id?: string
+  name: string
+  description?: string | null
+  note?: string | null
+  status?: $Enums.STATUS_COMPLETION
+  completedAt?: Date | string | null
+  isHidden?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tags?: Prisma.TagCreateNestedManyWithoutUseItemsInput
+  lists?: Prisma.List_UserItemCreateNestedManyWithoutUserItemInput
+  category: Prisma.CategoryCreateNestedOneWithoutItemsInput
+  usedInChallenge?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutItemsForChallengeInput
+  user: Prisma.UserCreateNestedOneWithoutUserItemsInput
+}
+
+export type User_ItemUncheckedCreateWithoutRatingsInput = {
+  id?: string
+  userId: string
+  name: string
+  description?: string | null
+  note?: string | null
+  status?: $Enums.STATUS_COMPLETION
+  completedAt?: Date | string | null
+  isHidden?: boolean
+  categoryId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tags?: Prisma.TagUncheckedCreateNestedManyWithoutUseItemsInput
+  lists?: Prisma.List_UserItemUncheckedCreateNestedManyWithoutUserItemInput
+  usedInChallenge?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutItemsForChallengeInput
+}
+
+export type User_ItemCreateOrConnectWithoutRatingsInput = {
+  where: Prisma.User_ItemWhereUniqueInput
+  create: Prisma.XOR<Prisma.User_ItemCreateWithoutRatingsInput, Prisma.User_ItemUncheckedCreateWithoutRatingsInput>
+}
+
+export type User_ItemUpsertWithoutRatingsInput = {
+  update: Prisma.XOR<Prisma.User_ItemUpdateWithoutRatingsInput, Prisma.User_ItemUncheckedUpdateWithoutRatingsInput>
+  create: Prisma.XOR<Prisma.User_ItemCreateWithoutRatingsInput, Prisma.User_ItemUncheckedCreateWithoutRatingsInput>
+  where?: Prisma.User_ItemWhereInput
+}
+
+export type User_ItemUpdateToOneWithWhereWithoutRatingsInput = {
+  where?: Prisma.User_ItemWhereInput
+  data: Prisma.XOR<Prisma.User_ItemUpdateWithoutRatingsInput, Prisma.User_ItemUncheckedUpdateWithoutRatingsInput>
+}
+
+export type User_ItemUpdateWithoutRatingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
@@ -834,12 +959,33 @@ export type User_ItemUncheckedUpdateWithoutListsInput = {
   isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tags?: Prisma.TagUpdateManyWithoutUseItemsNestedInput
+  lists?: Prisma.List_UserItemUpdateManyWithoutUserItemNestedInput
+  category?: Prisma.CategoryUpdateOneRequiredWithoutItemsNestedInput
+  usedInChallenge?: Prisma.GroupUser_ChallengeUpdateManyWithoutItemsForChallengeNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutUserItemsNestedInput
+}
+
+export type User_ItemUncheckedUpdateWithoutRatingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.TagUncheckedUpdateManyWithoutUseItemsNestedInput
+  lists?: Prisma.List_UserItemUncheckedUpdateManyWithoutUserItemNestedInput
   usedInChallenge?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutItemsForChallengeNestedInput
 }
 
 export type User_ItemCreateWithoutTagsInput = {
   id?: string
+  name: string
   description?: string | null
   note?: string | null
   status?: $Enums.STATUS_COMPLETION
@@ -848,24 +994,27 @@ export type User_ItemCreateWithoutTagsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lists?: Prisma.List_UserItemCreateNestedManyWithoutUserItemInput
+  category: Prisma.CategoryCreateNestedOneWithoutItemsInput
   usedInChallenge?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutItemsForChallengeInput
+  ratings?: Prisma.RatingCreateNestedManyWithoutUserItemInput
   user: Prisma.UserCreateNestedOneWithoutUserItemsInput
-  item: Prisma.ItemCreateNestedOneWithoutUserItemsInput
 }
 
 export type User_ItemUncheckedCreateWithoutTagsInput = {
   id?: string
   userId: string
-  itemId: string
+  name: string
   description?: string | null
   note?: string | null
   status?: $Enums.STATUS_COMPLETION
   completedAt?: Date | string | null
   isHidden?: boolean
+  categoryId: string
   createdAt?: Date | string
   updatedAt?: Date | string
   lists?: Prisma.List_UserItemUncheckedCreateNestedManyWithoutUserItemInput
   usedInChallenge?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutItemsForChallengeInput
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserItemInput
 }
 
 export type User_ItemCreateOrConnectWithoutTagsInput = {
@@ -891,6 +1040,7 @@ export type User_ItemUpdateManyWithWhereWithoutTagsInput = {
 
 export type User_ItemCreateWithoutUserInput = {
   id?: string
+  name: string
   description?: string | null
   note?: string | null
   status?: $Enums.STATUS_COMPLETION
@@ -900,23 +1050,26 @@ export type User_ItemCreateWithoutUserInput = {
   updatedAt?: Date | string
   tags?: Prisma.TagCreateNestedManyWithoutUseItemsInput
   lists?: Prisma.List_UserItemCreateNestedManyWithoutUserItemInput
+  category: Prisma.CategoryCreateNestedOneWithoutItemsInput
   usedInChallenge?: Prisma.GroupUser_ChallengeCreateNestedManyWithoutItemsForChallengeInput
-  item: Prisma.ItemCreateNestedOneWithoutUserItemsInput
+  ratings?: Prisma.RatingCreateNestedManyWithoutUserItemInput
 }
 
 export type User_ItemUncheckedCreateWithoutUserInput = {
   id?: string
-  itemId: string
+  name: string
   description?: string | null
   note?: string | null
   status?: $Enums.STATUS_COMPLETION
   completedAt?: Date | string | null
   isHidden?: boolean
+  categoryId: string
   createdAt?: Date | string
   updatedAt?: Date | string
   tags?: Prisma.TagUncheckedCreateNestedManyWithoutUseItemsInput
   lists?: Prisma.List_UserItemUncheckedCreateNestedManyWithoutUserItemInput
   usedInChallenge?: Prisma.GroupUser_ChallengeUncheckedCreateNestedManyWithoutItemsForChallengeInput
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutUserItemInput
 }
 
 export type User_ItemCreateOrConnectWithoutUserInput = {
@@ -945,52 +1098,10 @@ export type User_ItemUpdateManyWithWhereWithoutUserInput = {
   data: Prisma.XOR<Prisma.User_ItemUpdateManyMutationInput, Prisma.User_ItemUncheckedUpdateManyWithoutUserInput>
 }
 
-export type User_ItemUpdateWithoutUsedInChallengeInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
-  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tags?: Prisma.TagUpdateManyWithoutUseItemsNestedInput
-  lists?: Prisma.List_UserItemUpdateManyWithoutUserItemNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutUserItemsNestedInput
-  item?: Prisma.ItemUpdateOneRequiredWithoutUserItemsNestedInput
-}
-
-export type User_ItemUncheckedUpdateWithoutUsedInChallengeInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  itemId?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
-  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tags?: Prisma.TagUncheckedUpdateManyWithoutUseItemsNestedInput
-  lists?: Prisma.List_UserItemUncheckedUpdateManyWithoutUserItemNestedInput
-}
-
-export type User_ItemUncheckedUpdateManyWithoutUsedInChallengeInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  itemId?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
-  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type User_ItemCreateManyItemInput = {
+export type User_ItemCreateManyCategoryInput = {
   id?: string
   userId: string
+  name: string
   description?: string | null
   note?: string | null
   status?: $Enums.STATUS_COMPLETION
@@ -1000,8 +1111,9 @@ export type User_ItemCreateManyItemInput = {
   updatedAt?: Date | string
 }
 
-export type User_ItemUpdateWithoutItemInput = {
+export type User_ItemUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
@@ -1012,12 +1124,14 @@ export type User_ItemUpdateWithoutItemInput = {
   tags?: Prisma.TagUpdateManyWithoutUseItemsNestedInput
   lists?: Prisma.List_UserItemUpdateManyWithoutUserItemNestedInput
   usedInChallenge?: Prisma.GroupUser_ChallengeUpdateManyWithoutItemsForChallengeNestedInput
+  ratings?: Prisma.RatingUpdateManyWithoutUserItemNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutUserItemsNestedInput
 }
 
-export type User_ItemUncheckedUpdateWithoutItemInput = {
+export type User_ItemUncheckedUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
@@ -1028,22 +1142,73 @@ export type User_ItemUncheckedUpdateWithoutItemInput = {
   tags?: Prisma.TagUncheckedUpdateManyWithoutUseItemsNestedInput
   lists?: Prisma.List_UserItemUncheckedUpdateManyWithoutUserItemNestedInput
   usedInChallenge?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutItemsForChallengeNestedInput
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserItemNestedInput
 }
 
-export type User_ItemUncheckedUpdateManyWithoutItemInput = {
+export type User_ItemUncheckedUpdateManyWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type User_ItemUpdateWithoutUsedInChallengeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tags?: Prisma.TagUpdateManyWithoutUseItemsNestedInput
+  lists?: Prisma.List_UserItemUpdateManyWithoutUserItemNestedInput
+  category?: Prisma.CategoryUpdateOneRequiredWithoutItemsNestedInput
+  ratings?: Prisma.RatingUpdateManyWithoutUserItemNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutUserItemsNestedInput
+}
+
+export type User_ItemUncheckedUpdateWithoutUsedInChallengeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tags?: Prisma.TagUncheckedUpdateManyWithoutUseItemsNestedInput
+  lists?: Prisma.List_UserItemUncheckedUpdateManyWithoutUserItemNestedInput
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserItemNestedInput
+}
+
+export type User_ItemUncheckedUpdateManyWithoutUsedInChallengeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type User_ItemUpdateWithoutTagsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
@@ -1052,53 +1217,59 @@ export type User_ItemUpdateWithoutTagsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lists?: Prisma.List_UserItemUpdateManyWithoutUserItemNestedInput
+  category?: Prisma.CategoryUpdateOneRequiredWithoutItemsNestedInput
   usedInChallenge?: Prisma.GroupUser_ChallengeUpdateManyWithoutItemsForChallengeNestedInput
+  ratings?: Prisma.RatingUpdateManyWithoutUserItemNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutUserItemsNestedInput
-  item?: Prisma.ItemUpdateOneRequiredWithoutUserItemsNestedInput
 }
 
 export type User_ItemUncheckedUpdateWithoutTagsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  itemId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lists?: Prisma.List_UserItemUncheckedUpdateManyWithoutUserItemNestedInput
   usedInChallenge?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutItemsForChallengeNestedInput
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserItemNestedInput
 }
 
 export type User_ItemUncheckedUpdateManyWithoutTagsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  itemId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type User_ItemCreateManyUserInput = {
   id?: string
-  itemId: string
+  name: string
   description?: string | null
   note?: string | null
   status?: $Enums.STATUS_COMPLETION
   completedAt?: Date | string | null
   isHidden?: boolean
+  categoryId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type User_ItemUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
@@ -1108,33 +1279,37 @@ export type User_ItemUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.TagUpdateManyWithoutUseItemsNestedInput
   lists?: Prisma.List_UserItemUpdateManyWithoutUserItemNestedInput
+  category?: Prisma.CategoryUpdateOneRequiredWithoutItemsNestedInput
   usedInChallenge?: Prisma.GroupUser_ChallengeUpdateManyWithoutItemsForChallengeNestedInput
-  item?: Prisma.ItemUpdateOneRequiredWithoutUserItemsNestedInput
+  ratings?: Prisma.RatingUpdateManyWithoutUserItemNestedInput
 }
 
 export type User_ItemUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  itemId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.TagUncheckedUpdateManyWithoutUseItemsNestedInput
   lists?: Prisma.List_UserItemUncheckedUpdateManyWithoutUserItemNestedInput
   usedInChallenge?: Prisma.GroupUser_ChallengeUncheckedUpdateManyWithoutItemsForChallengeNestedInput
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutUserItemNestedInput
 }
 
 export type User_ItemUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  itemId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumSTATUS_COMPLETIONFieldUpdateOperationsInput | $Enums.STATUS_COMPLETION
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isHidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1148,12 +1323,14 @@ export type User_ItemCountOutputType = {
   tags: number
   lists: number
   usedInChallenge: number
+  ratings: number
 }
 
 export type User_ItemCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tags?: boolean | User_ItemCountOutputTypeCountTagsArgs
   lists?: boolean | User_ItemCountOutputTypeCountListsArgs
   usedInChallenge?: boolean | User_ItemCountOutputTypeCountUsedInChallengeArgs
+  ratings?: boolean | User_ItemCountOutputTypeCountRatingsArgs
 }
 
 /**
@@ -1187,85 +1364,98 @@ export type User_ItemCountOutputTypeCountUsedInChallengeArgs<ExtArgs extends run
   where?: Prisma.GroupUser_ChallengeWhereInput
 }
 
+/**
+ * User_ItemCountOutputType without action
+ */
+export type User_ItemCountOutputTypeCountRatingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RatingWhereInput
+}
+
 
 export type User_ItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  itemId?: boolean
+  name?: boolean
   description?: boolean
   note?: boolean
   status?: boolean
   completedAt?: boolean
   isHidden?: boolean
+  categoryId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tags?: boolean | Prisma.User_Item$tagsArgs<ExtArgs>
   lists?: boolean | Prisma.User_Item$listsArgs<ExtArgs>
+  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   usedInChallenge?: boolean | Prisma.User_Item$usedInChallengeArgs<ExtArgs>
+  ratings?: boolean | Prisma.User_Item$ratingsArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.User_ItemCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user_Item"]>
 
 export type User_ItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  itemId?: boolean
+  name?: boolean
   description?: boolean
   note?: boolean
   status?: boolean
   completedAt?: boolean
   isHidden?: boolean
+  categoryId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user_Item"]>
 
 export type User_ItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  itemId?: boolean
+  name?: boolean
   description?: boolean
   note?: boolean
   status?: boolean
   completedAt?: boolean
   isHidden?: boolean
+  categoryId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user_Item"]>
 
 export type User_ItemSelectScalar = {
   id?: boolean
   userId?: boolean
-  itemId?: boolean
+  name?: boolean
   description?: boolean
   note?: boolean
   status?: boolean
   completedAt?: boolean
   isHidden?: boolean
+  categoryId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type User_ItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "itemId" | "description" | "note" | "status" | "completedAt" | "isHidden" | "createdAt" | "updatedAt", ExtArgs["result"]["user_Item"]>
+export type User_ItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "name" | "description" | "note" | "status" | "completedAt" | "isHidden" | "categoryId" | "createdAt" | "updatedAt", ExtArgs["result"]["user_Item"]>
 export type User_ItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tags?: boolean | Prisma.User_Item$tagsArgs<ExtArgs>
   lists?: boolean | Prisma.User_Item$listsArgs<ExtArgs>
+  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   usedInChallenge?: boolean | Prisma.User_Item$usedInChallengeArgs<ExtArgs>
+  ratings?: boolean | Prisma.User_Item$ratingsArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.User_ItemCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type User_ItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
 }
 export type User_ItemIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  item?: boolean | Prisma.ItemDefaultArgs<ExtArgs>
 }
 
 export type $User_ItemPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1273,19 +1463,21 @@ export type $User_ItemPayload<ExtArgs extends runtime.Types.Extensions.InternalA
   objects: {
     tags: Prisma.$TagPayload<ExtArgs>[]
     lists: Prisma.$List_UserItemPayload<ExtArgs>[]
+    category: Prisma.$CategoryPayload<ExtArgs>
     usedInChallenge: Prisma.$GroupUser_ChallengePayload<ExtArgs>[]
+    ratings: Prisma.$RatingPayload<ExtArgs>[]
     user: Prisma.$UserPayload<ExtArgs>
-    item: Prisma.$ItemPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
-    itemId: string
+    name: string
     description: string | null
     note: string | null
     status: $Enums.STATUS_COMPLETION
     completedAt: Date | null
     isHidden: boolean
+    categoryId: string
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user_Item"]>
@@ -1684,9 +1876,10 @@ export interface Prisma__User_ItemClient<T, Null = never, ExtArgs extends runtim
   readonly [Symbol.toStringTag]: "PrismaPromise"
   tags<T extends Prisma.User_Item$tagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User_Item$tagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   lists<T extends Prisma.User_Item$listsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User_Item$listsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$List_UserItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  category<T extends Prisma.CategoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CategoryDefaultArgs<ExtArgs>>): Prisma.Prisma__CategoryClient<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   usedInChallenge<T extends Prisma.User_Item$usedInChallengeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User_Item$usedInChallengeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GroupUser_ChallengePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ratings<T extends Prisma.User_Item$ratingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User_Item$ratingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RatingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  item<T extends Prisma.ItemDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ItemDefaultArgs<ExtArgs>>): Prisma.Prisma__ItemClient<runtime.Types.Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1718,12 +1911,13 @@ export interface Prisma__User_ItemClient<T, Null = never, ExtArgs extends runtim
 export interface User_ItemFieldRefs {
   readonly id: Prisma.FieldRef<"User_Item", 'String'>
   readonly userId: Prisma.FieldRef<"User_Item", 'String'>
-  readonly itemId: Prisma.FieldRef<"User_Item", 'String'>
+  readonly name: Prisma.FieldRef<"User_Item", 'String'>
   readonly description: Prisma.FieldRef<"User_Item", 'String'>
   readonly note: Prisma.FieldRef<"User_Item", 'String'>
   readonly status: Prisma.FieldRef<"User_Item", 'STATUS_COMPLETION'>
   readonly completedAt: Prisma.FieldRef<"User_Item", 'DateTime'>
   readonly isHidden: Prisma.FieldRef<"User_Item", 'Boolean'>
+  readonly categoryId: Prisma.FieldRef<"User_Item", 'String'>
   readonly createdAt: Prisma.FieldRef<"User_Item", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User_Item", 'DateTime'>
 }
@@ -2196,6 +2390,30 @@ export type User_Item$usedInChallengeArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.GroupUser_ChallengeScalarFieldEnum | Prisma.GroupUser_ChallengeScalarFieldEnum[]
+}
+
+/**
+ * User_Item.ratings
+ */
+export type User_Item$ratingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Rating
+   */
+  select?: Prisma.RatingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Rating
+   */
+  omit?: Prisma.RatingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RatingInclude<ExtArgs> | null
+  where?: Prisma.RatingWhereInput
+  orderBy?: Prisma.RatingOrderByWithRelationInput | Prisma.RatingOrderByWithRelationInput[]
+  cursor?: Prisma.RatingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RatingScalarFieldEnum | Prisma.RatingScalarFieldEnum[]
 }
 
 /**

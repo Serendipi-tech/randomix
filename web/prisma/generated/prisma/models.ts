@@ -8,13 +8,12 @@
  *
  * 🟢 You can import this file directly.
  */
+export type * from './models/Category'
 export type * from './models/Group'
 export type * from './models/Group_User'
 export type * from './models/GroupList'
-export type * from './models/GroupList_AcceptedItemHistory'
 export type * from './models/GroupChallenge'
 export type * from './models/GroupUser_Challenge'
-export type * from './models/Item'
 export type * from './models/User_Item'
 export type * from './models/List'
 export type * from './models/List_UserItem'

@@ -217,10 +217,8 @@ export type GroupListWhereInput = {
   creator?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   group?: Prisma.XOR<Prisma.GroupScalarRelationFilter, Prisma.GroupWhereInput>
   memberLists?: Prisma.ListListRelationFilter
-  items?: Prisma.ItemListRelationFilter
   listCategories?: Prisma.ListCategoryListRelationFilter
   connectedChallenges?: Prisma.GroupChallengeListRelationFilter
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryListRelationFilter
 }
 
 export type GroupListOrderByWithRelationInput = {
@@ -236,10 +234,8 @@ export type GroupListOrderByWithRelationInput = {
   creator?: Prisma.UserOrderByWithRelationInput
   group?: Prisma.GroupOrderByWithRelationInput
   memberLists?: Prisma.ListOrderByRelationAggregateInput
-  items?: Prisma.ItemOrderByRelationAggregateInput
   listCategories?: Prisma.ListCategoryOrderByRelationAggregateInput
   connectedChallenges?: Prisma.GroupChallengeOrderByRelationAggregateInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryOrderByRelationAggregateInput
 }
 
 export type GroupListWhereUniqueInput = Prisma.AtLeast<{
@@ -258,10 +254,8 @@ export type GroupListWhereUniqueInput = Prisma.AtLeast<{
   creator?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   group?: Prisma.XOR<Prisma.GroupScalarRelationFilter, Prisma.GroupWhereInput>
   memberLists?: Prisma.ListListRelationFilter
-  items?: Prisma.ItemListRelationFilter
   listCategories?: Prisma.ListCategoryListRelationFilter
   connectedChallenges?: Prisma.GroupChallengeListRelationFilter
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryListRelationFilter
 }, "id">
 
 export type GroupListOrderByWithAggregationInput = {
@@ -305,10 +299,8 @@ export type GroupListCreateInput = {
   creator?: Prisma.UserCreateNestedOneWithoutGroupListsCreatedInput
   group: Prisma.GroupCreateNestedOneWithoutGroupListsInput
   memberLists?: Prisma.ListCreateNestedManyWithoutGroupListsInput
-  items?: Prisma.ItemCreateNestedManyWithoutGroupListsInput
   listCategories?: Prisma.ListCategoryCreateNestedManyWithoutGroupListsInput
   connectedChallenges?: Prisma.GroupChallengeCreateNestedManyWithoutAllowedListsInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryCreateNestedManyWithoutGroupListInput
 }
 
 export type GroupListUncheckedCreateInput = {
@@ -322,10 +314,8 @@ export type GroupListUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   memberLists?: Prisma.ListUncheckedCreateNestedManyWithoutGroupListsInput
-  items?: Prisma.ItemUncheckedCreateNestedManyWithoutGroupListsInput
   listCategories?: Prisma.ListCategoryUncheckedCreateNestedManyWithoutGroupListsInput
   connectedChallenges?: Prisma.GroupChallengeUncheckedCreateNestedManyWithoutAllowedListsInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedCreateNestedManyWithoutGroupListInput
 }
 
 export type GroupListUpdateInput = {
@@ -339,10 +329,8 @@ export type GroupListUpdateInput = {
   creator?: Prisma.UserUpdateOneWithoutGroupListsCreatedNestedInput
   group?: Prisma.GroupUpdateOneRequiredWithoutGroupListsNestedInput
   memberLists?: Prisma.ListUpdateManyWithoutGroupListsNestedInput
-  items?: Prisma.ItemUpdateManyWithoutGroupListsNestedInput
   listCategories?: Prisma.ListCategoryUpdateManyWithoutGroupListsNestedInput
   connectedChallenges?: Prisma.GroupChallengeUpdateManyWithoutAllowedListsNestedInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUpdateManyWithoutGroupListNestedInput
 }
 
 export type GroupListUncheckedUpdateInput = {
@@ -356,10 +344,8 @@ export type GroupListUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberLists?: Prisma.ListUncheckedUpdateManyWithoutGroupListsNestedInput
-  items?: Prisma.ItemUncheckedUpdateManyWithoutGroupListsNestedInput
   listCategories?: Prisma.ListCategoryUncheckedUpdateManyWithoutGroupListsNestedInput
   connectedChallenges?: Prisma.GroupChallengeUncheckedUpdateManyWithoutAllowedListsNestedInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedUpdateManyWithoutGroupListNestedInput
 }
 
 export type GroupListCreateManyInput = {
@@ -442,11 +428,6 @@ export type GroupListMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
-export type GroupListScalarRelationFilter = {
-  is?: Prisma.GroupListWhereInput
-  isNot?: Prisma.GroupListWhereInput
-}
-
 export type GroupListCreateNestedManyWithoutGroupInput = {
   create?: Prisma.XOR<Prisma.GroupListCreateWithoutGroupInput, Prisma.GroupListUncheckedCreateWithoutGroupInput> | Prisma.GroupListCreateWithoutGroupInput[] | Prisma.GroupListUncheckedCreateWithoutGroupInput[]
   connectOrCreate?: Prisma.GroupListCreateOrConnectWithoutGroupInput | Prisma.GroupListCreateOrConnectWithoutGroupInput[]
@@ -489,20 +470,6 @@ export type GroupListUncheckedUpdateManyWithoutGroupNestedInput = {
   deleteMany?: Prisma.GroupListScalarWhereInput | Prisma.GroupListScalarWhereInput[]
 }
 
-export type GroupListCreateNestedOneWithoutAcceptedItemsHistoryInput = {
-  create?: Prisma.XOR<Prisma.GroupListCreateWithoutAcceptedItemsHistoryInput, Prisma.GroupListUncheckedCreateWithoutAcceptedItemsHistoryInput>
-  connectOrCreate?: Prisma.GroupListCreateOrConnectWithoutAcceptedItemsHistoryInput
-  connect?: Prisma.GroupListWhereUniqueInput
-}
-
-export type GroupListUpdateOneRequiredWithoutAcceptedItemsHistoryNestedInput = {
-  create?: Prisma.XOR<Prisma.GroupListCreateWithoutAcceptedItemsHistoryInput, Prisma.GroupListUncheckedCreateWithoutAcceptedItemsHistoryInput>
-  connectOrCreate?: Prisma.GroupListCreateOrConnectWithoutAcceptedItemsHistoryInput
-  upsert?: Prisma.GroupListUpsertWithoutAcceptedItemsHistoryInput
-  connect?: Prisma.GroupListWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.GroupListUpdateToOneWithWhereWithoutAcceptedItemsHistoryInput, Prisma.GroupListUpdateWithoutAcceptedItemsHistoryInput>, Prisma.GroupListUncheckedUpdateWithoutAcceptedItemsHistoryInput>
-}
-
 export type GroupListCreateNestedManyWithoutConnectedChallengesInput = {
   create?: Prisma.XOR<Prisma.GroupListCreateWithoutConnectedChallengesInput, Prisma.GroupListUncheckedCreateWithoutConnectedChallengesInput> | Prisma.GroupListCreateWithoutConnectedChallengesInput[] | Prisma.GroupListUncheckedCreateWithoutConnectedChallengesInput[]
   connectOrCreate?: Prisma.GroupListCreateOrConnectWithoutConnectedChallengesInput | Prisma.GroupListCreateOrConnectWithoutConnectedChallengesInput[]
@@ -538,44 +505,6 @@ export type GroupListUncheckedUpdateManyWithoutConnectedChallengesNestedInput = 
   connect?: Prisma.GroupListWhereUniqueInput | Prisma.GroupListWhereUniqueInput[]
   update?: Prisma.GroupListUpdateWithWhereUniqueWithoutConnectedChallengesInput | Prisma.GroupListUpdateWithWhereUniqueWithoutConnectedChallengesInput[]
   updateMany?: Prisma.GroupListUpdateManyWithWhereWithoutConnectedChallengesInput | Prisma.GroupListUpdateManyWithWhereWithoutConnectedChallengesInput[]
-  deleteMany?: Prisma.GroupListScalarWhereInput | Prisma.GroupListScalarWhereInput[]
-}
-
-export type GroupListCreateNestedManyWithoutItemsInput = {
-  create?: Prisma.XOR<Prisma.GroupListCreateWithoutItemsInput, Prisma.GroupListUncheckedCreateWithoutItemsInput> | Prisma.GroupListCreateWithoutItemsInput[] | Prisma.GroupListUncheckedCreateWithoutItemsInput[]
-  connectOrCreate?: Prisma.GroupListCreateOrConnectWithoutItemsInput | Prisma.GroupListCreateOrConnectWithoutItemsInput[]
-  connect?: Prisma.GroupListWhereUniqueInput | Prisma.GroupListWhereUniqueInput[]
-}
-
-export type GroupListUncheckedCreateNestedManyWithoutItemsInput = {
-  create?: Prisma.XOR<Prisma.GroupListCreateWithoutItemsInput, Prisma.GroupListUncheckedCreateWithoutItemsInput> | Prisma.GroupListCreateWithoutItemsInput[] | Prisma.GroupListUncheckedCreateWithoutItemsInput[]
-  connectOrCreate?: Prisma.GroupListCreateOrConnectWithoutItemsInput | Prisma.GroupListCreateOrConnectWithoutItemsInput[]
-  connect?: Prisma.GroupListWhereUniqueInput | Prisma.GroupListWhereUniqueInput[]
-}
-
-export type GroupListUpdateManyWithoutItemsNestedInput = {
-  create?: Prisma.XOR<Prisma.GroupListCreateWithoutItemsInput, Prisma.GroupListUncheckedCreateWithoutItemsInput> | Prisma.GroupListCreateWithoutItemsInput[] | Prisma.GroupListUncheckedCreateWithoutItemsInput[]
-  connectOrCreate?: Prisma.GroupListCreateOrConnectWithoutItemsInput | Prisma.GroupListCreateOrConnectWithoutItemsInput[]
-  upsert?: Prisma.GroupListUpsertWithWhereUniqueWithoutItemsInput | Prisma.GroupListUpsertWithWhereUniqueWithoutItemsInput[]
-  set?: Prisma.GroupListWhereUniqueInput | Prisma.GroupListWhereUniqueInput[]
-  disconnect?: Prisma.GroupListWhereUniqueInput | Prisma.GroupListWhereUniqueInput[]
-  delete?: Prisma.GroupListWhereUniqueInput | Prisma.GroupListWhereUniqueInput[]
-  connect?: Prisma.GroupListWhereUniqueInput | Prisma.GroupListWhereUniqueInput[]
-  update?: Prisma.GroupListUpdateWithWhereUniqueWithoutItemsInput | Prisma.GroupListUpdateWithWhereUniqueWithoutItemsInput[]
-  updateMany?: Prisma.GroupListUpdateManyWithWhereWithoutItemsInput | Prisma.GroupListUpdateManyWithWhereWithoutItemsInput[]
-  deleteMany?: Prisma.GroupListScalarWhereInput | Prisma.GroupListScalarWhereInput[]
-}
-
-export type GroupListUncheckedUpdateManyWithoutItemsNestedInput = {
-  create?: Prisma.XOR<Prisma.GroupListCreateWithoutItemsInput, Prisma.GroupListUncheckedCreateWithoutItemsInput> | Prisma.GroupListCreateWithoutItemsInput[] | Prisma.GroupListUncheckedCreateWithoutItemsInput[]
-  connectOrCreate?: Prisma.GroupListCreateOrConnectWithoutItemsInput | Prisma.GroupListCreateOrConnectWithoutItemsInput[]
-  upsert?: Prisma.GroupListUpsertWithWhereUniqueWithoutItemsInput | Prisma.GroupListUpsertWithWhereUniqueWithoutItemsInput[]
-  set?: Prisma.GroupListWhereUniqueInput | Prisma.GroupListWhereUniqueInput[]
-  disconnect?: Prisma.GroupListWhereUniqueInput | Prisma.GroupListWhereUniqueInput[]
-  delete?: Prisma.GroupListWhereUniqueInput | Prisma.GroupListWhereUniqueInput[]
-  connect?: Prisma.GroupListWhereUniqueInput | Prisma.GroupListWhereUniqueInput[]
-  update?: Prisma.GroupListUpdateWithWhereUniqueWithoutItemsInput | Prisma.GroupListUpdateWithWhereUniqueWithoutItemsInput[]
-  updateMany?: Prisma.GroupListUpdateManyWithWhereWithoutItemsInput | Prisma.GroupListUpdateManyWithWhereWithoutItemsInput[]
   deleteMany?: Prisma.GroupListScalarWhereInput | Prisma.GroupListScalarWhereInput[]
 }
 
@@ -707,10 +636,8 @@ export type GroupListCreateWithoutGroupInput = {
   updatedAt?: Date | string
   creator?: Prisma.UserCreateNestedOneWithoutGroupListsCreatedInput
   memberLists?: Prisma.ListCreateNestedManyWithoutGroupListsInput
-  items?: Prisma.ItemCreateNestedManyWithoutGroupListsInput
   listCategories?: Prisma.ListCategoryCreateNestedManyWithoutGroupListsInput
   connectedChallenges?: Prisma.GroupChallengeCreateNestedManyWithoutAllowedListsInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryCreateNestedManyWithoutGroupListInput
 }
 
 export type GroupListUncheckedCreateWithoutGroupInput = {
@@ -723,10 +650,8 @@ export type GroupListUncheckedCreateWithoutGroupInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   memberLists?: Prisma.ListUncheckedCreateNestedManyWithoutGroupListsInput
-  items?: Prisma.ItemUncheckedCreateNestedManyWithoutGroupListsInput
   listCategories?: Prisma.ListCategoryUncheckedCreateNestedManyWithoutGroupListsInput
   connectedChallenges?: Prisma.GroupChallengeUncheckedCreateNestedManyWithoutAllowedListsInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedCreateNestedManyWithoutGroupListInput
 }
 
 export type GroupListCreateOrConnectWithoutGroupInput = {
@@ -770,86 +695,6 @@ export type GroupListScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"GroupList"> | Date | string
 }
 
-export type GroupListCreateWithoutAcceptedItemsHistoryInput = {
-  id?: string
-  name: string
-  icon: string
-  color: string
-  description?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  creator?: Prisma.UserCreateNestedOneWithoutGroupListsCreatedInput
-  group: Prisma.GroupCreateNestedOneWithoutGroupListsInput
-  memberLists?: Prisma.ListCreateNestedManyWithoutGroupListsInput
-  items?: Prisma.ItemCreateNestedManyWithoutGroupListsInput
-  listCategories?: Prisma.ListCategoryCreateNestedManyWithoutGroupListsInput
-  connectedChallenges?: Prisma.GroupChallengeCreateNestedManyWithoutAllowedListsInput
-}
-
-export type GroupListUncheckedCreateWithoutAcceptedItemsHistoryInput = {
-  id?: string
-  creatorId?: string | null
-  name: string
-  icon: string
-  color: string
-  description?: string | null
-  groupId: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  memberLists?: Prisma.ListUncheckedCreateNestedManyWithoutGroupListsInput
-  items?: Prisma.ItemUncheckedCreateNestedManyWithoutGroupListsInput
-  listCategories?: Prisma.ListCategoryUncheckedCreateNestedManyWithoutGroupListsInput
-  connectedChallenges?: Prisma.GroupChallengeUncheckedCreateNestedManyWithoutAllowedListsInput
-}
-
-export type GroupListCreateOrConnectWithoutAcceptedItemsHistoryInput = {
-  where: Prisma.GroupListWhereUniqueInput
-  create: Prisma.XOR<Prisma.GroupListCreateWithoutAcceptedItemsHistoryInput, Prisma.GroupListUncheckedCreateWithoutAcceptedItemsHistoryInput>
-}
-
-export type GroupListUpsertWithoutAcceptedItemsHistoryInput = {
-  update: Prisma.XOR<Prisma.GroupListUpdateWithoutAcceptedItemsHistoryInput, Prisma.GroupListUncheckedUpdateWithoutAcceptedItemsHistoryInput>
-  create: Prisma.XOR<Prisma.GroupListCreateWithoutAcceptedItemsHistoryInput, Prisma.GroupListUncheckedCreateWithoutAcceptedItemsHistoryInput>
-  where?: Prisma.GroupListWhereInput
-}
-
-export type GroupListUpdateToOneWithWhereWithoutAcceptedItemsHistoryInput = {
-  where?: Prisma.GroupListWhereInput
-  data: Prisma.XOR<Prisma.GroupListUpdateWithoutAcceptedItemsHistoryInput, Prisma.GroupListUncheckedUpdateWithoutAcceptedItemsHistoryInput>
-}
-
-export type GroupListUpdateWithoutAcceptedItemsHistoryInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.StringFieldUpdateOperationsInput | string
-  color?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  creator?: Prisma.UserUpdateOneWithoutGroupListsCreatedNestedInput
-  group?: Prisma.GroupUpdateOneRequiredWithoutGroupListsNestedInput
-  memberLists?: Prisma.ListUpdateManyWithoutGroupListsNestedInput
-  items?: Prisma.ItemUpdateManyWithoutGroupListsNestedInput
-  listCategories?: Prisma.ListCategoryUpdateManyWithoutGroupListsNestedInput
-  connectedChallenges?: Prisma.GroupChallengeUpdateManyWithoutAllowedListsNestedInput
-}
-
-export type GroupListUncheckedUpdateWithoutAcceptedItemsHistoryInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  creatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.StringFieldUpdateOperationsInput | string
-  color?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  groupId?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  memberLists?: Prisma.ListUncheckedUpdateManyWithoutGroupListsNestedInput
-  items?: Prisma.ItemUncheckedUpdateManyWithoutGroupListsNestedInput
-  listCategories?: Prisma.ListCategoryUncheckedUpdateManyWithoutGroupListsNestedInput
-  connectedChallenges?: Prisma.GroupChallengeUncheckedUpdateManyWithoutAllowedListsNestedInput
-}
-
 export type GroupListCreateWithoutConnectedChallengesInput = {
   id?: string
   name: string
@@ -861,9 +706,7 @@ export type GroupListCreateWithoutConnectedChallengesInput = {
   creator?: Prisma.UserCreateNestedOneWithoutGroupListsCreatedInput
   group: Prisma.GroupCreateNestedOneWithoutGroupListsInput
   memberLists?: Prisma.ListCreateNestedManyWithoutGroupListsInput
-  items?: Prisma.ItemCreateNestedManyWithoutGroupListsInput
   listCategories?: Prisma.ListCategoryCreateNestedManyWithoutGroupListsInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryCreateNestedManyWithoutGroupListInput
 }
 
 export type GroupListUncheckedCreateWithoutConnectedChallengesInput = {
@@ -877,9 +720,7 @@ export type GroupListUncheckedCreateWithoutConnectedChallengesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   memberLists?: Prisma.ListUncheckedCreateNestedManyWithoutGroupListsInput
-  items?: Prisma.ItemUncheckedCreateNestedManyWithoutGroupListsInput
   listCategories?: Prisma.ListCategoryUncheckedCreateNestedManyWithoutGroupListsInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedCreateNestedManyWithoutGroupListInput
 }
 
 export type GroupListCreateOrConnectWithoutConnectedChallengesInput = {
@@ -903,59 +744,6 @@ export type GroupListUpdateManyWithWhereWithoutConnectedChallengesInput = {
   data: Prisma.XOR<Prisma.GroupListUpdateManyMutationInput, Prisma.GroupListUncheckedUpdateManyWithoutConnectedChallengesInput>
 }
 
-export type GroupListCreateWithoutItemsInput = {
-  id?: string
-  name: string
-  icon: string
-  color: string
-  description?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  creator?: Prisma.UserCreateNestedOneWithoutGroupListsCreatedInput
-  group: Prisma.GroupCreateNestedOneWithoutGroupListsInput
-  memberLists?: Prisma.ListCreateNestedManyWithoutGroupListsInput
-  listCategories?: Prisma.ListCategoryCreateNestedManyWithoutGroupListsInput
-  connectedChallenges?: Prisma.GroupChallengeCreateNestedManyWithoutAllowedListsInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryCreateNestedManyWithoutGroupListInput
-}
-
-export type GroupListUncheckedCreateWithoutItemsInput = {
-  id?: string
-  creatorId?: string | null
-  name: string
-  icon: string
-  color: string
-  description?: string | null
-  groupId: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  memberLists?: Prisma.ListUncheckedCreateNestedManyWithoutGroupListsInput
-  listCategories?: Prisma.ListCategoryUncheckedCreateNestedManyWithoutGroupListsInput
-  connectedChallenges?: Prisma.GroupChallengeUncheckedCreateNestedManyWithoutAllowedListsInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedCreateNestedManyWithoutGroupListInput
-}
-
-export type GroupListCreateOrConnectWithoutItemsInput = {
-  where: Prisma.GroupListWhereUniqueInput
-  create: Prisma.XOR<Prisma.GroupListCreateWithoutItemsInput, Prisma.GroupListUncheckedCreateWithoutItemsInput>
-}
-
-export type GroupListUpsertWithWhereUniqueWithoutItemsInput = {
-  where: Prisma.GroupListWhereUniqueInput
-  update: Prisma.XOR<Prisma.GroupListUpdateWithoutItemsInput, Prisma.GroupListUncheckedUpdateWithoutItemsInput>
-  create: Prisma.XOR<Prisma.GroupListCreateWithoutItemsInput, Prisma.GroupListUncheckedCreateWithoutItemsInput>
-}
-
-export type GroupListUpdateWithWhereUniqueWithoutItemsInput = {
-  where: Prisma.GroupListWhereUniqueInput
-  data: Prisma.XOR<Prisma.GroupListUpdateWithoutItemsInput, Prisma.GroupListUncheckedUpdateWithoutItemsInput>
-}
-
-export type GroupListUpdateManyWithWhereWithoutItemsInput = {
-  where: Prisma.GroupListScalarWhereInput
-  data: Prisma.XOR<Prisma.GroupListUpdateManyMutationInput, Prisma.GroupListUncheckedUpdateManyWithoutItemsInput>
-}
-
 export type GroupListCreateWithoutMemberListsInput = {
   id?: string
   name: string
@@ -966,10 +754,8 @@ export type GroupListCreateWithoutMemberListsInput = {
   updatedAt?: Date | string
   creator?: Prisma.UserCreateNestedOneWithoutGroupListsCreatedInput
   group: Prisma.GroupCreateNestedOneWithoutGroupListsInput
-  items?: Prisma.ItemCreateNestedManyWithoutGroupListsInput
   listCategories?: Prisma.ListCategoryCreateNestedManyWithoutGroupListsInput
   connectedChallenges?: Prisma.GroupChallengeCreateNestedManyWithoutAllowedListsInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryCreateNestedManyWithoutGroupListInput
 }
 
 export type GroupListUncheckedCreateWithoutMemberListsInput = {
@@ -982,10 +768,8 @@ export type GroupListUncheckedCreateWithoutMemberListsInput = {
   groupId: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  items?: Prisma.ItemUncheckedCreateNestedManyWithoutGroupListsInput
   listCategories?: Prisma.ListCategoryUncheckedCreateNestedManyWithoutGroupListsInput
   connectedChallenges?: Prisma.GroupChallengeUncheckedCreateNestedManyWithoutAllowedListsInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedCreateNestedManyWithoutGroupListInput
 }
 
 export type GroupListCreateOrConnectWithoutMemberListsInput = {
@@ -1020,9 +804,7 @@ export type GroupListCreateWithoutListCategoriesInput = {
   creator?: Prisma.UserCreateNestedOneWithoutGroupListsCreatedInput
   group: Prisma.GroupCreateNestedOneWithoutGroupListsInput
   memberLists?: Prisma.ListCreateNestedManyWithoutGroupListsInput
-  items?: Prisma.ItemCreateNestedManyWithoutGroupListsInput
   connectedChallenges?: Prisma.GroupChallengeCreateNestedManyWithoutAllowedListsInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryCreateNestedManyWithoutGroupListInput
 }
 
 export type GroupListUncheckedCreateWithoutListCategoriesInput = {
@@ -1036,9 +818,7 @@ export type GroupListUncheckedCreateWithoutListCategoriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   memberLists?: Prisma.ListUncheckedCreateNestedManyWithoutGroupListsInput
-  items?: Prisma.ItemUncheckedCreateNestedManyWithoutGroupListsInput
   connectedChallenges?: Prisma.GroupChallengeUncheckedCreateNestedManyWithoutAllowedListsInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedCreateNestedManyWithoutGroupListInput
 }
 
 export type GroupListCreateOrConnectWithoutListCategoriesInput = {
@@ -1072,10 +852,8 @@ export type GroupListCreateWithoutCreatorInput = {
   updatedAt?: Date | string
   group: Prisma.GroupCreateNestedOneWithoutGroupListsInput
   memberLists?: Prisma.ListCreateNestedManyWithoutGroupListsInput
-  items?: Prisma.ItemCreateNestedManyWithoutGroupListsInput
   listCategories?: Prisma.ListCategoryCreateNestedManyWithoutGroupListsInput
   connectedChallenges?: Prisma.GroupChallengeCreateNestedManyWithoutAllowedListsInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryCreateNestedManyWithoutGroupListInput
 }
 
 export type GroupListUncheckedCreateWithoutCreatorInput = {
@@ -1088,10 +866,8 @@ export type GroupListUncheckedCreateWithoutCreatorInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   memberLists?: Prisma.ListUncheckedCreateNestedManyWithoutGroupListsInput
-  items?: Prisma.ItemUncheckedCreateNestedManyWithoutGroupListsInput
   listCategories?: Prisma.ListCategoryUncheckedCreateNestedManyWithoutGroupListsInput
   connectedChallenges?: Prisma.GroupChallengeUncheckedCreateNestedManyWithoutAllowedListsInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedCreateNestedManyWithoutGroupListInput
 }
 
 export type GroupListCreateOrConnectWithoutCreatorInput = {
@@ -1141,10 +917,8 @@ export type GroupListUpdateWithoutGroupInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   creator?: Prisma.UserUpdateOneWithoutGroupListsCreatedNestedInput
   memberLists?: Prisma.ListUpdateManyWithoutGroupListsNestedInput
-  items?: Prisma.ItemUpdateManyWithoutGroupListsNestedInput
   listCategories?: Prisma.ListCategoryUpdateManyWithoutGroupListsNestedInput
   connectedChallenges?: Prisma.GroupChallengeUpdateManyWithoutAllowedListsNestedInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUpdateManyWithoutGroupListNestedInput
 }
 
 export type GroupListUncheckedUpdateWithoutGroupInput = {
@@ -1157,10 +931,8 @@ export type GroupListUncheckedUpdateWithoutGroupInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberLists?: Prisma.ListUncheckedUpdateManyWithoutGroupListsNestedInput
-  items?: Prisma.ItemUncheckedUpdateManyWithoutGroupListsNestedInput
   listCategories?: Prisma.ListCategoryUncheckedUpdateManyWithoutGroupListsNestedInput
   connectedChallenges?: Prisma.GroupChallengeUncheckedUpdateManyWithoutAllowedListsNestedInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedUpdateManyWithoutGroupListNestedInput
 }
 
 export type GroupListUncheckedUpdateManyWithoutGroupInput = {
@@ -1185,9 +957,7 @@ export type GroupListUpdateWithoutConnectedChallengesInput = {
   creator?: Prisma.UserUpdateOneWithoutGroupListsCreatedNestedInput
   group?: Prisma.GroupUpdateOneRequiredWithoutGroupListsNestedInput
   memberLists?: Prisma.ListUpdateManyWithoutGroupListsNestedInput
-  items?: Prisma.ItemUpdateManyWithoutGroupListsNestedInput
   listCategories?: Prisma.ListCategoryUpdateManyWithoutGroupListsNestedInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUpdateManyWithoutGroupListNestedInput
 }
 
 export type GroupListUncheckedUpdateWithoutConnectedChallengesInput = {
@@ -1201,56 +971,10 @@ export type GroupListUncheckedUpdateWithoutConnectedChallengesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberLists?: Prisma.ListUncheckedUpdateManyWithoutGroupListsNestedInput
-  items?: Prisma.ItemUncheckedUpdateManyWithoutGroupListsNestedInput
   listCategories?: Prisma.ListCategoryUncheckedUpdateManyWithoutGroupListsNestedInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedUpdateManyWithoutGroupListNestedInput
 }
 
 export type GroupListUncheckedUpdateManyWithoutConnectedChallengesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  creatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.StringFieldUpdateOperationsInput | string
-  color?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  groupId?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type GroupListUpdateWithoutItemsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.StringFieldUpdateOperationsInput | string
-  color?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  creator?: Prisma.UserUpdateOneWithoutGroupListsCreatedNestedInput
-  group?: Prisma.GroupUpdateOneRequiredWithoutGroupListsNestedInput
-  memberLists?: Prisma.ListUpdateManyWithoutGroupListsNestedInput
-  listCategories?: Prisma.ListCategoryUpdateManyWithoutGroupListsNestedInput
-  connectedChallenges?: Prisma.GroupChallengeUpdateManyWithoutAllowedListsNestedInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUpdateManyWithoutGroupListNestedInput
-}
-
-export type GroupListUncheckedUpdateWithoutItemsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  creatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.StringFieldUpdateOperationsInput | string
-  color?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  groupId?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  memberLists?: Prisma.ListUncheckedUpdateManyWithoutGroupListsNestedInput
-  listCategories?: Prisma.ListCategoryUncheckedUpdateManyWithoutGroupListsNestedInput
-  connectedChallenges?: Prisma.GroupChallengeUncheckedUpdateManyWithoutAllowedListsNestedInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedUpdateManyWithoutGroupListNestedInput
-}
-
-export type GroupListUncheckedUpdateManyWithoutItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   creatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1272,10 +996,8 @@ export type GroupListUpdateWithoutMemberListsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   creator?: Prisma.UserUpdateOneWithoutGroupListsCreatedNestedInput
   group?: Prisma.GroupUpdateOneRequiredWithoutGroupListsNestedInput
-  items?: Prisma.ItemUpdateManyWithoutGroupListsNestedInput
   listCategories?: Prisma.ListCategoryUpdateManyWithoutGroupListsNestedInput
   connectedChallenges?: Prisma.GroupChallengeUpdateManyWithoutAllowedListsNestedInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUpdateManyWithoutGroupListNestedInput
 }
 
 export type GroupListUncheckedUpdateWithoutMemberListsInput = {
@@ -1288,10 +1010,8 @@ export type GroupListUncheckedUpdateWithoutMemberListsInput = {
   groupId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  items?: Prisma.ItemUncheckedUpdateManyWithoutGroupListsNestedInput
   listCategories?: Prisma.ListCategoryUncheckedUpdateManyWithoutGroupListsNestedInput
   connectedChallenges?: Prisma.GroupChallengeUncheckedUpdateManyWithoutAllowedListsNestedInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedUpdateManyWithoutGroupListNestedInput
 }
 
 export type GroupListUncheckedUpdateManyWithoutMemberListsInput = {
@@ -1317,9 +1037,7 @@ export type GroupListUpdateWithoutListCategoriesInput = {
   creator?: Prisma.UserUpdateOneWithoutGroupListsCreatedNestedInput
   group?: Prisma.GroupUpdateOneRequiredWithoutGroupListsNestedInput
   memberLists?: Prisma.ListUpdateManyWithoutGroupListsNestedInput
-  items?: Prisma.ItemUpdateManyWithoutGroupListsNestedInput
   connectedChallenges?: Prisma.GroupChallengeUpdateManyWithoutAllowedListsNestedInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUpdateManyWithoutGroupListNestedInput
 }
 
 export type GroupListUncheckedUpdateWithoutListCategoriesInput = {
@@ -1333,9 +1051,7 @@ export type GroupListUncheckedUpdateWithoutListCategoriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberLists?: Prisma.ListUncheckedUpdateManyWithoutGroupListsNestedInput
-  items?: Prisma.ItemUncheckedUpdateManyWithoutGroupListsNestedInput
   connectedChallenges?: Prisma.GroupChallengeUncheckedUpdateManyWithoutAllowedListsNestedInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedUpdateManyWithoutGroupListNestedInput
 }
 
 export type GroupListUncheckedUpdateManyWithoutListCategoriesInput = {
@@ -1371,10 +1087,8 @@ export type GroupListUpdateWithoutCreatorInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   group?: Prisma.GroupUpdateOneRequiredWithoutGroupListsNestedInput
   memberLists?: Prisma.ListUpdateManyWithoutGroupListsNestedInput
-  items?: Prisma.ItemUpdateManyWithoutGroupListsNestedInput
   listCategories?: Prisma.ListCategoryUpdateManyWithoutGroupListsNestedInput
   connectedChallenges?: Prisma.GroupChallengeUpdateManyWithoutAllowedListsNestedInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUpdateManyWithoutGroupListNestedInput
 }
 
 export type GroupListUncheckedUpdateWithoutCreatorInput = {
@@ -1387,10 +1101,8 @@ export type GroupListUncheckedUpdateWithoutCreatorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberLists?: Prisma.ListUncheckedUpdateManyWithoutGroupListsNestedInput
-  items?: Prisma.ItemUncheckedUpdateManyWithoutGroupListsNestedInput
   listCategories?: Prisma.ListCategoryUncheckedUpdateManyWithoutGroupListsNestedInput
   connectedChallenges?: Prisma.GroupChallengeUncheckedUpdateManyWithoutAllowedListsNestedInput
-  acceptedItemsHistory?: Prisma.GroupList_AcceptedItemHistoryUncheckedUpdateManyWithoutGroupListNestedInput
 }
 
 export type GroupListUncheckedUpdateManyWithoutCreatorInput = {
@@ -1411,18 +1123,14 @@ export type GroupListUncheckedUpdateManyWithoutCreatorInput = {
 
 export type GroupListCountOutputType = {
   memberLists: number
-  items: number
   listCategories: number
   connectedChallenges: number
-  acceptedItemsHistory: number
 }
 
 export type GroupListCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   memberLists?: boolean | GroupListCountOutputTypeCountMemberListsArgs
-  items?: boolean | GroupListCountOutputTypeCountItemsArgs
   listCategories?: boolean | GroupListCountOutputTypeCountListCategoriesArgs
   connectedChallenges?: boolean | GroupListCountOutputTypeCountConnectedChallengesArgs
-  acceptedItemsHistory?: boolean | GroupListCountOutputTypeCountAcceptedItemsHistoryArgs
 }
 
 /**
@@ -1445,13 +1153,6 @@ export type GroupListCountOutputTypeCountMemberListsArgs<ExtArgs extends runtime
 /**
  * GroupListCountOutputType without action
  */
-export type GroupListCountOutputTypeCountItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ItemWhereInput
-}
-
-/**
- * GroupListCountOutputType without action
- */
 export type GroupListCountOutputTypeCountListCategoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ListCategoryWhereInput
 }
@@ -1461,13 +1162,6 @@ export type GroupListCountOutputTypeCountListCategoriesArgs<ExtArgs extends runt
  */
 export type GroupListCountOutputTypeCountConnectedChallengesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.GroupChallengeWhereInput
-}
-
-/**
- * GroupListCountOutputType without action
- */
-export type GroupListCountOutputTypeCountAcceptedItemsHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.GroupList_AcceptedItemHistoryWhereInput
 }
 
 
@@ -1484,10 +1178,8 @@ export type GroupListSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   creator?: boolean | Prisma.GroupList$creatorArgs<ExtArgs>
   group?: boolean | Prisma.GroupDefaultArgs<ExtArgs>
   memberLists?: boolean | Prisma.GroupList$memberListsArgs<ExtArgs>
-  items?: boolean | Prisma.GroupList$itemsArgs<ExtArgs>
   listCategories?: boolean | Prisma.GroupList$listCategoriesArgs<ExtArgs>
   connectedChallenges?: boolean | Prisma.GroupList$connectedChallengesArgs<ExtArgs>
-  acceptedItemsHistory?: boolean | Prisma.GroupList$acceptedItemsHistoryArgs<ExtArgs>
   _count?: boolean | Prisma.GroupListCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["groupList"]>
 
@@ -1536,10 +1228,8 @@ export type GroupListInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   creator?: boolean | Prisma.GroupList$creatorArgs<ExtArgs>
   group?: boolean | Prisma.GroupDefaultArgs<ExtArgs>
   memberLists?: boolean | Prisma.GroupList$memberListsArgs<ExtArgs>
-  items?: boolean | Prisma.GroupList$itemsArgs<ExtArgs>
   listCategories?: boolean | Prisma.GroupList$listCategoriesArgs<ExtArgs>
   connectedChallenges?: boolean | Prisma.GroupList$connectedChallengesArgs<ExtArgs>
-  acceptedItemsHistory?: boolean | Prisma.GroupList$acceptedItemsHistoryArgs<ExtArgs>
   _count?: boolean | Prisma.GroupListCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type GroupListIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1557,10 +1247,8 @@ export type $GroupListPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     creator: Prisma.$UserPayload<ExtArgs> | null
     group: Prisma.$GroupPayload<ExtArgs>
     memberLists: Prisma.$ListPayload<ExtArgs>[]
-    items: Prisma.$ItemPayload<ExtArgs>[]
     listCategories: Prisma.$ListCategoryPayload<ExtArgs>[]
     connectedChallenges: Prisma.$GroupChallengePayload<ExtArgs>[]
-    acceptedItemsHistory: Prisma.$GroupList_AcceptedItemHistoryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1969,10 +1657,8 @@ export interface Prisma__GroupListClient<T, Null = never, ExtArgs extends runtim
   creator<T extends Prisma.GroupList$creatorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupList$creatorArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   group<T extends Prisma.GroupDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupDefaultArgs<ExtArgs>>): Prisma.Prisma__GroupClient<runtime.Types.Result.GetResult<Prisma.$GroupPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   memberLists<T extends Prisma.GroupList$memberListsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupList$memberListsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ListPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  items<T extends Prisma.GroupList$itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupList$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   listCategories<T extends Prisma.GroupList$listCategoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupList$listCategoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ListCategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   connectedChallenges<T extends Prisma.GroupList$connectedChallengesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupList$connectedChallengesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GroupChallengePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  acceptedItemsHistory<T extends Prisma.GroupList$acceptedItemsHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GroupList$acceptedItemsHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GroupList_AcceptedItemHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2455,30 +2141,6 @@ export type GroupList$memberListsArgs<ExtArgs extends runtime.Types.Extensions.I
 }
 
 /**
- * GroupList.items
- */
-export type GroupList$itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Item
-   */
-  select?: Prisma.ItemSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Item
-   */
-  omit?: Prisma.ItemOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ItemInclude<ExtArgs> | null
-  where?: Prisma.ItemWhereInput
-  orderBy?: Prisma.ItemOrderByWithRelationInput | Prisma.ItemOrderByWithRelationInput[]
-  cursor?: Prisma.ItemWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ItemScalarFieldEnum | Prisma.ItemScalarFieldEnum[]
-}
-
-/**
  * GroupList.listCategories
  */
 export type GroupList$listCategoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2524,30 +2186,6 @@ export type GroupList$connectedChallengesArgs<ExtArgs extends runtime.Types.Exte
   take?: number
   skip?: number
   distinct?: Prisma.GroupChallengeScalarFieldEnum | Prisma.GroupChallengeScalarFieldEnum[]
-}
-
-/**
- * GroupList.acceptedItemsHistory
- */
-export type GroupList$acceptedItemsHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the GroupList_AcceptedItemHistory
-   */
-  select?: Prisma.GroupList_AcceptedItemHistorySelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the GroupList_AcceptedItemHistory
-   */
-  omit?: Prisma.GroupList_AcceptedItemHistoryOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.GroupList_AcceptedItemHistoryInclude<ExtArgs> | null
-  where?: Prisma.GroupList_AcceptedItemHistoryWhereInput
-  orderBy?: Prisma.GroupList_AcceptedItemHistoryOrderByWithRelationInput | Prisma.GroupList_AcceptedItemHistoryOrderByWithRelationInput[]
-  cursor?: Prisma.GroupList_AcceptedItemHistoryWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.GroupList_AcceptedItemHistoryScalarFieldEnum | Prisma.GroupList_AcceptedItemHistoryScalarFieldEnum[]
 }
 
 /**

@@ -1,7 +1,6 @@
 import { GraphQLError } from 'graphql';
 import { builder, prisma } from '../../builder';
 import { RolesGroupEnum } from '../../enum';
-import { ItemRef } from '../item/index';
 import { GroupDetailRef, GroupListRef } from './index';
 
 type GroupRole = 'OWNER' | 'ADMIN' | 'AUTO_CONTRIBUTOR' | 'CONTRIBUTOR' | 'MEMBER';
@@ -447,93 +446,95 @@ builder.mutationField('removeListFromGroupList', (t) =>
 );
 
 // ---- Draw di gruppo ----
-
-builder.mutationField('drawFromGroupList', (t) =>
-  t.field({
-    type: ItemRef,
-    args: {
-      groupListId: t.arg.id({ required: true }),
-      previousItemId: t.arg.id({ required: false }),
-    },
-    resolve: async (_root, { groupListId, previousItemId }, ctx) => {
-      requireAuth(ctx.userId);
-      const glId = String(groupListId);
-
-      const groupList = await prisma.groupList.findUnique({
-        where: { id: glId },
-        select: { groupId: true },
-      });
-      if (!groupList) throw new GraphQLError('Lista gruppo non trovata.', { extensions: { code: 'NOT_FOUND' } });
-
-      const membership = await prisma.group_User.findUnique({
-        where: { groupId_userId: { groupId: groupList.groupId, userId: ctx.userId } },
-      });
-      if (!membership) throw new GraphQLError('Non sei membro.', { extensions: { code: 'FORBIDDEN' } });
-
-      const listUserItems = await prisma.list_UserItem.findMany({
-        where: {
-          list: { groupLists: { some: { id: glId } } },
-          ...(previousItemId
-            ? { userItem: { itemId: { not: String(previousItemId) } } }
-            : {}),
-        },
-        include: { userItem: { select: { itemId: true } } },
-      });
-
-      // deduplica per itemId
-      const seen = new Set<string>();
-      const itemIds: string[] = [];
-      for (const lui of listUserItems) {
-        const iId = lui.userItem.itemId;
-        if (!seen.has(iId)) {
-          seen.add(iId);
-          itemIds.push(iId);
-        }
-      }
-      if (itemIds.length === 0) {
-        throw new GraphQLError('Nessun elemento estraibile.', { extensions: { code: 'EMPTY_LIST' } });
-      }
-      const drawnId = itemIds[Math.floor(Math.random() * itemIds.length)];
-      return prisma.item.findUniqueOrThrow({ where: { id: drawnId } });
-    },
-  }),
-);
-
-builder.mutationField('acceptGroupDraw', (t) =>
-  t.boolean({
-    args: {
-      groupListId: t.arg.id({ required: true }),
-      itemId: t.arg.id({ required: true }),
-    },
-    resolve: async (_root, { groupListId, itemId }, ctx) => {
-      requireAuth(ctx.userId);
-      const glId = String(groupListId);
-
-      const groupList = await prisma.groupList.findUnique({
-        where: { id: glId },
-        select: { groupId: true },
-      });
-      if (!groupList) throw new GraphQLError('Lista gruppo non trovata.', { extensions: { code: 'NOT_FOUND' } });
-
-      const [myMembership, members] = await Promise.all([
-        prisma.group_User.findUnique({
-          where: { groupId_userId: { groupId: groupList.groupId, userId: ctx.userId } },
-        }),
-        prisma.group_User.findMany({
-          where: { groupId: groupList.groupId },
-          select: { id: true },
-        }),
-      ]);
-      if (!myMembership) throw new GraphQLError('Non sei membro.', { extensions: { code: 'FORBIDDEN' } });
-
-      await prisma.groupList_AcceptedItemHistory.create({
-        data: {
-          groupListId: glId,
-          itemId: String(itemId),
-          randomizingFor: { connect: members.map((m) => ({ id: m.id })) },
-        },
-      });
-      return true;
-    },
-  }),
-);
+// Disabilitato insieme a Item: pescava da un catalogo condiviso tra i membri, concetto che non
+// esiste più con item personali (vedi item.prisma). Gruppi/Challenge sono comunque da rifare (SUBROAD).
+//
+// builder.mutationField('drawFromGroupList', (t) =>
+//   t.field({
+//     type: ItemRef,
+//     args: {
+//       groupListId: t.arg.id({ required: true }),
+//       previousItemId: t.arg.id({ required: false }),
+//     },
+//     resolve: async (_root, { groupListId, previousItemId }, ctx) => {
+//       requireAuth(ctx.userId);
+//       const glId = String(groupListId);
+//
+//       const groupList = await prisma.groupList.findUnique({
+//         where: { id: glId },
+//         select: { groupId: true },
+//       });
+//       if (!groupList) throw new GraphQLError('Lista gruppo non trovata.', { extensions: { code: 'NOT_FOUND' } });
+//
+//       const membership = await prisma.group_User.findUnique({
+//         where: { groupId_userId: { groupId: groupList.groupId, userId: ctx.userId } },
+//       });
+//       if (!membership) throw new GraphQLError('Non sei membro.', { extensions: { code: 'FORBIDDEN' } });
+//
+//       const listUserItems = await prisma.list_UserItem.findMany({
+//         where: {
+//           list: { groupLists: { some: { id: glId } } },
+//           ...(previousItemId
+//             ? { userItem: { itemId: { not: String(previousItemId) } } }
+//             : {}),
+//         },
+//         include: { userItem: { select: { itemId: true } } },
+//       });
+//
+//       // deduplica per itemId
+//       const seen = new Set<string>();
+//       const itemIds: string[] = [];
+//       for (const lui of listUserItems) {
+//         const iId = lui.userItem.itemId;
+//         if (!seen.has(iId)) {
+//           seen.add(iId);
+//           itemIds.push(iId);
+//         }
+//       }
+//       if (itemIds.length === 0) {
+//         throw new GraphQLError('Nessun elemento estraibile.', { extensions: { code: 'EMPTY_LIST' } });
+//       }
+//       const drawnId = itemIds[Math.floor(Math.random() * itemIds.length)];
+//       return prisma.item.findUniqueOrThrow({ where: { id: drawnId } });
+//     },
+//   }),
+// );
+//
+// builder.mutationField('acceptGroupDraw', (t) =>
+//   t.boolean({
+//     args: {
+//       groupListId: t.arg.id({ required: true }),
+//       itemId: t.arg.id({ required: true }),
+//     },
+//     resolve: async (_root, { groupListId, itemId }, ctx) => {
+//       requireAuth(ctx.userId);
+//       const glId = String(groupListId);
+//
+//       const groupList = await prisma.groupList.findUnique({
+//         where: { id: glId },
+//         select: { groupId: true },
+//       });
+//       if (!groupList) throw new GraphQLError('Lista gruppo non trovata.', { extensions: { code: 'NOT_FOUND' } });
+//
+//       const [myMembership, members] = await Promise.all([
+//         prisma.group_User.findUnique({
+//           where: { groupId_userId: { groupId: groupList.groupId, userId: ctx.userId } },
+//         }),
+//         prisma.group_User.findMany({
+//           where: { groupId: groupList.groupId },
+//           select: { id: true },
+//         }),
+//       ]);
+//       if (!myMembership) throw new GraphQLError('Non sei membro.', { extensions: { code: 'FORBIDDEN' } });
+//
+//       await prisma.groupList_AcceptedItemHistory.create({
+//         data: {
+//           groupListId: glId,
+//           itemId: String(itemId),
+//           randomizingFor: { connect: members.map((m) => ({ id: m.id })) },
+//         },
+//       });
+//       return true;
+//     },
+//   }),
+// );

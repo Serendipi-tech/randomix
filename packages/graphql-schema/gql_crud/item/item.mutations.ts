@@ -7,13 +7,14 @@ export const ADD_ITEM_TO_LIST: DocumentNode = parse(`
       id
       userItem {
         id
+        name
         description
         note
         status
-        item {
+        category {
           id
           name
-          category
+          icon
         }
       }
     }

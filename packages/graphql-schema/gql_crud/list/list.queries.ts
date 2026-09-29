@@ -22,6 +22,7 @@ export const LIST_DETAIL: DocumentNode = parse(`
         acceptedCount
         userItem {
           id
+          name
           description
           note
           status
@@ -31,17 +32,15 @@ export const LIST_DETAIL: DocumentNode = parse(`
             name
             color
           }
-          item {
+          category {
             id
             name
-            description
-            imageUrl
-            category
-            myRating {
-              id
-              value
-              note
-            }
+            icon
+          }
+          rating {
+            id
+            value
+            note
           }
         }
       }
