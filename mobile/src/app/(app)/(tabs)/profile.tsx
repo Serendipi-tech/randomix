@@ -175,9 +175,10 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  // minHeight:0 è necessario sul web: un flex item ha min-height:auto di default e "cresce" oltre lo
-  // schermo invece di lasciare scrollare il figlio (ScrollView) — su nativo non serve, Yoga non ha questo problema.
-  safe: { flex: 1, minHeight: 0 },
+  // position:absolute (non flex:1) perché su web il container di TabSlot (expo-router) ha
+  // flexShrink:0: con contenuto più alto dello schermo si rifiuta di restringersi e trabocca
+  // invece di lasciare scrollare il figlio. Assoluto = dimensionato dai bordi, ignora quel flex a monte.
+  safe: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   topBar: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
