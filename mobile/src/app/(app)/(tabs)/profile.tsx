@@ -175,7 +175,9 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
+  // minHeight:0 è necessario sul web: un flex item ha min-height:auto di default e "cresce" oltre lo
+  // schermo invece di lasciare scrollare il figlio (ScrollView) — su nativo non serve, Yoga non ha questo problema.
+  safe: { flex: 1, minHeight: 0 },
   topBar: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -187,6 +189,7 @@ const styles = StyleSheet.create({
   },
   scroll: {
     flex: 1,
+    minHeight: 0,
   },
   content: {
     paddingHorizontal: Spacing.four,
