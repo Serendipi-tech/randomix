@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { LogOut, MessageSquare, Settings } from 'lucide-react-native';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { Colors, Spacing } from '@/constants/theme';
 import { AVATAR_PRESETS, resolveAvatarUri } from '@/constants/avatar-presets';
@@ -28,6 +28,8 @@ import { useProfileStats } from '@/utils/useProfileStats';
 const USERNAME_MIN_LENGTH = 3;
 // Deve combaciare con AVATAR_SIZE/2 di ProfileHeader: spazio per l'avatar che sfonda la card.
 const HERO_TOP_SPACE = 48;
+// Deve combaciare con BAR_HEIGHT di components/app-tabs.tsx: spazio per non finire sotto la tab bar.
+const NAVBAR_HEIGHT = 68;
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -35,6 +37,7 @@ export default function ProfileScreen() {
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
   const { logout } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const { profile, loading: loadingProfile, updateProfile, saving, saveError } = useProfile();
   const { friends } = useMyFriends();
@@ -84,7 +87,11 @@ export default function ProfileScreen() {
           <LogOut size={24} color={colors.textColor} />
         </Pressable>
       </View>
-      <View style={styles.content}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={[styles.content, { paddingBottom: NAVBAR_HEIGHT + insets.bottom + Spacing.three }]}
+        showsVerticalScrollIndicator={false}
+      >
         {loadingProfile && !profile ? (
           <ListCardSkeleton colorScheme={colorScheme} />
         ) : profile && !editing ? (
@@ -151,7 +158,7 @@ export default function ProfileScreen() {
             </CardShell>
           </Animated.View>
         ) : null}
-      </View>
+      </ScrollView>
 
       <ConfirmSheet
         visible={confirmingLogout}
@@ -177,6 +184,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.four,
     paddingBottom: Spacing.three,
+  },
+  scroll: {
+    flex: 1,
   },
   content: {
     paddingHorizontal: Spacing.four,
