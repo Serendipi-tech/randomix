@@ -14,6 +14,7 @@ import { ListCard } from '@/components/cards/ListCard';
 import { ContentCard } from '@/components/cards/ContentCard';
 import { useMyLists } from '@/utils/useLists';
 import { useNavbarClearance } from '@/utils/useNavbarClearance';
+import { useProfile } from '@/utils/useProfile';
 
 const SKELETON_COUNT = 6;
 
@@ -23,6 +24,7 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const { lists, loading, error, loadMore } = useMyLists();
+  const { profile } = useProfile();
   // clearance in fondo alla lista per non finire sotto la pillola-navbar (regola condivisa)
   const listBottomPadding = useNavbarClearance();
 
@@ -35,6 +37,11 @@ export default function HomeScreen() {
       <PageHeader
         icon={Home}
         title={t('title')}
+        subtitle={
+          profile
+            ? t('statsSubtitle', { lists: profile.listsCount, items: profile.totalItemsCount })
+            : undefined
+        }
         action={{ icon: Plus, onPress: () => router.push('/list-form') }}
       />
 
