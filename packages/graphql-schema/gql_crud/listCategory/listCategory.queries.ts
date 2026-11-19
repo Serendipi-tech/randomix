@@ -6,11 +6,13 @@ export const LIST_CATEGORIES: DocumentNode = parse(`
     listCategories {
       id
       name
+      nameEn
       description
       icon
       includedCategories {
         id
         name
+        nameEn
         icon
       }
       listsCount

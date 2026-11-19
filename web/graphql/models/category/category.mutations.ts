@@ -6,6 +6,7 @@ import './index';
 const CategoryInput = builder.inputType('CategoryInput', {
   fields: (t) => ({
     name: t.string({ required: true }),
+    nameEn: t.string({ required: false }),
     icon: t.string({ required: true }),
   }),
 });
@@ -18,7 +19,11 @@ builder.mutationField('adminCreateCategory', (t) =>
       await requireAdmin(ctx);
       return prisma.category.create({
         ...query,
-        data: { name: input.name, icon: input.icon },
+        data: {
+          name: input.name,
+          translations: input.nameEn ? { en: input.nameEn } : undefined,
+          icon: input.icon,
+        },
       });
     },
   }),
@@ -36,7 +41,11 @@ builder.mutationField('adminUpdateCategory', (t) =>
       return prisma.category.update({
         ...query,
         where: { id: String(id) },
-        data: { name: input.name, icon: input.icon },
+        data: {
+          name: input.name,
+          translations: input.nameEn ? { en: input.nameEn } : null,
+          icon: input.icon,
+        },
       });
     },
   }),

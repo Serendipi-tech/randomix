@@ -24,6 +24,8 @@ export function ListCategoryFormModal({ category, onClose }: ListCategoryFormMod
   const {
     name,
     setName,
+    nameEn,
+    setNameEn,
     description,
     setDescription,
     icon,
@@ -61,6 +63,7 @@ export function ListCategoryFormModal({ category, onClose }: ListCategoryFormMod
         </div>
 
         <Input name="name" label="Nome" value={name} onChangeText={setName} required />
+        <Input name="nameEn" label="Nome (EN)" value={nameEn} onChangeText={setNameEn} />
         <Input name="description" label="Descrizione" value={description} onChangeText={setDescription} />
 
         <div className="flex flex-col gap-1.5">

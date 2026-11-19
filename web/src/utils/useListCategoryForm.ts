@@ -16,6 +16,7 @@ interface UseListCategoryFormOptions {
 // Un solo hook per creazione/modifica/eliminazione: la modale li riusa entrambi in base a `initial`.
 export function useListCategoryForm({ initial, onSaved, onDeleted }: UseListCategoryFormOptions) {
   const [name, setName] = useState(initial?.name ?? '');
+  const [nameEn, setNameEn] = useState(initial?.nameEn ?? '');
   const [description, setDescription] = useState(initial?.description ?? '');
   const [icon, setIcon] = useState(initial?.icon ?? '');
   const [includedCategoryIds, setIncludedCategoryIds] = useState<string[]>(
@@ -33,7 +34,7 @@ export function useListCategoryForm({ initial, onSaved, onDeleted }: UseListCate
   };
 
   const save = async () => {
-    const input = { name, description: description || null, icon, includedCategoryIds };
+    const input = { name, nameEn: nameEn || null, description: description || null, icon, includedCategoryIds };
     if (initial) {
       await updateCategory({ variables: { id: initial.id, input } });
     } else {
@@ -51,6 +52,8 @@ export function useListCategoryForm({ initial, onSaved, onDeleted }: UseListCate
   return {
     name,
     setName,
+    nameEn,
+    setNameEn,
     description,
     setDescription,
     icon,

@@ -6,6 +6,7 @@ import './index';
 const ListCategoryInput = builder.inputType('ListCategoryInput', {
   fields: (t) => ({
     name: t.string({ required: true }),
+    nameEn: t.string({ required: false }),
     description: t.string({ required: false }),
     icon: t.string({ required: true }),
     includedCategoryIds: t.idList({ required: true }),
@@ -22,6 +23,7 @@ builder.mutationField('adminCreateListCategory', (t) =>
         ...query,
         data: {
           name: input.name,
+          translations: input.nameEn ? { en: input.nameEn } : undefined,
           description: input.description ?? null,
           icon: input.icon,
           includedCategories: { connect: input.includedCategoryIds.map((id) => ({ id: String(id) })) },
@@ -45,6 +47,7 @@ builder.mutationField('adminUpdateListCategory', (t) =>
         where: { id: String(id) },
         data: {
           name: input.name,
+          translations: input.nameEn ? { en: input.nameEn } : null,
           description: input.description ?? null,
           icon: input.icon,
           includedCategories: { set: input.includedCategoryIds.map((id) => ({ id: String(id) })) },

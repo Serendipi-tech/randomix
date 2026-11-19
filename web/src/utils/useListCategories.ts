@@ -9,6 +9,7 @@ const { LIST_CATEGORIES } = ListCategoryQueries;
 export interface ListCategory {
   id: string;
   name: string;
+  nameEn: string | null;
   description: string | null;
   icon: string;
   includedCategories: Category[];

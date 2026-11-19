@@ -18,7 +18,7 @@ export function CategoryFormModal({ category, onClose }: CategoryFormModalProps)
   const [iconPickerOpen, setIconPickerOpen] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
-  const { name, setName, icon, setIcon, save, saving, saveError, remove, deleting, deleteError } = useCategoryForm({
+  const { name, setName, nameEn, setNameEn, icon, setIcon, save, saving, saveError, remove, deleting, deleteError } = useCategoryForm({
     initial: category,
     onSaved: onClose,
     onDeleted: onClose,
@@ -48,6 +48,7 @@ export function CategoryFormModal({ category, onClose }: CategoryFormModalProps)
         </div>
 
         <Input name="name" label="Nome" value={name} onChangeText={setName} required />
+        <Input name="nameEn" label="Nome (EN)" value={nameEn} onChangeText={setNameEn} />
 
         <div className="flex flex-col gap-1.5">
           <span className="text-sm font-semibold text-text-color">
