@@ -55,6 +55,8 @@ export default function ListFormScreen() {
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId) ?? null;
   // Stato neutro dello slot category: solo se sto caricando e non ho ancora dati (con la cache non appare)
   const isCategoriesLoading = categoriesLoading && categories.length === 0;
+  // In creazione non esiste ancora nessun User_Item collegato: conteggio 0
+  const itemsCount = isEdit ? (list?.items.length ?? 0) : 0;
 
   // precompilo il form quando arrivano i dati della lista in modifica
   useEffect(() => {
@@ -146,7 +148,7 @@ export default function ListFormScreen() {
             category={selectedCategory?.name}
             icon={resolveListIcon(icon)}
             color={color}
-            itemsCount={0}
+            itemsCount={itemsCount}
             isHidden={isHidden}
           />
         </View>
