@@ -1,13 +1,20 @@
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
-import { LayoutGrid } from 'lucide-react-native';
+import type { ComponentType } from 'react';
 import { Colors } from '@/constants/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { getLucideIcon } from '@/utils/lucideIconRegistry';
 import { BottomSheet } from '@/components/organisms/BottomSheet';
 import { Input } from '@/components/molecules/Input';
 import { OptionRow } from '@/components/molecules/OptionRow';
 
-export type CategoryOption = { value: string; label: string };
+export type CategoryOption = {
+  value: string;
+  label: string;
+  icon: string;
+};
+
+type IconComponent = ComponentType<{ size?: number; color?: string }>;
 
 // Sotto questa soglia la ricerca è superflua: poche opzioni si scorrono a colpo d'occhio
 const SEARCH_MIN_OPTIONS = 10;
@@ -56,18 +63,21 @@ export function CategoryPickerSheet({
         {filtered.length === 0 ? (
           <Text style={[styles.empty, { color: colors.disabled }]}>{emptyLabel}</Text>
         ) : (
-          filtered.map((option) => (
-            <OptionRow
-              key={option.value}
-              icon={LayoutGrid}
-              title={option.label}
-              active={selected === option.value}
-              onPress={() => {
-                onSelect(option.value);
-                onClose();
-              }}
-            />
-          ))
+          filtered.map((option) => {
+            const iconComponent = getLucideIcon(option.icon) as IconComponent | undefined;
+            return (
+              <OptionRow
+                key={option.value}
+                icon={iconComponent || undefined}
+                title={option.label}
+                active={selected === option.value}
+                onPress={() => {
+                  onSelect(option.value);
+                  onClose();
+                }}
+              />
+            );
+          })
         )}
       </ScrollView>
     </BottomSheet>

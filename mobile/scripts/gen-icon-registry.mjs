@@ -39,6 +39,33 @@ const CATEGORY_KEYWORDS = [
 ];
 const MAX = 30;
 
+// Icone richieste dal documento LIST_CATEGORIES.md che DEVONO essere incluse
+const ICON_WHITELIST = [
+  'BookOpen',      // Reading
+  'BookMarked',    // Comics & Manga
+  'Clapperboard',  // Movies & TV
+  'Headphones',    // Listening
+  'Music',         // Music
+  'Gamepad2',      // Gaming
+  'Dices',         // Tabletop
+  'UtensilsCrossed', // Food & Dining
+  'ChefHat',       // Cooking & Recipes
+  'Wine',          // Drinks
+  'Plane',         // Travel & Places
+  'ShoppingBag',   // Shopping
+  'Ticket',        // Things to Do
+  'PartyPopper',   // Events & Nightlife
+  'Dumbbell',      // Sports & Fitness
+  'GraduationCap', // Learning & Study
+  'Palette',       // Arts & Culture
+  'Drama',         // Live & Stage
+  'Smartphone',    // Apps & Tech
+  'Heart',         // Date Ideas
+  'Gift',          // Wishlist
+  'Sparkles',      // Bucket List
+  'Shapes',        // Anything
+];
+
 const splitWords = (n) => n.match(/[A-Z][a-z0-9]*/g) ?? [n];
 const normalize = (w) => w.map((x) => x.replace(/\d+$/, '')).filter(Boolean);
 function dedupeGlobal(names) {
@@ -75,6 +102,11 @@ for (const { p, h } of dedupedIcons) {
   if (c) buckets.get(c[0]).push(p); else other.push(p);
 }
 const browsable = new Set();
+// Aggiungi le icone dalla whitelist se valide
+for (const icon of ICON_WHITELIST) {
+  if (validSet.has(icon)) browsable.add(icon);
+}
+// Aggiungi le altre icone, limitandole per categoria
 for (const [key] of CATEGORY_KEYWORDS) buckets.get(key).sort().slice(0, MAX).forEach((n) => browsable.add(n));
 other.sort().slice(0, MAX).forEach((n) => browsable.add(n));
 const names = [...browsable].sort();
