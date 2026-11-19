@@ -51,6 +51,9 @@ export default function MembershipsPage() {
               <p className="text-xs text-disabled">
                 {membership.maxLists ?? '∞'} liste · {membership.maxItemsPerList ?? '∞'} item/lista
               </p>
+              <p className="text-xs text-disabled">
+                {membership.maxGroupsCreatable ?? '∞'} gruppi creabili · {membership.maxGroupsJoinable ?? '∞'} gruppi partecipabili
+              </p>
               <p className="text-xs text-disabled">{membership.activeSubscriptionsCount} abbonati attivi</p>
             </Card>
           );

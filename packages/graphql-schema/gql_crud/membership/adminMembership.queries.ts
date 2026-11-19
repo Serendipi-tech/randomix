@@ -12,6 +12,11 @@ export const ADMIN_MEMBERSHIPS: DocumentNode = parse(`
       billing
       maxLists
       maxItemsPerList
+      hideItemsEnabled
+      maxGroupsCreatable
+      maxGroupsJoinable
+      showAds
+      supportPriority
       createdAt
       activeSubscriptionsCount
     }

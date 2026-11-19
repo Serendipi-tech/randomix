@@ -2,7 +2,7 @@
 
 import { useQuery } from '@apollo/client';
 import { AdminMembershipQueries } from '@randomix/graphql-schema';
-import type { MembershipPlan, BillingOption } from './membershipLabels';
+import type { MembershipPlan, BillingOption, SupportPriority } from './membershipLabels';
 
 const { ADMIN_MEMBERSHIPS } = AdminMembershipQueries;
 
@@ -15,6 +15,11 @@ export interface Membership {
   billing: BillingOption;
   maxLists: number | null;
   maxItemsPerList: number | null;
+  hideItemsEnabled: boolean | null;
+  maxGroupsCreatable: number | null;
+  maxGroupsJoinable: number | null;
+  showAds: boolean | null;
+  supportPriority: SupportPriority | null;
   activeSubscriptionsCount: number;
 }
 

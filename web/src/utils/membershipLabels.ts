@@ -17,3 +17,12 @@ export const BILLING_LABELS: Record<BillingOption, string> = {
   MONTHLY: 'Mensile',
   YEARLY: 'Annuale',
 };
+
+export const SUPPORT_PRIORITIES = ['LOW', 'MEDIUM', 'HIGH'] as const;
+export type SupportPriority = (typeof SUPPORT_PRIORITIES)[number];
+
+export const SUPPORT_PRIORITY_LABELS: Record<SupportPriority, string> = {
+  LOW: 'Bassa',
+  MEDIUM: 'Media',
+  HIGH: 'Alta',
+};

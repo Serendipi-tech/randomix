@@ -3,7 +3,14 @@
 import { useState } from 'react';
 import { useMembershipForm } from '@/utils/useMembershipForm';
 import type { Membership } from '@/utils/useMemberships';
-import { PLAN_LABELS, BILLING_OPTIONS, BILLING_LABELS, type MembershipPlan } from '@/utils/membershipLabels';
+import {
+  PLAN_LABELS,
+  BILLING_OPTIONS,
+  BILLING_LABELS,
+  SUPPORT_PRIORITIES,
+  SUPPORT_PRIORITY_LABELS,
+  type MembershipPlan,
+} from '@/utils/membershipLabels';
 import { Input } from '@/components/molecules/Input';
 import { Button } from '@/components/atoms/Button';
 import { FormError } from '@/components/molecules/FormError';
@@ -31,6 +38,16 @@ export function MembershipFormModal({ initial, defaultPlan, onClose }: Membershi
     setMaxLists,
     maxItemsPerList,
     setMaxItemsPerList,
+    hideItemsEnabled,
+    setHideItemsEnabled,
+    maxGroupsCreatable,
+    setMaxGroupsCreatable,
+    maxGroupsJoinable,
+    setMaxGroupsJoinable,
+    showAds,
+    setShowAds,
+    supportPriority,
+    setSupportPriority,
     save,
     saving,
     saveError,
@@ -93,6 +110,56 @@ export function MembershipFormModal({ initial, defaultPlan, onClose }: Membershi
             onChangeText={setMaxItemsPerList}
           />
         </div>
+
+        <div className="flex gap-3">
+          <Input
+            name="maxGroupsCreatable"
+            label="Max gruppi creabili (vuoto = illimitato)"
+            value={maxGroupsCreatable}
+            onChangeText={setMaxGroupsCreatable}
+          />
+          <Input
+            name="maxGroupsJoinable"
+            label="Max gruppi a cui partecipare (vuoto = illimitato)"
+            value={maxGroupsJoinable}
+            onChangeText={setMaxGroupsJoinable}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-text-color">Priorità supporto clienti</span>
+          <select
+            value={supportPriority}
+            onChange={(e) => setSupportPriority(e.target.value as (typeof SUPPORT_PRIORITIES)[number])}
+            className="w-full rounded-[10px] border-[1.5px] border-border bg-foreground px-3.5 py-3 text-sm text-text-color"
+          >
+            {SUPPORT_PRIORITIES.map((option) => (
+              <option key={option} value={option}>
+                {SUPPORT_PRIORITY_LABELS[option]}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <label className="flex items-center gap-2 text-sm text-text-color">
+          <input
+            type="checkbox"
+            checked={hideItemsEnabled}
+            onChange={(e) => setHideItemsEnabled(e.target.checked)}
+            className="h-4 w-4 rounded border-border"
+          />
+          Permetti di nascondere gli item agli altri
+        </label>
+
+        <label className="flex items-center gap-2 text-sm text-text-color">
+          <input
+            type="checkbox"
+            checked={showAds}
+            onChange={(e) => setShowAds(e.target.checked)}
+            className="h-4 w-4 rounded border-border"
+          />
+          Mostra pubblicità in app
+        </label>
 
         {saveError && <FormError message={saveError.message} />}
         {deleteError && <FormError message={deleteError.message} />}

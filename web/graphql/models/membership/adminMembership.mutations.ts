@@ -2,7 +2,7 @@ import { GraphQLError } from 'graphql';
 import { builder, prisma } from '../../builder';
 import { requireAdmin } from '../../auth';
 import { MembershipPlanEnum, BillingEnum } from '../../enum';
-import './index';
+import { SupportPriorityEnum } from './index';
 
 const MembershipInput = builder.inputType('MembershipInput', {
   fields: (t) => ({
@@ -13,12 +13,54 @@ const MembershipInput = builder.inputType('MembershipInput', {
     billing: t.field({ type: BillingEnum, required: true }),
     maxLists: t.int({ required: false }),
     maxItemsPerList: t.int({ required: false }),
+    hideItemsEnabled: t.boolean({ required: false }),
+    maxGroupsCreatable: t.int({ required: false }),
+    maxGroupsJoinable: t.int({ required: false }),
+    showAds: t.boolean({ required: false }),
+    supportPriority: t.field({ type: SupportPriorityEnum, required: false }),
   }),
 });
 
-function buildLimitations(maxLists?: number | null, maxItemsPerList?: number | null) {
-  if (maxLists == null && maxItemsPerList == null) return undefined;
-  return { maxLists: maxLists ?? null, maxItemsPerList: maxItemsPerList ?? null };
+interface LimitationsInput {
+  maxLists?: number | null;
+  maxItemsPerList?: number | null;
+  hideItemsEnabled?: boolean | null;
+  maxGroupsCreatable?: number | null;
+  maxGroupsJoinable?: number | null;
+  showAds?: boolean | null;
+  supportPriority?: 'LOW' | 'MEDIUM' | 'HIGH' | null;
+}
+
+function buildLimitations(input: LimitationsInput) {
+  const {
+    maxLists,
+    maxItemsPerList,
+    hideItemsEnabled,
+    maxGroupsCreatable,
+    maxGroupsJoinable,
+    showAds,
+    supportPriority,
+  } = input;
+
+  const allUnset =
+    maxLists == null &&
+    maxItemsPerList == null &&
+    hideItemsEnabled == null &&
+    maxGroupsCreatable == null &&
+    maxGroupsJoinable == null &&
+    showAds == null &&
+    supportPriority == null;
+  if (allUnset) return undefined;
+
+  return {
+    maxLists: maxLists ?? null,
+    maxItemsPerList: maxItemsPerList ?? null,
+    hideItemsEnabled: hideItemsEnabled ?? null,
+    maxGroupsCreatable: maxGroupsCreatable ?? null,
+    maxGroupsJoinable: maxGroupsJoinable ?? null,
+    showAds: showAds ?? null,
+    supportPriority: supportPriority ?? null,
+  };
 }
 
 // Ogni "modifica" crea una nuova versione (nuova riga) e soft-elimina quella precedente: gli
@@ -47,7 +89,7 @@ builder.mutationField('adminCreateMembership', (t) =>
           price: input.price,
           currency: input.currency ?? 'EUR',
           billing: input.billing,
-          limitations: buildLimitations(input.maxLists, input.maxItemsPerList),
+          limitations: buildLimitations(input),
         },
       });
     },
@@ -84,7 +126,7 @@ builder.mutationField('adminUpdateMembership', (t) =>
             price: input.price,
             currency: input.currency ?? 'EUR',
             billing: input.billing,
-            limitations: buildLimitations(input.maxLists, input.maxItemsPerList),
+            limitations: buildLimitations(input),
           },
         }),
       ]);

@@ -12,6 +12,11 @@ export const ADMIN_CREATE_MEMBERSHIP: DocumentNode = parse(`
       billing
       maxLists
       maxItemsPerList
+      hideItemsEnabled
+      maxGroupsCreatable
+      maxGroupsJoinable
+      showAds
+      supportPriority
       activeSubscriptionsCount
     }
   }
@@ -28,6 +33,11 @@ export const ADMIN_UPDATE_MEMBERSHIP: DocumentNode = parse(`
       billing
       maxLists
       maxItemsPerList
+      hideItemsEnabled
+      maxGroupsCreatable
+      maxGroupsJoinable
+      showAds
+      supportPriority
       activeSubscriptionsCount
     }
   }

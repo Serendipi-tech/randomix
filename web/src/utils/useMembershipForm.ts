@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { AdminMembershipMutations } from '@randomix/graphql-schema';
 import type { Membership } from './useMemberships';
-import type { MembershipPlan, BillingOption } from './membershipLabels';
+import type { MembershipPlan, BillingOption, SupportPriority } from './membershipLabels';
 
 const { ADMIN_CREATE_MEMBERSHIP, ADMIN_UPDATE_MEMBERSHIP, ADMIN_DELETE_MEMBERSHIP } = AdminMembershipMutations;
 
@@ -28,6 +28,15 @@ export function useMembershipForm({ initial, defaultPlan, onSaved, onDeleted }: 
   const [maxItemsPerList, setMaxItemsPerList] = useState(
     initial?.maxItemsPerList != null ? String(initial.maxItemsPerList) : '',
   );
+  const [hideItemsEnabled, setHideItemsEnabled] = useState(initial?.hideItemsEnabled ?? false);
+  const [maxGroupsCreatable, setMaxGroupsCreatable] = useState(
+    initial?.maxGroupsCreatable != null ? String(initial.maxGroupsCreatable) : '',
+  );
+  const [maxGroupsJoinable, setMaxGroupsJoinable] = useState(
+    initial?.maxGroupsJoinable != null ? String(initial.maxGroupsJoinable) : '',
+  );
+  const [showAds, setShowAds] = useState(initial?.showAds ?? false);
+  const [supportPriority, setSupportPriority] = useState<SupportPriority>(initial?.supportPriority ?? 'LOW');
 
   const [createMembership, { loading: creating, error: createError }] = useMutation(ADMIN_CREATE_MEMBERSHIP);
   const [updateMembership, { loading: updating, error: updateError }] = useMutation(ADMIN_UPDATE_MEMBERSHIP);
@@ -42,6 +51,11 @@ export function useMembershipForm({ initial, defaultPlan, onSaved, onDeleted }: 
       billing,
       maxLists: maxLists.trim() ? parseInt(maxLists, 10) : null,
       maxItemsPerList: maxItemsPerList.trim() ? parseInt(maxItemsPerList, 10) : null,
+      hideItemsEnabled,
+      maxGroupsCreatable: maxGroupsCreatable.trim() ? parseInt(maxGroupsCreatable, 10) : null,
+      maxGroupsJoinable: maxGroupsJoinable.trim() ? parseInt(maxGroupsJoinable, 10) : null,
+      showAds,
+      supportPriority,
     };
 
     if (initial) {
@@ -73,6 +87,16 @@ export function useMembershipForm({ initial, defaultPlan, onSaved, onDeleted }: 
     setMaxLists,
     maxItemsPerList,
     setMaxItemsPerList,
+    hideItemsEnabled,
+    setHideItemsEnabled,
+    maxGroupsCreatable,
+    setMaxGroupsCreatable,
+    maxGroupsJoinable,
+    setMaxGroupsJoinable,
+    showAds,
+    setShowAds,
+    supportPriority,
+    setSupportPriority,
     save,
     saving: creating || updating,
     saveError: createError ?? updateError,
