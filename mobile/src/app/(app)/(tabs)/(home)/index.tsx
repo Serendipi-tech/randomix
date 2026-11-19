@@ -37,11 +37,6 @@ export default function HomeScreen() {
       <PageHeader
         icon={Home}
         title={t('title')}
-        subtitle={
-          profile
-            ? t('statsSubtitle', { lists: profile.listsCount, items: profile.totalItemsCount })
-            : undefined
-        }
         action={{ icon: Plus, onPress: () => router.push('/list-form') }}
       />
 
