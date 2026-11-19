@@ -15,6 +15,8 @@ const AddItemToListInput = builder.inputType('AddItemToListInput', {
 
 const UpdateUserItemInput = builder.inputType('UpdateUserItemInput', {
   fields: (t) => ({
+    name: t.string({ required: false }),
+    categoryId: t.id({ required: false }),
     description: t.string({ required: false }),
     note: t.string({ required: false }),
     status: t.field({ type: StatusCompletionEnum, required: false }),
@@ -87,6 +89,30 @@ builder.mutationField('updateUserItem', (t) =>
       if (!userItem) {
         throw new GraphQLError('Elemento non trovato.', { extensions: { code: 'NOT_FOUND' } });
       }
+
+      // name/categoryId non sono nullable su User_Item: un null esplicito dal client è trattato come "nessuna modifica"
+      const nextName = input.name != null ? input.name.trim() : userItem.name;
+      const nextCategoryId = input.categoryId != null ? String(input.categoryId) : userItem.categoryId;
+
+      if (input.categoryId != null) {
+        const category = await prisma.category.findUnique({ where: { id: nextCategoryId } });
+        if (!category) {
+          throw new GraphQLError('Categoria non trovata.', { extensions: { code: 'NOT_FOUND' } });
+        }
+      }
+
+      // nome+categoria sono univoci per utente (vedi @@unique in item.prisma): evito la violazione di vincolo
+      if (nextName !== userItem.name || nextCategoryId !== userItem.categoryId) {
+        const duplicate = await prisma.user_Item.findFirst({
+          where: { userId: ctx.userId, name: nextName, categoryId: nextCategoryId, NOT: { id: userItem.id } },
+        });
+        if (duplicate) {
+          throw new GraphQLError('Hai già un elemento con questo nome in questa categoria.', {
+            extensions: { code: 'CONFLICT' },
+          });
+        }
+      }
+
       // accetto solo tag dell'utente o di sistema
       let validTagIds: string[] | null = null;
       if (input.tagIds) {
@@ -103,6 +129,8 @@ builder.mutationField('updateUserItem', (t) =>
         ...query,
         where: { id: String(id) },
         data: {
+          ...(input.name != null && { name: nextName }),
+          ...(input.categoryId != null && { categoryId: nextCategoryId }),
           ...(input.description !== undefined && { description: input.description }),
           ...(input.note !== undefined && { note: input.note }),
           ...(input.status != null && { status: input.status }),

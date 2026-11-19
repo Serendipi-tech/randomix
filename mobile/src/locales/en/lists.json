@@ -113,7 +113,8 @@
     "ratingNotePlaceholder": "Write a review (optional)…",
     "remove": "Remove from list",
     "showLess": "Show less",
-    "addTag": "+ Tag"
+    "addTag": "+ Tag",
+    "friendReviews": "Friends' reviews"
   },
   "status": {
     "NOT_STARTED": "Not started",

@@ -19,6 +19,7 @@ import { BottomSheet } from '@/components/organisms/BottomSheet';
 import { SectionLabel } from '@/components/atoms/SectionLabel';
 import { SegmentedControl } from '@/components/atoms/SegmentedControl';
 import { Rating } from '@/components/atoms/Rating';
+import { Avatar } from '@/components/atoms/Avatar';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
 import { TagList } from '@/components/molecules/TagList';
@@ -26,7 +27,9 @@ import { ExpandableText } from '@/components/molecules/ExpandableText';
 import { DescriptionTabs } from '@/components/molecules/DescriptionTabs';
 import { TagPickerSheet } from '@/components/organisms/TagPickerSheet';
 import { RatingSheet } from '@/components/organisms/RatingSheet';
+import { CategoryPickerSheet, type CategoryOption } from '@/components/organisms/CategoryPickerSheet';
 import type { Tag as TagData } from '@/utils/useTags';
+import { useFriendRatings } from '@/utils/useFriendRatings';
 
 // Tag già collegati all'item: qui basta id/name/color, non serve isSystem (solo la picker lo usa)
 type AttachedTag = { id: string; name: string; color: string };
@@ -35,8 +38,16 @@ export type ItemCardDetailsProps = {
   visible: boolean;
   onClose: () => void;
   imageUri?: string;
+  /** Id dello User_Item: serve solo per interrogare le recensioni degli amici sullo stesso item. */
+  userItemId?: string;
   name: string;
+  /** Salva il nuovo nome; se presente, il titolo diventa modificabile (icona matita). */
+  onChangeName?: (name: string) => void;
   category?: string;
+  categoryId?: string;
+  /** Opzioni scelte dalla lista padre: se presenti insieme a onChangeCategory, la categoria diventa modificabile. */
+  categoryOptions?: CategoryOption[];
+  onChangeCategory?: (categoryId: string) => void;
   description?: string; // descrizione generale dell'item
   userDescription?: string; // descrizione personale dell'utente
   note?: string;
@@ -98,8 +109,13 @@ export function ItemCardDetails({
   visible,
   onClose,
   imageUri,
+  userItemId,
   name,
+  onChangeName,
   category,
+  categoryId,
+  categoryOptions,
+  onChangeCategory,
   description,
   userDescription,
   note,
@@ -131,6 +147,28 @@ export function ItemCardDetails({
   const showTags = Boolean(tags?.length);
   const [showTagPicker, setShowTagPicker] = useState(false);
   const selectedTagIds = (tags ?? []).map((tag) => tag.id);
+
+  // Recensioni degli amici sullo stesso item: interrogate solo a sheet aperta, nessuna sezione se vuote
+  const { friendRatings } = useFriendRatings(userItemId, visible);
+  const showFriendReviews = friendRatings.length > 0;
+
+  // Modifica del nome: stessa bottomsheet dedicata di nota/descrizione
+  const [showNameEditor, setShowNameEditor] = useState(false);
+  const [nameDraft, setNameDraft] = useState('');
+  const openNameEditor = () => {
+    setNameDraft(name);
+    setShowNameEditor(true);
+  };
+  const confirmName = () => {
+    const trimmed = nameDraft.trim();
+    if (!trimmed) return; // il nome è obbligatorio, niente salvataggio vuoto
+    onChangeName?.(trimmed);
+    setShowNameEditor(false);
+  };
+
+  // Modifica della categoria: riusa CategoryPickerSheet già usato in creazione
+  const canEditCategory = Boolean(categoryOptions && onChangeCategory);
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
 
   // Rileva il troncamento confrontando l'altezza del titolo visibile (numberOfLines) con quella di una
   // copia invisibile senza limite, stessa larghezza: se la seconda è più alta, il testo è stato tagliato.
@@ -182,7 +220,14 @@ export function ItemCardDetails({
           {(category || canPickTags || onRemoveFromList || onChangeRating) && (
             <View style={styles.categoryRow}>
               {category ? (
-                <Text style={[styles.category, { color: colors.textColor }]}>{category}</Text>
+                canEditCategory ? (
+                  <Pressable onPress={() => setShowCategoryPicker(true)} hitSlop={4} style={styles.categoryPressable}>
+                    <Text style={[styles.category, { color: colors.textColor }]}>{category}</Text>
+                    <Pencil size={11} color={colors.textColor} style={styles.categoryEditIcon} />
+                  </Pressable>
+                ) : (
+                  <Text style={[styles.category, { color: colors.textColor }]}>{category}</Text>
+                )
               ) : (
                 <View />
               )}
@@ -230,6 +275,11 @@ export function ItemCardDetails({
                 {nameTruncated && (
                   <Pressable onPress={() => setShowFullName(true)} hitSlop={8} style={styles.infoButton}>
                     <Info size={16} color={colors.primary} />
+                  </Pressable>
+                )}
+                {onChangeName && (
+                  <Pressable onPress={openNameEditor} hitSlop={8} style={styles.infoButton}>
+                    <Pencil size={16} color={colors.primary} />
                   </Pressable>
                 )}
               </View>
@@ -311,6 +361,30 @@ export function ItemCardDetails({
               />
             ) : null}
           </View>
+
+          {showFriendReviews && (
+            <View style={styles.section}>
+              <SectionLabel>{t('itemDetail.friendReviews')}</SectionLabel>
+              <View style={styles.friendReviewList}>
+                {friendRatings.map((review) => (
+                  <View key={review.id} style={styles.friendReviewRow}>
+                    <Avatar uri={review.user?.avatarUrl ?? undefined} fallbackColor={colors.primary} size={36} ring={false} />
+                    <View style={styles.friendReviewBody}>
+                      <View style={styles.friendReviewHeader}>
+                        <Text style={[styles.friendReviewName, { color: colors.textColor }]} numberOfLines={1}>
+                          {review.user?.username ?? ''}
+                        </Text>
+                        <Rating variant="medium" value={review.value} color={colors.warning} inactiveColor={colors.border} />
+                      </View>
+                      {review.note && (
+                        <Text style={[styles.paragraph, { color: colors.textColor }]}>{review.note}</Text>
+                      )}
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
 
           {completedAt && (
             <Text style={[styles.completedAt, { color: colors.textColor }]}>
@@ -398,6 +472,40 @@ export function ItemCardDetails({
         </BottomSheet>
       )}
 
+      {onChangeName && (
+        <BottomSheet visible={showNameEditor} onClose={() => setShowNameEditor(false)}>
+          <View style={styles.noteEditContent}>
+            <Input
+              label={t('itemForm.name')}
+              value={nameDraft}
+              onChangeText={setNameDraft}
+              placeholder={t('itemForm.namePlaceholder')}
+              autoFocus
+            />
+            <View style={styles.noteEditActions}>
+              <View style={styles.noteEditAction}>
+                <Button variant="secondary" label={t('itemForm.cancel')} onPress={() => setShowNameEditor(false)} />
+              </View>
+              <View style={styles.noteEditAction}>
+                <Button variant="primary" label={t('itemForm.save')} onPress={confirmName} />
+              </View>
+            </View>
+          </View>
+        </BottomSheet>
+      )}
+
+      {canEditCategory && (
+        <CategoryPickerSheet
+          visible={showCategoryPicker}
+          onClose={() => setShowCategoryPicker(false)}
+          options={categoryOptions ?? []}
+          selected={categoryId ?? null}
+          onSelect={(value) => onChangeCategory?.(value)}
+          searchPlaceholder={t('itemForm.categorySearch')}
+          emptyLabel={t('itemForm.noCategories')}
+        />
+      )}
+
       {onChangeRating && (
         <RatingSheet
           visible={Boolean(ratingEditorVisible)}
@@ -453,6 +561,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+  },
+  categoryPressable: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  categoryEditIcon: {
+    opacity: 0.55,
   },
   // Stelle compatte (rating) + bottoni azione, ravvicinati fra loro come un unico gruppo a destra
   headerRight: {
@@ -553,5 +669,28 @@ const styles = StyleSheet.create({
   completedAt: {
     fontSize: 12,
     opacity: 0.5,
+  },
+  friendReviewList: {
+    gap: 14,
+  },
+  friendReviewRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  friendReviewBody: {
+    flex: 1,
+    gap: 2,
+    justifyContent: 'center',
+  },
+  friendReviewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  friendReviewName: {
+    fontSize: 14,
+    fontWeight: '600',
+    flexShrink: 1,
   },
 });

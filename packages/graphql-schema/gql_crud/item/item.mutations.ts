@@ -25,10 +25,16 @@ export const UPDATE_USER_ITEM: DocumentNode = parse(`
   mutation UpdateUserItem($id: ID!, $input: UpdateUserItemInput!) {
     updateUserItem(id: $id, input: $input) {
       id
+      name
       description
       note
       status
       isHidden
+      category {
+        id
+        name
+        icon
+      }
       tags {
         id
         name

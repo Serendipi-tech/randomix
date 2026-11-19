@@ -1,5 +1,5 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dices, Pencil, Plus } from 'lucide-react-native';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
@@ -16,8 +16,10 @@ import { PageHeader } from '@/components/molecules/PageHeader';
 import { ItemCard } from '@/components/cards/ItemCard';
 import { CardShell } from '@/components/cards/CardShell';
 import { Button } from '@/components/atoms/Button';
+import type { CategoryOption } from '@/components/organisms/CategoryPickerSheet';
 import { useItemMutations } from '@/utils/useItemMutations';
 import { useListDetail, type ListItemEntry } from '@/utils/useListDetail';
+import { useListCategories } from '@/utils/useListCategories';
 import { useNavbarClearance } from '@/utils/useNavbarClearance';
 import { useTags, type Tag as TagData } from '@/utils/useTags';
 
@@ -32,6 +34,7 @@ export default function ListDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { list, loading, error } = useListDetail(id);
   const { removeItemFromList, updateUserItem, rateItem } = useItemMutations();
+  const { categories: allMacroCategories } = useListCategories();
   const {
     tags: availableTags,
     createTag,
@@ -45,6 +48,19 @@ export default function ListDetailScreen() {
   const listBottomPadding = useNavbarClearance();
 
   const [entryToRemove, setEntryToRemove] = useState<ListItemEntry | null>(null);
+
+  // Categorie modificabili per gli item = unione degli includedCategories delle macro-categorie della
+  // lista corrente (stesso calcolo usato in item-form.tsx per la creazione)
+  const categoryOptions = useMemo<CategoryOption[]>(() => {
+    const listMacroIds = new Set((list?.categories ?? []).map((c) => c.id));
+    const seen = new Map<string, CategoryOption>();
+    allMacroCategories
+      .filter((macro) => listMacroIds.has(macro.id))
+      .forEach((macro) =>
+        macro.includedCategories.forEach((cat) => seen.set(cat.id, { value: cat.id, label: cat.name })),
+      );
+    return Array.from(seen.values());
+  }, [allMacroCategories, list]);
 
   // Aggiunge/rimuove un tag dall'item corrente in base alla selezione fatta nella TagPickerSheet
   const toggleEntryTag = (entry: ListItemEntry, tag: TagData) => {
@@ -146,8 +162,13 @@ export default function ListDetailScreen() {
                 rating={entry.userItem.rating?.value ?? undefined}
                 tags={entry.userItem.tags}
                 detail={{
+                  userItemId: entry.userItem.id,
                   name: entry.userItem.name,
+                  onChangeName: (name) => updateUserItem(entry.userItem.id, { name }),
                   category: entry.userItem.category.name,
+                  categoryId: entry.userItem.category.id,
+                  categoryOptions,
+                  onChangeCategory: (categoryId) => updateUserItem(entry.userItem.id, { categoryId }),
                   userDescription: entry.userItem.description ?? undefined,
                   note: entry.userItem.note ?? undefined,
                   status: entry.userItem.status,
