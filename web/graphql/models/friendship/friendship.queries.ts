@@ -1,5 +1,6 @@
 import { GraphQLError } from 'graphql';
 import { builder, prisma } from '../../builder';
+import { ProfileStatsRef, type ProfileStatsShape } from '../profileStats/index';
 import {
   FriendProfileRef,
   FriendRequestRef,
@@ -16,6 +17,81 @@ function requireAuth(userId: string | null): asserts userId is string {
     throw new GraphQLError('Non autenticato.', { extensions: { code: 'UNAUTHENTICATED' } });
   }
 }
+
+interface CategoryAccumulator {
+  name: string;
+  icon: string;
+  itemsCount: number;
+  drawCount: number;
+}
+
+// Stessa aggregazione di profileStats.queries.ts, ma parametrizzata per un userId arbitrario
+// (qui serve per un amico, non per l'utente autenticato). Quel file resta fuori dallo scope
+// di modifica di questo task: la logica è replicata invece di essere estratta in un helper condiviso.
+async function computeProfileStatsForUser(userId: string): Promise<ProfileStatsShape> {
+  const [items, listUserItems, notStarted, inProgress, completed, drawAgg] = await Promise.all([
+    prisma.user_Item.findMany({
+      where: { userId },
+      select: { categoryId: true, category: { select: { name: true, icon: true } } },
+    }),
+    prisma.list_UserItem.findMany({
+      where: { userItem: { userId } },
+      select: { count: true, userItem: { select: { categoryId: true, category: { select: { name: true, icon: true } } } } },
+    }),
+    prisma.user_Item.count({ where: { userId, status: 'NOT_STARTED' } }),
+    prisma.user_Item.count({ where: { userId, status: 'IN_PROGRESS' } }),
+    prisma.user_Item.count({ where: { userId, status: 'COMPLETED' } }),
+    prisma.list_UserItem.aggregate({
+      where: { userItem: { userId } },
+      _sum: { acceptedCount: true, skippedCount: true },
+    }),
+  ]);
+
+  const byCategory = new Map<string, CategoryAccumulator>();
+  for (const item of items) {
+    const entry = byCategory.get(item.categoryId) ?? {
+      name: item.category.name,
+      icon: item.category.icon,
+      itemsCount: 0,
+      drawCount: 0,
+    };
+    entry.itemsCount += 1;
+    byCategory.set(item.categoryId, entry);
+  }
+  for (const row of listUserItems) {
+    const { categoryId, category } = row.userItem;
+    const entry = byCategory.get(categoryId) ?? {
+      name: category.name,
+      icon: category.icon,
+      itemsCount: 0,
+      drawCount: 0,
+    };
+    entry.drawCount += row.count;
+    byCategory.set(categoryId, entry);
+  }
+
+  const categoryStats = Array.from(byCategory.entries())
+    .map(([categoryId, v]) => ({ categoryId, ...v }))
+    .sort((a, b) => b.itemsCount - a.itemsCount);
+
+  return {
+    categoryStats,
+    completionBreakdown: { notStarted, inProgress, completed },
+    drawAcceptance: {
+      accepted: drawAgg._sum.acceptedCount ?? 0,
+      skipped: drawAgg._sum.skippedCount ?? 0,
+    },
+  };
+}
+
+// Campo aggiuntivo su FriendProfile, definito qui invece che in index.ts (fuori scope):
+// Pothos permette di estendere un objectRef già implementato da un altro file.
+builder.objectFields(FriendProfileRef, (t) => ({
+  stats: t.field({
+    type: ProfileStatsRef,
+    resolve: (parent) => computeProfileStatsForUser(parent.user.id),
+  }),
+}));
 
 builder.queryField('myFriends', (t) =>
   t.field({

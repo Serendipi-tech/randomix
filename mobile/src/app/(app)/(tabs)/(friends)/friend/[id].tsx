@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { List, Users } from 'lucide-react-native';
+import { List, UserMinus, Users } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,9 +10,15 @@ import { useNavbarClearance } from '@/utils/useNavbarClearance';
 import { RadialBackground } from '@/components/molecules/radial-background';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { Avatar } from '@/components/atoms/Avatar';
+import { Button } from '@/components/atoms/Button';
 import { PageHeader } from '@/components/molecules/PageHeader';
+import { Tabs } from '@/components/molecules/Tabs';
+import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
+import { ProfileStatsGroup } from '@/components/molecules/profile-stats-group';
 import { ListCard } from '@/components/cards/ListCard';
 import { useFriendProfile } from '@/utils/useFriendProfile';
+import { useRemoveFriend } from '@/utils/useFriends';
+import { useProfileStats } from '@/utils/useProfileStats';
 
 const SKELETON_COUNT = 3;
 
@@ -24,13 +31,35 @@ export default function FriendProfileScreen() {
 
   const { id } = useLocalSearchParams<{ id: string }>();
   const { profile, loading, error } = useFriendProfile(id);
+  const {
+    categoryStats: myCategoryStats,
+    completionBreakdown: myCompletionBreakdown,
+    drawAcceptance: myDrawAcceptance,
+  } = useProfileStats();
+  const { removeFriend } = useRemoveFriend();
+
+  const [statsTab, setStatsTab] = useState(0);
+  const [showLists, setShowLists] = useState(false);
+  const [confirmingRemove, setConfirmingRemove] = useState(false);
 
   const showSkeleton = loading && !profile;
+
+  const handleRemoveConfirmed = async () => {
+    if (!id) return;
+    await removeFriend(id);
+    setConfirmingRemove(false);
+    router.back();
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
       <RadialBackground colorScheme={colorScheme} />
-      <PageHeader icon={Users} title={profile?.user.username ?? ''} onBack={() => router.back()} />
+      <PageHeader
+        icon={Users}
+        title={profile?.user.username ?? ''}
+        onBack={() => router.back()}
+        action={{ icon: UserMinus, onPress: () => setConfirmingRemove(true) }}
+      />
 
       {showSkeleton ? (
         <View style={styles.content}>
@@ -47,7 +76,7 @@ export default function FriendProfileScreen() {
       ) : (
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={profile.lists}
+          data={showLists ? profile.lists : []}
           keyExtractor={(list) => list.id}
           contentContainerStyle={[styles.content, { paddingBottom: listBottomPadding }]}
           renderItem={({ item: list }) => (
@@ -63,28 +92,78 @@ export default function FriendProfileScreen() {
           ListHeaderComponent={
             <View style={styles.header}>
               <View style={styles.userRow}>
-                <Avatar
-                  uri={profile.user.avatarUrl ?? undefined}
-                  fallbackColor={colors.primary}
-                />
+                <Avatar uri={profile.user.avatarUrl ?? undefined} fallbackColor={colors.primary} />
                 <Text style={[styles.username, { color: colors.textColor }]} numberOfLines={1}>
                   {profile.user.username}
                 </Text>
               </View>
-              <Text style={[styles.sectionTitle, { color: colors.textColor }]}>
-                {t('friend.listsTitle')}
-              </Text>
+
+              <Tabs
+                items={[t('friend.stats.onlyTheirs'), t('friend.stats.compare')]}
+                activeIndex={statsTab}
+                onChange={setStatsTab}
+              />
+
+              {statsTab === 0 ? (
+                <ProfileStatsGroup
+                  label={profile.user.username}
+                  categoryStats={profile.stats.categoryStats}
+                  completionBreakdown={profile.stats.completionBreakdown}
+                  drawAcceptance={profile.stats.drawAcceptance}
+                />
+              ) : (
+                <View style={styles.compareGroup}>
+                  <ProfileStatsGroup
+                    label={t('friend.stats.you')}
+                    categoryStats={myCategoryStats}
+                    completionBreakdown={myCompletionBreakdown}
+                    drawAcceptance={myDrawAcceptance}
+                  />
+                  <ProfileStatsGroup
+                    label={profile.user.username}
+                    categoryStats={profile.stats.categoryStats}
+                    completionBreakdown={profile.stats.completionBreakdown}
+                    drawAcceptance={profile.stats.drawAcceptance}
+                  />
+                </View>
+              )}
+
+              <Button
+                variant="secondary"
+                icon={List}
+                label={showLists ? t('friend.hideLists') : t('friend.viewLists')}
+                onPress={() => setShowLists((v) => !v)}
+              />
+
+              {showLists && (
+                <Text style={[styles.sectionTitle, { color: colors.textColor }]}>
+                  {t('friend.listsTitle')}
+                </Text>
+              )}
             </View>
           }
           ListEmptyComponent={
-            <View style={styles.empty}>
-              <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
-                {t('friend.listsEmpty')}
-              </Text>
-            </View>
+            showLists ? (
+              <View style={styles.empty}>
+                <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
+                  {t('friend.listsEmpty')}
+                </Text>
+              </View>
+            ) : null
           }
         />
       )}
+
+      <ConfirmSheet
+        visible={confirmingRemove}
+        title={t('friends.removeConfirmTitle')}
+        message={t('friends.removeConfirmMessage')}
+        confirmLabel={t('friends.remove')}
+        cancelLabel={t('cancel', { defaultValue: 'Cancel' })}
+        colorScheme={colorScheme}
+        onConfirm={handleRemoveConfirmed}
+        onCancel={() => setConfirmingRemove(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -98,7 +177,7 @@ const styles = StyleSheet.create({
     gap: Spacing.two + Spacing.one,
   },
   header: {
-    gap: Spacing.two,
+    gap: Spacing.three,
   },
   userRow: {
     flexDirection: 'row',
@@ -108,6 +187,9 @@ const styles = StyleSheet.create({
   username: {
     flex: 1,
     fontSize: 26,
+  },
+  compareGroup: {
+    gap: Spacing.four,
   },
   sectionTitle: {
     fontSize: 20,
