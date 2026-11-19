@@ -26,18 +26,22 @@ interface AddItemToListResult {
 }
 
 export function useItemMutations() {
-  // ListDetail va ricaricata: cambia l'elenco items della lista aperta
+  // ListDetail va ricaricata: cambia l'elenco items della lista aperta.
+  // ProfileStats va ricaricata: un nuovo item cambia itemsCount di categoria nel profilo.
   const [addMutation, { loading: adding, error: addError }] = useMutation<AddItemToListResult>(ADD_ITEM_TO_LIST, {
-    refetchQueries: ['ListDetail'],
+    refetchQueries: ['ListDetail', 'ProfileStats'],
   });
 
   // Niente refetchQueries: la mutation ora restituisce tutti i campi che ListDetail usa (tags incluso),
   // la cache normalizzata di Apollo aggiorna da sola l'User_Item già in cache — molto più veloce di un refetch completo
   const [updateMutation, { loading: updating, error: updateError }] = useMutation(UPDATE_USER_ITEM);
 
+  // ListDetail va ricaricata per l'elenco items. ProfileStats va ricaricata anche qui: la riga
+  // List_UserItem eliminata porta con sé count/acceptedCount/skippedCount, quindi drawCount e
+  // drawAcceptance esposti dal profilo possono scendere insieme alla rimozione.
   const [removeMutation, { loading: removing, error: removeError }] = useMutation(
     REMOVE_ITEM_FROM_LIST,
-    { refetchQueries: ['ListDetail'] },
+    { refetchQueries: ['ListDetail', 'ProfileStats'] },
   );
 
   const [rateMutation, { loading: rating, error: rateError }] = useMutation(RATE_ITEM, {

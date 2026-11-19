@@ -21,9 +21,10 @@ interface CreateListMutation {
 }
 
 export function useListMutations() {
-  // MyLists va ricaricata: cambiano membership e ordinamento (updatedAt desc)
+  // MyLists va ricaricata: cambiano membership e ordinamento (updatedAt desc).
+  // ProfileStats va ricaricata: una nuova lista cambia i conteggi mostrati nel profilo.
   const [createMutation, { loading: creating, error: createError }] =
-    useMutation<CreateListMutation>(CREATE_LIST, { refetchQueries: ['MyLists'] });
+    useMutation<CreateListMutation>(CREATE_LIST, { refetchQueries: ['MyLists', 'ProfileStats'] });
 
   const [updateMutation, { loading: updating, error: updateError }] = useMutation(UPDATE_LIST, {
     refetchQueries: ['MyLists'],

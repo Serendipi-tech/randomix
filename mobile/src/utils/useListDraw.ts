@@ -12,7 +12,10 @@ export function useListDraw() {
   const [drawMutation, { loading: drawing, error: drawError }] =
     useMutation<DrawFromListMutation>(DRAW_FROM_LIST);
 
-  const [acceptMutation, { loading: accepting, error: acceptError }] = useMutation(ACCEPT_DRAW);
+  // ProfileStats va ricaricata: l'accettazione incrementa acceptedCount, mostrato in drawAcceptance
+  const [acceptMutation, { loading: accepting, error: acceptError }] = useMutation(ACCEPT_DRAW, {
+    refetchQueries: ['ProfileStats'],
+  });
 
   // previousEntryId presente solo alla rigenerazione: fa scattare +1 skipped sul precedente
   const draw = async (listId: string, previousEntryId?: string) => {
