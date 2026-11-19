@@ -15,7 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Defs, LinearGradient as SvgLinearGradient, Path, Stop } from 'react-native-svg';
 import MaskedView from '@react-native-masked-view/masked-view';
-import { Bell, Home, LayoutGrid, Users } from 'lucide-react-native';
+import { Bell, Home, LayoutGrid, Users, UserRound } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
@@ -35,7 +35,7 @@ const WAVE_AMPLITUDE = 5;
 const WAVE_DURATION = 800;
 
 const SIDE_TAB_ICONS = {
-  profile: Users,
+  profile: UserRound,
   notifications: Bell,
   friends: Users,
   groups: LayoutGrid,
