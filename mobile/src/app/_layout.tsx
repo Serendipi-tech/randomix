@@ -8,6 +8,7 @@ import { apolloClient } from '@/lib/apollo';
 import '@/lib/i18n';
 import { AppThemeProvider } from '@/utils/useAppTheme';
 import { AuthIntroReplayProvider } from '@/utils/useAuthIntroReplay';
+import { ToastProvider } from '@/utils/useToast';
 import { tokenStorage } from '@/utils/tokenStorage';
 import '../global.css';
 
@@ -38,12 +39,14 @@ export default function RootLayout() {
   return (
     <ApolloProvider client={apolloClient}>
       <AppThemeProvider>
-        <AuthIntroReplayProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(app)" />
-          </Stack>
-        </AuthIntroReplayProvider>
+        <ToastProvider>
+          <AuthIntroReplayProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(auth)" />
+              <Stack.Screen name="(app)" />
+            </Stack>
+          </AuthIntroReplayProvider>
+        </ToastProvider>
       </AppThemeProvider>
       <AnimatedSplashOverlay />
     </ApolloProvider>
