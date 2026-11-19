@@ -23,6 +23,7 @@ import './models/tag/tag.mutations';
 import './models/tag/adminTag.queries';
 import './models/tag/adminTag.mutations';
 import './models/rating/index';
+import './models/rating/rating.queries';
 import './models/rating/rating.mutations';
 import './models/randomizer/randomizer.queries';
 import './models/randomizer/randomizer.mutations';

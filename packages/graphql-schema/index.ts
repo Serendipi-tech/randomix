@@ -14,6 +14,7 @@ export * as TagMutations from './gql_crud/tag/tag.mutations';
 export * as AdminTagQueries from './gql_crud/tag/adminTag.queries';
 export * as AdminTagMutations from './gql_crud/tag/adminTag.mutations';
 export * as RatingMutations from './gql_crud/rating/rating.mutations';
+export * as RatingQueries from './gql_crud/rating/rating.queries';
 export * as RandomizerQueries from './gql_crud/randomizer/randomizer.queries';
 export * as RandomizerMutations from './gql_crud/randomizer/randomizer.mutations';
 export * as GroupQueries from './gql_crud/group/group.queries';

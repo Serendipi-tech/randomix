@@ -14,6 +14,8 @@ export interface AddItemInput {
 }
 
 export interface UpdateUserItemInput {
+  name?: string;
+  categoryId?: string;
   description?: string | null;
   note?: string | null;
   status?: CompletionStatus;
