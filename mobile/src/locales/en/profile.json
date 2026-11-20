@@ -66,6 +66,34 @@
       "comingSoon": {
         "title": "Coming soon",
         "subtitle": "Payments and subscription plans aren't available yet."
+      },
+      "plans": {
+        "title": "Choose your plan",
+        "loading": "Loading plans...",
+        "error": "Unable to load plans.",
+        "yourPlan": "Your plan",
+        "free": "Free",
+        "changeCta": "Coming soon",
+        "billing": {
+          "NEVER": "one-time",
+          "MONTHLY": "/month",
+          "YEARLY": "/year"
+        },
+        "planNames": {
+          "FREE": "Free",
+          "PREMIUM": "Premium",
+          "UNLIMITED": "Unlimited",
+          "FREE_TRIAL": "Free trial",
+          "FULL_ACCESS": "Full access"
+        },
+        "limits": {
+          "lists": "{{count}} lists",
+          "listsUnlimited": "Unlimited lists",
+          "itemsPerList": "{{count}} items/list",
+          "itemsPerListUnlimited": "Unlimited items/list",
+          "groups": "{{count}} groups",
+          "groupsUnlimited": "Unlimited groups"
+        }
       }
     }
   }

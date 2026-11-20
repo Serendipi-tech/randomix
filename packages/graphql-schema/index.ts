@@ -26,6 +26,7 @@ export * as NotificationQueries from './gql_crud/notification/notification.queri
 export * as NotificationMutations from './gql_crud/notification/notification.mutations';
 export * as AdminNotificationQueries from './gql_crud/notification/adminNotification.queries';
 export * as AdminNotificationMutations from './gql_crud/notification/adminNotification.mutations';
+export * as MembershipQueries from './gql_crud/membership/membership.queries';
 export * as AdminMembershipQueries from './gql_crud/membership/adminMembership.queries';
 export * as AdminMembershipMutations from './gql_crud/membership/adminMembership.mutations';
 export * as AdminReportQueries from './gql_crud/report/adminReport.queries';

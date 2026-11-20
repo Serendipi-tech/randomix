@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { CreditCard, Settings as SettingsIcon } from 'lucide-react-native';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -10,13 +10,14 @@ import { RadialBackground } from '@/components/molecules/radial-background';
 import { PageHeader } from '@/components/molecules/PageHeader';
 import { Input } from '@/components/molecules/Input';
 import { Button } from '@/components/atoms/Button';
+import { Badge } from '@/components/atoms/Badge';
 import { FormError } from '@/components/molecules/form-error';
 import { CardShell } from '@/components/cards/CardShell';
 import { BottomSheet } from '@/components/organisms/BottomSheet';
-import { EmptyState } from '@/components/molecules/EmptyState';
 import { useProfile } from '@/utils/useProfile';
 import { useEmailChange } from '@/utils/useEmailChange';
 import { useChangePassword } from '@/utils/useChangePassword';
+import { useMembershipPlans } from '@/utils/useMembershipPlans';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function SettingsScreen() {
 
   const { profile } = useProfile();
   const [paymentsSheetOpen, setPaymentsSheetOpen] = useState(false);
+  const { plans, loading: plansLoading, error: plansError } = useMembershipPlans();
 
   const {
     requestChange,
@@ -196,13 +198,34 @@ export default function SettingsScreen() {
       </View>
 
       <BottomSheet visible={paymentsSheetOpen} onClose={() => setPaymentsSheetOpen(false)}>
-        <View style={styles.paymentsSheet}>
-          <EmptyState
-            icon={CreditCard}
-            title={t('settings.payments.comingSoon.title')}
-            subtitle={t('settings.payments.comingSoon.subtitle')}
-          />
-        </View>
+        <ScrollView contentContainerStyle={styles.paymentsSheet} showsVerticalScrollIndicator={false}>
+          <Text style={[styles.heading, { color: colors.textColor }]}>{t('settings.payments.plans.title')}</Text>
+          {plansLoading && (
+            <Text style={[styles.currentLabel, { color: colors.textColor }]}>{t('settings.payments.plans.loading')}</Text>
+          )}
+          {plansError && <FormError message={t('settings.payments.plans.error')} />}
+          {plans.map((plan) => (
+            <CardShell key={plan.id} backgroundColor={colors.foreground} borderColor={colors.border}>
+              <View style={styles.section}>
+                <View style={styles.planHeaderRow}>
+                  <Text style={[styles.heading, { color: colors.textColor }]}>{plan.planLabel}</Text>
+                  {plan.isCurrent && <Badge label={t('settings.payments.plans.yourPlan')} color={colors.primary} />}
+                </View>
+                <Text style={[styles.currentValue, { color: colors.textColor }]}>{plan.priceLabel}</Text>
+                <Text style={[styles.currentLabel, { color: colors.textColor }]}>{plan.limitsSummary}</Text>
+                {!plan.isCurrent && (
+                  <Button
+                    variant="secondary"
+                    icon={CreditCard}
+                    label={t('settings.payments.plans.changeCta')}
+                    onPress={() => {}}
+                    disabled
+                  />
+                )}
+              </View>
+            </CardShell>
+          ))}
+        </ScrollView>
       </BottomSheet>
     </SafeAreaView>
   );
@@ -237,5 +260,11 @@ const styles = StyleSheet.create({
   paymentsSheet: {
     paddingHorizontal: Spacing.four,
     paddingBottom: Spacing.four,
+    gap: Spacing.four,
+  },
+  planHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });
