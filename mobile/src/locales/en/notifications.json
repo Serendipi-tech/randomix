@@ -1,4 +1,13 @@
 {
   "title": "Notifications",
-  "comingSoon": "Coming soon."
+  "requests": {
+    "title": "Friend requests",
+    "accept": "Accept",
+    "reject": "Reject"
+  },
+  "empty": {
+    "title": "No notifications yet",
+    "subtitle": "We'll let you know when something happens."
+  },
+  "error": "Couldn't load your notifications. Please try again."
 }

@@ -18,7 +18,7 @@ export const MembershipPlanEnum = builder.enumType('MEMBERSHIP_PLAN', {
   values: ['FREE', 'PREMIUM', 'UNLIMITED', 'FREE_TRIAL', 'FULL_ACCESS'] as const,
 });
 
-builder.enumType('NOTIFICATION_TYPE', {
+export const NotificationTypeEnum = builder.enumType('NOTIFICATION_TYPE', {
   values: [
     'CHALLENGE_NEW', 'CHALLENGE_COMPLETED', 'CHALLENGE_FAILED',
     'FRIENDSHIP', 'GROUP_INVITE', 'GROUP_AUTOCONTRIBUTOR', 'SYSTEM',
