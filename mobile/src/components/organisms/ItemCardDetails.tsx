@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDirtyState } from '@/utils/useDirtyState';
 import {
   Image,
   Platform,
@@ -207,6 +208,11 @@ export function ItemCardDetails({
     onChangeDescription?.(descriptionDraft.trim());
     setShowDescriptionEditor(false);
   };
+
+  // Dirty-state check per i tre editor
+  const { isDirty: isNameDirty } = useDirtyState(name, nameDraft);
+  const { isDirty: isNoteDirty } = useDirtyState(note ?? '', noteDraft);
+  const { isDirty: isDescriptionDirty } = useDirtyState(userDescription ?? '', descriptionDraft);
 
   return (
     <BottomSheet visible={visible} onClose={onClose}>
@@ -441,7 +447,7 @@ export function ItemCardDetails({
                 <Button variant="secondary" label={t('itemForm.cancel')} onPress={() => setShowNoteEditor(false)} />
               </View>
               <View style={styles.noteEditAction}>
-                <Button variant="primary" label={t('itemForm.save')} onPress={confirmNote} />
+                <Button variant="primary" label={t('itemForm.save')} onPress={confirmNote} disabled={!isNoteDirty} />
               </View>
             </View>
           </View>
@@ -465,7 +471,7 @@ export function ItemCardDetails({
                 <Button variant="secondary" label={t('itemForm.cancel')} onPress={() => setShowDescriptionEditor(false)} />
               </View>
               <View style={styles.noteEditAction}>
-                <Button variant="primary" label={t('itemForm.save')} onPress={confirmDescription} />
+                <Button variant="primary" label={t('itemForm.save')} onPress={confirmDescription} disabled={!isDescriptionDirty} />
               </View>
             </View>
           </View>
@@ -487,7 +493,7 @@ export function ItemCardDetails({
                 <Button variant="secondary" label={t('itemForm.cancel')} onPress={() => setShowNameEditor(false)} />
               </View>
               <View style={styles.noteEditAction}>
-                <Button variant="primary" label={t('itemForm.save')} onPress={confirmName} />
+                <Button variant="primary" label={t('itemForm.save')} onPress={confirmName} disabled={!isNameDirty} />
               </View>
             </View>
           </View>

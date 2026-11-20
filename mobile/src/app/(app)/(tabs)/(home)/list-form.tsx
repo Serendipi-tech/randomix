@@ -1,5 +1,5 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { List, Pencil } from 'lucide-react-native';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -20,6 +20,7 @@ import { ListCard } from '@/components/cards/ListCard';
 import { useListCategories } from '@/utils/useListCategories';
 import { useListDetail } from '@/utils/useListDetail';
 import { useListMutations } from '@/utils/useListMutations';
+import { useDirtyState } from '@/utils/useDirtyState';
 
 const NAME_MAX_LENGTH = 20;
 const DESCRIPTION_MAX_LENGTH = 100;
@@ -52,21 +53,65 @@ export default function ListFormScreen() {
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
+  const initialSnapshotRef = useRef<{
+    name: string;
+    icon: string;
+    description: string;
+    color: string;
+    isHidden: boolean;
+    selectedCategoryId: string | null;
+  } | null>(null);
+
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId) ?? null;
   // Stato neutro dello slot category: solo se sto caricando e non ho ancora dati (con la cache non appare)
   const isCategoriesLoading = categoriesLoading && categories.length === 0;
   // In creazione non esiste ancora nessun User_Item collegato: conteggio 0
   const itemsCount = isEdit ? (list?.items.length ?? 0) : 0;
 
+  // Dirty-check: solo in modifica, compara lo stato corrente con lo snapshot iniziale
+  const { isDirty } = useDirtyState(
+    initialSnapshotRef.current ?? {
+      name: '',
+      icon: DEFAULT_LIST_ICON_KEY,
+      description: '',
+      color: listColors[0],
+      isHidden: false,
+      selectedCategoryId: null,
+    },
+    {
+      name,
+      icon,
+      description,
+      color,
+      isHidden,
+      selectedCategoryId,
+    }
+  );
+
   // precompilo il form quando arrivano i dati della lista in modifica
   useEffect(() => {
     if (!isEdit || !list) return;
-    setName(list.name);
-    setIcon(list.icon);
-    setDescription(list.description ?? '');
-    setColor(list.color);
-    setIsHidden(list.isHidden);
-    setSelectedCategoryId(list.categories[0]?.id ?? null);
+    const listName = list.name;
+    const listIcon = list.icon;
+    const listDescription = list.description ?? '';
+    const listColor = list.color;
+    const listIsHidden = list.isHidden;
+    const listCategoryId = list.categories[0]?.id ?? null;
+    setName(listName);
+    setIcon(listIcon);
+    setDescription(listDescription);
+    setColor(listColor);
+    setIsHidden(listIsHidden);
+    setSelectedCategoryId(listCategoryId);
+    // Salva lo snapshot iniziale per il dirty-check
+    initialSnapshotRef.current = {
+      name: listName,
+      icon: listIcon,
+      description: listDescription,
+      color: listColor,
+      isHidden: listIsHidden,
+      selectedCategoryId: listCategoryId,
+    };
     // in modifica l'icona esistente è "voluta": la categoria non la sovrascrive
     setIconTouched(true);
   }, [isEdit, list]);
@@ -233,6 +278,7 @@ export default function ListFormScreen() {
             label={isEdit ? t('form.save') : t('form.create')}
             onPress={save}
             loading={saving}
+            disabled={isEdit && (!isDirty || saving)}
           />
         </View>
       </View>
