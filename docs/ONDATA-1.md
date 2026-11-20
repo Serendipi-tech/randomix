@@ -270,5 +270,37 @@ produce codice).
 
 ## Esito
 
-*Da compilare a chiusura ondata: cosa è stato consegnato, commit per pacchetto, task passati a ✅/🧪/🧩,
-eventuali task divisi o riaperti.*
+**Chiusa il 19/11/2026. Tutti i 23 task entrati nell'ondata sono ✅ Fatto.** Dettaglio task-per-task e commit
+nelle rispettive schede di `TODO.md`. Riepilogo per pacchetto:
+
+- **A** (T01, T11, T20): A1 `62eb1ae`, A2 `70d68ce`, A3 `e71f062`, A1b `514e420` (rilanciata una volta — la
+  prima esecuzione si è fermata correttamente su una base disallineata, vedi incidente sotto).
+- **B** (T04, T05, T06, T07, T14): B1 `f8da768`, B2 `f393a22`, B3 `e9b3de9`, B4 `dd31a42`. Sequenza interna
+  rispettata (B1 → B2/B3 → B4).
+- **C** (T02, T09, T10, T12, T13, T15, T16): C1 `ce3e566`, C4 (solo verifica, nessun commit), C5 `0da39b5`;
+  C2 e C3 interrotte da un rate limit di sessione a metà lavoro, riprese dal WIP già scritto (non rilanciate
+  da zero) — C2 chiusa con fix aggiuntivo `6730e65` (migrazione applicata), C3 chiusa dopo verifica che T12
+  non richiedeva più alcuna modifica. Un bug di integrazione fra C1 e C3 (tipo `CategoryOption` richiedeva
+  `icon`, non popolato in un punto) corretto con `330b467`.
+- **D** (T17, T18, T19): D1 `f5d5ff3`, D2 `0fd0a41`.
+- **E** (T22, T23, T24, T27, T28): E2 (solo verifica, nessun commit); E1 ed E3 interrotte dallo stesso rate
+  limit di C2/C3, riprese dal WIP già scritto.
+
+**Trovato durante il lavoro**: T30 (`myLists` non filtra `isHidden`), scoperto da C4 mentre verificava T13.
+Aggiunto a `TODO.md`, non assegnato a questa ondata.
+
+**Incidente — base worktree disallineata**: a metà ondata, dopo molti merge locali mai pushati, `origin/main`
+era 27 commit indietro rispetto alla HEAD locale. Gli agenti con `isolation: "worktree"` partono per default
+da `origin/main` ("fresh"), non dalla HEAD locale — tre foglie lanciate in quella finestra (B2, B3, il primo
+tentativo di A1b) hanno quindi ricevuto una base vecchia. A1b l'ha rilevato da sola (due controlli sulla base
+nel mandato) e si è fermata senza scrivere nulla, come da istruzioni; B2 e B3 l'hanno rilevato e corretto da
+sole con un `git merge main` interno. Nessun danno, ma il mandato per le ondate future dovrebbe includere
+esplicitamente il controllo "la tua base include gli ultimi merge?" come primo passo, non solo per i casi a
+rischio. Corretto alla radice pushando `main` su `origin` (`git push origin main`, 27 commit, autorizzato
+dall'utente) e impostando `worktree.baseRef: "head"` in `.claude/settings.json`.
+
+**Verifica finale**: `npx tsc --noEmit` pulito su `mobile/` e `web/` dopo l'ultimo merge (solo un errore
+preesistente non correlato in `TagCreateSheet.tsx`). Nessuna verifica visiva interattiva reale (nessun
+browser/simulatore disponibile in questo ambiente) — build statica (`expo export --platform web`) usata come
+proxy da una foglia, raccomandata una verifica manuale dell'utente prima di considerare l'ondata "provata",
+non solo "scritta".
