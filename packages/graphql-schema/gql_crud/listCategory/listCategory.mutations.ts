@@ -6,11 +6,13 @@ export const ADMIN_CREATE_LIST_CATEGORY: DocumentNode = parse(`
     adminCreateListCategory(input: $input) {
       id
       name
+      nameEn
       description
       icon
       includedCategories {
         id
         name
+        nameEn
         icon
       }
       listsCount
@@ -24,11 +26,13 @@ export const ADMIN_UPDATE_LIST_CATEGORY: DocumentNode = parse(`
     adminUpdateListCategory(id: $id, input: $input) {
       id
       name
+      nameEn
       description
       icon
       includedCategories {
         id
         name
+        nameEn
         icon
       }
       listsCount

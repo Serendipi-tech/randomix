@@ -6,6 +6,7 @@ export const ADMIN_CREATE_CATEGORY: DocumentNode = parse(`
     adminCreateCategory(input: $input) {
       id
       name
+      nameEn
       icon
     }
   }
@@ -16,6 +17,7 @@ export const ADMIN_UPDATE_CATEGORY: DocumentNode = parse(`
     adminUpdateCategory(id: $id, input: $input) {
       id
       name
+      nameEn
       icon
     }
   }

@@ -1,7 +1,8 @@
 model Category {
     id String @id @default(cuid())
 
-    name String // testo mostrato direttamente (nessuna chiave i18n, come ListCategory)
+    name String // testo originale/canonico, mostrato quando manca una traduzione (admin lo edita come "nome base")
+    translations Json? // { en?: string }, traduzioni aggiuntive per nome — fallback su `name` se lingua assente
     icon String
 
     items                User_Item[] // item personali con questa categoria

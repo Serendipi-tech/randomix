@@ -8,6 +8,7 @@ const { CATEGORIES } = CategoryQueries;
 export interface Category {
   id: string;
   name: string;
+  nameEn: string | null;
   icon: string;
   itemsCount: number;
   listCategoriesCount: number;

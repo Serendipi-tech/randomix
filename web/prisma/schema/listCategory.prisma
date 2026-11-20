@@ -2,6 +2,7 @@ model ListCategory {
     id String @id @default(cuid())
 
     name        String
+    translations Json? // { en?: string }, traduzioni aggiuntive per nome — fallback su `name` se lingua assente
     description String? // opzionale
     icon        String
 
