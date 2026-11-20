@@ -35,6 +35,13 @@
     "itemCount_one": "{{count}} item",
     "itemCount_other": "{{count}} items",
     "notFound": "Profile not found.",
-    "error": "Couldn't load this profile. Please try again."
+    "error": "Couldn't load this profile. Please try again.",
+    "viewLists": "View lists",
+    "hideLists": "Hide lists",
+    "stats": {
+      "onlyTheirs": "Their stats",
+      "compare": "Compare",
+      "you": "You"
+    }
   }
 }

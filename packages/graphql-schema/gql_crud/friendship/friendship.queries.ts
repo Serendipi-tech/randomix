@@ -53,6 +53,24 @@ export const FRIEND_PROFILE: DocumentNode = parse(`
         description
         itemCount
       }
+      stats {
+        categoryStats {
+          categoryId
+          name
+          icon
+          itemsCount
+          drawCount
+        }
+        completionBreakdown {
+          notStarted
+          inProgress
+          completed
+        }
+        drawAcceptance {
+          accepted
+          skipped
+        }
+      }
     }
   }
 `);
