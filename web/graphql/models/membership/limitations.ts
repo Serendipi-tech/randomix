@@ -25,8 +25,23 @@ const NO_PLAN_FALLBACK: MembershipLimitations = {
   supportPriority: 'LOW',
 };
 
+// Un admin non è mai limitato dal piano: tutti i campi null/true = illimitato o abilitato,
+// nella stessa convenzione usata altrove (null = nessun limite).
+const ADMIN_UNLIMITED: MembershipLimitations = {
+  maxLists: null,
+  maxItemsPerList: null,
+  maxGroupsCreatable: null,
+  maxGroupsJoinable: null,
+  hideItemsEnabled: true,
+  showAds: false,
+  supportPriority: 'HIGH',
+};
+
 /**
  * Ritorna i limiti del piano attivo dell'utente.
+ *
+ * Un utente con ruolo ADMIN salta del tutto la logica di piano: nessun limite si applica al
+ * pannello admin né ai suoi account di test.
  *
  * Oggi la creazione di un utente (registerWithCredentials / loginWithGoogle in
  * user.mutations.ts) NON crea automaticamente una Subscription: non è garantito che ogni
@@ -35,6 +50,11 @@ const NO_PLAN_FALLBACK: MembershipLimitations = {
  * 2. Se neanche un piano FREE esiste a DB, usiamo NO_PLAN_FALLBACK (nessuna creazione consentita).
  */
 export async function getActiveMembership(userId: string): Promise<MembershipLimitations | null> {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+  if (user?.role === 'ADMIN') {
+    return ADMIN_UNLIMITED;
+  }
+
   const activeSubscription = await prisma.subscription.findFirst({
     where: { userId, status: 'ACTIVE' },
     orderBy: { startDate: 'desc' },
