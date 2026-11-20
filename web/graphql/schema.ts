@@ -41,6 +41,7 @@ import './models/notification/notification.mutations';
 import './models/notification/adminNotification.queries';
 import './models/notification/adminNotification.mutations';
 import './models/membership/index';
+import './models/membership/membership.queries';
 import './models/membership/adminMembership.queries';
 import './models/membership/adminMembership.mutations';
 import './models/report/index';
