@@ -1,6 +1,7 @@
 import { GraphQLError } from 'graphql';
 import { builder, prisma } from '../../builder';
 import { RolesGroupEnum } from '../../enum';
+import { getActiveMembership } from '../membership/limitations';
 import { GroupDetailRef, GroupListRef } from './index';
 
 type GroupRole = 'OWNER' | 'ADMIN' | 'AUTO_CONTRIBUTOR' | 'CONTRIBUTOR' | 'MEMBER';
@@ -17,6 +18,33 @@ function requireRole(role: GroupRole, allowed: GroupRole[]): void {
   }
 }
 
+// verifica il limite maxGroupsCreatable del piano attivo prima di creare un nuovo gruppo
+async function checkMaxGroupsCreatableLimit(userId: string) {
+  const limitations = await getActiveMembership(userId);
+  if (limitations?.maxGroupsCreatable == null) return;
+
+  const ownedGroupsCount = await prisma.group.count({ where: { ownerId: userId } });
+  if (ownedGroupsCount >= limitations.maxGroupsCreatable) {
+    throw new GraphQLError('Hai raggiunto il numero massimo di gruppi creabili dal tuo piano.', {
+      extensions: { code: 'LIMIT_REACHED' },
+    });
+  }
+}
+
+// verifica il limite maxGroupsJoinable del piano attivo prima di unirsi a un nuovo gruppo
+// (le partecipazioni includono anche i gruppi di cui l'utente è owner, via Group_User)
+async function checkMaxGroupsJoinableLimit(userId: string) {
+  const limitations = await getActiveMembership(userId);
+  if (limitations?.maxGroupsJoinable == null) return;
+
+  const joinedGroupsCount = await prisma.group_User.count({ where: { userId } });
+  if (joinedGroupsCount >= limitations.maxGroupsJoinable) {
+    throw new GraphQLError('Hai raggiunto il numero massimo di gruppi a cui puoi partecipare per il tuo piano.', {
+      extensions: { code: 'LIMIT_REACHED' },
+    });
+  }
+}
+
 // ---- CRUD Gruppo ----
 
 builder.mutationField('createGroup', (t) =>
@@ -28,6 +56,7 @@ builder.mutationField('createGroup', (t) =>
     },
     resolve: async (_root, { name, description }, ctx) => {
       requireAuth(ctx.userId);
+      await checkMaxGroupsCreatableLimit(ctx.userId);
       const group = await prisma.group.create({
         data: {
           name: name.trim(),
@@ -160,6 +189,7 @@ builder.mutationField('acceptGroupInvite', (t) =>
         where: { groupId_userId: { groupId: notif.groupId, userId: ctx.userId } },
       });
       if (!alreadyMember) {
+        await checkMaxGroupsJoinableLimit(ctx.userId);
         await prisma.group_User.create({
           data: { groupId: notif.groupId, userId: ctx.userId, role: 'MEMBER' },
         });

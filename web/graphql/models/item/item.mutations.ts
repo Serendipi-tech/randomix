@@ -1,6 +1,7 @@
 import { GraphQLError } from 'graphql';
 import { builder, prisma } from '../../builder';
 import { StatusCompletionEnum } from '../../enum';
+import { getActiveMembership } from '../membership/limitations';
 import './index';
 
 const AddItemToListInput = builder.inputType('AddItemToListInput', {
@@ -31,6 +32,27 @@ function requireAuth(userId: string | null): asserts userId is string {
   }
 }
 
+// verifica il limite maxItemsPerList del piano attivo, solo se l'item non è già in lista
+// (altrimenti l'upsert è un no-op e non aumenta il conteggio)
+async function checkMaxItemsPerListLimit(userId: string, listId: string, userItemId: string | null) {
+  const alreadyInList = userItemId
+    ? await prisma.list_UserItem.findUnique({
+        where: { listId_userItemId: { listId, userItemId } },
+      })
+    : null;
+  if (alreadyInList) return;
+
+  const limitations = await getActiveMembership(userId);
+  if (limitations?.maxItemsPerList == null) return;
+
+  const itemsCount = await prisma.list_UserItem.count({ where: { listId } });
+  if (itemsCount >= limitations.maxItemsPerList) {
+    throw new GraphQLError('Hai raggiunto il numero massimo di elementi consentiti dal tuo piano per questa lista.', {
+      extensions: { code: 'LIMIT_REACHED' },
+    });
+  }
+}
+
 builder.mutationField('addItemToList', (t) =>
   t.prismaField({
     type: 'List_UserItem',
@@ -50,6 +72,13 @@ builder.mutationField('addItemToList', (t) =>
       }
 
       // riuso il record personale dell'utente se l'item (stesso nome+categoria) è già nella sua collezione
+      const existingUserItem = await prisma.user_Item.findUnique({
+        where: {
+          userId_name_categoryId: { userId: ctx.userId, name: input.name.trim(), categoryId },
+        },
+      });
+      await checkMaxItemsPerListLimit(ctx.userId, listId, existingUserItem?.id ?? null);
+
       const userItem = await prisma.user_Item.upsert({
         where: {
           userId_name_categoryId: { userId: ctx.userId, name: input.name.trim(), categoryId },
