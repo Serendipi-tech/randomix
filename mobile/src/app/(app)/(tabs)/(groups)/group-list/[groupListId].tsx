@@ -29,7 +29,9 @@ export default function GroupListScreen() {
     listName?: string;
   }>();
 
-  const { lists: myLists } = useMyLists();
+  const { lists: allMyLists } = useMyLists();
+  // le liste nascoste agli amici non vanno offerte per la condivisione in un gruppo (T30)
+  const myLists = allMyLists.filter((l) => !l.isHidden);
   const { sharedIds } = useGroupListSharedListIds(groupListId);
   const { addList, removeList } = useGroupListManage(groupListId);
 
