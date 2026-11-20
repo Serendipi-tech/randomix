@@ -1,5 +1,6 @@
 import { GraphQLError } from 'graphql';
 import { builder, prisma } from '../../builder';
+import { getActiveMembership } from '../membership/limitations';
 import './index';
 
 const CreateListInput = builder.inputType('CreateListInput', {
@@ -46,6 +47,19 @@ function validateListFields(name: string | null | undefined, description: string
   }
 }
 
+// verifica il limite maxLists del piano attivo prima di creare una nuova lista
+async function checkMaxListsLimit(userId: string) {
+  const limitations = await getActiveMembership(userId);
+  if (limitations?.maxLists == null) return;
+
+  const listsCount = await prisma.list.count({ where: { userId } });
+  if (listsCount >= limitations.maxLists) {
+    throw new GraphQLError('Hai raggiunto il numero massimo di liste consentite dal tuo piano.', {
+      extensions: { code: 'LIMIT_REACHED' },
+    });
+  }
+}
+
 // la lista deve esistere ed essere dell'utente, altrimenti NOT_FOUND
 async function requireOwnedList(listId: string, userId: string) {
   const list = await prisma.list.findFirst({ where: { id: listId, userId } });
@@ -62,6 +76,7 @@ builder.mutationField('createList', (t) =>
     resolve: async (query, _root, { input }, ctx) => {
       requireAuth(ctx.userId);
       validateListFields(input.name, input.description);
+      await checkMaxListsLimit(ctx.userId);
       return prisma.list.create({
         ...query,
         data: {
