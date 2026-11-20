@@ -103,6 +103,16 @@ builder.mutationField('addItemToList', (t) =>
   }),
 );
 
+// verifica che il piano attivo consenta di nascondere gli item agli amici
+async function checkHideItemsEnabled(userId: string) {
+  const limitations = await getActiveMembership(userId);
+  if (!limitations?.hideItemsEnabled) {
+    throw new GraphQLError('Il tuo piano non consente di nascondere gli elementi agli amici.', {
+      extensions: { code: 'LIMIT_REACHED' },
+    });
+  }
+}
+
 builder.mutationField('updateUserItem', (t) =>
   t.prismaField({
     type: 'User_Item',
@@ -140,6 +150,10 @@ builder.mutationField('updateUserItem', (t) =>
             extensions: { code: 'CONFLICT' },
           });
         }
+      }
+
+      if (input.isHidden === true) {
+        await checkHideItemsEnabled(ctx.userId);
       }
 
       // accetto solo tag dell'utente o di sistema
