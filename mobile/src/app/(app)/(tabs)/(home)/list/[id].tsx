@@ -57,7 +57,7 @@ export default function ListDetailScreen() {
     allMacroCategories
       .filter((macro) => listMacroIds.has(macro.id))
       .forEach((macro) =>
-        macro.includedCategories.forEach((cat) => seen.set(cat.id, { value: cat.id, label: cat.name })),
+        macro.includedCategories.forEach((cat) => seen.set(cat.id, { value: cat.id, label: cat.name, icon: cat.icon })),
       );
     return Array.from(seen.values());
   }, [allMacroCategories, list]);
