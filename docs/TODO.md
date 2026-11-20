@@ -10,7 +10,8 @@
 > **19/11/2026**: 23 task entrano in [`ONDATA-1.md`](ONDATA-1.md), pianificata col metodo in
 > [`metodo-agenti/`](metodo-agenti/). Restano fuori T26 (🔍, in valutazione), T29 (⏸️, decisione del titolare),
 > T08, T21, T25 (⏸️, rimandati — nessun brief per i tre redesign estetici, per ora) e T03 (⏸️, rimandato — le
-> immagini item, upload e utilizzo, vanno valutate in un'ondata a parte).
+> immagini item, upload e utilizzo, vanno valutate in un'ondata a parte). **T30** nato durante l'ondata 1
+> (trovato dalla foglia C4 mentre verificava T13), non ancora assegnato a nessuna ondata.
 
 ---
 
@@ -113,6 +114,7 @@ a mano quando cambia uno stato) · l'elenco delle schede.
 | T27 | Ridisegnare il profilo amico (statistiche in accordion) | [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx) | Pagina attuale: solo header + elenco liste condivise, nessuna statistica | 🔄 | 🟡 | 🟡 | 🔴 |
 | T28 | Rimozione amico dalla pagina profilo amico | [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx) | La rimozione esiste solo dalla lista amici, non dal profilo singolo | 🔄 | 🟢 | 🟢 | 🟢 |
 | T29 | Decidere se includere i Gruppi nell'MVP | [`group.prisma`](../web/prisma/schema/group.prisma) | Da valutare mole di lavoro residua vs. rimando a post-MVP | ⏸️ | 🟡 | 🟢 | 🟢 |
+| T30 | `myLists` non filtra le liste nascoste | [`list.queries.ts`](../web/graphql/models/list/list.queries.ts) | Una lista `isHidden` può essere condivisa in un `GroupList` | ⏳ | 🟡 | 🟡 | 🟢 |
 
 ---
 
@@ -557,3 +559,22 @@ Incrocio urgenza × rischio (per l'urgenza 🔴 sono indicati anche gli id):
   **Cosa fare**: stimare il lavoro residuo su sfide/notifiche di gruppo, presentare la stima al titolare.
   **Decisione da prendere**: Gruppi dentro l'MVP o rimandati a post-lancio.
   **Fatto quando**: la decisione è presa e riportata in questa scheda con la data.
+
+### T30
+- [ ] [FIX] `myLists` non filtra le liste nascoste
+- 🏷️ Area: 📋 Liste e item
+- ⏳ Da fare (trovato dalla foglia C4 dell'ondata 1, 19/11/2026, mentre verificava T13 — non assegnato a
+  nessuna ondata) · Urgenza 🟡 · Rischio 🟡 · Effort 🟢
+- [`list.queries.ts`](../web/graphql/models/list/list.queries.ts) (resolver `myLists`, nessun filtro su
+  `isHidden`), [`group-list/[groupListId].tsx`](../mobile/src/app/(app)/(tabs)/(groups)/group-list/[groupListId].tsx)
+  (mostra tutte le liste di `myLists` senza filtro quando si sceglie cosa condividere nel gruppo)
+- **Problema**: confermato sul codice — a differenza di `friendProfile` (che filtra correttamente
+  `isHidden: false`), il resolver `myLists` restituisce tutte le liste dell'utente senza escludere quelle
+  nascoste. La UI di scelta liste da condividere in un `GroupList` usa `myLists` senza filtro aggiuntivo,
+  quindi una lista nascosta agli amici può comunque essere condivisa in un gruppo — il che contraddice il
+  senso di `isHidden`.
+  **Cosa fare**: filtrare `isHidden: false` in `myLists`, oppure (se altrove nell'app `myLists` deve
+  mostrare anche le liste nascoste all'utente stesso, es. nella propria Home) aggiungere un parametro
+  esplicito e filtrare solo nel punto di scelta per `GroupList`. Decidere quale dei due, verificando prima
+  tutti i chiamanti di `myLists`.
+  **Fatto quando**: una lista con `isHidden=true` non compare più fra le liste condivisibili in un gruppo.
