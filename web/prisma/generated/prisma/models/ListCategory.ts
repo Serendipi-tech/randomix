@@ -45,6 +45,7 @@ export type ListCategoryMaxAggregateOutputType = {
 export type ListCategoryCountAggregateOutputType = {
   id: number
   name: number
+  translations: number
   description: number
   icon: number
   createdAt: number
@@ -74,6 +75,7 @@ export type ListCategoryMaxAggregateInputType = {
 export type ListCategoryCountAggregateInputType = {
   id?: true
   name?: true
+  translations?: true
   description?: true
   icon?: true
   createdAt?: true
@@ -156,6 +158,7 @@ export type ListCategoryGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 export type ListCategoryGroupByOutputType = {
   id: string
   name: string
+  translations: runtime.JsonValue | null
   description: string | null
   icon: string
   createdAt: Date
@@ -186,6 +189,7 @@ export type ListCategoryWhereInput = {
   NOT?: Prisma.ListCategoryWhereInput | Prisma.ListCategoryWhereInput[]
   id?: Prisma.StringFilter<"ListCategory"> | string
   name?: Prisma.StringFilter<"ListCategory"> | string
+  translations?: Prisma.JsonNullableFilter<"ListCategory">
   description?: Prisma.StringNullableFilter<"ListCategory"> | string | null
   icon?: Prisma.StringFilter<"ListCategory"> | string
   createdAt?: Prisma.DateTimeFilter<"ListCategory"> | Date | string
@@ -198,6 +202,7 @@ export type ListCategoryWhereInput = {
 export type ListCategoryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  translations?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   icon?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -213,6 +218,7 @@ export type ListCategoryWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ListCategoryWhereInput[]
   NOT?: Prisma.ListCategoryWhereInput | Prisma.ListCategoryWhereInput[]
   name?: Prisma.StringFilter<"ListCategory"> | string
+  translations?: Prisma.JsonNullableFilter<"ListCategory">
   description?: Prisma.StringNullableFilter<"ListCategory"> | string | null
   icon?: Prisma.StringFilter<"ListCategory"> | string
   createdAt?: Prisma.DateTimeFilter<"ListCategory"> | Date | string
@@ -225,6 +231,7 @@ export type ListCategoryWhereUniqueInput = Prisma.AtLeast<{
 export type ListCategoryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  translations?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   icon?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -240,6 +247,7 @@ export type ListCategoryScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ListCategoryScalarWhereWithAggregatesInput | Prisma.ListCategoryScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ListCategory"> | string
   name?: Prisma.StringWithAggregatesFilter<"ListCategory"> | string
+  translations?: Prisma.JsonNullableWithAggregatesFilter<"ListCategory">
   description?: Prisma.StringNullableWithAggregatesFilter<"ListCategory"> | string | null
   icon?: Prisma.StringWithAggregatesFilter<"ListCategory"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ListCategory"> | Date | string
@@ -249,6 +257,7 @@ export type ListCategoryScalarWhereWithAggregatesInput = {
 export type ListCategoryCreateInput = {
   id?: string
   name: string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   icon: string
   createdAt?: Date | string
@@ -261,6 +270,7 @@ export type ListCategoryCreateInput = {
 export type ListCategoryUncheckedCreateInput = {
   id?: string
   name: string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   icon: string
   createdAt?: Date | string
@@ -273,6 +283,7 @@ export type ListCategoryUncheckedCreateInput = {
 export type ListCategoryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -285,6 +296,7 @@ export type ListCategoryUpdateInput = {
 export type ListCategoryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -297,6 +309,7 @@ export type ListCategoryUncheckedUpdateInput = {
 export type ListCategoryCreateManyInput = {
   id?: string
   name: string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   icon: string
   createdAt?: Date | string
@@ -306,6 +319,7 @@ export type ListCategoryCreateManyInput = {
 export type ListCategoryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -315,6 +329,7 @@ export type ListCategoryUpdateManyMutationInput = {
 export type ListCategoryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -334,6 +349,7 @@ export type ListCategoryOrderByRelationAggregateInput = {
 export type ListCategoryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  translations?: Prisma.SortOrder
   description?: Prisma.SortOrder
   icon?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -475,6 +491,7 @@ export type ListCategoryUncheckedUpdateManyWithoutListsNestedInput = {
 export type ListCategoryCreateWithoutIncludedCategoriesInput = {
   id?: string
   name: string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   icon: string
   createdAt?: Date | string
@@ -486,6 +503,7 @@ export type ListCategoryCreateWithoutIncludedCategoriesInput = {
 export type ListCategoryUncheckedCreateWithoutIncludedCategoriesInput = {
   id?: string
   name: string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   icon: string
   createdAt?: Date | string
@@ -521,6 +539,7 @@ export type ListCategoryScalarWhereInput = {
   NOT?: Prisma.ListCategoryScalarWhereInput | Prisma.ListCategoryScalarWhereInput[]
   id?: Prisma.StringFilter<"ListCategory"> | string
   name?: Prisma.StringFilter<"ListCategory"> | string
+  translations?: Prisma.JsonNullableFilter<"ListCategory">
   description?: Prisma.StringNullableFilter<"ListCategory"> | string | null
   icon?: Prisma.StringFilter<"ListCategory"> | string
   createdAt?: Prisma.DateTimeFilter<"ListCategory"> | Date | string
@@ -530,6 +549,7 @@ export type ListCategoryScalarWhereInput = {
 export type ListCategoryCreateWithoutGroupListsInput = {
   id?: string
   name: string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   icon: string
   createdAt?: Date | string
@@ -541,6 +561,7 @@ export type ListCategoryCreateWithoutGroupListsInput = {
 export type ListCategoryUncheckedCreateWithoutGroupListsInput = {
   id?: string
   name: string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   icon: string
   createdAt?: Date | string
@@ -573,6 +594,7 @@ export type ListCategoryUpdateManyWithWhereWithoutGroupListsInput = {
 export type ListCategoryCreateWithoutListsInput = {
   id?: string
   name: string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   icon: string
   createdAt?: Date | string
@@ -584,6 +606,7 @@ export type ListCategoryCreateWithoutListsInput = {
 export type ListCategoryUncheckedCreateWithoutListsInput = {
   id?: string
   name: string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   icon: string
   createdAt?: Date | string
@@ -616,6 +639,7 @@ export type ListCategoryUpdateManyWithWhereWithoutListsInput = {
 export type ListCategoryUpdateWithoutIncludedCategoriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -627,6 +651,7 @@ export type ListCategoryUpdateWithoutIncludedCategoriesInput = {
 export type ListCategoryUncheckedUpdateWithoutIncludedCategoriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -638,6 +663,7 @@ export type ListCategoryUncheckedUpdateWithoutIncludedCategoriesInput = {
 export type ListCategoryUncheckedUpdateManyWithoutIncludedCategoriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -647,6 +673,7 @@ export type ListCategoryUncheckedUpdateManyWithoutIncludedCategoriesInput = {
 export type ListCategoryUpdateWithoutGroupListsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -658,6 +685,7 @@ export type ListCategoryUpdateWithoutGroupListsInput = {
 export type ListCategoryUncheckedUpdateWithoutGroupListsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -669,6 +697,7 @@ export type ListCategoryUncheckedUpdateWithoutGroupListsInput = {
 export type ListCategoryUncheckedUpdateManyWithoutGroupListsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -678,6 +707,7 @@ export type ListCategoryUncheckedUpdateManyWithoutGroupListsInput = {
 export type ListCategoryUpdateWithoutListsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -689,6 +719,7 @@ export type ListCategoryUpdateWithoutListsInput = {
 export type ListCategoryUncheckedUpdateWithoutListsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -700,6 +731,7 @@ export type ListCategoryUncheckedUpdateWithoutListsInput = {
 export type ListCategoryUncheckedUpdateManyWithoutListsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  translations?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icon?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -758,6 +790,7 @@ export type ListCategoryCountOutputTypeCountGroupListsArgs<ExtArgs extends runti
 export type ListCategorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  translations?: boolean
   description?: boolean
   icon?: boolean
   createdAt?: boolean
@@ -771,6 +804,7 @@ export type ListCategorySelect<ExtArgs extends runtime.Types.Extensions.Internal
 export type ListCategorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  translations?: boolean
   description?: boolean
   icon?: boolean
   createdAt?: boolean
@@ -780,6 +814,7 @@ export type ListCategorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.
 export type ListCategorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  translations?: boolean
   description?: boolean
   icon?: boolean
   createdAt?: boolean
@@ -789,13 +824,14 @@ export type ListCategorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
 export type ListCategorySelectScalar = {
   id?: boolean
   name?: boolean
+  translations?: boolean
   description?: boolean
   icon?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ListCategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "icon" | "createdAt" | "updatedAt", ExtArgs["result"]["listCategory"]>
+export type ListCategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "translations" | "description" | "icon" | "createdAt" | "updatedAt", ExtArgs["result"]["listCategory"]>
 export type ListCategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   includedCategories?: boolean | Prisma.ListCategory$includedCategoriesArgs<ExtArgs>
   lists?: boolean | Prisma.ListCategory$listsArgs<ExtArgs>
@@ -815,6 +851,7 @@ export type $ListCategoryPayload<ExtArgs extends runtime.Types.Extensions.Intern
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
+    translations: runtime.JsonValue | null
     description: string | null
     icon: string
     createdAt: Date
@@ -1247,6 +1284,7 @@ export interface Prisma__ListCategoryClient<T, Null = never, ExtArgs extends run
 export interface ListCategoryFieldRefs {
   readonly id: Prisma.FieldRef<"ListCategory", 'String'>
   readonly name: Prisma.FieldRef<"ListCategory", 'String'>
+  readonly translations: Prisma.FieldRef<"ListCategory", 'Json'>
   readonly description: Prisma.FieldRef<"ListCategory", 'String'>
   readonly icon: Prisma.FieldRef<"ListCategory", 'String'>
   readonly createdAt: Prisma.FieldRef<"ListCategory", 'DateTime'>

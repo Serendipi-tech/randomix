@@ -92,6 +92,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const CategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  translations: 'translations',
   icon: 'icon',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -224,6 +225,7 @@ export type List_UserItemScalarFieldEnum = (typeof List_UserItemScalarFieldEnum)
 export const ListCategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  translations: 'translations',
   description: 'description',
   icon: 'icon',
   createdAt: 'createdAt',
@@ -412,14 +414,6 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
 export const JsonNullValueFilter = {
   DbNull: DbNull,
   JsonNull: JsonNull,
@@ -427,4 +421,12 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

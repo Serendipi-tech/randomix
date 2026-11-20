@@ -1,4 +1,5 @@
 import { GraphQLError } from 'graphql';
+import { Prisma } from '../../../prisma/generated/prisma/client';
 import { builder, prisma } from '../../builder';
 import { requireAdmin } from '../../auth';
 import './index';
@@ -43,7 +44,7 @@ builder.mutationField('adminUpdateCategory', (t) =>
         where: { id: String(id) },
         data: {
           name: input.name,
-          translations: input.nameEn ? { en: input.nameEn } : null,
+          translations: input.nameEn ? { en: input.nameEn } : Prisma.DbNull,
           icon: input.icon,
         },
       });
