@@ -7,10 +7,21 @@
     "colors": "Colors",
     "dice": "Dice"
   },
-  "minPlaceholder": "Min",
-  "maxPlaceholder": "Max",
-  "countPlaceholder": "How many",
-  "facesPlaceholder": "Faces",
+  "hints": {
+    "numbers": "From 1 to 100, no repeats",
+    "letters": "A to Z, no repeats",
+    "colors": "Up to 100",
+    "dice": "2 to 120 sides"
+  },
+  "fields": {
+    "range": "Range",
+    "count": "How many",
+    "diceType": "Dice type",
+    "diceCount": "How many dice",
+    "other": "Other…",
+    "customFacesTitle": "Custom sides",
+    "confirm": "Confirm"
+  },
   "generate": "Generate",
   "total": "Total",
   "invalidInput": "Check the values and try again.",
