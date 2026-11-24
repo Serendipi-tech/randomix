@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Randomix — mockup randomizzatore</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+  :root{
+    --background:#191024;
+    --foreground:#261b3b;
+    --primary:#7154e7;
+    --secondary:#f7c041;
+    --secondaryGradient:#FF6B6B;
+    --accent:#1dffe1;
+    --error:#eb3040;
+    --warning:#fda129;
+    --border:#334155;
+    --disabled:#5c7597;
+    --textColor:#fdfcf5;
+    --text-80: rgba(253,252,245,.8);
+    --text-55: rgba(253,252,245,.55);
+    --extra3:#3d56e6; --extra6:#943de6; --extra8:#e63db3;
+
+    --r-card:12px;
+    --sp1:4px; --sp2:8px; --sp3:16px; --sp4:24px;
+
+    --font-display: Inter, "Spline Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-rounded: "SF Pro Rounded", "Hiragino Maru Gothic ProN", Meiryo, sans-serif;
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; height:100%; background:#0b0710; font-family:var(--font-display); }
+
+  .device-wrap{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:28px 12px; }
+  .device{
+    width:390px; height:844px; border-radius:46px; background:#000;
+    padding:12px; box-shadow: 0 40px 80px -30px rgba(0,0,0,.8), 0 0 0 1px #000;
+    position:relative;
+  }
+  .notch{
+    position:absolute; top:12px; left:50%; transform:translateX(-50%);
+    width:120px; height:26px; background:#000; border-radius:0 0 18px 18px; z-index:5;
+  }
+  .screen{
+    width:100%; height:100%; border-radius:36px; overflow:hidden; position:relative;
+    background:
+      radial-gradient(circle at 20% -8%, rgba(113,84,231,.5), transparent 40%),
+      radial-gradient(circle at 100% 85%, rgba(255,107,107,.28), transparent 42%),
+      linear-gradient(165deg, var(--background) 0%, #3A1C57 55%, #4e1e5a 100%);
+    color:var(--textColor);
+  }
+  .screen::after{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:.05; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .statusbar{ height:44px; }
+
+  .app{ padding: 0 var(--sp3) var(--sp4); display:flex; flex-direction:column; height:calc(100% - 44px); position:relative; z-index:1; }
+
+  svg.icon{ width:20px; height:20px; stroke:currentColor; stroke-width:2; fill:none; stroke-linecap:round; stroke-linejoin:round; display:block; }
+
+  /* ---------- header ---------- */
+  .header{ display:flex; align-items:center; gap:var(--sp2); margin-bottom:var(--sp3); height:40px; }
+  .header .back{
+    width:32px; height:32px; border-radius:10px; background:rgba(255,255,255,0.06);
+    border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:var(--textColor); user-select:none;
+    transition: transform .15s ease, background .15s ease; flex-shrink:0;
+    visibility:hidden;
+  }
+  .header .back svg{ width:17px; height:17px; }
+  .header .back.show{ visibility:visible; }
+  .header .back:hover{ background:rgba(255,255,255,0.12); }
+  .header h1{ font-size:19px; font-weight:700; margin:0; letter-spacing:-0.2px; line-height:1.15; }
+  .header .sub{ font-size:12px; color:var(--text-55); margin-top:1px; }
+
+  /* ---------- grid landing ---------- */
+  #grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--sp2); }
+  .mode-card{
+    position:relative; border-radius:var(--r-card); padding:var(--sp3);
+    min-height:112px; display:flex; flex-direction:column; justify-content:space-between; gap:6px;
+    background:var(--foreground); border:1px solid var(--border);
+    cursor:pointer; overflow:hidden;
+    transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s ease;
+    opacity:0; transform:translateY(10px);
+    animation: card-in .45s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  .mode-card:nth-child(1){ animation-delay:.05s; }
+  .mode-card:nth-child(2){ animation-delay:.12s; }
+  .mode-card:nth-child(3){ animation-delay:.19s; }
+  .mode-card:nth-child(4){ animation-delay:.26s; }
+  @keyframes card-in{ to{ opacity:1; transform:translateY(0); } }
+  .mode-card:active{ transform:scale(.97); }
+  .mode-card .icon-badge{
+    width:36px; height:36px; border-radius:11px; display:flex; align-items:center; justify-content:center;
+    background:var(--badge-tint); color:var(--badge-ink);
+  }
+  .mode-card .label{ font-size:15px; font-weight:700; color:var(--textColor); }
+  .mode-card .hint{ font-size:11.5px; color:var(--text-55); margin-top:-3px; line-height:1.3; }
+
+  #card-numbers{ --badge-tint: rgba(61,86,230,.2);  --badge-ink:#7d90ff; }
+  #card-letters{ --badge-tint: rgba(148,61,230,.2); --badge-ink:#c08cf7; }
+  #card-colors{ --badge-tint: rgba(230,61,179,.2);  --badge-ink:#f28cd4; }
+  #card-dice  { --badge-tint: rgba(247,192,65,.2);  --badge-ink:#f7c041; }
+
+  /* ---------- stage shell ---------- */
+  .stage{ display:none; flex-direction:column; gap:var(--sp2); flex:1; min-height:0; }
+  .stage.active{ display:flex; }
+
+  .panel{
+    background:var(--foreground); border:1px solid var(--border);
+    border-radius:var(--r-card); padding:var(--sp2) var(--sp3);
+  }
+
+  .field-label{ display:flex; align-items:center; gap:6px; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-55); margin-bottom:6px; font-weight:600; }
+  .field-label svg{ width:13px; height:13px; }
+
+  .stepper{ display:flex; align-items:center; justify-content:space-between; }
+  .stepper .btn{
+    width:34px; height:34px; border-radius:10px; border:1px solid var(--border);
+    background:rgba(255,255,255,0.05); color:var(--textColor); font-size:17px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .stepper .btn:hover{ background:rgba(255,255,255,0.1); }
+  .stepper .btn:active{ transform:scale(.9); }
+  .stepper .value{ font-family:var(--font-rounded); font-size:20px; font-weight:700; min-width:36px; text-align:center; color:var(--textColor); }
+
+  .range-row{ display:flex; gap:var(--sp2); }
+  .range-row .stepper{ flex:1; }
+
+  .chip-row{ display:flex; gap:6px; flex-wrap:wrap; }
+  .chip{
+    padding:6px 12px; border-radius:999px; border:1px solid var(--border);
+    background:rgba(255,255,255,0.04); font-size:12.5px; font-weight:600; cursor:pointer;
+    color:var(--text-80); transition: all .15s ease;
+    display:inline-flex; align-items:center; gap:5px;
+  }
+  .chip svg{ width:11px; height:11px; stroke:currentColor; stroke-width:2; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+  .chip.sel{ background:var(--primary); border-color:var(--primary); color:var(--textColor); }
+  /* bordo tratteggiato: segnala che è un valore modificabile, non un preset fisso */
+  .chip.custom{ border-style:dashed; }
+  .chip.custom.sel{ border-style:solid; }
+
+  .generate-btn{
+    border:none; border-radius:16px; padding:14px; font-size:15px; font-weight:700;
+    color:#1a1324; cursor:pointer; letter-spacing:.2px; margin-top:4px;
+    background:linear-gradient(135deg, var(--secondary), var(--secondaryGradient));
+    box-shadow: 0 8px 20px -8px rgba(247,192,65,0.5);
+    transition: transform .15s ease;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .generate-btn svg{ width:17px; height:17px; stroke:#1a1324; }
+  .generate-btn:active{ transform:scale(.98); }
+
+  .stage-visual{
+    flex:1; min-height:0; display:flex; align-items:center; justify-content:center;
+    border-radius:var(--r-card); position:relative; background:rgba(0,0,0,0.18);
+    border:1px solid rgba(255,255,255,0.05);
+  }
+
+  /* ============ NUMBERS: odometer reel ============ */
+  .reels{ display:flex; gap:7px; flex-wrap:wrap; justify-content:center; width:100%; padding:0 var(--sp2); }
+  .reel{
+    flex:1 1 62px; max-width:84px; min-width:52px; height:78px;
+    border-radius:15px; background:var(--foreground);
+    border:1px solid var(--border); overflow:hidden; position:relative;
+  }
+  .reel-strip{
+    display:flex; flex-direction:column; align-items:center;
+    font-family:var(--font-rounded); font-size:28px; font-weight:700; color:var(--textColor);
+  }
+  .reel-strip div{ height:78px; display:flex; align-items:center; }
+  .reel.spin .reel-strip{ animation: spin-reel .95s cubic-bezier(.12,.75,.2,1) forwards; }
+  @keyframes spin-reel{ from{ transform:translateY(0); } to{ transform:translateY(var(--landed)); } }
+
+  /* ============ LETTERS: flip tiles ============ */
+  .tiles{ display:flex; gap:9px; flex-wrap:wrap; justify-content:center; perspective:600px; width:100%; padding:0 var(--sp2); }
+  .tile{ flex:1 1 58px; max-width:78px; min-width:46px; height:70px; position:relative; }
+  .tile-inner{
+    width:100%; height:100%; position:relative; transform-style:preserve-3d;
+    transition: transform .55s cubic-bezier(.3,.9,.3,1);
+  }
+  .tile.flipped .tile-inner{ transform:rotateY(180deg); }
+  .tile-face{
+    position:absolute; inset:0; backface-visibility:hidden; border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .tile-face.front{
+    background:var(--foreground); border:1px solid var(--border);
+  }
+  .tile-face.front svg{ width:21px; height:21px; stroke:var(--text-55); opacity:.5; }
+  .tile-face.back{
+    transform:rotateY(180deg); position:relative; overflow:hidden;
+    box-shadow:0 8px 16px -6px rgba(0,0,0,.5);
+  }
+  .tile-face.back::before{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(135deg, rgba(255,255,255,.3), transparent 50%, rgba(0,0,0,.2) 100%);
+  }
+  .tile-face.back .letter-glyph{
+    position:relative; z-index:1; font-family:var(--font-rounded); font-weight:800;
+    font-size:27px; letter-spacing:-.02em;
+  }
+
+  /* ============ COLORS: pour / fill (riquadri più grandi) ============ */
+  .swatches{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .swatch-wrap{ display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .swatch{
+    width:64px; height:64px; border-radius:16px; background:#000; position:relative; overflow:hidden;
+    border:1px solid rgba(255,255,255,0.1);
+  }
+  .swatch .fill{ position:absolute; left:0; right:0; bottom:0; height:0%; transition:height .8s cubic-bezier(.2,.9,.3,1); }
+  .swatch.poured .fill{ height:100%; }
+  .swatch-hex{ font-size:11px; color:var(--text-55); font-family:var(--font-rounded); }
+
+  /* ============ DICE — famiglie di forma per numero di facce ============ */
+  .dice-row{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; align-items:center; perspective:800px; }
+  .die{ width:58px; height:58px; position:relative; }
+  .die.rolling .die-face, .die.rolling .diamond-shape, .die.rolling .hex-wrap, .die.rolling .circle-shape{
+    animation: tumble .85s cubic-bezier(.17,.84,.44,1);
+  }
+  @keyframes tumble{
+    0%{ transform:rotateX(0) rotateY(0) rotateZ(0) scale(1); }
+    35%{ transform:rotateX(280deg) rotateY(170deg) rotateZ(50deg) scale(1.1); }
+    70%{ transform:rotateX(560deg) rotateY(390deg) rotateZ(-15deg) scale(.94); }
+    100%{ transform:rotateX(720deg) rotateY(720deg) rotateZ(0) scale(1); }
+  }
+  /* la versione "diamond" ruota già 45° a riposo: la tumble la farebbe sembrare storta in mezzo,
+     quindi applichiamo lo spin al contenitore esterno invece che alla forma già rotata */
+  .die.rolling .diamond-outer{ animation: tumble .85s cubic-bezier(.17,.84,.44,1); }
+  .die.rolling .diamond-shape{ animation:none; }
+
+  /* --- famiglia "pip": d≤6, rilievo a pallini, nessun numero --- */
+  .die-face.pip{
+    width:100%; height:100%; border-radius:14px; background:var(--foreground);
+    box-shadow:
+      inset 0 2px 0 rgba(255,255,255,.08),
+      inset 0 -3px 6px rgba(0,0,0,.4),
+      0 6px 14px -6px rgba(0,0,0,.6);
+    border:1px solid rgba(255,255,255,.08);
+    display:grid; grid-template-columns:1fr 1fr 1fr; grid-template-rows:1fr 1fr 1fr;
+    padding:9px;
+  }
+  .die-face.pip .pip-dot{ width:8px; height:8px; border-radius:50%; justify-self:center; align-self:center; background:transparent; }
+  .die-face.pip .pip-dot.on{
+    background:var(--secondary);
+    box-shadow: 0 0 6px rgba(247,192,65,.7), inset 0 1px 1px rgba(255,255,255,.5);
+  }
+
+  /* contenuto numerico condiviso da diamond / hexagon / circle */
+  .gem-num{ font-family:var(--font-rounded); font-weight:800; font-size:17px; color:#1a1324; }
+  .gem-tag{ font-size:8.5px; font-weight:700; color:rgba(26,19,36,.6); letter-spacing:.03em; margin-top:-2px; }
+
+  /* --- famiglia "diamond": 7-9 facce, quadrato ruotato 45° con angoli arrotondati nativi --- */
+  .diamond-outer{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+  .diamond-shape{
+    width:74%; height:74%; border-radius:20%; transform:rotate(45deg); position:relative;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 16px -6px rgba(0,0,0,.55);
+  }
+  .diamond-shape::before{
+    content:""; position:absolute; inset:0; border-radius:20%;
+    background:linear-gradient(135deg, rgba(255,255,255,.35), transparent 45%, rgba(0,0,0,.25) 100%);
+  }
+  .diamond-shape .diamond-content{ transform:rotate(-45deg); position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; }
+
+  /* --- famiglia "hexagon": 10-14 facce, SVG con stroke arrotondato (niente angoli vivi) --- */
+  .hex-wrap{ position:relative; width:100%; height:100%; }
+  .hex-wrap svg{ position:absolute; inset:0; filter: drop-shadow(0 7px 9px rgba(0,0,0,.45)); }
+  .hex-overlay{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+
+  /* --- famiglia "circle": 15+ facce, un poliedro con tante facce tende alla sfera --- */
+  .circle-shape{
+    width:100%; height:100%; border-radius:50%; position:relative;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    box-shadow:0 8px 16px -6px rgba(0,0,0,.55);
+  }
+  .circle-shape::before{
+    content:""; position:absolute; inset:0; border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, rgba(255,255,255,.45), transparent 55%);
+  }
+  .circle-shape .gem-num, .circle-shape .gem-tag{ position:relative; z-index:1; }
+
+  .result-total{ text-align:center; font-size:12.5px; color:var(--text-55); }
+  .result-total b{ color:var(--textColor); font-family:var(--font-rounded); font-size:15px; }
+
+  .note{ font-size:11px; color:var(--text-55); line-height:1.45; }
+
+  /* ---------- modale facce personalizzate (sostituisce prompt nativo) ---------- */
+  .modal-backdrop{
+    position:absolute; inset:0; background:rgba(8,5,14,.6); backdrop-filter:blur(3px);
+    display:none; align-items:center; justify-content:center; z-index:30;
+  }
+  .modal-backdrop.show{ display:flex; }
+  .modal-card{
+    width:76%; background:var(--foreground); border:1px solid var(--border);
+    border-radius:var(--r-card); padding:var(--sp3);
+    animation: card-in .25s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  .modal-title{ font-size:14px; font-weight:700; text-align:center; color:var(--textColor); }
+  .modal-stepper{ display:flex; align-items:center; justify-content:center; gap:18px; margin:var(--sp3) 0; }
+  .modal-stepper .value{ font-size:28px; }
+  .modal-actions{ display:flex; gap:8px; }
+  .modal-btn{ flex:1; text-align:center; padding:10px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; user-select:none; }
+  .modal-btn.ghost{ background:rgba(255,255,255,.06); border:1px solid var(--border); color:var(--text-80); }
+  .modal-btn.primary{ background:var(--primary); color:var(--textColor); }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+<defs>
+  <symbol id="ic-hash" viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"/></symbol>
+  <symbol id="ic-type" viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></symbol>
+  <symbol id="ic-palette" viewBox="0 0 24 24"><path d="M12 22a10 10 0 1 1 0-20c5 0 9 3.5 9 8 0 2.5-2 4-4.5 4h-1a2 2 0 0 0-1 3.7 1.5 1.5 0 0 1-1 2.6Z"/><circle cx="7.5" cy="10.5" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="16.5" cy="10.5" r="1"/><circle cx="8" cy="15" r="1"/></symbol>
+  <symbol id="ic-dice" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="8" cy="8" r="1.3"/><circle cx="16" cy="16" r="1.3"/><circle cx="12" cy="12" r="1.3"/></symbol>
+  <symbol id="ic-chevron" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></symbol>
+  <symbol id="ic-range" viewBox="0 0 24 24"><path d="M3 12h18M3 12l4-4M3 12l4 4M21 12l-4-4M21 12l-4 4"/></symbol>
+  <symbol id="ic-sparkle" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></symbol>
+  <symbol id="ic-shuffle" viewBox="0 0 24 24"><path d="M3 6h3.5a4 4 0 0 1 3.4 1.9L15 18h6M14 6h7M17 3l3 3-3 3M3 18h3.5a4 4 0 0 0 3.4-1.9L10.6 14M17 21l3-3-3-3"/></symbol>
+  <symbol id="ic-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+</defs>
+</svg>
+
+<div class="device-wrap">
+<div class="device">
+  <div class="notch"></div>
+  <div class="screen">
+    <div class="statusbar"></div>
+    <div class="app">
+
+      <div class="header">
+        <div class="back" id="backBtn" onclick="showGrid()"><svg class="icon"><use href="#ic-chevron"/></svg></div>
+        <div>
+          <h1 id="pageTitle">Randomizzatore</h1>
+          <div class="sub" id="pageSub">Scegli cosa sorteggiare</div>
+        </div>
+      </div>
+
+      <div id="grid">
+        <div class="mode-card" id="card-numbers" onclick="openStage('numbers')">
+          <div class="icon-badge"><svg class="icon"><use href="#ic-hash"/></svg></div>
+          <div>
+            <div class="label">Numeri</div>
+            <div class="hint">da X a Y, fino a 100</div>
+          </div>
+        </div>
+        <div class="mode-card" id="card-letters" onclick="openStage('letters')">
+          <div class="icon-badge"><svg class="icon"><use href="#ic-type"/></svg></div>
+          <div>
+            <div class="label">Lettere</div>
+            <div class="hint">alfabeto A–Z</div>
+          </div>
+        </div>
+        <div class="mode-card" id="card-colors" onclick="openStage('colors')">
+          <div class="icon-badge"><svg class="icon"><use href="#ic-palette"/></svg></div>
+          <div>
+            <div class="label">Colori</div>
+            <div class="hint">fino a 100</div>
+          </div>
+        </div>
+        <div class="mode-card" id="card-dice" onclick="openStage('dice')">
+          <div class="icon-badge"><svg class="icon"><use href="#ic-dice"/></svg></div>
+          <div>
+            <div class="label">Dadi</div>
+            <div class="hint">2–120 facce</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage" id="stage-numbers">
+        <div class="panel">
+          <div class="field-label"><svg class="icon"><use href="#ic-range"/></svg>Intervallo</div>
+          <div class="range-row">
+            <div class="stepper"><div class="btn" onclick="step('num_min',-1)">–</div><div class="value" id="num_min">1</div><div class="btn" onclick="step('num_min',1)">+</div></div>
+            <div class="stepper"><div class="btn" onclick="step('num_max',-1)">–</div><div class="value" id="num_max">100</div><div class="btn" onclick="step('num_max',1)">+</div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="field-label"><svg class="icon"><use href="#ic-hash"/></svg>Estrazioni</div>
+          <div class="stepper">
+            <div class="btn" onclick="step('num_count',-1)">–</div>
+            <div class="value" id="num_count">1</div>
+            <div class="btn" onclick="step('num_count',1)">+</div>
+          </div>
+        </div>
+        <div class="stage-visual"><div class="reels" id="reels"></div></div>
+        <button class="generate-btn" onclick="rollNumbers()"><svg><use href="#ic-shuffle"/></svg>Genera</button>
+        <div class="note">min≤max · 1–100 estrazioni · senza ripetizioni · mai più dei numeri disponibili nel range</div>
+      </div>
+
+      <div class="stage" id="stage-letters">
+        <div class="panel">
+          <div class="field-label"><svg class="icon"><use href="#ic-hash"/></svg>Quante lettere</div>
+          <div class="stepper">
+            <div class="btn" onclick="step('let_count',-1)">–</div>
+            <div class="value" id="let_count">1</div>
+            <div class="btn" onclick="step('let_count',1)">+</div>
+          </div>
+        </div>
+        <div class="stage-visual"><div class="tiles" id="tiles"></div></div>
+        <button class="generate-btn" onclick="rollLetters()"><svg><use href="#ic-shuffle"/></svg>Genera</button>
+        <div class="note">Pool fisso A–Z (26), senza ripetizioni — tetto noto, niente campo libero</div>
+      </div>
+
+      <div class="stage" id="stage-colors">
+        <div class="panel">
+          <div class="field-label"><svg class="icon"><use href="#ic-hash"/></svg>Quanti colori</div>
+          <div class="stepper">
+            <div class="btn" onclick="step('col_count',-1)">–</div>
+            <div class="value" id="col_count">5</div>
+            <div class="btn" onclick="step('col_count',1)">+</div>
+          </div>
+        </div>
+        <div class="stage-visual"><div class="swatches" id="swatches"></div></div>
+        <button class="generate-btn" onclick="rollColors()"><svg><use href="#ic-shuffle"/></svg>Genera</button>
+        <div class="note">RGB completamente casuale, non dalla palette tema — scelta già presa lato backend</div>
+      </div>
+
+      <div class="stage" id="stage-dice">
+        <div class="panel">
+          <div class="field-label"><svg class="icon"><use href="#ic-dice"/></svg>Tipo di dado</div>
+          <div class="chip-row" id="faceChips"></div>
+        </div>
+        <div class="panel">
+          <div class="field-label"><svg class="icon"><use href="#ic-hash"/></svg>Quanti dadi</div>
+          <div class="stepper">
+            <div class="btn" onclick="step('dice_count',-1)">–</div>
+            <div class="value" id="dice_count">2</div>
+            <div class="btn" onclick="step('dice_count',1)">+</div>
+          </div>
+        </div>
+        <div class="stage-visual"><div class="dice-row" id="diceRow"></div></div>
+        <button class="generate-btn" onclick="rollDice()"><svg><use href="#ic-sparkle"/></svg>Tira</button>
+        <div id="diceTotal" class="result-total" style="display:none">Totale: <b id="diceTotalVal">0</b></div>
+      </div>
+
+    </div>
+
+    <div class="modal-backdrop" id="facesModal" onclick="closeFacesModal()">
+      <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-title">Facce personalizzate</div>
+        <div class="modal-stepper">
+          <div class="btn" onclick="stepCustomFaces(-1)">–</div>
+          <div class="value" id="customFacesValue">7</div>
+          <div class="btn" onclick="stepCustomFaces(1)">+</div>
+        </div>
+        <div class="modal-actions">
+          <div class="modal-btn ghost" onclick="closeFacesModal()">Annulla</div>
+          <div class="modal-btn primary" onclick="confirmCustomFaces()">Conferma</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+const state = {
+  num_min:1, num_max:100, num_count:1,
+  let_count:1,
+  col_count:5,
+  dice_count:2, dice_faces:6
+};
+const TITLES = {
+  numbers:['Numeri','da X a Y'], letters:['Lettere','alfabeto A–Z'],
+  colors:['Colori','RGB casuale'], dice:['Dadi','2–120 facce']
+};
+
+function showGrid(){
+  document.getElementById('grid').style.display='grid';
+  document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
+  document.getElementById('backBtn').classList.remove('show');
+  document.getElementById('pageTitle').textContent='Randomizzatore';
+  document.getElementById('pageSub').textContent='Scegli cosa sorteggiare';
+}
+function openStage(mode){
+  document.getElementById('grid').style.display='none';
+  document.getElementById('stage-'+mode).classList.add('active');
+  document.getElementById('backBtn').classList.add('show');
+  document.getElementById('pageTitle').textContent=TITLES[mode][0];
+  document.getElementById('pageSub').textContent=TITLES[mode][1];
+  if(mode==='dice') buildFaceChips();
+}
+function step(key, delta){
+  let bounds = {
+    num_min:[-999,state.num_max-1], num_max:[state.num_min+1,999],
+    num_count:[1, Math.min(100, state.num_max-state.num_min+1)],
+    let_count:[1,26], col_count:[1,100], dice_count:[1,20]
+  }[key];
+  state[key] = Math.max(bounds[0], Math.min(bounds[1], state[key]+delta));
+  document.getElementById(key).textContent = state[key];
+}
+
+function rollNumbers(){
+  const pool=[]; for(let i=state.num_min;i<=state.num_max;i++) pool.push(i);
+  const n = Math.min(state.num_count, pool.length);
+  const picks = drawUnique(pool, n);
+  const el = document.getElementById('reels'); el.innerHTML='';
+  picks.forEach((val,i)=>{
+    const reel = document.createElement('div'); reel.className='reel';
+    const strip = document.createElement('div'); strip.className='reel-strip';
+    const spins = 12; let html='';
+    for(let s=0;s<spins;s++) html += `<div>${Math.abs(Math.round(Math.random()*9))}</div>`;
+    html += `<div>${val}</div>`;
+    strip.innerHTML = html;
+    strip.style.setProperty('--landed', `-${spins*78}px`);
+    reel.appendChild(strip);
+    el.appendChild(reel);
+    setTimeout(()=>{ reel.classList.add('spin'); }, i*80);
+  });
+}
+
+/* stessa famiglia di colori reali usata per i dadi "gemma", qui a rotazione per lettera */
+const LETTER_COLORS = [
+  ['#7154e7','#4b36a8', 'var(--textColor)'],
+  ['#3d56e6','#1f2fa8', 'var(--textColor)'],
+  ['#943de6','#5f1fa8', 'var(--textColor)'],
+  ['#e63db3','#a81f82', 'var(--textColor)'],
+  ['#FF6B6B','#c23f3f', 'var(--textColor)'],
+  ['#1dffe1','#139e8c', '#1a1324']
+];
+
+function rollLetters(){
+  const ALPHABET='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const picks = drawUnique(ALPHABET, state.let_count);
+  const el = document.getElementById('tiles'); el.innerHTML='';
+  picks.forEach((letter,i)=>{
+    const [a,b,ink] = LETTER_COLORS[i % LETTER_COLORS.length];
+    const tile=document.createElement('div'); tile.className='tile';
+    tile.innerHTML = `<div class="tile-inner">
+      <div class="tile-face front"><svg class="icon"><use href="#ic-type"/></svg></div>
+      <div class="tile-face back" style="background:linear-gradient(145deg, ${a}, ${b}); color:${ink}">
+        <div class="letter-glyph">${letter}</div>
+      </div>
+    </div>`;
+    el.appendChild(tile);
+    setTimeout(()=> tile.classList.add('flipped'), 150 + i*110);
+  });
+}
+
+function rollColors(){
+  const el = document.getElementById('swatches'); el.innerHTML='';
+  for(let i=0;i<state.col_count;i++){
+    const hex = '#' + Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0').toUpperCase();
+    const wrap=document.createElement('div'); wrap.className='swatch-wrap';
+    wrap.innerHTML = `<div class="swatch"><div class="fill" style="background:${hex}"></div></div>
+      <div class="swatch-hex">${hex}</div>`;
+    el.appendChild(wrap);
+    setTimeout(()=> wrap.querySelector('.swatch').classList.add('poured'), 100 + i*80);
+  }
+}
+
+/* notazione standard dei dadi poliedrici (RPG): dN = dado a N facce.
+   Serve a distinguere subito un "3" uscito su un d4 da un "3" su un d20. */
+const COMMON_FACES=[4,6,8,10,12,20];
+let tmpCustomFaces = 7;
+
+function buildFaceChips(){
+  const el=document.getElementById('faceChips'); el.innerHTML='';
+  COMMON_FACES.forEach(f=>{
+    const chip=document.createElement('div');
+    chip.className='chip'+(f===state.dice_faces?' sel':'');
+    chip.textContent='d'+f;
+    chip.onclick=()=>{ state.dice_faces=f; buildFaceChips(); };
+    el.appendChild(chip);
+  });
+  const custom=document.createElement('div');
+  const isCustom = !COMMON_FACES.includes(state.dice_faces);
+  custom.className='chip custom'+(isCustom?' sel':'');
+  /* la matita resta visibile anche dopo la scelta, per far capire che il valore si può ancora cambiare */
+  custom.innerHTML = '<svg><use href="#ic-edit"/></svg>' + (isCustom ? ('d'+state.dice_faces) : 'altro…');
+  custom.onclick = openFacesModal;
+  el.appendChild(custom);
+}
+
+function openFacesModal(){
+  tmpCustomFaces = !COMMON_FACES.includes(state.dice_faces) ? state.dice_faces : 7;
+  document.getElementById('customFacesValue').textContent = tmpCustomFaces;
+  document.getElementById('facesModal').classList.add('show');
+}
+function closeFacesModal(){ document.getElementById('facesModal').classList.remove('show'); }
+function stepCustomFaces(d){
+  tmpCustomFaces = Math.max(2, Math.min(120, tmpCustomFaces+d));
+  document.getElementById('customFacesValue').textContent = tmpCustomFaces;
+}
+function confirmCustomFaces(){
+  state.dice_faces = tmpCustomFaces;
+  closeFacesModal();
+  buildFaceChips();
+}
+
+/* pip condiviso da d≤6 (compreso d4, come richiesto) */
+const PIP_LAYOUT = { 1:[5], 2:[1,9], 3:[1,5,9], 4:[1,3,7,9], 5:[1,3,5,7,9], 6:[1,3,4,6,7,9] };
+
+/* più facce ha il dado, più la forma "arrotonda" verso il cerchio */
+function bucketFor(faces){
+  if(faces<=6) return 'pip';
+  if(faces<=9) return 'diamond';
+  if(faces<=14) return 'hexagon';
+  return 'circle';
+}
+const BUCKET_COLORS = {
+  diamond: ['#FF6B6B','#c23f3f'],
+  hexagon: ['#943de6','#5f1fa8'],
+  circle:  ['#1dffe1','#139e8c']
+};
+let hexGradSeq = 0;
+
+function diceFaceMarkup(value, faces){
+  const bucket = bucketFor(faces);
+
+  if(bucket === 'pip'){
+    const active = PIP_LAYOUT[value] || [];
+    let cells=''; for(let c=1;c<=9;c++) cells += `<div class="pip-dot${active.includes(c)?' on':''}"></div>`;
+    return `<div class="die-face pip">${cells}</div>`;
+  }
+
+  if(bucket === 'diamond'){
+    const [a,b] = BUCKET_COLORS.diamond;
+    return `<div class="diamond-outer"><div class="diamond-shape" style="background:linear-gradient(145deg, ${a}, ${b})">
+      <div class="diamond-content"><div class="gem-num">${value}</div><div class="gem-tag">d${faces}</div></div>
+    </div></div>`;
+  }
+
+  if(bucket === 'hexagon'){
+    const [a,b] = BUCKET_COLORS.hexagon;
+    const gid = 'hexg'+(hexGradSeq++);
+    return `<div class="hex-wrap">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+        <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/>
+        </linearGradient></defs>
+        <polygon points="50,12 82.9,31 82.9,69 50,88 17.1,69 17.1,31"
+          fill="url(#${gid})" stroke="url(#${gid})" stroke-width="14" stroke-linejoin="round"/>
+      </svg>
+      <div class="hex-overlay"><div class="gem-num">${value}</div><div class="gem-tag">d${faces}</div></div>
+    </div>`;
+  }
+
+  const [a,b] = BUCKET_COLORS.circle;
+  return `<div class="circle-shape" style="background:linear-gradient(145deg, ${a}, ${b})">
+    <div class="gem-num">${value}</div><div class="gem-tag">d${faces}</div>
+  </div>`;
+}
+
+function rollDice(){
+  const el=document.getElementById('diceRow'); el.innerHTML='';
+  const rolls=[];
+  for(let i=0;i<state.dice_count;i++){
+    const val = 1+Math.floor(Math.random()*state.dice_faces);
+    rolls.push(val);
+    const die=document.createElement('div'); die.className='die rolling';
+    die.innerHTML = diceFaceMarkup(val, state.dice_faces);
+    el.appendChild(die);
+  }
+  const totalEl=document.getElementById('diceTotal');
+  if(state.dice_count>1){
+    totalEl.style.display='block';
+    document.getElementById('diceTotalVal').textContent = rolls.reduce((a,b)=>a+b,0);
+  } else { totalEl.style.display='none'; }
+}
+
+function drawUnique(pool, n){
+  const copy=[...pool]; const out=[];
+  for(let i=0;i<n;i++){ const idx=Math.floor(Math.random()*copy.length); out.push(copy.splice(idx,1)[0]); }
+  return out;
+}
+</script>
+</body>
+</html>

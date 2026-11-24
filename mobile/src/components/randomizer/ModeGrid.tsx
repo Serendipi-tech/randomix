@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   // sottotitolo attenuato via opacity sul textColor, mai un grigio a parte (vedi PageHeader.subtitle)
   hint: {
     fontSize: 11.5,
-    opacity: 0.6,
+    opacity: 0.55,
     lineHeight: 15,
   },
 });

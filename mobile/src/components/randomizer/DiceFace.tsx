@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
-import Svg, { Polygon } from 'react-native-svg';
-import { DICE_COLORS } from '@/constants/dice';
-import { bucketForFaces, PIP_LAYOUT } from '@/utils/diceShapes';
+import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Defs, LinearGradient as SvgLinearGradient, Polygon, Stop } from 'react-native-svg';
+import { Colors } from '@/constants/theme';
+import { darkenColor } from '@/utils/color';
+import { useAppTheme } from '@/utils/useAppTheme';
+import { bucketForFaces, PIP_LAYOUT, type DiceShapeBucket } from '@/utils/diceShapes';
 
 type DiceFaceProps = {
   value: number;
@@ -11,29 +14,41 @@ type DiceFaceProps = {
 const SIZE = 58;
 // esagono "a punta in alto" dentro un viewBox 100x100, stroke arrotondato per evitare angoli vivi
 const HEXAGON_POINTS = '50,12 82.9,31 82.9,69 50,88 17.1,69 17.1,31';
+// scurimento per il secondo stop del gradiente, derivato dal token (mai un hex nuovo)
+const DARKEN_AMOUNT = 0.22;
 
-const diceShadow = {
-  shadowColor: DICE_COLORS.bevel,
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.6,
-  shadowRadius: 6,
-  elevation: 3,
-} as const;
+// unione dei due schemi: `Colors[colorScheme]` non è restringibile a un solo scheme (literal `as const`)
+type ThemeColors = typeof Colors.light | typeof Colors.dark;
 
-/** Faccia di un dado: pallini per facce <=6 (come il d6 esistente, estesi al d4), numero su
- *  sagoma via via più arrotondata (rombo, esagono, cerchio) al crescere delle facce. Stessa
- *  palette decorativa del dado esistente in ogni sagoma: nessun colore nuovo introdotto. */
+function gemGradient(colors: ThemeColors, bucket: DiceShapeBucket): readonly [string, string] {
+  const base =
+    bucket === 'diamond' ? colors.secondaryGradient : bucket === 'hexagon' ? colors.extraColors.six : colors.accent;
+  return [base, darkenColor(base, DARKEN_AMOUNT)] as const;
+}
+
+/** Faccia di un dado: pallini per facce <=6 (incluso d4), numero su sagoma via via più
+ *  arrotondata (rombo, esagono, cerchio) al crescere delle facce — più facce ha il dado,
+ *  più la forma tende al cerchio. */
 export function DiceFace({ value, faces }: DiceFaceProps) {
+  const { colorScheme } = useAppTheme();
+  const colors = Colors[colorScheme];
   const bucket = bucketForFaces(faces);
 
   if (bucket === 'pip') {
     const active = PIP_LAYOUT[value] ?? [];
     return (
-      <View style={[styles.square, diceShadow]}>
+      <View style={[styles.square, { backgroundColor: colors.foreground, borderColor: colors.border }]}>
         <View style={styles.pipGrid}>
           {Array.from({ length: 9 }, (_, i) => i + 1).map((cell) => (
             <View key={cell} style={styles.pipCell}>
-              {active.includes(cell) && <View style={styles.pipDot} />}
+              {active.includes(cell) && (
+                <View
+                  style={[
+                    styles.pipDot,
+                    { backgroundColor: colors.secondary, shadowColor: colors.secondary },
+                  ]}
+                />
+              )}
             </View>
           ))}
         </View>
@@ -41,13 +56,17 @@ export function DiceFace({ value, faces }: DiceFaceProps) {
     );
   }
 
+  const [from, to] = gemGradient(colors, bucket);
+
   if (bucket === 'diamond') {
     return (
-      <View style={[styles.square, { alignItems: 'center', justifyContent: 'center' }]}>
-        <View style={[styles.diamond, diceShadow]}>
-          <View style={styles.diamondContent}>
-            <DiceLabel value={value} faces={faces} />
-          </View>
+      <View style={[styles.square, styles.transparentSquare, { alignItems: 'center', justifyContent: 'center' }]}>
+        <View style={styles.diamondOuter}>
+          <LinearGradient colors={[from, to]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.diamondShape}>
+            <View style={styles.diamondContent}>
+              <DiceLabel value={value} faces={faces} ink={colors.background} />
+            </View>
+          </LinearGradient>
         </View>
       </View>
     );
@@ -55,35 +74,46 @@ export function DiceFace({ value, faces }: DiceFaceProps) {
 
   if (bucket === 'hexagon') {
     return (
-      <View style={[styles.square, diceShadow]}>
+      <View style={[styles.square, styles.transparentSquare]}>
         <Svg width="100%" height="100%" viewBox="0 0 100 100">
+          <Defs>
+            <SvgLinearGradient id="hexGrad" x1="0" y1="0" x2="1" y2="1">
+              <Stop offset="0" stopColor={from} />
+              <Stop offset="1" stopColor={to} />
+            </SvgLinearGradient>
+          </Defs>
           <Polygon
             points={HEXAGON_POINTS}
-            fill={DICE_COLORS.face}
-            stroke={DICE_COLORS.border}
-            strokeWidth={12}
+            fill="url(#hexGrad)"
+            stroke="url(#hexGrad)"
+            strokeWidth={14}
             strokeLinejoin="round"
           />
         </Svg>
         <View style={styles.overlay}>
-          <DiceLabel value={value} faces={faces} />
+          <DiceLabel value={value} faces={faces} ink={colors.background} />
         </View>
       </View>
     );
   }
 
   return (
-    <View style={[styles.square, styles.circle, diceShadow]}>
-      <DiceLabel value={value} faces={faces} />
-    </View>
+    <LinearGradient
+      colors={[from, to]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={[styles.square, styles.circle, { borderWidth: 0 }]}
+    >
+      <DiceLabel value={value} faces={faces} ink={colors.background} />
+    </LinearGradient>
   );
 }
 
-function DiceLabel({ value, faces }: DiceFaceProps) {
+function DiceLabel({ value, faces, ink }: DiceFaceProps & { ink: string }) {
   return (
     <>
-      <Text style={styles.value}>{value}</Text>
-      <Text style={styles.tag}>d{faces}</Text>
+      <Text style={[styles.value, { color: ink }]}>{value}</Text>
+      <Text style={[styles.tag, { color: ink }]}>d{faces}</Text>
     </>
   );
 }
@@ -93,13 +123,16 @@ const styles = StyleSheet.create({
     width: SIZE,
     height: SIZE,
     borderRadius: 16,
-    backgroundColor: DICE_COLORS.face,
     borderWidth: 2,
-    borderColor: DICE_COLORS.border,
     overflow: 'hidden',
+  },
+  transparentSquare: {
+    borderWidth: 0,
   },
   circle: {
     borderRadius: SIZE / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   overlay: {
     position: 'absolute',
@@ -126,15 +159,20 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: DICE_COLORS.pip,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.7,
+    shadowRadius: 4,
   },
-  diamond: {
+  diamondOuter: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  diamondShape: {
     width: SIZE * 0.74,
     height: SIZE * 0.74,
-    borderRadius: 10,
-    backgroundColor: DICE_COLORS.face,
-    borderWidth: 2,
-    borderColor: DICE_COLORS.border,
+    borderRadius: SIZE * 0.74 * 0.2,
     transform: [{ rotate: '45deg' }],
     alignItems: 'center',
     justifyContent: 'center',
@@ -146,12 +184,10 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 17,
     fontWeight: '800',
-    color: DICE_COLORS.pip,
   },
   tag: {
     fontSize: 9,
     fontWeight: '700',
-    color: DICE_COLORS.pip,
     opacity: 0.6,
     marginTop: -2,
   },

@@ -12,6 +12,7 @@ import { Chip } from '@/components/atoms/Chip';
 import { Stepper } from '@/components/atoms/Stepper';
 import { PageHeader } from '@/components/molecules/PageHeader';
 import { ModeGrid, type ModeGridItem } from '@/components/randomizer/ModeGrid';
+import { CustomFacesChip } from '@/components/randomizer/CustomFacesChip';
 import { NumberResults } from '@/components/randomizer/NumberResults';
 import { LetterResults } from '@/components/randomizer/LetterResults';
 import { ColorResults } from '@/components/randomizer/ColorResults';
@@ -140,7 +141,7 @@ export default function RandomizerScreen() {
                 {COMMON_FACES.map((f) => (
                   <Chip key={f} label={`d${f}`} selected={faces === f} onPress={() => setFaces(f)} />
                 ))}
-                <Chip
+                <CustomFacesChip
                   label={COMMON_FACES.includes(faces) ? t('fields.other') : `d${faces}`}
                   selected={!COMMON_FACES.includes(faces)}
                   onPress={() => setFacesSheetOpen(true)}
@@ -199,7 +200,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    opacity: 0.6,
+    opacity: 0.55,
   },
   rangeRow: {
     flexDirection: 'row',

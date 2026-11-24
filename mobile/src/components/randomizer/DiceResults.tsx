@@ -1,5 +1,14 @@
+import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, {
+  Easing,
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from 'react-native-reanimated';
 import { Colors } from '@/constants/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { DiceFace } from '@/components/randomizer/DiceFace';
@@ -10,7 +19,8 @@ type DiceResultsProps = {
   totalLabel: string;
 };
 
-/** Facce dei dadi (una forma per fascia di facce) più, se sono più di una, la somma. */
+/** Facce dei dadi (una forma per fascia di facce), ognuna con un tumble 3D all'ingresso,
+ *  più, se sono più di una, la somma. */
 export function DiceResults({ values, faces, totalLabel }: DiceResultsProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
@@ -20,17 +30,47 @@ export function DiceResults({ values, faces, totalLabel }: DiceResultsProps) {
     <View style={styles.wrap}>
       <View style={styles.row}>
         {values.map((value, i) => (
-          <Animated.View key={`${value}-${i}`} entering={ZoomIn.delay(i * 70).springify().damping(13)}>
-            <DiceFace value={Number(value)} faces={faces} />
-          </Animated.View>
+          <TumblingDie key={`${value}-${i}`} value={Number(value)} faces={faces} delay={i * 70} />
         ))}
       </View>
       {values.length > 1 && (
-        <Text style={[styles.total, { color: colors.textColor, opacity: 0.6 }]}>
+        <Text style={[styles.total, { color: colors.textColor, opacity: 0.55 }]}>
           {totalLabel}: {total}
         </Text>
       )}
     </View>
+  );
+}
+
+function TumblingDie({ value, faces, delay }: { value: number; faces: number; delay: number }) {
+  const progress = useSharedValue(0);
+
+  useEffect(() => {
+    progress.value = withDelay(delay, withTiming(1, { duration: 850, easing: Easing.out(Easing.cubic) }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- sola animazione d'ingresso, nessun valore reattivo da risincronizzare
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const stops = [0, 0.35, 0.7, 1];
+    const rotateX = interpolate(progress.value, stops, [0, 280, 560, 720], Extrapolation.CLAMP);
+    const rotateY = interpolate(progress.value, stops, [0, 170, 390, 720], Extrapolation.CLAMP);
+    const rotateZ = interpolate(progress.value, stops, [0, 50, -15, 0], Extrapolation.CLAMP);
+    const scale = interpolate(progress.value, stops, [1, 1.1, 0.94, 1], Extrapolation.CLAMP);
+    return {
+      transform: [
+        { perspective: 800 },
+        { rotateX: `${rotateX}deg` },
+        { rotateY: `${rotateY}deg` },
+        { rotateZ: `${rotateZ}deg` },
+        { scale },
+      ],
+    };
+  });
+
+  return (
+    <Animated.View style={animatedStyle}>
+      <DiceFace value={value} faces={faces} />
+    </Animated.View>
   );
 }
 
