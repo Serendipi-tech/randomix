@@ -46,7 +46,9 @@ export function TagCreateSheet({
   const palette = Object.values(colors.extraColors);
 
   const [name, setName] = useState('');
-  const [color, setColor] = useState(palette[0]);
+  // Tipizzato come string: i valori di extraColors sono letterali, e senza annotazione lo stato
+  // si restringerebbe a quella unione, rifiutando sia il colore salvato sia ColorPickerSheet
+  const [color, setColor] = useState<string>(palette[0]);
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   // Precompila i campi quando si apre in modifica; li azzera quando si apre in creazione
