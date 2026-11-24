@@ -19,6 +19,8 @@ const OFFSCREEN = Dimensions.get('window').height;
 const RISE_DURATION = 700;
 const GAP = 24;
 const MIN_TOP = 24;
+const SCALE_FALL = 1.4;
+const SCALE_REST = 1;
 
 /**
  * Coreografia d'apertura del login: il dado cade e rimbalza restando fermo.
@@ -29,6 +31,8 @@ const MIN_TOP = 24;
 export function useAuthIntro() {
   const fallY = useSharedValue(FALL_FROM);
   const rotate = useSharedValue(0);
+  const scale = useSharedValue(SCALE_FALL);
+  const labelOpacity = useSharedValue(0);
   const blockTranslateY = useSharedValue(OFFSCREEN);
   const diceTop = useSharedValue(0);
   const diceBottom = useSharedValue(0);
@@ -36,7 +40,9 @@ export function useAuthIntro() {
 
   const reveal = useCallback(() => {
     blockTranslateY.value = withTiming(0, { duration: RISE_DURATION, easing: Easing.out(Easing.cubic) });
-  }, [blockTranslateY]);
+    scale.value = withTiming(SCALE_REST, { duration: RISE_DURATION, easing: Easing.out(Easing.cubic) });
+    labelOpacity.value = withTiming(1, { duration: RISE_DURATION });
+  }, [blockTranslateY, scale, labelOpacity]);
 
   const play = useCallback(() => {
     rotate.value = withTiming(SPIN_TURNS * 360 + REST_TILT, {
@@ -62,9 +68,11 @@ export function useAuthIntro() {
   const replay = useCallback(() => {
     fallY.value = FALL_FROM;
     rotate.value = 0;
+    scale.value = SCALE_FALL;
+    labelOpacity.value = 0;
     blockTranslateY.value = OFFSCREEN;
     play();
-  }, [play, fallY, rotate, blockTranslateY]);
+  }, [play, fallY, rotate, scale, labelOpacity, blockTranslateY]);
 
   const onDiceLayout = useCallback(
     (e: LayoutChangeEvent) => {
@@ -92,12 +100,20 @@ export function useAuthIntro() {
   });
 
   const diceStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: fallY.value + diceShift.value }, { rotateZ: `${rotate.value}deg` }],
+    transform: [
+      { translateY: fallY.value + diceShift.value },
+      { rotateZ: `${rotate.value}deg` },
+      { scale: scale.value },
+    ],
   }));
 
   const blockStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: blockTranslateY.value }],
   }));
 
-  return { diceStyle, blockStyle, onDiceLayout, onBlockLayout, replay };
+  const labelStyle = useAnimatedStyle(() => ({
+    opacity: labelOpacity.value,
+  }));
+
+  return { diceStyle, blockStyle, labelStyle, onDiceLayout, onBlockLayout, replay };
 }

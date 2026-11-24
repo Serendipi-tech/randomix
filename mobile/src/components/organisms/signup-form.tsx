@@ -1,0 +1,79 @@
+import { StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/atoms/Button';
+import { Input } from '@/components/molecules/Input';
+import { Title } from '@/components/molecules/title';
+import { FormError } from '@/components/molecules/form-error';
+
+type SignupFormProps = {
+  colorScheme: 'light' | 'dark';
+  email: string;
+  onEmailChange: (value: string) => void;
+  username: string;
+  onUsernameChange: (value: string) => void;
+  password: string;
+  onPasswordChange: (value: string) => void;
+  confirmPassword: string;
+  onConfirmPasswordChange: (value: string) => void;
+  error: string | null;
+  loading: boolean;
+  onSubmit: () => void;
+};
+
+/** Contenuto della bottomsheet di registrazione: credenziali + submit. */
+export function SignupForm({
+  colorScheme,
+  email,
+  onEmailChange,
+  username,
+  onUsernameChange,
+  password,
+  onPasswordChange,
+  confirmPassword,
+  onConfirmPasswordChange,
+  error,
+  loading,
+  onSubmit,
+}: SignupFormProps) {
+  const { t } = useTranslation('auth');
+
+  return (
+    <View style={styles.form}>
+      <Title variant="lead-accent" lead={t('register.headline')} accent={t('register.brand')} colorScheme={colorScheme} />
+
+      <Input
+        placeholder={t('register.emailPlaceholder')}
+        autoCapitalize="none"
+        keyboardType="email-address"
+        value={email}
+        onChangeText={onEmailChange}
+      />
+      <Input
+        placeholder={t('register.usernamePlaceholder')}
+        autoCapitalize="none"
+        value={username}
+        onChangeText={onUsernameChange}
+      />
+      <Input variant="password"
+        placeholder={t('register.passwordPlaceholder')}
+        value={password}
+        onChangeText={onPasswordChange}
+        showStrength
+      />
+      <Input variant="password"
+        placeholder={t('register.confirmPasswordPlaceholder')}
+        value={confirmPassword}
+        onChangeText={onConfirmPasswordChange}
+        showStrength={false}
+      />
+
+      {error && <FormError message={error} />}
+
+      <Button label={t('register.submit')} onPress={onSubmit} loading={loading} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  form: { gap: 6 },
+});
