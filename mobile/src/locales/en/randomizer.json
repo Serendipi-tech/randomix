@@ -5,13 +5,15 @@
     "numbers": "Numbers",
     "letters": "Letters",
     "colors": "Colors",
-    "dice": "Dice"
+    "dice": "Dice",
+    "bottle": "Bottle"
   },
   "hints": {
     "numbers": "From 1 to 100, no repeats",
     "letters": "A to Z, no repeats",
     "colors": "Up to 100",
-    "dice": "2 to 120 sides"
+    "dice": "2 to 120 sides",
+    "bottle": "Spin for a name"
   },
   "fields": {
     "range": "Range",
@@ -31,5 +33,14 @@
     "accept": "Accept",
     "accepted": "Accepted!",
     "backToList": "Back to list"
+  },
+  "bottle": {
+    "withNames": "With names",
+    "spinOnly": "Spin only",
+    "namePlaceholder": "Name",
+    "addName": "Add name",
+    "spin": "Spin",
+    "winner": "It's your turn",
+    "minNames": "Add at least 2 names."
   }
 }

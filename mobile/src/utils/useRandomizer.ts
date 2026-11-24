@@ -45,11 +45,18 @@ export function useRandomizer() {
     return data?.rollDice ?? [];
   };
 
+  // Estrae l'indice vincente fra `count` partecipanti (usata dalla bottiglia con nomi)
+  const drawWinnerIndex = async (count: number) => {
+    const [winner] = await generateNumbers(0, count - 1, 1);
+    return winner ?? 0;
+  };
+
   return {
     generateNumbers,
     generateLetters,
     generateColors,
     generateDice,
+    drawWinnerIndex,
     loading:
       numbersState.loading || lettersState.loading || colorsState.loading || diceState.loading,
     error:

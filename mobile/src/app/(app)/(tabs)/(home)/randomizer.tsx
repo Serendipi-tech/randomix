@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dices, Hash, Palette, Shuffle, Sparkles, Type } from 'lucide-react-native';
+import { Dices, Hash, Palette, Shuffle, Sparkles, Type, Wine } from 'lucide-react-native';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
@@ -18,9 +18,13 @@ import { LetterResults } from '@/components/randomizer/LetterResults';
 import { ColorResults } from '@/components/randomizer/ColorResults';
 import { DiceResults } from '@/components/randomizer/DiceResults';
 import { CustomFacesSheet } from '@/components/randomizer/CustomFacesSheet';
+import { BottleNamesInput } from '@/components/randomizer/BottleNamesInput';
+import { BottleSpinner, BOTTLE_SPIN_DURATION } from '@/components/randomizer/BottleSpinner';
+import { SegmentedControl } from '@/components/atoms/SegmentedControl';
 import { useRandomizer } from '@/utils/useRandomizer';
 
-type Mode = 'numbers' | 'letters' | 'colors' | 'dice';
+type Mode = 'numbers' | 'letters' | 'colors' | 'dice' | 'bottle';
+type BottleVariant = 'names' | 'spin';
 
 const COMMON_FACES = [4, 6, 8, 10, 12, 20];
 const DEFAULT_CUSTOM_FACES = 7;
@@ -31,7 +35,7 @@ export default function RandomizerScreen() {
   const colors = Colors[colorScheme];
   const router = useRouter();
 
-  const { generateNumbers, generateLetters, generateColors, generateDice, loading, error } =
+  const { generateNumbers, generateLetters, generateColors, generateDice, drawWinnerIndex, loading, error } =
     useRandomizer();
 
   const [mode, setMode] = useState<Mode | null>(null);
@@ -44,12 +48,29 @@ export default function RandomizerScreen() {
   const [localError, setLocalError] = useState<string | null>(null);
   const [facesSheetOpen, setFacesSheetOpen] = useState(false);
 
+  const [bottleVariant, setBottleVariant] = useState<BottleVariant>('names');
+  const [names, setNames] = useState(['', '']);
+  const [winnerIndex, setWinnerIndex] = useState<number | null>(null);
+  // Cambia a ogni giro per far ripartire l'animazione della bottiglia
+  const [spinKey, setSpinKey] = useState(0);
+  // Tiene il bottone occupato per tutta la durata del giro, non solo della query
+  const [spinBusy, setSpinBusy] = useState(false);
+
+  const withNames = bottleVariant === 'names';
+
   const numberMaxCount = Math.min(100, Math.max(1, max - min + 1));
+
+  const resetBottle = () => {
+    setWinnerIndex(null);
+    setSpinKey(0);
+    setSpinBusy(false);
+  };
 
   const openMode = (next: string) => {
     setMode(next as Mode);
     setResults([]);
     setLocalError(null);
+    resetBottle();
   };
 
   const goBack = () => {
@@ -57,6 +78,7 @@ export default function RandomizerScreen() {
       setMode(null);
       setResults([]);
       setLocalError(null);
+      resetBottle();
     } else {
       router.back();
     }
@@ -77,10 +99,31 @@ export default function RandomizerScreen() {
         setResults(await generateColors(count));
       } else if (mode === 'dice') {
         setResults((await generateDice(diceCount, faces)).map(String));
+      } else if (mode === 'bottle') {
+        await spinBottle();
       }
     } catch (e) {
       setLocalError((e as Error).message);
     }
+  };
+
+  /** Con i nomi estrae prima il vincitore e poi fa fermare lì la bottiglia; in "solo spin"
+   *  il giro è puramente visivo e non consuma una query. */
+  const spinBottle = async () => {
+    if (withNames) {
+      const trimmed = names.map((n) => n.trim()).filter(Boolean);
+      if (trimmed.length < 2) {
+        setLocalError(t('bottle.minNames'));
+        return;
+      }
+      setWinnerIndex(await drawWinnerIndex(trimmed.length));
+    } else {
+      setWinnerIndex(null);
+    }
+
+    setSpinKey((k) => k + 1);
+    setSpinBusy(true);
+    setTimeout(() => setSpinBusy(false), BOTTLE_SPIN_DURATION);
   };
 
   const displayError = localError ?? error?.message ?? null;
@@ -90,6 +133,7 @@ export default function RandomizerScreen() {
     { key: 'letters', icon: Type, label: t('modes.letters'), hint: t('hints.letters'), tint: colors.extraColors.six },
     { key: 'colors', icon: Palette, label: t('modes.colors'), hint: t('hints.colors'), tint: colors.extraColors.eight },
     { key: 'dice', icon: Dices, label: t('modes.dice'), hint: t('hints.dice'), tint: colors.secondary },
+    { key: 'bottle', icon: Wine, label: t('modes.bottle'), hint: t('hints.bottle'), tint: colors.warning },
   ];
 
   return (
@@ -155,9 +199,48 @@ export default function RandomizerScreen() {
           </>
         )}
 
+        {mode === 'bottle' && (
+          <View style={styles.panel}>
+            <SegmentedControl
+              options={[
+                { value: 'names', label: t('bottle.withNames'), activeColor: colors.warning },
+                { value: 'spin', label: t('bottle.spinOnly'), activeColor: colors.warning },
+              ]}
+              value={bottleVariant}
+              onChange={setBottleVariant}
+            />
+            {withNames && (
+              <BottleNamesInput
+                names={names}
+                onChange={setNames}
+                addLabel={t('bottle.addName')}
+                namePlaceholder={t('bottle.namePlaceholder')}
+              />
+            )}
+          </View>
+        )}
+
         {mode && displayError && <Text style={[styles.error, { color: colors.error }]}>{displayError}</Text>}
 
-        {mode && <Button label={t('generate')} onPress={generate} loading={loading} icon={Sparkles} />}
+        {mode && (
+          <Button
+            label={mode === 'bottle' ? t('bottle.spin') : t('generate')}
+            onPress={generate}
+            loading={mode === 'bottle' ? spinBusy || loading : loading}
+            icon={Sparkles}
+          />
+        )}
+
+        {mode === 'bottle' && spinKey > 0 && (
+          <View style={styles.resultArea}>
+            <BottleSpinner
+              names={withNames ? names.map((n) => n.trim()).filter(Boolean) : []}
+              winnerIndex={winnerIndex}
+              spinKey={spinKey}
+              winnerLabel={t('bottle.winner')}
+            />
+          </View>
+        )}
 
         {mode && results.length > 0 && (
           <View style={styles.resultArea}>
