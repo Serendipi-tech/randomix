@@ -1,5 +1,7 @@
-import type { Friendship, List, User } from '../../../prisma/generated/prisma/client';
-import { builder } from '../../builder';
+import type { Category, Friendship, List, User, User_Item } from '../../../prisma/generated/prisma/client';
+import { builder, prisma } from '../../builder';
+import { StatusCompletionEnum } from '../../enum';
+import { CategoryRef } from '../category/index';
 
 // Profilo pubblico di un altro utente: mai esporre email o campi sensibili
 export const PublicUserRef = builder.objectRef<User>('PublicUser');
@@ -43,7 +45,22 @@ UserSearchResultRef.implement({
   }),
 });
 
-// Lista visibile di un amico: solo i campi pubblici, niente items
+// Item di una lista di un amico: sola lettura, stessa forma usata altrove per mostrare un item (nome, categoria, stato, nota)
+type FriendListItemShape = User_Item & { category: Category };
+
+export const FriendListItemRef = builder.objectRef<FriendListItemShape>('FriendListItem');
+
+FriendListItemRef.implement({
+  fields: (t) => ({
+    id: t.exposeID('id'),
+    name: t.exposeString('name'),
+    note: t.exposeString('note', { nullable: true }),
+    status: t.field({ type: StatusCompletionEnum, resolve: (parent) => parent.status }),
+    category: t.field({ type: CategoryRef, resolve: (parent) => parent.category }),
+  }),
+});
+
+// Lista visibile di un amico: campi pubblici + items (filtrati isHidden:false sia a livello di lista, a monte, sia di singolo item qui)
 type FriendListShape = List & { _count: { items: number } };
 
 export const FriendListRef = builder.objectRef<FriendListShape>('FriendList');
@@ -56,6 +73,16 @@ FriendListRef.implement({
     color: t.exposeString('color'),
     description: t.exposeString('description', { nullable: true }),
     itemCount: t.int({ resolve: (parent) => parent._count.items }),
+    items: t.field({
+      type: [FriendListItemRef],
+      resolve: async (parent) => {
+        const rows = await prisma.list_UserItem.findMany({
+          where: { listId: parent.id, userItem: { isHidden: false } },
+          include: { userItem: { include: { category: true } } },
+        });
+        return rows.map((row) => row.userItem);
+      },
+    }),
   }),
 });
 
