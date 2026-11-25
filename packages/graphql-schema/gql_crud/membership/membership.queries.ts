@@ -15,6 +15,7 @@ const MEMBERSHIP_FIELDS = `
   maxGroupsJoinable
   showAds
   supportPriority
+  endDate
 `;
 
 export const MEMBERSHIP_PLANS: DocumentNode = parse(`

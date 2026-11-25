@@ -22,6 +22,7 @@ interface MembershipData {
   maxGroupsJoinable: number | null;
   showAds: boolean | null;
   supportPriority: SupportPriority | null;
+  endDate: string | null;
 }
 
 interface MembershipPlansQuery {
@@ -38,6 +39,7 @@ export interface MembershipPlanCard {
   priceLabel: string;
   limitsSummary: string;
   isCurrent: boolean;
+  endDateLabel: string | null;
 }
 
 export function useMembershipPlans() {
@@ -64,6 +66,7 @@ export function useMembershipPlans() {
     priceLabel: formatPrice(membership, t),
     limitsSummary: formatLimitsSummary(membership, t),
     isCurrent: membership.plan === currentPlan,
+    endDateLabel: membership.endDate == null ? null : formatEndDateLabel(membership.endDate, t),
   }));
 
   return {
@@ -79,6 +82,11 @@ function formatPrice(membership: MembershipData, t: (key: string) => string): st
   }
   const billingSuffix = t(`settings.payments.plans.billing.${membership.billing}`);
   return `${membership.price} ${membership.currency} ${billingSuffix}`;
+}
+
+function formatEndDateLabel(endDate: string, t: (key: string, opts?: Record<string, unknown>) => string): string {
+  const date = new Date(endDate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+  return t('settings.payments.plans.endDateLabel', { date });
 }
 
 function formatLimitsSummary(membership: MembershipData, t: (key: string, opts?: Record<string, unknown>) => string): string {

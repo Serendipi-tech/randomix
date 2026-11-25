@@ -14,6 +14,7 @@ import { Badge } from '@/components/atoms/Badge';
 import { FormError } from '@/components/molecules/form-error';
 import { CardShell } from '@/components/cards/CardShell';
 import { BottomSheet } from '@/components/organisms/BottomSheet';
+import { Collapsible } from '@/components/ui/collapsible';
 import { useProfile } from '@/utils/useProfile';
 import { useEmailChange } from '@/utils/useEmailChange';
 import { useChangePassword } from '@/utils/useChangePassword';
@@ -104,86 +105,89 @@ export default function SettingsScreen() {
       <RadialBackground colorScheme={colorScheme} />
       <PageHeader icon={SettingsIcon} title={t('settings.title')} onBack={() => router.back()} />
       <View style={styles.content}>
-        <CardShell backgroundColor={colors.foreground} borderColor={colors.border}>
-          <View style={styles.section}>
-            <Text style={[styles.heading, { color: colors.textColor }]}>{t('settings.email.heading')}</Text>
-            <View style={styles.currentRow}>
-              <Text style={[styles.currentLabel, { color: colors.textColor }]}>{t('settings.email.current')}</Text>
-              <Text style={[styles.currentValue, { color: colors.textColor }]}>{profile?.email}</Text>
-            </View>
-            {!otpSent ? (
-              <Input
-                placeholder={t('settings.email.newPlaceholder')}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                value={newEmail}
-                onChangeText={setNewEmail}
-              />
-            ) : (
-              <Input
-                placeholder={t('settings.email.otpPlaceholder')}
-                keyboardType="number-pad"
-                maxLength={6}
-                value={otp}
-                onChangeText={setOtp}
-              />
-            )}
-            {emailErrorMessage && <FormError message={emailErrorMessage} />}
-            {!otpSent ? (
-              <Button
-                label={t('settings.email.sendCode')}
-                onPress={sendCode}
-                loading={emailLoading}
-                disabled={newEmail.trim().length === 0}
-              />
-            ) : (
-              <>
-                <Button
-                  label={t('settings.email.confirm')}
-                  onPress={confirmEmail}
-                  loading={emailLoading}
-                  disabled={otp.trim().length === 0}
+        <Collapsible title={t('settings.email.heading')}>
+          <CardShell backgroundColor={colors.foreground} borderColor={colors.border}>
+            <View style={styles.section}>
+              <Text style={[styles.currentLabel, { color: colors.textColor }]}>{t('settings.email.flowExplanation')}</Text>
+              <View style={styles.currentRow}>
+                <Text style={[styles.currentLabel, { color: colors.textColor }]}>{t('settings.email.current')}</Text>
+                <Text style={[styles.currentValue, { color: colors.textColor }]}>{profile?.email}</Text>
+              </View>
+              {!otpSent ? (
+                <Input
+                  placeholder={t('settings.email.newPlaceholder')}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  value={newEmail}
+                  onChangeText={setNewEmail}
                 />
-                <Button variant="secondary" label={t('cancel')} onPress={editEmail} disabled={emailLoading} />
-              </>
-            )}
-          </View>
-        </CardShell>
+              ) : (
+                <Input
+                  placeholder={t('settings.email.otpPlaceholder')}
+                  keyboardType="number-pad"
+                  maxLength={6}
+                  value={otp}
+                  onChangeText={setOtp}
+                />
+              )}
+              {emailErrorMessage && <FormError message={emailErrorMessage} />}
+              {!otpSent ? (
+                <Button
+                  label={t('settings.email.sendCode')}
+                  onPress={sendCode}
+                  loading={emailLoading}
+                  disabled={newEmail.trim().length === 0}
+                />
+              ) : (
+                <>
+                  <Button
+                    label={t('settings.email.confirm')}
+                    onPress={confirmEmail}
+                    loading={emailLoading}
+                    disabled={otp.trim().length === 0}
+                  />
+                  <Button variant="secondary" label={t('cancel')} onPress={editEmail} disabled={emailLoading} />
+                </>
+              )}
+            </View>
+          </CardShell>
+        </Collapsible>
 
-        <CardShell backgroundColor={colors.foreground} borderColor={colors.border}>
-          <View style={styles.section}>
-            <Text style={[styles.heading, { color: colors.textColor }]}>{t('settings.password.heading')}</Text>
-            <Input
-              variant="password"
-              placeholder={t('settings.password.oldPlaceholder')}
-              value={oldPassword}
-              onChangeText={setOldPassword}
-              showStrength={false}
-            />
-            <Input
-              variant="password"
-              placeholder={t('settings.password.newPlaceholder')}
-              value={newPassword}
-              onChangeText={setNewPassword}
-            />
-            <Input
-              variant="password"
-              placeholder={t('settings.password.confirmPlaceholder')}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              showStrength={false}
-            />
-            {passwordErrorMessage && <FormError message={passwordErrorMessage} />}
-            <Button
-              label={t('settings.password.submit')}
-              onPress={submitPassword}
-              loading={passwordLoading}
-              disabled={!oldPassword || !newPassword || !confirmPassword}
-            />
-          </View>
-        </CardShell>
+        <Collapsible title={t('settings.password.heading')}>
+          <CardShell backgroundColor={colors.foreground} borderColor={colors.border}>
+            <View style={styles.section}>
+              <Input
+                variant="password"
+                placeholder={t('settings.password.oldPlaceholder')}
+                value={oldPassword}
+                onChangeText={setOldPassword}
+                showStrength={false}
+              />
+              <Input
+                variant="password"
+                placeholder={t('settings.password.newPlaceholder')}
+                value={newPassword}
+                onChangeText={setNewPassword}
+              />
+              <Input
+                variant="password"
+                placeholder={t('settings.password.confirmPlaceholder')}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                showStrength={false}
+              />
+              {passwordErrorMessage && <FormError message={passwordErrorMessage} />}
+              <Button
+                label={t('settings.password.submit')}
+                onPress={submitPassword}
+                loading={passwordLoading}
+                disabled={!oldPassword || !newPassword || !confirmPassword}
+              />
+            </View>
+          </CardShell>
+        </Collapsible>
 
-        <CardShell backgroundColor={colors.foreground} borderColor={colors.border}>
+        <CardShell backgroundColor={colors.foreground} borderColor={colors.accent}>
           <View style={styles.section}>
             <Text style={[styles.heading, { color: colors.textColor }]}>{t('settings.payments.heading')}</Text>
             <Text style={[styles.currentLabel, { color: colors.textColor }]}>{t('settings.payments.description')}</Text>
@@ -205,14 +209,17 @@ export default function SettingsScreen() {
           )}
           {plansError && <FormError message={t('settings.payments.plans.error')} />}
           {plans.map((plan) => (
-            <CardShell key={plan.id} backgroundColor={colors.foreground} borderColor={colors.border}>
+            <CardShell key={plan.id} backgroundColor={colors.foreground} borderColor={colors.accent}>
               <View style={styles.section}>
                 <View style={styles.planHeaderRow}>
                   <Text style={[styles.heading, { color: colors.textColor }]}>{plan.planLabel}</Text>
-                  {plan.isCurrent && <Badge label={t('settings.payments.plans.yourPlan')} color={colors.primary} />}
+                  {plan.isCurrent && <Badge label={t('settings.payments.plans.yourPlan')} color={colors.accent} />}
                 </View>
                 <Text style={[styles.currentValue, { color: colors.textColor }]}>{plan.priceLabel}</Text>
                 <Text style={[styles.currentLabel, { color: colors.textColor }]}>{plan.limitsSummary}</Text>
+                {plan.isCurrent && plan.endDateLabel && (
+                  <Text style={[styles.currentLabel, { color: colors.textColor }]}>{plan.endDateLabel}</Text>
+                )}
                 {!plan.isCurrent && (
                   <Button
                     variant="secondary"

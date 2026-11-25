@@ -65,5 +65,20 @@ export const MembershipRef = builder.prismaObject('Membership', {
     activeSubscriptionsCount: t.int({
       resolve: (m) => prisma.subscription.count({ where: { membershipId: m.id, status: 'ACTIVE' } }),
     }),
+    // Scadenza della subscription ATTIVA dell'utente corrente per questo piano (null se il piano
+    // non è il suo, o se non prevede scadenza).
+    endDate: t.field({
+      type: 'DateTime',
+      nullable: true,
+      resolve: async (m, _args, ctx) => {
+        if (!ctx.userId) return null;
+        const subscription = await prisma.subscription.findFirst({
+          where: { membershipId: m.id, userId: ctx.userId, status: 'ACTIVE' },
+          orderBy: { startDate: 'desc' },
+          select: { endDate: true },
+        });
+        return subscription?.endDate ?? null;
+      },
+    }),
   }),
 });
