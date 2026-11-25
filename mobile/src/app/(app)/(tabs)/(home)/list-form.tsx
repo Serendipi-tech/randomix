@@ -1,6 +1,7 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ApolloError } from '@apollo/client';
 import { List, Pencil } from 'lucide-react-native';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,6 +14,7 @@ import { Switch } from '@/components/atoms/Switch';
 import { Input } from '@/components/molecules/Input';
 import { PageHeader } from '@/components/molecules/PageHeader';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
+import { BottomSheet } from '@/components/organisms/BottomSheet';
 import { IconPickerSheet } from '@/components/organisms/IconPickerSheet';
 import { ColorPickerSheet } from '@/components/organisms/ColorPickerSheet';
 import { ListCategoryPickerSheet } from '@/components/organisms/ListCategoryPickerSheet';
@@ -52,6 +54,7 @@ export default function ListFormScreen() {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [showLimitReachedSheet, setShowLimitReachedSheet] = useState(false);
 
   const initialSnapshotRef = useRef<{
     name: string;
@@ -164,8 +167,19 @@ export default function ListFormScreen() {
       }
       router.back();
     } catch (e) {
+      // LIMIT_REACHED va mostrato con una sheet dedicata verso i piani, non come testo d'errore generico
+      const code = e instanceof ApolloError ? (e.graphQLErrors[0]?.extensions?.code as string | undefined) : undefined;
+      if (code === 'LIMIT_REACHED') {
+        setShowLimitReachedSheet(true);
+        return;
+      }
       setLocalError((e as Error).message);
     }
+  };
+
+  const goToPlans = () => {
+    setShowLimitReachedSheet(false);
+    router.push('/settings');
   };
 
   const handleDeleteConfirmed = async () => {
@@ -318,6 +332,14 @@ export default function ListFormScreen() {
         searchPlaceholder={t('form.categorySearch')}
         emptyLabel={t('form.categoryEmpty')}
       />
+
+      <BottomSheet visible={showLimitReachedSheet} onClose={() => setShowLimitReachedSheet(false)}>
+        <View style={styles.limitSheetContent}>
+          <Text style={[styles.limitSheetTitle, { color: colors.textColor }]}>{t('form.limitReached.title')}</Text>
+          <Text style={[styles.limitSheetMessage, { color: colors.disabled }]}>{t('form.limitReached.message')}</Text>
+          <Button variant="primary" label={t('form.limitReached.cta')} onPress={goToPlans} />
+        </View>
+      </BottomSheet>
     </SafeAreaView>
   );
 }
@@ -366,5 +388,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.light.error,
     textAlign: 'center',
+  },
+  limitSheetContent: {
+    paddingHorizontal: Spacing.four,
+    paddingBottom: Spacing.four,
+    gap: Spacing.two,
+  },
+  limitSheetTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  limitSheetMessage: {
+    fontSize: 15,
+    marginBottom: Spacing.two,
   },
 });
