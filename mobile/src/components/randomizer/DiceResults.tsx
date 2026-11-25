@@ -13,6 +13,8 @@ import { Colors } from '@/constants/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { DiceFace } from '@/components/randomizer/DiceFace';
 
+const TUMBLE_DURATION = 850;
+
 type DiceResultsProps = {
   values: string[];
   faces: number;
@@ -30,7 +32,12 @@ export function DiceResults({ values, faces, totalLabel }: DiceResultsProps) {
     <View style={styles.wrap}>
       <View style={styles.row}>
         {values.map((value, i) => (
-          <TumblingDie key={`${value}-${i}`} value={Number(value)} faces={faces} delay={i * 70} />
+          <TumblingDie
+            key={`${value}-${i}`}
+            value={Number(value)}
+            faces={faces}
+            delay={i * TUMBLE_DURATION}
+          />
         ))}
       </View>
       {values.length > 1 && (
@@ -46,7 +53,10 @@ function TumblingDie({ value, faces, delay }: { value: number; faces: number; de
   const progress = useSharedValue(0);
 
   useEffect(() => {
-    progress.value = withDelay(delay, withTiming(1, { duration: 850, easing: Easing.out(Easing.cubic) }));
+    progress.value = withDelay(
+      delay,
+      withTiming(1, { duration: TUMBLE_DURATION, easing: Easing.out(Easing.cubic) }),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps -- sola animazione d'ingresso, nessun valore reattivo da risincronizzare
   }, []);
 
@@ -57,6 +67,8 @@ function TumblingDie({ value, faces, delay }: { value: number; faces: number; de
     const rotateZ = interpolate(progress.value, stops, [0, 50, -15, 0], Extrapolation.CLAMP);
     const scale = interpolate(progress.value, stops, [1, 1.1, 0.94, 1], Extrapolation.CLAMP);
     return {
+      // finché non tocca a lui il dado non esiste a schermo: progress resta 0 per tutta l'attesa
+      opacity: progress.value > 0 ? 1 : 0,
       transform: [
         { perspective: 800 },
         { rotateX: `${rotateX}deg` },

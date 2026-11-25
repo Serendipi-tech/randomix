@@ -1,55 +1,32 @@
-import { useLazyQuery } from '@apollo/client';
-import { RandomizerQueries } from '@randomix/graphql-schema';
+import {
+  randomColors,
+  randomInt,
+  randomLetters,
+  randomNumbers,
+  rollDice,
+} from './random';
 
-const { RANDOM_NUMBERS, RANDOM_LETTERS, RANDOM_COLORS, ROLL_DICE } = RandomizerQueries;
-
-interface RandomNumbersQuery {
-  randomNumbers: number[];
-}
-interface RandomLettersQuery {
-  randomLetters: string[];
-}
-interface RandomColorsQuery {
-  randomColors: string[];
-}
-interface RollDiceQuery {
-  rollDice: number[];
-}
-
-// ogni estrazione deve essere nuova: mai servire risultati dalla cache
-const OPTIONS = { fetchPolicy: 'network-only' } as const;
-
+/**
+ * Estrazioni del randomizzatore, calcolate sul dispositivo: sono risultati usa e getta, non
+ * vengono salvati e non devono valere per altri utenti, quindi non passano dal backend (niente
+ * latenza, niente obbligo di connessione). Le estrazioni condivise o legate alle liste restano
+ * lato server, nelle loro mutation.
+ *
+ * Le funzioni restano async: i chiamanti le attendono e cosi' la firma non cambia se in futuro
+ * una modalita' dovesse tornare al server.
+ */
 export function useRandomizer() {
-  const [runNumbers, numbersState] = useLazyQuery<RandomNumbersQuery>(RANDOM_NUMBERS, OPTIONS);
-  const [runLetters, lettersState] = useLazyQuery<RandomLettersQuery>(RANDOM_LETTERS, OPTIONS);
-  const [runColors, colorsState] = useLazyQuery<RandomColorsQuery>(RANDOM_COLORS, OPTIONS);
-  const [runDice, diceState] = useLazyQuery<RollDiceQuery>(ROLL_DICE, OPTIONS);
+  const generateNumbers = async (min: number, max: number, count: number, allowRepeats = false) =>
+    randomNumbers(min, max, count, allowRepeats);
 
-  const generateNumbers = async (min: number, max: number, count: number) => {
-    const { data } = await runNumbers({ variables: { min, max, count } });
-    return data?.randomNumbers ?? [];
-  };
+  const generateLetters = async (count: number) => randomLetters(count);
 
-  const generateLetters = async (count: number) => {
-    const { data } = await runLetters({ variables: { count } });
-    return data?.randomLetters ?? [];
-  };
+  const generateColors = async (count: number) => randomColors(count);
 
-  const generateColors = async (count: number) => {
-    const { data } = await runColors({ variables: { count } });
-    return data?.randomColors ?? [];
-  };
+  const generateDice = async (count: number, faces: number) => rollDice(count, faces);
 
-  const generateDice = async (count: number, faces: number) => {
-    const { data } = await runDice({ variables: { count, faces } });
-    return data?.rollDice ?? [];
-  };
-
-  // Estrae l'indice vincente fra `count` partecipanti (usata dalla bottiglia con nomi)
-  const drawWinnerIndex = async (count: number) => {
-    const [winner] = await generateNumbers(0, count - 1, 1);
-    return winner ?? 0;
-  };
+  // Indice vincente fra `count` partecipanti (usata dalla bottiglia con nomi)
+  const drawWinnerIndex = async (count: number) => randomInt(0, count - 1);
 
   return {
     generateNumbers,
@@ -57,9 +34,7 @@ export function useRandomizer() {
     generateColors,
     generateDice,
     drawWinnerIndex,
-    loading:
-      numbersState.loading || lettersState.loading || colorsState.loading || diceState.loading,
-    error:
-      numbersState.error ?? lettersState.error ?? colorsState.error ?? diceState.error ?? null,
+    loading: false,
+    error: null as Error | null,
   };
 }

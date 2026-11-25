@@ -1,7 +1,13 @@
 import { ApolloProvider } from '@apollo/client';
+import {
+  Nunito_400Regular,
+  Nunito_600SemiBold,
+  Nunito_800ExtraBold,
+  useFonts,
+} from '@expo-google-fonts/nunito';
 import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { apolloClient } from '@/lib/apollo';
@@ -16,6 +22,8 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const router = useRouter();
+  const [fontsLoaded] = useFonts({ Nunito_400Regular, Nunito_600SemiBold, Nunito_800ExtraBold });
+  const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -23,18 +31,23 @@ export default function RootLayout() {
         const token = await tokenStorage.init();
 
         if (!token) {
-          router.replace('/(auth)/login');
+          router.replace('/(auth)/onboarding');
           return;
         }
 
         router.replace('/(app)/(tabs)/(home)');
       } finally {
-        SplashScreen.hideAsync();
+        setAuthReady(true);
       }
     };
 
     init();
   }, []);
+
+  // Lo splash resta finché auth e font non sono pronti: così nessuna schermata appare con il font di fallback
+  useEffect(() => {
+    if (authReady && fontsLoaded) SplashScreen.hideAsync();
+  }, [authReady, fontsLoaded]);
 
   return (
     <ApolloProvider client={apolloClient}>

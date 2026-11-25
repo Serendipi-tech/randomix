@@ -1,15 +1,12 @@
 import type { ComponentType } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Colors, Spacing } from '@/constants/theme';
-import { hexToRgba } from '@/utils/color';
-import { useAppTheme } from '@/utils/useAppTheme';
-import { CardShell } from '@/components/cards/CardShell';
+import { StyleSheet, View } from 'react-native';
+import { Spacing } from '@/constants/theme';
+import { TileCard } from '@/components/cards/TileCard';
 
 export type ModeGridItem = {
   key: string;
   icon: ComponentType<{ size?: number; color?: string }>;
   label: string;
-  hint: string;
   tint: string;
 };
 
@@ -18,22 +15,14 @@ type ModeGridProps = {
   onSelect: (key: string) => void;
 };
 
-/** Griglia 2x2 di card selezionabili, una per modalità del randomizzatore. */
+/** Griglia a due colonne delle modalità del randomizzatore. Celle a larghezza fissa e riga
+ *  centrata: l'ultima voce di una riga spaiata resta grande come le altre. */
 export function ModeGrid({ items, onSelect }: ModeGridProps) {
-  const { colorScheme } = useAppTheme();
-  const colors = Colors[colorScheme];
-
   return (
     <View style={styles.grid}>
-      {items.map(({ key, icon: Icon, label, hint, tint }) => (
+      {items.map(({ key, icon, label, tint }) => (
         <View key={key} style={styles.cell}>
-          <CardShell onPress={() => onSelect(key)}>
-            <View style={[styles.iconBadge, { backgroundColor: hexToRgba(tint, 0.2) }]}>
-              <Icon size={20} color={tint} />
-            </View>
-            <Text style={[styles.label, { color: colors.textColor }]}>{label}</Text>
-            <Text style={[styles.hint, { color: colors.textColor }]}>{hint}</Text>
-          </CardShell>
+          <TileCard icon={icon} label={label} color={tint} onPress={() => onSelect(key)} />
         </View>
       ))}
     </View>
@@ -44,29 +33,10 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'center',
     gap: Spacing.two,
   },
   cell: {
     width: '47%',
-    flexGrow: 1,
-  },
-  iconBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 11,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Spacing.two,
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: '700',
-    marginBottom: 2,
-  },
-  // sottotitolo attenuato via opacity sul textColor, mai un grigio a parte (vedi PageHeader.subtitle)
-  hint: {
-    fontSize: 11.5,
-    opacity: 0.55,
-    lineHeight: 15,
   },
 });

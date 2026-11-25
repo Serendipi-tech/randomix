@@ -31,7 +31,9 @@ export function LoginForm({
 
   return (
     <View style={styles.form}>
-      <Title variant="lead-accent" lead={t('login.headline')} accent={t('login.brand')} colorScheme={colorScheme} />
+      <View style={styles.titleZone}>
+        <Title variant="display" lead={t('login.headline')} accent={t('login.brand')} colorScheme={colorScheme} />
+      </View>
 
       <Input
         placeholder={t('login.identifierPlaceholder')}
@@ -55,4 +57,6 @@ export function LoginForm({
 
 const styles = StyleSheet.create({
   form: { gap: 6 },
+  // Il titolo display è grande: senza respiro sotto si incolla al primo input
+  titleZone: { paddingBottom: 20 },
 });
