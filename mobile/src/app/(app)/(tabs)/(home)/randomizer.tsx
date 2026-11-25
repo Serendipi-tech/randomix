@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dices, Hash, Palette, Shuffle, Sparkles, Type, Wine } from 'lucide-react-native';
+import { Coins, Dices, Hash, Palette, Shuffle, Sparkles, Type, Users, Wine } from 'lucide-react-native';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
@@ -9,6 +9,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
 import { Button } from '@/components/atoms/Button';
 import { Chip } from '@/components/atoms/Chip';
+import { SectionLabel } from '@/components/atoms/SectionLabel';
 import { Stepper } from '@/components/atoms/Stepper';
 import { PageHeader } from '@/components/molecules/PageHeader';
 import { ModeGrid, type ModeGridItem } from '@/components/randomizer/ModeGrid';
@@ -18,13 +19,13 @@ import { LetterResults } from '@/components/randomizer/LetterResults';
 import { ColorResults } from '@/components/randomizer/ColorResults';
 import { DiceResults } from '@/components/randomizer/DiceResults';
 import { CustomFacesSheet } from '@/components/randomizer/CustomFacesSheet';
-import { BottleNamesInput } from '@/components/randomizer/BottleNamesInput';
+import { ParticipantsSheet } from '@/components/randomizer/ParticipantsSheet';
 import { BottleSpinner, BOTTLE_SPIN_DURATION } from '@/components/randomizer/BottleSpinner';
-import { SegmentedControl } from '@/components/atoms/SegmentedControl';
+import { CoinResults, type CoinSide } from '@/components/randomizer/CoinResults';
+import { Switch } from '@/components/atoms/Switch';
 import { useRandomizer } from '@/utils/useRandomizer';
 
-type Mode = 'numbers' | 'letters' | 'colors' | 'dice' | 'bottle';
-type BottleVariant = 'names' | 'spin';
+type Mode = 'numbers' | 'letters' | 'colors' | 'dice' | 'bottle' | 'coin';
 
 const COMMON_FACES = [4, 6, 8, 10, 12, 20];
 const DEFAULT_CUSTOM_FACES = 7;
@@ -42,23 +43,32 @@ export default function RandomizerScreen() {
   const [min, setMin] = useState(1);
   const [max, setMax] = useState(100);
   const [count, setCount] = useState(1);
+  const [allowRepeats, setAllowRepeats] = useState(false);
   const [faces, setFaces] = useState(6);
   const [diceCount, setDiceCount] = useState(2);
   const [results, setResults] = useState<string[]>([]);
   const [localError, setLocalError] = useState<string | null>(null);
   const [facesSheetOpen, setFacesSheetOpen] = useState(false);
 
-  const [bottleVariant, setBottleVariant] = useState<BottleVariant>('names');
-  const [names, setNames] = useState(['', '']);
+  const [names, setNames] = useState<string[]>([]);
+  const [participantsSheetOpen, setParticipantsSheetOpen] = useState(false);
   const [winnerIndex, setWinnerIndex] = useState<number | null>(null);
-  // Cambia a ogni giro per far ripartire l'animazione della bottiglia
+  // Cambia a ogni giro per far ripartire l'animazione della bottiglia e della moneta
   const [spinKey, setSpinKey] = useState(0);
   // Tiene il bottone occupato per tutta la durata del giro, non solo della query
   const [spinBusy, setSpinBusy] = useState(false);
 
-  const withNames = bottleVariant === 'names';
+  // Nessun selettore di modalità: senza partecipanti il giro è solo visivo, con due o più si estrae
+  const withNames = names.length > 0;
 
-  const numberMaxCount = Math.min(100, Math.max(1, max - min + 1));
+  // Senza ripetizioni non si possono estrarre più numeri di quanti ne contiene il range
+  const numberMaxCount = allowRepeats ? 100 : Math.min(100, Math.max(1, max - min + 1));
+
+  // Spegnendo le ripetizioni il conteggio può superare il nuovo tetto: lo riporto dentro
+  const onAllowRepeatsChange = (next: boolean) => {
+    setAllowRepeats(next);
+    if (!next) setCount((c) => Math.min(c, Math.min(100, Math.max(1, max - min + 1))));
+  };
 
   const resetBottle = () => {
     setWinnerIndex(null);
@@ -92,7 +102,7 @@ export default function RandomizerScreen() {
           setLocalError(t('invalidInput'));
           return;
         }
-        setResults((await generateNumbers(min, max, count)).map(String));
+        setResults((await generateNumbers(min, max, count, allowRepeats)).map(String));
       } else if (mode === 'letters') {
         setResults(await generateLetters(count));
       } else if (mode === 'colors') {
@@ -101,22 +111,27 @@ export default function RandomizerScreen() {
         setResults((await generateDice(diceCount, faces)).map(String));
       } else if (mode === 'bottle') {
         await spinBottle();
+      } else if (mode === 'coin') {
+        // Una sola estrazione 0/1: 0 = testa, 1 = croce
+        const [drawn] = await generateNumbers(0, 1, 1);
+        const side: CoinSide = drawn === 0 ? 'heads' : 'tails';
+        setResults([side]);
+        setSpinKey((k) => k + 1);
       }
     } catch (e) {
       setLocalError((e as Error).message);
     }
   };
 
-  /** Con i nomi estrae prima il vincitore e poi fa fermare lì la bottiglia; in "solo spin"
-   *  il giro è puramente visivo e non consuma una query. */
+  /** Con i partecipanti estrae prima il vincitore e poi fa fermare lì la bottiglia; senza nomi
+   *  il giro è puramente visivo. */
   const spinBottle = async () => {
     if (withNames) {
-      const trimmed = names.map((n) => n.trim()).filter(Boolean);
-      if (trimmed.length < 2) {
+      if (names.length < 2) {
         setLocalError(t('bottle.minNames'));
         return;
       }
-      setWinnerIndex(await drawWinnerIndex(trimmed.length));
+      setWinnerIndex(await drawWinnerIndex(names.length));
     } else {
       setWinnerIndex(null);
     }
@@ -129,11 +144,12 @@ export default function RandomizerScreen() {
   const displayError = localError ?? error?.message ?? null;
 
   const modeItems: ModeGridItem[] = [
-    { key: 'numbers', icon: Hash, label: t('modes.numbers'), hint: t('hints.numbers'), tint: colors.extraColors.three },
-    { key: 'letters', icon: Type, label: t('modes.letters'), hint: t('hints.letters'), tint: colors.extraColors.six },
-    { key: 'colors', icon: Palette, label: t('modes.colors'), hint: t('hints.colors'), tint: colors.extraColors.eight },
-    { key: 'dice', icon: Dices, label: t('modes.dice'), hint: t('hints.dice'), tint: colors.secondary },
-    { key: 'bottle', icon: Wine, label: t('modes.bottle'), hint: t('hints.bottle'), tint: colors.warning },
+    { key: 'numbers', icon: Hash, label: t('modes.numbers'), tint: colors.extraColors.nine },
+    { key: 'letters', icon: Type, label: t('modes.letters'), tint: colors.extraColors.six },
+    { key: 'colors', icon: Palette, label: t('modes.colors'), tint: colors.extraColors.eight },
+    { key: 'dice', icon: Dices, label: t('modes.dice'), tint: colors.extraColors.four },
+    { key: 'bottle', icon: Wine, label: t('modes.bottle'), tint: colors.extraColors.five },
+    { key: 'coin', icon: Coins, label: t('modes.coin'), tint: colors.extraColors.two },
   ];
 
   return (
@@ -146,7 +162,7 @@ export default function RandomizerScreen() {
         {mode === 'numbers' && (
           <>
             <View style={styles.panel}>
-              <Text style={[styles.fieldLabel, { color: colors.textColor }]}>{t('fields.range')}</Text>
+              <SectionLabel>{t('fields.range')}</SectionLabel>
               <View style={styles.rangeRow}>
                 <View style={styles.rangeItem}>
                   <Stepper value={min} min={-999} max={max - 1} onChange={setMin} />
@@ -157,22 +173,33 @@ export default function RandomizerScreen() {
               </View>
             </View>
             <View style={styles.panel}>
-              <Text style={[styles.fieldLabel, { color: colors.textColor }]}>{t('fields.count')}</Text>
-              <Stepper value={count} min={1} max={numberMaxCount} onChange={setCount} />
+              <SectionLabel>{t('fields.count')}</SectionLabel>
+              {/* Stepper e toggle sulla stessa riga: il toggle cambia il significato del conteggio */}
+              <View style={styles.countRow}>
+                <View style={styles.countItem}>
+                  <Stepper value={count} min={1} max={numberMaxCount} onChange={setCount} />
+                </View>
+                <View style={[styles.countItem, styles.toggleControl]}>
+                  <Text style={[styles.toggleLabel, { color: colors.textColor }]}>
+                    {t('fields.allowRepeats')}
+                  </Text>
+                  <Switch value={allowRepeats} onChange={onAllowRepeatsChange} />
+                </View>
+              </View>
             </View>
           </>
         )}
 
         {mode === 'letters' && (
           <View style={styles.panel}>
-            <Text style={[styles.fieldLabel, { color: colors.textColor }]}>{t('fields.count')}</Text>
+            <SectionLabel>{t('fields.count')}</SectionLabel>
             <Stepper value={count} min={1} max={26} onChange={setCount} />
           </View>
         )}
 
         {mode === 'colors' && (
           <View style={styles.panel}>
-            <Text style={[styles.fieldLabel, { color: colors.textColor }]}>{t('fields.count')}</Text>
+            <SectionLabel>{t('fields.count')}</SectionLabel>
             <Stepper value={count} min={1} max={100} onChange={setCount} />
           </View>
         )}
@@ -180,20 +207,26 @@ export default function RandomizerScreen() {
         {mode === 'dice' && (
           <>
             <View style={styles.panel}>
-              <Text style={[styles.fieldLabel, { color: colors.textColor }]}>{t('fields.diceType')}</Text>
-              <View style={styles.chipRow}>
+              <SectionLabel>{t('fields.diceType')}</SectionLabel>
+              {/* Celle di uguale larghezza, quattro per riga: i chip a contenuto andavano a capo
+                  in modo irregolare perché "other" è molto più largo di "d4" */}
+              <View style={styles.chipGrid}>
                 {COMMON_FACES.map((f) => (
-                  <Chip key={f} label={`d${f}`} selected={faces === f} onPress={() => setFaces(f)} />
+                  <View key={f} style={styles.chipCell}>
+                    <Chip label={`d${f}`} selected={faces === f} onPress={() => setFaces(f)} />
+                  </View>
                 ))}
-                <CustomFacesChip
-                  label={COMMON_FACES.includes(faces) ? t('fields.other') : `d${faces}`}
-                  selected={!COMMON_FACES.includes(faces)}
-                  onPress={() => setFacesSheetOpen(true)}
-                />
+                <View style={styles.chipCellWide}>
+                  <CustomFacesChip
+                    label={COMMON_FACES.includes(faces) ? t('fields.other') : `d${faces}`}
+                    selected={!COMMON_FACES.includes(faces)}
+                    onPress={() => setFacesSheetOpen(true)}
+                  />
+                </View>
               </View>
             </View>
             <View style={styles.panel}>
-              <Text style={[styles.fieldLabel, { color: colors.textColor }]}>{t('fields.diceCount')}</Text>
+              <SectionLabel>{t('fields.diceCount')}</SectionLabel>
               <Stepper value={diceCount} min={1} max={20} onChange={setDiceCount} />
             </View>
           </>
@@ -201,21 +234,14 @@ export default function RandomizerScreen() {
 
         {mode === 'bottle' && (
           <View style={styles.panel}>
-            <SegmentedControl
-              options={[
-                { value: 'names', label: t('bottle.withNames'), activeColor: colors.warning },
-                { value: 'spin', label: t('bottle.spinOnly'), activeColor: colors.warning },
-              ]}
-              value={bottleVariant}
-              onChange={setBottleVariant}
+            <Button
+              variant="secondary"
+              icon={Users}
+              label={withNames ? t('bottle.participantsCount', { count: names.length }) : t('bottle.participants')}
+              onPress={() => setParticipantsSheetOpen(true)}
             />
-            {withNames && (
-              <BottleNamesInput
-                names={names}
-                onChange={setNames}
-                addLabel={t('bottle.addName')}
-                namePlaceholder={t('bottle.namePlaceholder')}
-              />
+            {!withNames && (
+              <Text style={[styles.hint, { color: colors.textColor }]}>{t('bottle.spinOnlyHint')}</Text>
             )}
           </View>
         )}
@@ -224,20 +250,30 @@ export default function RandomizerScreen() {
 
         {mode && (
           <Button
-            label={mode === 'bottle' ? t('bottle.spin') : t('generate')}
+            label={
+              mode === 'bottle' ? t('bottle.spin') : mode === 'coin' ? t('coin.flip') : t('generate')
+            }
             onPress={generate}
             loading={mode === 'bottle' ? spinBusy || loading : loading}
             icon={Sparkles}
           />
         )}
 
-        {mode === 'bottle' && spinKey > 0 && (
+        {mode === 'coin' && (
           <View style={styles.resultArea}>
+            {/* la moneta è a schermo anche prima del primo lancio: flipKey 0 = ferma su testa */}
+            <CoinResults side={(results[0] as CoinSide) ?? 'heads'} flipKey={spinKey} />
+          </View>
+        )}
+
+        {mode === 'bottle' && (
+          <View style={styles.resultArea}>
+            {/* key: ogni lancio rimonta la ruota, che riparte da ferma senza stato da azzerare */}
             <BottleSpinner
-              names={withNames ? names.map((n) => n.trim()).filter(Boolean) : []}
+              key={spinKey}
+              names={names}
               winnerIndex={winnerIndex}
-              spinKey={spinKey}
-              winnerLabel={t('bottle.winner')}
+              spinning={spinKey > 0}
             />
           </View>
         )}
@@ -251,6 +287,19 @@ export default function RandomizerScreen() {
           </View>
         )}
       </ScrollView>
+
+      <ParticipantsSheet
+        visible={participantsSheetOpen}
+        names={names}
+        namePlaceholder={t('bottle.namePlaceholder')}
+        emptyLabel={t('bottle.noParticipants')}
+        onClose={() => setParticipantsSheetOpen(false)}
+        onChange={(next) => {
+          setNames(next);
+          // cambiare i partecipanti invalida il giro precedente
+          resetBottle();
+        }}
+      />
 
       <CustomFacesSheet
         visible={facesSheetOpen}
@@ -271,19 +320,37 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
   },
+  // Niente padding in alto: lo stacco dall'header lo dà già il suo paddingBottom.
+  // flexGrow: il contenuto occupa almeno tutta l'altezza, così l'area risultati può prendersi
+  // lo spazio avanzato e centrarci dentro le celle.
   content: {
-    padding: Spacing.four,
+    flexGrow: 1,
+    paddingHorizontal: Spacing.four,
+    paddingBottom: Spacing.four,
     gap: Spacing.three,
   },
   panel: {
     gap: Spacing.two,
   },
-  fieldLabel: {
-    fontSize: 12,
+  countRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.three,
+  },
+  // Stesse metà del range qui sopra: stepper e toggle occupano la stessa larghezza
+  countItem: {
+    flex: 1,
+  },
+  toggleControl: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.two,
+  },
+  toggleLabel: {
+    fontSize: 14,
     fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    opacity: 0.55,
+    opacity: 0.8,
   },
   rangeRow: {
     flexDirection: 'row',
@@ -292,16 +359,30 @@ const styles = StyleSheet.create({
   rangeItem: {
     flex: 1,
   },
-  chipRow: {
+  chipGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: Spacing.two,
+  },
+  // Quattro per riga: 4 celle al 23% + 3 gap da 8px stanno dentro la larghezza disponibile
+  chipCell: {
+    width: '23%',
+  },
+  // "Other" occupa due celle: 23% + 23% più il gap che le separa
+  chipCellWide: {
+    width: '48%',
+  },
+  hint: {
+    fontSize: 14,
+    opacity: 0.6,
   },
   error: {
     fontSize: 14,
     textAlign: 'center',
   },
   resultArea: {
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
 });

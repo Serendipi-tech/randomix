@@ -133,6 +133,14 @@ export const Fonts = Platform.select({
   },
 });
 
+/** Famiglia tonda caricata da expo-google-fonts in app/_layout.tsx: tono "display" dell'onboarding.
+ *  Usato in: components/organisms/onboarding/onboarding-slides.tsx. */
+export const DisplayFonts = {
+  extraBold: 'Nunito_800ExtraBold',
+  semiBold: 'Nunito_600SemiBold',
+  regular: 'Nunito_400Regular',
+} as const;
+
 export const Spacing = {
   half: 2,
   one: 4,

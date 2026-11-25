@@ -80,7 +80,7 @@ export function useAuth() {
       // il token viene rimosso localmente in ogni caso
     }
     await tokenStorage.clearTokens();
-    router.replace('/(auth)/login');
+    router.replace('/(auth)/onboarding');
   };
 
   return {

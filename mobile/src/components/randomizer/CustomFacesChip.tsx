@@ -40,9 +40,11 @@ const styles = StyleSheet.create({
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 44,
     gap: 5,
     paddingVertical: 7,
-    paddingHorizontal: 14,
+    paddingHorizontal: 10,
     borderRadius: 6,
     borderWidth: 1,
   },

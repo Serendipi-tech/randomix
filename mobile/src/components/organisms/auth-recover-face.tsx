@@ -49,7 +49,7 @@ export function AuthRecoverFace({
   if (step === 'request') {
     return (
       <View style={styles.form}>
-        <Title variant="lead-accent" lead={t('forgotPassword.headline')} accent={t('forgotPassword.brand')} colorScheme={colorScheme} />
+        <Title variant="display" lead={t('forgotPassword.headline')} accent={t('forgotPassword.brand')} colorScheme={colorScheme} />
         <Text style={[styles.tagline, { color: textColor }]}>{t('forgotPassword.tagline')}</Text>
         <Input
           placeholder={t('forgotPassword.emailPlaceholder')}
@@ -78,7 +78,7 @@ export function AuthRecoverFace({
 
   return (
     <View style={styles.form}>
-      <Title variant="lead-accent" lead={t('resetPassword.headline')} accent={t('resetPassword.brand')} colorScheme={colorScheme} />
+      <Title variant="display" lead={t('resetPassword.headline')} accent={t('resetPassword.brand')} colorScheme={colorScheme} />
       <Text style={[styles.tagline, { color: textColor }]}>{t('resetPassword.tagline')}</Text>
       <Input
         placeholder={t('resetPassword.otpPlaceholder')}

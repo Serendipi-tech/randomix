@@ -1,14 +1,28 @@
 import { StyleSheet, Text } from 'react-native';
-import { Colors } from '@/constants/theme';
+import { Colors, DisplayFonts } from '@/constants/theme';
 
 type TitleProps = { colorScheme: 'light' | 'dark' } & (
   | { variant?: 'plain'; text: string }
   | { variant: 'lead-accent'; lead: string; accent: string }
+  | { variant: 'display'; lead: string; accent: string }
 );
 
-/** Titolo riusabile: variante "plain" (una riga) o "lead-accent" (due righe, con parola finale in evidenza). */
+/** Titolo riusabile: "plain" (una riga), "lead-accent" (due righe, parola finale in evidenza)
+ *  o "display" (due righe grandi e inclinate, usato da onboarding e schermate auth). */
 export function Title(props: TitleProps) {
   const textColor = Colors[props.colorScheme].textColor;
+
+  if (props.variant === 'display') {
+    return (
+      <Text style={styles.display}>
+        <Text style={{ color: textColor }}>
+          {props.lead}
+          {'\n'}
+        </Text>
+        <Text style={{ color: Colors[props.colorScheme].secondary }}>{props.accent}</Text>
+      </Text>
+    );
+  }
 
   if (props.variant === 'lead-accent') {
     return (
@@ -34,6 +48,15 @@ const styles = StyleSheet.create({
   },
   plain: {
     fontSize: 20,
+  },
+  // Righe ravvicinate e titolo appena inclinato: stessa identità visiva dell'onboarding
+  display: {
+    fontSize: 38,
+    lineHeight: 38,
+    textAlign: 'center',
+    letterSpacing: -0.4,
+    fontFamily: DisplayFonts.extraBold,
+    transform: [{ rotate: '-2deg' }],
   },
   lead: {
     fontSize: 17,

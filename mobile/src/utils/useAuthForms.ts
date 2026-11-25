@@ -1,94 +1,30 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useAuth } from './useAuth';
-import { getAuthErrorMessage } from './getAuthErrorMessage';
-import { getPasswordStrength } from './passwordStrength';
+import { useLoginForm } from './useLoginForm';
+import { useSignupForm } from './useSignupForm';
 
+/** Adattatore legacy: espone i due form con i nomi usati dalla vecchia schermata unica
+ *  (app/(auth)/_old). La logica vive in useLoginForm/useSignupForm, qui non è duplicata. */
 export function useAuthForms() {
-  const { t } = useTranslation('auth');
-  const { loginWithCredentials, loginWithGoogle, registerWithCredentials, loading } = useAuth();
-
-  const [loginIdentifier, setLoginIdentifier] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [loginError, setLoginError] = useState<string | null>(null);
-
-  const [registerEmail, setRegisterEmail] = useState('');
-  const [registerUsername, setRegisterUsername] = useState('');
-  const [registerPassword, setRegisterPassword] = useState('');
-  const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
-  const [registerError, setRegisterError] = useState<string | null>(null);
-
-  const submitLogin = async () => {
-    setLoginError(null);
-    if (!loginIdentifier.trim() || !loginPassword) {
-      setLoginError(t('login.missingFields'));
-      return;
-    }
-    try {
-      await loginWithCredentials(loginIdentifier.trim(), loginPassword);
-    } catch (e) {
-      setLoginError(getAuthErrorMessage(e, t));
-    }
-  };
-
-  const submitGoogleLogin = async (idToken: string) => {
-    setLoginError(null);
-    try {
-      await loginWithGoogle(idToken);
-    } catch (e) {
-      setLoginError(getAuthErrorMessage(e, t));
-    }
-  };
-
-  const submitRegister = async () => {
-    setRegisterError(null);
-    if (
-      !registerEmail.trim() ||
-      !registerUsername.trim() ||
-      !registerPassword ||
-      !registerConfirmPassword
-    ) {
-      setRegisterError(t('register.missingFields'));
-      return;
-    }
-    if (registerPassword !== registerConfirmPassword) {
-      setRegisterError(t('register.passwordMismatch'));
-      return;
-    }
-    const { rules } = getPasswordStrength(registerPassword);
-    if (!rules.length || !rules.letter || !rules.number || !rules.special) {
-      setRegisterError(t('register.passwordTooShort'));
-      return;
-    }
-    if (registerUsername.trim().length < 3) {
-      setRegisterError(t('register.usernameTooShort'));
-      return;
-    }
-    try {
-      await registerWithCredentials(registerEmail.trim(), registerPassword, registerUsername.trim());
-    } catch (e) {
-      setRegisterError(getAuthErrorMessage(e, t));
-    }
-  };
+  const login = useLoginForm();
+  const register = useSignupForm();
 
   return {
-    loginIdentifier,
-    setLoginIdentifier,
-    loginPassword,
-    setLoginPassword,
-    loginError,
-    submitLogin,
-    submitGoogleLogin,
-    registerEmail,
-    setRegisterEmail,
-    registerUsername,
-    setRegisterUsername,
-    registerPassword,
-    setRegisterPassword,
-    registerConfirmPassword,
-    setRegisterConfirmPassword,
-    registerError,
-    submitRegister,
-    loading,
+    loginIdentifier: login.identifier,
+    setLoginIdentifier: login.setIdentifier,
+    loginPassword: login.password,
+    setLoginPassword: login.setPassword,
+    loginError: login.error,
+    submitLogin: login.submit,
+    submitGoogleLogin: login.submitWithGoogle,
+    registerEmail: register.email,
+    setRegisterEmail: register.setEmail,
+    registerUsername: register.username,
+    setRegisterUsername: register.setUsername,
+    registerPassword: register.password,
+    setRegisterPassword: register.setPassword,
+    registerConfirmPassword: register.confirmPassword,
+    setRegisterConfirmPassword: register.setConfirmPassword,
+    registerError: register.error,
+    submitRegister: register.submit,
+    loading: login.loading || register.loading,
   };
 }

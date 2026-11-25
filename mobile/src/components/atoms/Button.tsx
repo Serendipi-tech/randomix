@@ -196,9 +196,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   label: {
-    fontSize: 16,
+    fontSize: 18,
+    lineHeight: 18,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+    // Il padding del font su Android non è simmetrico e spinge la label qualche px più in basso:
+    // disattivandolo, con lineHeight esplicita, il testo resta centrato su entrambe le piattaforme
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
   pressed: {
     transform: [{ scale: 0.97 }],
