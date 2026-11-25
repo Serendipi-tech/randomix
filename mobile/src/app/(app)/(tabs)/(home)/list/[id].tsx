@@ -151,6 +151,7 @@ export default function ListDetailScreen() {
               <ItemCard
                 title={entry.userItem.name}
                 category={entry.userItem.category.name}
+                categoryIcon={entry.userItem.category.icon}
                 status={t(`status.${entry.userItem.status}`)}
                 statusColor={
                   entry.userItem.status === 'IN_PROGRESS'
@@ -175,6 +176,8 @@ export default function ListDetailScreen() {
                   ratingValue: entry.userItem.rating?.value ?? undefined,
                   ratingNote: entry.userItem.rating?.note ?? undefined,
                   tags: entry.userItem.tags,
+                  isHidden: entry.userItem.isHidden,
+                  onChangeHidden: (isHidden) => updateUserItem(entry.userItem.id, { isHidden }),
                   onChangeStatus: (status) => updateUserItem(entry.userItem.id, { status }),
                   onChangeRating: (value, note) => rateItem(entry.userItem.id, value, note ?? null),
                   onChangeNote: (note) => updateUserItem(entry.userItem.id, { note: note || null }),

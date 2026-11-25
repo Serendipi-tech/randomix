@@ -119,7 +119,8 @@
     "remove": "Remove from list",
     "showLess": "Show less",
     "addTag": "+ Tag",
-    "friendReviews": "Friends' reviews"
+    "friendReviews": "Friends' reviews",
+    "hidden": "Hidden from friends"
   },
   "status": {
     "NOT_STARTED": "Not started",
