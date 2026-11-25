@@ -1,7 +1,21 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import type { ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Coins, Dices, Hash, Palette, Shuffle, Sparkles, Type, Users, Wine } from 'lucide-react-native';
+import {
+  Coins,
+  Dices,
+  Hand,
+  HandFist,
+  Hash,
+  Palette,
+  Scissors,
+  Shuffle,
+  Sparkles,
+  Type,
+  Users,
+  Wine,
+} from 'lucide-react-native';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
@@ -24,11 +38,19 @@ import { BottleSpinner, BOTTLE_SPIN_DURATION } from '@/components/randomizer/Bot
 import { CoinResults, type CoinSide } from '@/components/randomizer/CoinResults';
 import { Switch } from '@/components/atoms/Switch';
 import { useRandomizer } from '@/utils/useRandomizer';
+import type { RockPaperScissorsChoice } from '@/utils/random';
 
-type Mode = 'numbers' | 'letters' | 'colors' | 'dice' | 'bottle' | 'coin';
+type Mode = 'numbers' | 'letters' | 'colors' | 'dice' | 'bottle' | 'coin' | 'rps';
 
 const COMMON_FACES = [4, 6, 8, 10, 12, 20];
 const DEFAULT_CUSTOM_FACES = 7;
+
+// Icona rappresentativa per ogni esito di "Carta Forbice Pietra"
+const RPS_ICONS: Record<RockPaperScissorsChoice, ComponentType<{ size?: number; color?: string }>> = {
+  rock: HandFist,
+  paper: Hand,
+  scissors: Scissors,
+};
 
 export default function RandomizerScreen() {
   const { t } = useTranslation('randomizer');
@@ -36,8 +58,16 @@ export default function RandomizerScreen() {
   const colors = Colors[colorScheme];
   const router = useRouter();
 
-  const { generateNumbers, generateLetters, generateColors, generateDice, drawWinnerIndex, loading, error } =
-    useRandomizer();
+  const {
+    generateNumbers,
+    generateLetters,
+    generateColors,
+    generateDice,
+    drawWinnerIndex,
+    generateRockPaperScissors,
+    loading,
+    error,
+  } = useRandomizer();
 
   const [mode, setMode] = useState<Mode | null>(null);
   const [min, setMin] = useState(1);
@@ -117,6 +147,8 @@ export default function RandomizerScreen() {
         const side: CoinSide = drawn === 0 ? 'heads' : 'tails';
         setResults([side]);
         setSpinKey((k) => k + 1);
+      } else if (mode === 'rps') {
+        setResults([await generateRockPaperScissors()]);
       }
     } catch (e) {
       setLocalError((e as Error).message);
@@ -143,6 +175,9 @@ export default function RandomizerScreen() {
 
   const displayError = localError ?? error?.message ?? null;
 
+  // Esito corrente della modalità "Carta Forbice Pietra", estratto da `results`
+  const rpsChoice = mode === 'rps' ? (results[0] as RockPaperScissorsChoice | undefined) : undefined;
+
   const modeItems: ModeGridItem[] = [
     { key: 'numbers', icon: Hash, label: t('modes.numbers'), tint: colors.extraColors.nine },
     { key: 'letters', icon: Type, label: t('modes.letters'), tint: colors.extraColors.six },
@@ -150,6 +185,7 @@ export default function RandomizerScreen() {
     { key: 'dice', icon: Dices, label: t('modes.dice'), tint: colors.extraColors.four },
     { key: 'bottle', icon: Wine, label: t('modes.bottle'), tint: colors.extraColors.five },
     { key: 'coin', icon: Coins, label: t('modes.coin'), tint: colors.extraColors.two },
+    { key: 'rps', icon: Scissors, label: t('modes.rps'), tint: colors.extraColors.seven },
   ];
 
   return (
@@ -284,6 +320,17 @@ export default function RandomizerScreen() {
             {mode === 'letters' && <LetterResults values={results} />}
             {mode === 'colors' && <ColorResults values={results} />}
             {mode === 'dice' && <DiceResults values={results} faces={faces} totalLabel={t('total')} />}
+            {mode === 'rps' && rpsChoice && (
+              <View style={styles.rpsResult}>
+                {(() => {
+                  const RpsIcon = RPS_ICONS[rpsChoice];
+                  return <RpsIcon size={96} color={colors.textColor} />;
+                })()}
+                <Text style={[styles.rpsLabel, { color: colors.textColor }]}>
+                  {t(`rps.${rpsChoice}`)}
+                </Text>
+              </View>
+            )}
           </View>
         )}
       </ScrollView>
@@ -384,5 +431,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  rpsResult: {
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
+  rpsLabel: {
+    fontSize: 20,
+    fontWeight: '700',
   },
 });
