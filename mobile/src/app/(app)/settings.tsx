@@ -217,6 +217,9 @@ export default function SettingsScreen() {
                 </View>
                 <Text style={[styles.currentValue, { color: colors.textColor }]}>{plan.priceLabel}</Text>
                 <Text style={[styles.currentLabel, { color: colors.textColor }]}>{plan.limitsSummary}</Text>
+                {plan.isCurrent && plan.endDateLabel && (
+                  <Text style={[styles.currentLabel, { color: colors.textColor }]}>{plan.endDateLabel}</Text>
+                )}
                 {!plan.isCurrent && (
                   <Button
                     variant="secondary"

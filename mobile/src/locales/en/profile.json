@@ -63,7 +63,7 @@
     "payments": {
       "heading": "Payments",
       "description": "Subscription plans and billing.",
-      "cta": "Learn more",
+      "cta": "View plans",
       "comingSoon": {
         "title": "Coming soon",
         "subtitle": "Payments and subscription plans aren't available yet."
@@ -73,6 +73,7 @@
         "loading": "Loading plans...",
         "error": "Unable to load plans.",
         "yourPlan": "Your plan",
+        "endDateLabel": "Expires on {{date}}",
         "free": "Free",
         "changeCta": "Coming soon",
         "billing": {
