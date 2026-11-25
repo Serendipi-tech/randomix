@@ -25,6 +25,11 @@
     "nameRequired": "Name is required.",
     "nameTooLong": "Name can't be longer than {{max}} characters.",
     "descriptionTooLong": "Description can't be longer than {{max}} characters.",
+    "limitReached": {
+      "title": "List limit reached",
+      "message": "Your plan doesn't allow any more lists. Upgrade to create more.",
+      "cta": "See plans"
+    },
     "editIcon": "Edit icon",
     "editColor": "Edit color",
     "iconPickerTitle": "Icon",
