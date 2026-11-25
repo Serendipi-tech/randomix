@@ -12,6 +12,12 @@
 > decisione del titolare), T08, T21, T25 (⏸️, rimandati — nessun brief per i tre redesign estetici, per ora) e
 > T03 (⏸️, rimandato — le immagini item, upload e utilizzo, vanno valutate in un'ondata a parte). **T30** nato
 > durante l'ondata 1 (trovato dalla foglia C4 mentre verificava T13), non ancora assegnato a nessuna ondata.
+>
+> **25/11/2026**: aggiunti **T31-T49** dai punti elencati in [`altri-errori.md`](altri-errori.md), **esclusa la
+> sezione Gruppi** (in fase di analisi separata, su richiesta esplicita). Ogni scheda è stata verificata sul
+> codice attuale prima di essere scritta (non trascritta alla lettera dalla wishlist): un punto della wishlist
+> ("categoria lista obbligatoria, con *") risulta **già implementato** (`list-form.tsx`), quindi non ha
+> generato un task nuovo; "randomizzatore della lista da rifare" è lo stesso T08 già presente, nessun duplicato.
 
 ---
 
@@ -115,24 +121,43 @@ a mano quando cambia uno stato) · l'elenco delle schede.
 | T28 | Rimozione amico dalla pagina profilo amico | [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx) | La rimozione esiste solo dalla lista amici, non dal profilo singolo | ✅ | 🟢 | 🟢 | 🟢 |
 | T29 | Decidere se includere i Gruppi nell'MVP | [`group.prisma`](../web/prisma/schema/group.prisma) | Da valutare mole di lavoro residua vs. rimando a post-MVP | ⏸️ | 🟡 | 🟢 | 🟢 |
 | T30 | `myLists` non filtra le liste nascoste | [`group-list/[groupListId].tsx`](../mobile/src/app/(app)/(tabs)/(groups)/group-list/[groupListId].tsx) | Una lista `isHidden` può essere condivisa in un `GroupList` | ✅ | 🟡 | 🟡 | 🟢 |
+| T31 | Statistiche profilo in riga, non in lista | [`profile-stats-panel.tsx`](../mobile/src/components/molecules/profile-stats-panel.tsx) | Lists/Completed/Friends sono tre righe impilate, non affiancate | ⏳ | 🟢 | 🟢 | 🟢 |
+| T32 | Badge notifiche non lette in navbar | [`app-tabs.tsx`](../mobile/src/components/app-tabs.tsx) | Nessun contatore sulla tab Notifiche, nemmeno il meccanismo di base | ⏳ | 🟡 | 🟢 | 🟡 |
+| T33 | Apertura/lettura estesa di una notifica | [`notifications.tsx`](../mobile/src/app/(app)/(tabs)/notifications.tsx) | Il tap su una notifica solo la segna letta, nessuna vista dedicata | ⏳ | 🟢 | 🟢 | 🟡 |
+| T34 | Sistema di aggiunta amici (+ e BottomSheet) | [`friends.tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friends.tsx) | La ricerca è un campo sempre visibile in testa alla lista, non un + con sheet | ⏳ | 🟡 | 🟡 | 🟡 |
+| T35 | Tab Amici non resetta sul profilo amico | [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx) | Ritoccare "Amici" in navbar non torna alla lista; a volte compare "Couldn't load this profile" | ⏳ | 🔴 | 🟡 | 🟡 |
+| T36 | Header profilo amico: layout e nome troncato | [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx), [`PageHeader.tsx`](../mobile/src/components/molecules/PageHeader.tsx) | Serve "Rimuovi"/"Indietro" in space-between col nome; il nome nell'header non ha truncate | ⏳ | 🟢 | 🟢 | 🟢 |
+| T37 | Togliere "accettazione sorteggio" dalle statistiche amico | [`profile-stats-group.tsx`](../mobile/src/components/molecules/profile-stats-group.tsx) | La statistica compare ancora nel profilo amico e nel confronto | ⏳ | 🟢 | 🟢 | 🟢 |
+| T38 | Sezione "Compare" profilo amico da rivedere | [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx) | Le due colonne del confronto mostrano le stesse identiche statistiche | 🔍 | 🟡 | 🟢 | 🟡 |
+| T39 | Liste dell'amico non cliccabili | [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx) | `ListCard` ha `onPress={() => {}}`, nessuna vista degli item | ⏳ | 🟡 | 🟡 | 🟡 |
+| T40 | Area Email/"Send code" poco chiara in Impostazioni | [`settings.tsx`](../mobile/src/app/(app)/settings.tsx) | Flusso OTP reale ma senza etichette/step, sempre espanso | ⏳ | 🟢 | 🟢 | 🟢 |
+| T41 | Sezione "Cambio password" troppo in evidenza | [`settings.tsx`](../mobile/src/app/(app)/settings.tsx) | Stessa prominenza visiva di tutte le altre sezioni | ⏳ | 🟢 | 🟢 | 🟢 |
+| T42 | Scadenza piano e CTA migliore in Payments | [`settings.tsx`](../mobile/src/app/(app)/settings.tsx), [`membership.queries.ts`](../web/graphql/models/membership/membership.queries.ts) | `Subscription.endDate` esiste ma non è mai esposto; CTA è un generico "Learn more" | ⏳ | 🟡 | 🟢 | 🟡 |
+| T43 | Avviso limite raggiunto alla creazione lista | [`index.tsx`](../mobile/src/app/(app)/(tabs)/(home)/index.tsx), [`list-form.tsx`](../mobile/src/app/(app)/(tabs)/(home)/list-form.tsx) | L'errore `LIMIT_REACHED` del backend arriva come testo grezzo, nessuna BottomSheet/CTA | ⏳ | 🟡 | 🟢 | 🟡 |
+| T44 | Nascondere un singolo item: manca il controllo in UI | [`ItemCardDetails.tsx`](../mobile/src/components/organisms/ItemCardDetails.tsx) | Il gate di T14 è solo backend; nessun toggle per l'utente | ⏳ | 🟡 | 🟢 | 🟡 |
+| T45 | Icona categoria item non mostrata fuori dal picker | [`ItemCard.tsx`](../mobile/src/components/cards/ItemCard.tsx), [`ItemCardDetails.tsx`](../mobile/src/components/organisms/ItemCardDetails.tsx) | La card lista e il dettaglio item mostrano solo il nome testuale della categoria | ⏳ | 🟢 | 🟢 | 🟢 |
+| T46 | Cambio di stato item percepito lento | [`useItemMutations.ts`](../mobile/src/utils/useItemMutations.ts) | Nessun `optimisticResponse`, l'UI aspetta il giro di rete completo | ⏳ | 🟡 | 🟡 | 🟡 |
+| T47 | Pagina/flusso unico di modifica item | [`ItemCardDetails.tsx`](../mobile/src/components/organisms/ItemCardDetails.tsx) | Editing frammentato in micro-pencil separati, nessuna icona Pencil dedicata fra Tag e Trash | ⏳ | 🟡 | 🟡 | 🟡 |
+| T48 | UI membership/upgrade deve usare l'accent Cyan | [`settings.tsx`](../mobile/src/app/(app)/settings.tsx) | La UI membership reale usa `primary`, non l'accent `colors.accent` già mockato in colors-showcase | ⏳ | 🟢 | 🟢 | 🟢 |
+| T49 | Modalità "Carta Forbice Pietra" nel Randomizzatore | [`randomizer.tsx`](../mobile/src/app/(app)/(tabs)/(home)/randomizer.tsx) | Confermata assenza: i modi sono solo numbers/letters/colors/dice/bottle | ⏳ | 🟢 | 🟢 | 🟡 |
 
 ---
 
 ### Riepilogo per stato
 
-Conteggio sui 30 task della tabella (aggiornato al 19/11/2026).
+Conteggio sui 49 task della tabella (aggiornato al 25/11/2026).
 
 | Stato | Task | Urgenza 🔴 · 🟡 · 🟢 | Quota |
 |---|---:|---|---:|
-| ✅ Fatti | 24 | 🔴 5 · 🟡 11 · 🟢 8 | 80% |
-| ⏳ Da fare | 0 | — | 0% |
+| ✅ Fatti | 24 | 🔴 5 · 🟡 11 · 🟢 8 | 49% |
+| ⏳ Da fare | 18 | 🔴 1 · 🟡 9 · 🟢 8 | 37% |
 | 🔄 In corso | 0 | — | 0% |
-| 🔍 Da valutare | 1 | 🔴 0 · 🟡 1 · 🟢 0 | 3% |
-| ⏸️ In attesa | 5 | 🔴 0 · 🟡 4 · 🟢 1 | 17% |
+| 🔍 Da valutare | 2 | 🔴 0 · 🟡 2 · 🟢 0 | 4% |
+| ⏸️ In attesa | 5 | 🔴 0 · 🟡 4 · 🟢 1 | 10% |
 | 🧩 Da completare | 0 | — | 0% |
 | 🧪 Da testare | 0 | — | 0% |
 | 🗑️ Rimossi | 0 | — | 0% |
-| **Totale** | **30** | 🔴 5 · 🟡 16 · 🟢 9 | 100% |
+| **Totale** | **49** | 🔴 6 · 🟡 25 · 🟢 18 | 100% |
 
 **✅ Fatti (24)**
 - Ondata 1 (23): T01, T02, T04, T05, T06, T07, T09, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,
@@ -141,9 +166,13 @@ Conteggio sui 30 task della tabella (aggiornato al 19/11/2026).
 - Fuori ondata (1): T30 — nato durante l'ondata 1, chiuso il 19/11/2026 con un fix diretto (sotto soglia di
   delega, nessun agente lanciato).
 
-**🔍 Da valutare (1)**, per urgenza:
+**⏳ Da fare (18)**, aggiunti il 25/11/2026 da [`altri-errori.md`](altri-errori.md) (sezione Gruppi esclusa):
+T31, T32, T33, T34, T35, T36, T37, T39, T40, T41, T42, T43, T44, T45, T46, T47, T48, T49.
+
+**🔍 Da valutare (2)**, per urgenza:
 - 🔴: —
-- 🟡: T26 (rimandato dall'utente il 19/11/2026, insieme a T25)
+- 🟡: T26 (rimandato dall'utente il 19/11/2026, insieme a T25), T38 (decisione su quali statistiche mostrare
+  nel confronto profilo amico, segnalata [DA-VALUTARE] nella fonte originale)
 - 🟢: —
 
 **⏸️ In attesa (5)**, per urgenza:
@@ -155,21 +184,21 @@ Conteggio sui 30 task della tabella (aggiornato al 19/11/2026).
 
 ### Riepilogo per urgenza e rischio
 
-Conteggio sui 30 task della tabella (aggiornato al 19/11/2026).
+Conteggio sui 49 task della tabella (aggiornato al 25/11/2026).
 
 | | 🔴 | 🟡 | 🟢 | Totale |
 |---|---|---|---|---|
-| **Urgenza** | 5 | 16 | 9 | 30 |
-| **Rischio** | 2 | 16 | 12 | 30 |
+| **Urgenza** | 6 | 25 | 18 | 49 |
+| **Rischio** | 2 | 21 | 26 | 49 |
 
 Incrocio urgenza × rischio (per l'urgenza 🔴 sono indicati anche gli id):
 
 | Urgenza \ Rischio | Rischio 🔴 | Rischio 🟡 | Rischio 🟢 | Totale |
 |---|---|---|---|---|
-| **Urgenza 🔴** | **0** (—) | **4** (T16, T18, T23, T24) | **1** (T22) | **5** |
-| **Urgenza 🟡** | **2** | **10** | **4** | **16** |
-| **Urgenza 🟢** | **0** | **2** | **7** | **9** |
-| **Totale** | **2** | **16** | **12** | **30** |
+| **Urgenza 🔴** | **0** (—) | **5** (T16, T18, T23, T24, T35) | **1** (T22) | **6** |
+| **Urgenza 🟡** | **2** | **14** | **9** | **25** |
+| **Urgenza 🟢** | **0** | **2** | **16** | **18** |
+| **Totale** | **2** | **21** | **26** | **49** |
 
 ---
 
@@ -617,3 +646,259 @@ Incrocio urgenza × rischio (per l'urgenza 🔴 sono indicati anche gli id):
   `isHidden` era già nei dati scaricati da `useMyLists()`: filtro client-side in
   `group-list/[groupListId].tsx` (`allMyLists.filter(l => !l.isHidden)`), nessuna modifica al resolver né
   all'hook condiviso.
+
+### T31
+- [ ] [TODO] Statistiche profilo in riga, non in lista
+- 🏷️ Area: 👤 Profilo e statistiche
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟢 · Rischio 🟢 · Effort 🟢
+- [`profile-stats-panel.tsx`](../mobile/src/components/molecules/profile-stats-panel.tsx), [`profile.tsx`](../mobile/src/app/(app)/(tabs)/profile.tsx)
+- **Problema**: confermato sul codice — `ProfileStatsPanel` (da non confondere con `ProfileStatsGroup` di
+  T27, che riguarda solo il confronto con l'amico) mostra Lists/Completed/Friends come tre `StatRow`
+  impilate verticalmente dentro una `CardShell`, separate da `Divider`, non affiancate.
+  **Cosa fare**: cambiare il contenitore da colonna a riga (3 blocchi di pari larghezza fianco a fianco),
+  mantenendo icona+valore di ogni `StatRow` ma senza i `Divider` orizzontali.
+  **Fatto quando**: nel profilo personale, Lists/Completed/Friends compaiono affiancati sulla stessa riga.
+
+### T32
+- [ ] [TODO] Badge notifiche non lette in navbar
+- 🏷️ Area: 🔔 Notifiche · 🧭 Navigazione
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟡 · Rischio 🟢 · Effort 🟡
+- [`app-tabs.tsx`](../mobile/src/components/app-tabs.tsx), [`useNotifications.ts`](../mobile/src/utils/useNotifications.ts)
+- **Problema**: confermato sul codice — `app-tabs.tsx` non ha nessun meccanismo di badge/contatore su
+  nessuna tab; la tab Notifiche usa solo l'icona `Bell` senza overlay numerico. `useNotifications()` calcola
+  `markedAsRead` per singola notifica ma non espone un conteggio aggregato.
+  **Cosa fare**: derivare un conteggio non-lette da `useNotifications` (o una query dedicata più leggera) ed
+  esporlo come badge sulla tab Notifiche in `app-tabs.tsx`.
+  **Fatto quando**: con almeno una notifica non letta, l'icona Notifiche in navbar mostra il numerino; a
+  zero non-lette il badge non compare.
+
+### T33
+- [ ] [TODO] Apertura/lettura estesa di una notifica
+- 🏷️ Area: 🔔 Notifiche
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟢 · Rischio 🟢 · Effort 🟡
+- [`notifications.tsx`](../mobile/src/app/(app)/(tabs)/notifications.tsx), [`NotificationCard.tsx`](../mobile/src/components/cards/NotificationCard.tsx)
+- **Problema**: corretto dopo verifica — il sistema letto/non letto **esiste già** (pallino colorato su
+  `NotificationCard` quando `unread`, persistito via `markNotificationAsRead`). Manca invece una vera
+  interazione di apertura: il tap su una card chiama solo `markAsRead`, nessuna vista dedicata/espansa,
+  nessuna navigazione — non c'è altro da "aprire" oltre al testo già visibile per intero nella card.
+  **Cosa fare**: valutare con l'utente cosa deve mostrare la vista estesa (es. notifiche di gruppo/amicizia
+  con più contesto o azioni) prima di costruirla, per non aggiungere un'interazione senza contenuto reale
+  da mostrarci dentro.
+  **Fatto quando**: aprendo una notifica si ottiene qualcosa in più del solo stato letto (dettaglio o azione
+  contestuale), definito col titolare.
+
+### T34
+- [ ] [TODO] Sistema di aggiunta amici (+ e BottomSheet)
+- 🏷️ Area: 🧑‍🤝‍🧑 Amici
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟡 · Rischio 🟡 · Effort 🟡
+- [`friends.tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friends.tsx)
+- **Problema**: confermato sul codice — la ricerca amici è un `Input` sempre visibile in testa alla lista
+  (occupa spazio permanente), non un bottone `+` che apre una ricerca in `BottomSheet`.
+  **Cosa fare**: spostare il campo di ricerca in un `BottomSheet` (già usato altrove in app) aperto da un
+  bottone `+`, mantenendo `UserSearchRow` e la logica di ricerca esistenti.
+  **Fatto quando**: la lista amici non mostra più un campo di ricerca fisso; un bottone `+` apre la ricerca
+  in una sheet.
+
+### T35
+- [ ] [FIX] Tab Amici non resetta sul profilo amico
+- 🏷️ Area: 🧑‍🤝‍🧑 Amici · 🧭 Navigazione
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🔴 · Rischio 🟡 · Effort 🟡
+- [`app-tabs.tsx`](../mobile/src/components/app-tabs.tsx), [`(friends)/_layout.tsx`](../mobile/src/app/(app)/(tabs)/(friends)/_layout.tsx), [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx), [`useFriendProfile.ts`](../mobile/src/utils/useFriendProfile.ts)
+- **Problema**: confermato sul codice — la tab Amici è un `Stack` semplice senza alcuna logica di reset;
+  ritoccare "Amici" in navbar mentre si è su `friend/[id]` non fa nulla (nessun `popToTop`/listener sul
+  ri-tap). In quello stato, a volte compare "Couldn't load this profile. Please try again." — testo in
+  `friends.json` (`friend.error`), mostrato quando `useFriendProfile` resta con `profile` nullo (es. `id`
+  temporaneamente non valido durante la navigazione bloccata).
+  **Cosa fare**: agganciare il ri-tap della tab Amici a un reset dello stack interno (pattern standard Expo
+  Router/React Navigation per "tab già attiva → pop to top"); verificare se risolvere il reset basta anche a
+  far sparire l'errore di caricamento (sintomo collegato) o se serve un controllo separato su `id` instabile.
+  **Fatto quando**: da qualunque profilo amico, ritoccare "Amici" in navbar torna sempre alla lista amici;
+  l'errore "Couldn't load this profile" non compare più in questo flusso.
+
+### T36
+- [ ] [TODO] Header profilo amico: layout e nome troncato
+- 🏷️ Area: 🧑‍🤝‍🧑 Amici · 🎨 UI/UX trasversale
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟢 · Rischio 🟢 · Effort 🟢
+- [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx), [`PageHeader.tsx`](../mobile/src/components/molecules/PageHeader.tsx)
+- **Problema**: confermato sul codice — `friend/[id].tsx` usa il `PageHeader` condiviso, che mette icona+nome
+  a sinistra e (azione, poi back) impilati a destra: non il layout "Indietro / nome / Rimuovi amico" in
+  space-between richiesto. Il nome nel titolo del `PageHeader` non ha `numberOfLines`, quindi può sborare (il
+  nome più in basso nella pagina, invece, ha già `numberOfLines={1}`).
+  **Cosa fare**: **`PageHeader.tsx` è un componente condiviso in tutta l'app — non va modificato senza
+  permesso esplicito.** Due strade possibili da decidere con l'utente: (a) un header dedicato solo per questa
+  pagina, oppure (b) un piccolo intervento su `PageHeader.tsx` (es. `numberOfLines` sul titolo, riordino
+  azioni) se l'utente autorizza a toccarlo. Il truncate del nome andrebbe in entrambi i casi.
+  **Fatto quando**: nella pagina profilo amico, back/nome/rimuovi sono disposti come richiesto e il nome non
+  sbora mai, anche se molto lungo.
+
+### T37
+- [ ] [FIX] Togliere "accettazione sorteggio" dalle statistiche amico
+- 🏷️ Area: 🧑‍🤝‍🧑 Amici
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟢 · Rischio 🟢 · Effort 🟢
+- [`profile-stats-group.tsx`](../mobile/src/components/molecules/profile-stats-group.tsx), [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx)
+- **Problema**: confermato sul codice — `ProfileStatsGroup` renderizza ancora `ProfileDrawAcceptance`
+  (statistica "sorteggio accettato") sia nel profilo amico singolo sia in entrambe le colonne del confronto.
+  **Cosa fare**: togliere il rendering di `ProfileDrawAcceptance` da `ProfileStatsGroup` (o da dove viene
+  passato il dato in `friend/[id].tsx`), lasciando `categoryStats`/`completionBreakdown`.
+  **Fatto quando**: la statistica sull'accettazione del sorteggio non compare più né nel profilo amico né nel
+  confronto.
+
+### T38
+- [ ] [TODO] Sezione "Compare" profilo amico da rivedere
+- 🏷️ Area: 🧑‍🤝‍🧑 Amici
+- 🔍 Da valutare (da [`altri-errori.md`](altri-errori.md), 25/11/2026 — segnalato [DA-VALUTARE] nella fonte
+  originale) · Urgenza 🟡 · Rischio 🟢 · Effort 🟡
+- [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx), [`profile-stats-group.tsx`](../mobile/src/components/molecules/profile-stats-group.tsx)
+- **Problema**: confermato sul codice — in modalità confronto, le due `ProfileStatsGroup` ("tue" e
+  dell'amico) mostrano esattamente lo stesso set di statistiche fianco a fianco, senza alcuna
+  differenziazione: non è un vero confronto, solo una duplicazione.
+  **Cosa fare (da decidere)**: scegliere quali statistiche mostrare in modalità confronto (diverse da quelle
+  "solo mie"/"solo sue"), per evitare la ripetizione identica segnalata.
+  **Decisione da prendere**: quale set di statistiche è più sensato per un confronto a due persone, prima di
+  toccare `profile-stats-group.tsx`.
+  **Fatto quando**: la sezione "Compare" mostra statistiche scelte apposta per il confronto, non la stessa
+  lista duplicata due volte.
+
+### T39
+- [ ] [TODO] Liste dell'amico non cliccabili
+- 🏷️ Area: 🧑‍🤝‍🧑 Amici · 📋 Liste e item
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟡 · Rischio 🟡 · Effort 🟡
+- [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx)
+- **Problema**: confermato sul codice — ogni `ListCard` nel profilo amico ha `onPress={() => {}}`: le liste
+  condivise sono solo mostrate/nascoste con un toggle, non apribili.
+  **Cosa fare**: collegare il tap della card a una vista di dettaglio in sola lettura degli item della lista
+  (riusando la UI di `list/[id].tsx` dove possibile), rispettando sia `List.isHidden` (già filtrato da
+  `friendProfile`, T13) sia l'eventuale `isHidden` a livello di singolo item (da verificare lato resolver).
+  **Fatto quando**: dal profilo di un amico, toccando una delle sue liste non nascoste si vedono i suoi item
+  non nascosti.
+
+### T40
+- [ ] [TODO] Area Email/"Send code" poco chiara in Impostazioni
+- 🏷️ Area: 🎨 UI/UX trasversale
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟢 · Rischio 🟢 · Effort 🟢
+- [`settings.tsx`](../mobile/src/app/(app)/settings.tsx), [`collapsible.tsx`](../mobile/src/components/ui/collapsible.tsx)
+- **Problema**: confermato sul codice — il flusso è reale e funzionante (OTP a due passi: richiesta codice →
+  conferma), non rotto; il problema è che non è etichettato (nessun titolo che spieghi i due step) e resta
+  sempre espanso con lo stesso peso visivo di tutto il resto.
+  **Cosa fare**: aggiungere testo che spieghi i due passaggi (richiesta/conferma codice) e racchiudere la
+  sezione nel `Collapsible` già esistente in `components/ui/collapsible.tsx` (riuso, non un nuovo
+  componente).
+  **Fatto quando**: la sezione Email spiega cosa fa prima di essere aperta, ed è collassata di default.
+
+### T41
+- [ ] [TODO] Sezione "Cambio password" troppo in evidenza
+- 🏷️ Area: 🎨 UI/UX trasversale
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟢 · Rischio 🟢 · Effort 🟢
+- [`settings.tsx`](../mobile/src/app/(app)/settings.tsx), [`collapsible.tsx`](../mobile/src/components/ui/collapsible.tsx)
+- **Problema**: confermato sul codice — la sezione cambio password è una `CardShell` sempre visibile, stessa
+  prominenza di ogni altra sezione (stesso stile titolo, stessa card), posizionata subito sotto Email.
+  **Cosa fare**: racchiuderla nel `Collapsible` esistente (stesso riuso di T40), chiusa di default.
+  **Fatto quando**: la sezione cambio password è collassata di default e non spicca più delle altre.
+
+### T42
+- [ ] [TODO] Scadenza piano e CTA migliore in Payments
+- 🏷️ Area: 💳 Membership e pagamenti
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟡 · Rischio 🟢 · Effort 🟡
+- [`settings.tsx`](../mobile/src/app/(app)/settings.tsx), [`membership.queries.ts`](../web/graphql/models/membership/membership.queries.ts) (`myMembership`), [`subscription.prisma`](../web/prisma/schema/subscription.prisma) (`Subscription.endDate`)
+- **Problema**: confermato sul codice — `Subscription.endDate` **esiste già** nello schema, ma `myMembership`
+  seleziona solo `membershipId` dalla subscription attiva e ritorna il solo `Membership` (il piano), scartando
+  la data di scadenza; lato mobile non arriva quindi nessuna data. Il bottone "Learn more" in realtà apre
+  correttamente la sheet dei piani di T07 (non è disconnesso), ma l'etichetta non dice cosa fa.
+  **Cosa fare**: estendere `myMembership` (o un campo dedicato) per esporre anche `endDate` quando presente;
+  mostrarla in `settings.tsx` solo se il piano prevede una scadenza; rinominare "Learn more" con un'etichetta
+  che dica cosa succede al tap (es. "Vedi i piani").
+  **Fatto quando**: un utente con piano a scadenza vede quando scade; il bottone ha un'etichetta chiara.
+
+### T43
+- [ ] [TODO] Avviso limite raggiunto alla creazione lista
+- 🏷️ Area: 💳 Membership e pagamenti · 📋 Liste e item
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟡 · Rischio 🟢 · Effort 🟡
+- [`index.tsx`](../mobile/src/app/(app)/(tabs)/(home)/index.tsx), [`list-form.tsx`](../mobile/src/app/(app)/(tabs)/(home)/list-form.tsx), [`list.mutations.ts`](../web/graphql/models/list/list.mutations.ts) (`code: 'LIMIT_REACHED'`)
+- **Problema**: confermato sul codice — il bottone `+` apre direttamente il form; se il limite piano è già
+  raggiunto, `createList` fallisce con `LIMIT_REACHED` ma `list-form.tsx` lo mostra come testo d'errore
+  generico, nessuna `BottomSheet` dedicata né collegamento alla pagina membership.
+  **Cosa fare**: in `list-form.tsx`, intercettare `extensions.code === 'LIMIT_REACHED'` e mostrare una
+  `BottomSheet` con spiegazione e bottone verso la sheet piani di T07 (non un errore inline).
+  **Fatto quando**: un utente al limite che prova a creare una lista vede una sheet chiara con un bottone per
+  passare a un piano superiore, non un testo d'errore grezzo.
+
+### T44
+- [ ] [TODO] Nascondere un singolo item: manca il controllo in UI
+- 🏷️ Area: 📋 Liste e item · 💳 Membership e pagamenti
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟡 · Rischio 🟢 · Effort 🟡
+- [`ItemCardDetails.tsx`](../mobile/src/components/organisms/ItemCardDetails.tsx), [`list/[id].tsx`](../mobile/src/app/(app)/(tabs)/(home)/list/[id].tsx), [`useItemMutations.ts`](../mobile/src/utils/useItemMutations.ts) (`UpdateUserItemInput.isHidden` già presente)
+- **Problema**: confermato sul codice — il gate di piano per `isHidden` su un item esiste già lato backend
+  (T14), e la mutation già accetta `isHidden`, ma `ItemCardDetails` non ha nessuna prop/controllo per
+  impostarlo: nessun utente, a nessun livello di piano, può oggi nascondere un proprio item (la lista intera
+  sì, via `list-form.tsx`, il singolo item no).
+  **Cosa fare**: aggiungere un toggle in `ItemCardDetails.tsx` (visibile/disabilitato in base al piano, come
+  da T14), cablato in `list/[id].tsx` a `updateUserItem({ isHidden })`.
+  **Fatto quando**: un utente con piano abilitato può nascondere/mostrare un singolo item dal suo dettaglio.
+
+### T45
+- [ ] [FIX] Icona categoria item non mostrata fuori dal picker
+- 🏷️ Area: 📋 Liste e item
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟢 · Rischio 🟢 · Effort 🟢
+- [`ItemCard.tsx`](../mobile/src/components/cards/ItemCard.tsx), [`ItemCardDetails.tsx`](../mobile/src/components/organisms/ItemCardDetails.tsx), [`CategoryPickerSheet.tsx`](../mobile/src/components/organisms/CategoryPickerSheet.tsx)
+- **Problema**: confermato sul codice — l'icona di categoria (T10) compare solo dentro `CategoryPickerSheet`;
+  `ItemCard.tsx` riceve `category` come stringa e la mostra come solo testo (nessuna prop icona), e
+  `ItemCardDetails.tsx` fa lo stesso pur avendo già `categoryOptions`/`categoryId` (con `.icon`) disponibili.
+  **Cosa fare**: passare/derivare l'icona della categoria anche in `ItemCard.tsx` e nella riga categoria di
+  `ItemCardDetails.tsx`, riusando lo stesso `getLucideIcon` del picker.
+  **Fatto quando**: l'icona della categoria di un item compare anche nella card lista e nel dettaglio, non
+  solo nel picker.
+
+### T46
+- [ ] [FIX] Cambio di stato item percepito lento
+- 🏷️ Area: 📋 Liste e item
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟡 · Rischio 🟡 · Effort 🟡
+- [`useItemMutations.ts`](../mobile/src/utils/useItemMutations.ts) (`updateMutation`, nessun `optimisticResponse`), [`ItemCardDetails.tsx`](../mobile/src/components/organisms/ItemCardDetails.tsx) (`SegmentedControl` riflette lo `status` della query, non uno stato locale)
+- **Problema**: confermato sul codice — il cambio di stato (Not started/In progress/Completed) aspetta la
+  risposta completa della mutation prima che l'UI si aggiorni: nessun `optimisticResponse`, nessuno stato
+  locale intermedio nel `SegmentedControl`. Non ci sono `refetchQueries` superflui (rimossi di proposito, per
+  nota nel codice) — il collo di bottiglia è solo l'attesa del giro di rete.
+  **Cosa fare**: aggiungere un `optimisticResponse` alla mutation di update status, così il `SegmentedControl`
+  cambia subito e torna indietro solo in caso di errore reale.
+  **Fatto quando**: toccando un nuovo stato, il controllo cambia visivamente subito, senza attesa percepibile.
+
+### T47
+- [ ] [TODO] Pagina/flusso unico di modifica item
+- 🏷️ Area: 📋 Liste e item · 💳 Membership e pagamenti
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟡 · Rischio 🟡 · Effort 🟡
+- [`ItemCardDetails.tsx`](../mobile/src/components/organisms/ItemCardDetails.tsx)
+- **Problema**: confermato sul codice — oggi fra le icone Tag e Trash non c'è nessuna icona Pencil; nome,
+  categoria (T16) e descrizione personale sono già modificabili, ma ognuno tramite un proprio micro-editor
+  inline separato, senza un punto d'ingresso unico "modifica item". L'area upload immagine placeholder
+  (visibile per tutti, bloccata/con lucchetto per chi non ha il piano, con suggerimento verso la pagina
+  membership) **dipende da T03** (upload immagini item), ancora in attesa: la parte immagine di questo task
+  non è sbloccabile finché T03 non è deciso.
+  **Cosa fare**: aggiungere un'icona Pencil fra Tag e Trash che apra un'unica vista di modifica
+  (nome/categoria/descrizione, riusando gli editor già esistenti) invece di pencil sparsi; aggiungere l'area
+  placeholder immagine **solo dopo** che T03 definisce come gestire l'upload.
+  **Fatto quando**: un'icona Pencil dedicata apre un'unica schermata/sheet con tutti i campi modificabili
+  dell'item (l'immagine resta un placeholder visibile ma bloccato finché T03 non è implementato).
+
+### T48
+- [ ] [TODO] UI membership/upgrade deve usare l'accent Cyan
+- 🏷️ Area: 💳 Membership e pagamenti · 🎨 UI/UX trasversale
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟢 · Rischio 🟢 · Effort 🟢
+- [`settings.tsx`](../mobile/src/app/(app)/settings.tsx), [`colors-showcase.tsx`](../mobile/src/app/(app)/colors-showcase.tsx) (riferimento: blocco mockup membership con `colors.accent`)
+- **Problema**: confermato sul codice — la UI membership reale in `settings.tsx` usa `colors.primary` per il
+  badge "il tuo piano" e `colors.border`/`colors.foreground` per le card; non usa mai `colors.accent` (cyan),
+  a differenza del blocco mockup "membership" già presente in `colors-showcase.tsx`.
+  **Cosa fare**: riportare la palette cyan del mockup (badge, bordo card, bottoni) sulla UI reale di
+  `settings.tsx` ovunque si parli di piano/upgrade.
+  **Fatto quando**: badge piano, card e bottoni legati a membership/upgrade usano l'accent cyan, come nel
+  mockup di colors-showcase.
+
+### T49
+- [ ] [TODO] Modalità "Carta Forbice Pietra" nel Randomizzatore
+- 🏷️ Area: 🎲 Randomizzatore
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟢 · Rischio 🟢 · Effort 🟡
+- [`randomizer.tsx`](../mobile/src/app/(app)/(tabs)/(home)/randomizer.tsx), [`randomizer.queries.ts`](../web/graphql/models/randomizer/randomizer.queries.ts)
+- **Problema**: confermato sul codice — i modi disponibili sono solo numbers/letters/colors/dice/bottle;
+  nessuna modalità "sasso-carta-forbice" esiste né lato UI né lato resolver.
+  **Cosa fare**: nuovo resolver (es. `rockPaperScissors`, ritorna una delle tre opzioni) e nuova card modalità
+  in `randomizer.tsx`, stessa struttura griglia→stage delle altre modalità.
+  **Fatto quando**: dalla griglia del randomizzatore è selezionabile "Carta Forbice Pietra" e produce un
+  risultato casuale fra le tre opzioni.
