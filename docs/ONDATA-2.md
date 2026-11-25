@@ -356,4 +356,59 @@ un commit locale (anche provvisorio, da amend/squash dopo) sul proprio branch, m
 
 ## Esito
 
-*(da compilare a chiusura ondata)*
+**Chiusa il 25/11/2026. 16 task su 17 pianificati sono ✅ Fatto; T33 risultato bloccato da un limite reale
+del modello dati, passato a ⏸️ in attesa (vedi sotto).** Dettaglio task-per-task in `TODO.md`. Riepilogo per
+pacchetto, con i commit dei merge (`--no-ff`) su `main`:
+
+- **Notifiche** (T32, T33): N1 `362862e` (badge). N2 **nessun commit** — ha verificato che il ramo
+  "lista/gruppo" previsto per T33 è irrealizzabile con lo schema `Notification` attuale (niente `listId`,
+  `groupId`/`challengeId` non esposti su `NotificationRef`, solo `SYSTEM` viene mai creata); T33 passato a
+  ⏸️ in attesa di una decisione del titolare (estendere il modello o chiudere il task). Nessun ramo "sistema"
+  da aggiungere: il testo è già mostrato per intero.
+- **Amici** (T34, T35, T37, T39): F1 `24c649d` (+ e BottomSheet per aggiungere amici). F2 `9f1276e` (fix
+  reset tab al ri-tap, causa trovata leggendo il sorgente reale di `expo-router/ui`). F3 `902b24d` (rimossa
+  stat sorteggio; nuovo field `items` su `FriendListRef`, liste amico ora cliccabili).
+- **Profilo** (T31): P1 `1b11af7` (statistiche in riga).
+- **Impostazioni** (T40, T41, T42, T48): S1 `dc60dd3` + S1b `bb0de07` (accordion email/password, accent
+  cyan, scadenza piano — S1 si è fermata correttamente su `npm run codegen`, scoperto inesistente nel repo;
+  S1b ha chiuso la parte mobile a mano, senza codegen).
+- **Home** (T43): H1 `d29ab20` (BottomSheet di avviso limite + CTA verso i piani).
+- **Item** (T44, T45, T46, T47): I1 `8e5ec17` (icona categoria, `optimisticResponse` sul cambio stato,
+  verificato field-per-field contro la vera selection set GraphQL prima del merge). I2 `a3765ad` (toggle
+  nascondi item, icona Pencil con vista unica di modifica, ha chiuso anche il collegamento di T45 lasciato
+  in sospeso da I1 in `list/[id].tsx`).
+- **Randomizzatore** (T49): R1 `a06e643` (modalità "Carta Forbice Pietra", mandato riscritto a metà ondata
+  dopo l'incidente sotto).
+
+**Incidente 1 — merge di una collega a metà ondata**: documentato sopra (sezione «Incidente»). Il
+randomizzatore è stato spostato interamente lato client da una collega mentre 8 foglie erano già in corso;
+nessun'altra foglia toccava i file coinvolti, solo R1 (T49) ha richiesto un mandato riscritto da zero.
+
+**Incidente 2 — `git stash` condiviso fra worktree**: durante i rilanci, sia R1 sia S1 hanno usato
+`git stash`/`git stash pop` quasi in contemporanea; essendo `refs/stash` comune a tutti i worktree (non
+isolato come i file), ciascuno ha "rubato" temporaneamente lo stash dell'altro. Entrambi recuperati senza
+perdita reale: R1 ha salvato su file il diff estraneo prima di scartarlo e ha rifatto le proprie modifiche;
+S1 ha ritrovato il proprio lavoro come commit dangling via `git fsck --dangling`. **Nuovo divieto permanente
+per ogni foglia futura**: mai `git stash` dentro un worktree isolato — usare un commit locale per "mettere
+via" lavoro temporaneo.
+
+**Scoperta 3 — `npm run codegen` non esiste**: nonostante sia documentato come comando standard (anche in
+CLAUDE.md), nessun `package.json` del repo ha quello script; i file in `packages/graphql-schema/gql_crud/`
+sono `DocumentNode` scritti a mano con `parse()`, non output di un generatore. Scoperto da S1 fermandosi
+correttamente invece di inventare un comando. **Da segnalare al titolare**: la documentazione del progetto
+e la realtà del repo sono disallineate su questo punto.
+
+**Foglie morte per limite di sessione (tetto d'uso)**: N1, P1, S1, R1, I1 (primo lancio) sono morte a metà
+lavoro per limite di sessione, non per un errore di codice. Tutte rilanciate con successo (vedi sezione
+«Incidente» sopra per i dettagli su cosa è stato recuperato da ciascuna prima del rilancio). Un secondo
+tentativo di lancio di I1 ha anche incontrato un errore tecnico transitorio del tool (metadati di worktree
+non risolvibili per contesa momentanea durante il lancio simultaneo di 4 foglie) — risolto riprovando.
+
+**Verifica finale**: `npx tsc --noEmit` pulito su `mobile/` e `web/` dopo ogni singolo merge (11 verifiche
+separate, non solo una finale) — mai una regressione introdotta da una foglia di questa ondata. Gli unici
+errori visti per tutta la durata sono preesistenti dal merge della collega (route typing Expo Router in
+`login.tsx`/`onboarding.tsx`/`useAuth.ts`/`_layout.tsx`, e il modulo `@expo-google-fonts/nunito` mancante) —
+non collegati a nessun task di questa ondata, non affrontati perché fuori scope. L'`optimisticResponse` di
+I1 è stato letto e verificato a mano (non solo sul self-report dell'agente) contro la vera selection set di
+`UPDATE_USER_ITEM` prima del merge, per la regola 8 (verificare dove sbagliare costa — cache condivisa).
+Nessuna verifica visiva interattiva reale (nessun simulatore disponibile in questo ambiente).
