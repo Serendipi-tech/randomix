@@ -7,7 +7,6 @@ import { Colors } from "@/constants/theme";
 import { darkenColor } from "@/utils/color";
 import { useAppTheme } from "@/utils/useAppTheme";
 import { CardShell } from "@/components/cards/CardShell";
-import { Divider } from "@/components/atoms/Divider";
 
 type ThemeColors = typeof Colors.light | typeof Colors.dark;
 
@@ -36,33 +35,39 @@ export function ProfileStatsPanel({
 
   return (
     <CardShell variant="gradient" gradientBorderWidth={2}>
-      <StatRow
-        icon={ListIcon}
-        label={t("stats.lists")}
-        value={String(listsCount)}
-        detail={t("stats.itemsDetail", {
-          count: totalItemsCount,
-          avg: averagePerList,
-        })}
-        colors={colors}
-        accentColor={colors.primary}
-      />
-      <Divider />
-      <StatRow
-        icon={CheckCircle2}
-        label={t("stats.completedItems")}
-        value={`${completedItemsCount}/${totalItemsCount}`}
-        colors={colors}
-        accentColor={colors.success}
-      />
-      <Divider />
-      <StatRow
-        icon={Users}
-        label={t("stats.friends")}
-        value={String(friendsCount)}
-        colors={colors}
-        accentColor={colors.accent}
-      />
+      <View style={styles.rowContainer}>
+        <View style={styles.statBlock}>
+          <StatRow
+            icon={ListIcon}
+            label={t("stats.lists")}
+            value={String(listsCount)}
+            detail={t("stats.itemsDetail", {
+              count: totalItemsCount,
+              avg: averagePerList,
+            })}
+            colors={colors}
+            accentColor={colors.primary}
+          />
+        </View>
+        <View style={styles.statBlock}>
+          <StatRow
+            icon={CheckCircle2}
+            label={t("stats.completedItems")}
+            value={`${completedItemsCount}/${totalItemsCount}`}
+            colors={colors}
+            accentColor={colors.success}
+          />
+        </View>
+        <View style={styles.statBlock}>
+          <StatRow
+            icon={Users}
+            label={t("stats.friends")}
+            value={String(friendsCount)}
+            colors={colors}
+            accentColor={colors.accent}
+          />
+        </View>
+      </View>
     </CardShell>
   );
 }
@@ -94,29 +99,32 @@ function StatRow({
       >
         <Icon size={20} color={colors.textColor} />
       </LinearGradient>
-      <View style={styles.texts}>
-        <Text style={[styles.label, { color: colors.textColor }]}>{label}</Text>
-        {detail && (
-          <Text
-            style={[styles.detail, { color: colors.disabled }]}
-            numberOfLines={1}
-          >
-            {detail}
-          </Text>
-        )}
-      </View>
+      <Text style={[styles.label, { color: colors.textColor }]}>{label}</Text>
+      {detail && (
+        <Text
+          style={[styles.detail, { color: colors.disabled }]}
+          numberOfLines={2}
+        >
+          {detail}
+        </Text>
+      )}
       <Text style={[styles.value, { color: colors.textColor }]}>{value}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
+  rowContainer: {
     flexDirection: "row",
-    alignItems: "center",
     gap: 12,
-    minHeight: 56,
-    paddingVertical: 8,
+  },
+  statBlock: {
+    flex: 1,
+  },
+  row: {
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 8,
   },
   iconWrap: {
     width: 36,
@@ -125,16 +133,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  texts: {
-    flex: 1,
-    gap: 2,
-  },
   label: {
     fontSize: 14,
     fontWeight: "600",
+    textAlign: "center",
   },
   detail: {
     fontSize: 13,
+    textAlign: "center",
   },
   value: {
     fontSize: 18,
