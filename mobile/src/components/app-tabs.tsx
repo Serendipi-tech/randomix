@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'expo-router';
 import { Tabs, TabList, TabTrigger, TabSlot, type TabTriggerSlotProps, type TabListProps } from 'expo-router/ui';
 import { BlurView } from 'expo-blur';
-import { Platform, Pressable, StyleSheet, View, type LayoutChangeEvent, type ViewStyle } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View, type LayoutChangeEvent, type ViewStyle } from 'react-native';
 import Animated, {
   Easing,
   Extrapolation,
@@ -20,6 +20,7 @@ import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { buildFillWavePath } from '@/utils/buildFillWavePath';
+import { useNotifications } from '@/utils/useNotifications';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
@@ -46,6 +47,21 @@ const SIDE_TAB_ICONS = {
 const HIDDEN_PATHS = ['/list-form', '/item-form', '/draw', '/randomizer'];
 
 type SideTabName = keyof typeof SIDE_TAB_ICONS;
+
+/** Badge numerato per le notifiche non lette. */
+function NotificationsBadge() {
+  const { unreadCount } = useNotifications();
+  const { colorScheme } = useAppTheme();
+  const colors = Colors[colorScheme];
+
+  if (unreadCount === 0) return null;
+
+  return (
+    <View style={[styles.badge, { backgroundColor: colors.secondary }]}>
+      <Text style={[styles.badgeText, { color: colors.foreground }]}>{unreadCount}</Text>
+    </View>
+  );
+}
 
 /** Contorno della pillola con una tacca a onda al centro, dove si annida il pulsante Home:
  *  la tacca scende DENTRO l'altezza della barra, non sporge mai sopra il bordo superiore. */
@@ -134,6 +150,7 @@ function SideTabButton({ name, isFocused, ...props }: SideTabButtonProps) {
           <Icon size={24} color={activeColor} fill={activeColor} strokeWidth={2} />
         </Animated.View>
       </Animated.View>
+      {name === 'notifications' && <NotificationsBadge />}
     </Pressable>
   );
 }
@@ -311,5 +328,19 @@ const styles = StyleSheet.create({
   homeIconStack: {
     position: 'relative',
     zIndex: 1,
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    minWidth: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '600',
   },
 });
