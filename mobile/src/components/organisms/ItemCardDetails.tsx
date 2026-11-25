@@ -24,6 +24,7 @@ import { SegmentedControl } from '@/components/atoms/SegmentedControl';
 import { Rating } from '@/components/atoms/Rating';
 import { Avatar } from '@/components/atoms/Avatar';
 import { Button } from '@/components/atoms/Button';
+import { Switch } from '@/components/atoms/Switch';
 import { Input } from '@/components/molecules/Input';
 import { TagList } from '@/components/molecules/TagList';
 import { ExpandableText } from '@/components/molecules/ExpandableText';
@@ -61,6 +62,9 @@ export type ItemCardDetailsProps = {
   ratingNote?: string;
   tags?: AttachedTag[];
   completedAt?: string;
+  /** Nasconde l'item agli amici (T14): toggle sempre visibile, l'eventuale rifiuto del piano arriva dall'errore della mutation. */
+  isHidden?: boolean;
+  onChangeHidden?: (isHidden: boolean) => void;
   onChangeStatus?: (status: ItemStatus) => void;
   /** Imposta/modifica il voto. Non è previsto cancellare il rating: una volta impostato si può solo
    *  aumentare/diminuire. Il testo del giudizio resta invece sempre facoltativo. */
@@ -129,6 +133,8 @@ export function ItemCardDetails({
   ratingNote,
   tags,
   completedAt,
+  isHidden,
+  onChangeHidden,
   onChangeStatus,
   onChangeRating,
   ratingEditorVisible,
@@ -174,6 +180,8 @@ export function ItemCardDetails({
   // Modifica della categoria: riusa CategoryPickerSheet già usato in creazione
   const canEditCategory = Boolean(categoryOptions && onChangeCategory);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+  // Se la picker è aperta dalla vista di modifica unica (T47) la scelta va nel draft, non applicata subito
+  const [categoryPickerForEdit, setCategoryPickerForEdit] = useState(false);
 
   // Icona della categoria corrente: risolta dalle opzioni già disponibili (stesso registro del picker)
   const categoryIconSlug = categoryOptions?.find((option) => option.value === categoryId)?.icon;
@@ -222,6 +230,32 @@ export function ItemCardDetails({
   const { isDirty: isNoteDirty } = useDirtyState(note ?? '', noteDraft);
   const { isDirty: isDescriptionDirty } = useDirtyState(userDescription ?? '', descriptionDraft);
 
+  // Vista unica di modifica (T47): nome, categoria e descrizione insieme, riusando i draft/editor sopra
+  const canOpenEditSheet = Boolean(onChangeName || canEditCategory || onChangeDescription);
+  const [showEditSheet, setShowEditSheet] = useState(false);
+  const [editCategoryDraft, setEditCategoryDraft] = useState<string | null>(null);
+  const openEditSheet = () => {
+    setNameDraft(name);
+    setDescriptionDraft(userDescription ?? '');
+    setEditCategoryDraft(categoryId ?? null);
+    setShowEditSheet(true);
+  };
+  const openCategoryPickerForEdit = () => {
+    setCategoryPickerForEdit(true);
+    setShowCategoryPicker(true);
+  };
+  const confirmEdit = () => {
+    const trimmedName = nameDraft.trim();
+    if (trimmedName && trimmedName !== name) onChangeName?.(trimmedName);
+    if (editCategoryDraft && editCategoryDraft !== categoryId) onChangeCategory?.(editCategoryDraft);
+    const trimmedDescription = descriptionDraft.trim();
+    if (trimmedDescription !== (userDescription ?? '')) onChangeDescription?.(trimmedDescription);
+    setShowEditSheet(false);
+  };
+  const editCategoryDirty = canEditCategory && editCategoryDraft !== (categoryId ?? null);
+  const isEditDirty = isNameDirty || isDescriptionDirty || editCategoryDirty;
+  const editCategoryOption = categoryOptions?.find((option) => option.value === editCategoryDraft);
+
   return (
     <BottomSheet visible={visible} onClose={onClose}>
       <ScrollView
@@ -231,11 +265,18 @@ export function ItemCardDetails({
       >
         <View style={styles.body}>
           {/* Categoria + rating compatto + azioni: riga a piena larghezza, sopra copertina/titolo */}
-          {(category || canPickTags || onRemoveFromList || onChangeRating) && (
+          {(category || canPickTags || onRemoveFromList || onChangeRating || canOpenEditSheet) && (
             <View style={styles.categoryRow}>
               {category ? (
                 canEditCategory ? (
-                  <Pressable onPress={() => setShowCategoryPicker(true)} hitSlop={4} style={styles.categoryPressable}>
+                  <Pressable
+                    onPress={() => {
+                      setCategoryPickerForEdit(false);
+                      setShowCategoryPicker(true);
+                    }}
+                    hitSlop={4}
+                    style={styles.categoryPressable}
+                  >
                     {CategoryIcon && <CategoryIcon size={12} color={colors.textColor} />}
                     <Text style={[styles.category, { color: colors.textColor }]}>{category}</Text>
                     <Pencil size={11} color={colors.textColor} style={styles.categoryEditIcon} />
@@ -249,7 +290,7 @@ export function ItemCardDetails({
               ) : (
                 <View />
               )}
-              {(canPickTags || onRemoveFromList || onChangeRating) && (
+              {(canPickTags || onRemoveFromList || onChangeRating || canOpenEditSheet) && (
                 <View style={styles.headerRight}>
                   {onChangeRating && (
                     <Rating
@@ -264,6 +305,11 @@ export function ItemCardDetails({
                     {canPickTags && (
                       <Pressable onPress={() => setShowTagPicker(true)} hitSlop={4} style={styles.headerActionButton}>
                         <TagIcon size={18} color={colors.textColor} />
+                      </Pressable>
+                    )}
+                    {canOpenEditSheet && (
+                      <Pressable onPress={openEditSheet} hitSlop={4} style={styles.headerActionButton}>
+                        <Pencil size={18} color={colors.textColor} />
                       </Pressable>
                     )}
                     {onRemoveFromList && (
@@ -345,6 +391,14 @@ export function ItemCardDetails({
                   activeColor: resolveStatusColor(key, colors),
                 }))}
               />
+            </View>
+          )}
+
+          {/* Toggle visibilità (T14/T44): sempre visibile, un piano che non lo consente rifiuta dalla mutation */}
+          {onChangeHidden && (
+            <View style={styles.hiddenRow}>
+              <Text style={[styles.hiddenLabel, { color: colors.textColor }]}>{t('itemDetail.hidden')}</Text>
+              <Switch value={Boolean(isHidden)} onChange={onChangeHidden} />
             </View>
           )}
 
@@ -512,13 +566,63 @@ export function ItemCardDetails({
         </BottomSheet>
       )}
 
+      {/* Vista unica di modifica (T47): nome, categoria e descrizione insieme, stessi draft/stati degli editor singoli sopra */}
+      {canOpenEditSheet && (
+        <BottomSheet visible={showEditSheet} onClose={() => setShowEditSheet(false)}>
+          <View style={styles.noteEditContent}>
+            {onChangeName && (
+              <Input
+                label={t('itemForm.name')}
+                value={nameDraft}
+                onChangeText={setNameDraft}
+                placeholder={t('itemForm.namePlaceholder')}
+              />
+            )}
+            {canEditCategory && (
+              <View style={styles.editCategoryField}>
+                <SectionLabel>{t('itemForm.category')}</SectionLabel>
+                <Button
+                  variant="soft"
+                  label={editCategoryOption?.label ?? t('itemForm.categoryPlaceholder')}
+                  onPress={openCategoryPickerForEdit}
+                />
+              </View>
+            )}
+            {onChangeDescription && (
+              <Input
+                label={t('itemDetail.yourDescription')}
+                value={descriptionDraft}
+                onChangeText={setDescriptionDraft}
+                placeholder={t('itemDetail.descriptionPlaceholder')}
+                variant="textarea"
+                maxLength={DESCRIPTION_MAX_LENGTH}
+              />
+            )}
+            <View style={styles.noteEditActions}>
+              <View style={styles.noteEditAction}>
+                <Button variant="secondary" label={t('itemForm.cancel')} onPress={() => setShowEditSheet(false)} />
+              </View>
+              <View style={styles.noteEditAction}>
+                <Button variant="primary" label={t('itemForm.save')} onPress={confirmEdit} disabled={!isEditDirty} />
+              </View>
+            </View>
+          </View>
+        </BottomSheet>
+      )}
+
       {canEditCategory && (
         <CategoryPickerSheet
           visible={showCategoryPicker}
           onClose={() => setShowCategoryPicker(false)}
           options={categoryOptions ?? []}
-          selected={categoryId ?? null}
-          onSelect={(value) => onChangeCategory?.(value)}
+          selected={categoryPickerForEdit ? editCategoryDraft : categoryId ?? null}
+          onSelect={(value) => {
+            if (categoryPickerForEdit) {
+              setEditCategoryDraft(value);
+            } else {
+              onChangeCategory?.(value);
+            }
+          }}
           searchPlaceholder={t('itemForm.categorySearch')}
           emptyLabel={t('itemForm.noCategories')}
         />
@@ -631,6 +735,17 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   section: {
+    gap: 6,
+  },
+  hiddenRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  hiddenLabel: {
+    fontSize: 14,
+  },
+  editCategoryField: {
     gap: 6,
   },
   textSection: {
