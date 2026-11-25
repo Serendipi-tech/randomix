@@ -45,6 +45,7 @@
     "title": "Settings",
     "email": {
       "heading": "Email",
+      "flowExplanation": "Two steps: send a verification code to your new address, then enter it below to confirm the change.",
       "current": "Current email",
       "newPlaceholder": "New email",
       "sendCode": "Send code",
