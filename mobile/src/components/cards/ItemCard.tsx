@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '@/constants/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { getLucideIcon } from '@/utils/lucideIconRegistry';
 import { CardShell } from '@/components/cards/CardShell';
 import { StatusBadge } from '@/components/atoms/StatusBadge';
 import { Rating } from '@/components/atoms/Rating';
@@ -15,6 +16,8 @@ type ItemTag = { name: string; color: string };
 type ItemCardProps = {
   title: string;
   category?: string;
+  /** Nome export Lucide (es. "Book") della categoria: se presente, mostrato accanto al testo. */
+  categoryIcon?: string;
   status?: string;
   /** Colore del badge di stato già risolto; se assente, dedotto dal nome dello stato. */
   statusColor?: string;
@@ -44,11 +47,23 @@ function resolveStatusColor(status: string, colors: ThemeColors): string {
 
 /** Card di item: categoria + stato, titolo ad altezza fissa e footer con tag e rating (stella frazionaria + valore).
  *  Colonna immagine full-bleed a destra solo se c'è `imageUri` (altrimenti nessuna immagine). Shell condivisa (CardShell); tap gestito dal chiamante. */
-export function ItemCard({ title, category, status, statusColor, imageUri, rating, tags, detail, onPress }: ItemCardProps) {
+export function ItemCard({
+  title,
+  category,
+  categoryIcon,
+  status,
+  statusColor,
+  imageUri,
+  rating,
+  tags,
+  detail,
+  onPress,
+}: ItemCardProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   const [detailOpen, setDetailOpen] = useState(false);
   const [ratingEditorVisible, setRatingEditorVisible] = useState(false);
+  const CategoryIcon = categoryIcon ? getLucideIcon(categoryIcon) : undefined;
 
   const hasFooter = (tags && tags.length > 0) || rating !== undefined;
   // Regola fissa: con un dettaglio il tap apre sempre il bottomsheet; altrimenti resta il tap del chiamante
@@ -63,9 +78,12 @@ export function ItemCard({ title, category, status, statusColor, imageUri, ratin
           <View style={styles.topGroup}>
             <View style={styles.header}>
               {category && (
-                <Text style={[styles.category, { color: colors.textColor }]} numberOfLines={1}>
-                  {category}
-                </Text>
+                <View style={styles.categoryGroup}>
+                  {CategoryIcon && <CategoryIcon size={13} color={colors.textColor} />}
+                  <Text style={[styles.category, { color: colors.textColor }]} numberOfLines={1}>
+                    {category}
+                  </Text>
+                </View>
               )}
               {status && <StatusBadge label={status} color={statusColor ?? resolveStatusColor(status, colors)} />}
             </View>
@@ -140,10 +158,16 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 8,
   },
+  categoryGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    flex: 1,
+  },
   category: {
     fontSize: 14,
     opacity: 0.7,
-    flex: 1,
+    flexShrink: 1,
   },
   titleWrap: {
     height: TITLE_HEIGHT,
