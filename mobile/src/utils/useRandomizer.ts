@@ -3,7 +3,9 @@ import {
   randomInt,
   randomLetters,
   randomNumbers,
+  randomRockPaperScissors,
   rollDice,
+  type RockPaperScissorsChoice,
 } from './random';
 
 /**
@@ -28,12 +30,16 @@ export function useRandomizer() {
   // Indice vincente fra `count` partecipanti (usata dalla bottiglia con nomi)
   const drawWinnerIndex = async (count: number) => randomInt(0, count - 1);
 
+  const generateRockPaperScissors = async (): Promise<RockPaperScissorsChoice> =>
+    randomRockPaperScissors();
+
   return {
     generateNumbers,
     generateLetters,
     generateColors,
     generateDice,
     drawWinnerIndex,
+    generateRockPaperScissors,
     loading: false,
     error: null as Error | null,
   };

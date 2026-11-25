@@ -53,3 +53,13 @@ export function randomColors(count: number): string[] {
 export function rollDice(count: number, faces: number): number[] {
   return Array.from({ length: count }, () => randomInt(1, faces));
 }
+
+/** Le tre opzioni della modalità "Carta Forbice Pietra". */
+export type RockPaperScissorsChoice = 'rock' | 'paper' | 'scissors';
+
+const ROCK_PAPER_SCISSORS_CHOICES: RockPaperScissorsChoice[] = ['rock', 'paper', 'scissors'];
+
+/** Estrazione casuale fra sasso, carta e forbice. */
+export function randomRockPaperScissors(): RockPaperScissorsChoice {
+  return ROCK_PAPER_SCISSORS_CHOICES[randomInt(0, ROCK_PAPER_SCISSORS_CHOICES.length - 1)];
+}

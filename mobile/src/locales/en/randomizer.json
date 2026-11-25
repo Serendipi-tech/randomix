@@ -7,7 +7,8 @@
     "colors": "Colors",
     "dice": "Dice",
     "bottle": "Bottle",
-    "coin": "Coin"
+    "coin": "Coin",
+    "rps": "Rock Paper Scissors"
   },
   "hints": {
     "numbers": "From 1 to 100, no repeats",
@@ -15,7 +16,8 @@
     "colors": "Up to 100",
     "dice": "2 to 120 sides",
     "bottle": "Spin for a name",
-    "coin": "Heads or tails"
+    "coin": "Heads or tails",
+    "rps": "Rock, paper or scissors"
   },
   "fields": {
     "range": "Range",
@@ -53,5 +55,10 @@
     "heads": "Heads",
     "tails": "Tails",
     "flip": "Flip"
+  },
+  "rps": {
+    "rock": "Rock",
+    "paper": "Paper",
+    "scissors": "Scissors"
   }
 }
