@@ -123,10 +123,10 @@ a mano quando cambia uno stato) · l'elenco delle schede.
 | T30 | `myLists` non filtra le liste nascoste | [`group-list/[groupListId].tsx`](../mobile/src/app/(app)/(tabs)/(groups)/group-list/[groupListId].tsx) | Una lista `isHidden` può essere condivisa in un `GroupList` | ✅ | 🟡 | 🟡 | 🟢 |
 | T31 | Statistiche profilo in riga, non in lista | [`profile-stats-panel.tsx`](../mobile/src/components/molecules/profile-stats-panel.tsx) | Lists/Completed/Friends sono tre righe impilate, non affiancate | ⏳ | 🟢 | 🟢 | 🟢 |
 | T32 | Badge notifiche non lette in navbar | [`app-tabs.tsx`](../mobile/src/components/app-tabs.tsx) | Nessun contatore sulla tab Notifiche, nemmeno il meccanismo di base | ⏳ | 🟡 | 🟢 | 🟡 |
-| T33 | Apertura/lettura estesa di una notifica | [`notifications.tsx`](../mobile/src/app/(app)/(tabs)/notifications.tsx) | Il tap su una notifica solo la segna letta, nessuna vista dedicata | ⏳ | 🟢 | 🟢 | 🟡 |
+| T33 | Apertura/lettura estesa di una notifica (con azioni) | [`notifications.tsx`](../mobile/src/app/(app)/(tabs)/notifications.tsx) | Il tap su una notifica solo la segna letta; serve una vista con azioni contestuali | ⏳ | 🟢 | 🟢 | 🟡 |
 | T34 | Sistema di aggiunta amici (+ e BottomSheet) | [`friends.tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friends.tsx) | La ricerca è un campo sempre visibile in testa alla lista, non un + con sheet | ⏳ | 🟡 | 🟡 | 🟡 |
 | T35 | Tab Amici non resetta sul profilo amico | [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx) | Ritoccare "Amici" in navbar non torna alla lista; a volte compare "Couldn't load this profile" | ⏳ | 🔴 | 🟡 | 🟡 |
-| T36 | Header profilo amico: layout e nome troncato | [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx), [`PageHeader.tsx`](../mobile/src/components/molecules/PageHeader.tsx) | Serve "Rimuovi"/"Indietro" in space-between col nome; il nome nell'header non ha truncate | ⏳ | 🟢 | 🟢 | 🟢 |
+| T36 | Header profilo amico: layout e nome troncato | [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx), [`PageHeader.tsx`](../mobile/src/components/molecules/PageHeader.tsx) | Serve "Rimuovi"/"Indietro" in space-between col nome; il nome nell'header non ha truncate | ⏸️ | 🟢 | 🟢 | 🟢 |
 | T37 | Togliere "accettazione sorteggio" dalle statistiche amico | [`profile-stats-group.tsx`](../mobile/src/components/molecules/profile-stats-group.tsx) | La statistica compare ancora nel profilo amico e nel confronto | ⏳ | 🟢 | 🟢 | 🟢 |
 | T38 | Sezione "Compare" profilo amico da rivedere | [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx) | Le due colonne del confronto mostrano le stesse identiche statistiche | 🔍 | 🟡 | 🟢 | 🟡 |
 | T39 | Liste dell'amico non cliccabili | [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx) | `ListCard` ha `onPress={() => {}}`, nessuna vista degli item | ⏳ | 🟡 | 🟡 | 🟡 |
@@ -150,10 +150,10 @@ Conteggio sui 49 task della tabella (aggiornato al 25/11/2026).
 | Stato | Task | Urgenza 🔴 · 🟡 · 🟢 | Quota |
 |---|---:|---|---:|
 | ✅ Fatti | 24 | 🔴 5 · 🟡 11 · 🟢 8 | 49% |
-| ⏳ Da fare | 18 | 🔴 1 · 🟡 9 · 🟢 8 | 37% |
+| ⏳ Da fare | 17 | 🔴 1 · 🟡 9 · 🟢 7 | 35% |
 | 🔄 In corso | 0 | — | 0% |
 | 🔍 Da valutare | 2 | 🔴 0 · 🟡 2 · 🟢 0 | 4% |
-| ⏸️ In attesa | 5 | 🔴 0 · 🟡 4 · 🟢 1 | 10% |
+| ⏸️ In attesa | 6 | 🔴 0 · 🟡 4 · 🟢 2 | 12% |
 | 🧩 Da completare | 0 | — | 0% |
 | 🧪 Da testare | 0 | — | 0% |
 | 🗑️ Rimossi | 0 | — | 0% |
@@ -166,8 +166,8 @@ Conteggio sui 49 task della tabella (aggiornato al 25/11/2026).
 - Fuori ondata (1): T30 — nato durante l'ondata 1, chiuso il 19/11/2026 con un fix diretto (sotto soglia di
   delega, nessun agente lanciato).
 
-**⏳ Da fare (18)**, aggiunti il 25/11/2026 da [`altri-errori.md`](altri-errori.md) (sezione Gruppi esclusa):
-T31, T32, T33, T34, T35, T36, T37, T39, T40, T41, T42, T43, T44, T45, T46, T47, T48, T49.
+**⏳ Da fare (17)**, aggiunti il 25/11/2026 da [`altri-errori.md`](altri-errori.md) (sezione Gruppi esclusa):
+T31, T32, T33, T34, T35, T37, T39, T40, T41, T42, T43, T44, T45, T46, T47, T48, T49.
 
 **🔍 Da valutare (2)**, per urgenza:
 - 🔴: —
@@ -175,12 +175,13 @@ T31, T32, T33, T34, T35, T36, T37, T39, T40, T41, T42, T43, T44, T45, T46, T47, 
   nel confronto profilo amico, segnalata [DA-VALUTARE] nella fonte originale)
 - 🟢: —
 
-**⏸️ In attesa (5)**, per urgenza:
+**⏸️ In attesa (6)**, per urgenza:
 - 🔴: —
 - 🟡: T08 (rimandato dall'utente il 19/11/2026 — niente brief per ora), T21 (rimandato dall'utente il
   19/11/2026 — niente brief per ora), T25 (rimandato dall'utente il 19/11/2026, insieme a T26), T29 (scelta
   o dato del titolare — mole di lavoro Gruppi)
-- 🟢: T03 (rimandato dall'utente il 19/11/2026 — immagini item, upload e utilizzo, in un'ondata a parte)
+- 🟢: T03 (rimandato dall'utente il 19/11/2026 — immagini item, upload e utilizzo, in un'ondata a parte),
+  T36 (rimandato dall'utente il 25/11/2026 — richiede toccare `PageHeader.tsx` condiviso)
 
 ### Riepilogo per urgenza e rischio
 
@@ -673,19 +674,24 @@ Incrocio urgenza × rischio (per l'urgenza 🔴 sono indicati anche gli id):
   zero non-lette il badge non compare.
 
 ### T33
-- [ ] [TODO] Apertura/lettura estesa di una notifica
+- [ ] [TODO] Apertura/lettura estesa di una notifica (con azioni)
 - 🏷️ Area: 🔔 Notifiche
-- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟢 · Rischio 🟢 · Effort 🟡
+- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026 — scope deciso dall'utente il 25/11/2026:
+  azioni contestuali, non solo testo esteso) · Urgenza 🟢 · Rischio 🟢 · Effort 🟡
 - [`notifications.tsx`](../mobile/src/app/(app)/(tabs)/notifications.tsx), [`NotificationCard.tsx`](../mobile/src/components/cards/NotificationCard.tsx)
 - **Problema**: corretto dopo verifica — il sistema letto/non letto **esiste già** (pallino colorato su
   `NotificationCard` quando `unread`, persistito via `markNotificationAsRead`). Manca invece una vera
-  interazione di apertura: il tap su una card chiama solo `markAsRead`, nessuna vista dedicata/espansa,
-  nessuna navigazione — non c'è altro da "aprire" oltre al testo già visibile per intero nella card.
-  **Cosa fare**: valutare con l'utente cosa deve mostrare la vista estesa (es. notifiche di gruppo/amicizia
-  con più contesto o azioni) prima di costruirla, per non aggiungere un'interazione senza contenuto reale
-  da mostrarci dentro.
-  **Fatto quando**: aprendo una notifica si ottiene qualcosa in più del solo stato letto (dettaglio o azione
-  contestuale), definito col titolare.
+  interazione di apertura: il tap su una card chiama solo `markAsRead`, nessuna azione contestuale in base al
+  tipo di notifica. **Scope corretto in revisione (ondata 2)**: niente ramo "richiesta di amicizia
+  accettabile/rifiutabile dalla notifica" — nessun punto del backend crea mai una `Notification` con
+  `notificationType: 'FRIENDSHIP'` (le richieste pendenti arrivano solo dalla query separata
+  `friendRequests`, già mostrata in una sezione propria di questa pagina fin da T24); quel ramo sarebbe
+  codice morto.
+  **Cosa fare**: in base al `notificationType`, offrire un'azione diretta dalla card/sheet — notifica legata
+  a una lista o a un gruppo → bottone che naviga lì; notifica di sistema → solo espansione testo, nessuna
+  azione.
+  **Fatto quando**: aprendo una notifica legata a lista/gruppo si naviga lì direttamente; una notifica di
+  sistema si espande mostrando il testo per intero.
 
 ### T34
 - [ ] [TODO] Sistema di aggiunta amici (+ e BottomSheet)
@@ -718,16 +724,17 @@ Incrocio urgenza × rischio (per l'urgenza 🔴 sono indicati anche gli id):
 ### T36
 - [ ] [TODO] Header profilo amico: layout e nome troncato
 - 🏷️ Area: 🧑‍🤝‍🧑 Amici · 🎨 UI/UX trasversale
-- ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟢 · Rischio 🟢 · Effort 🟢
+- ⏸️ In attesa (rimandato dall'utente il 25/11/2026 — richiede toccare `PageHeader.tsx`, componente condiviso
+  in tutta l'app; decisione rimandata, escluso dall'ondata) · Urgenza 🟢 · Rischio 🟢 · Effort 🟢
 - [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx), [`PageHeader.tsx`](../mobile/src/components/molecules/PageHeader.tsx)
 - **Problema**: confermato sul codice — `friend/[id].tsx` usa il `PageHeader` condiviso, che mette icona+nome
   a sinistra e (azione, poi back) impilati a destra: non il layout "Indietro / nome / Rimuovi amico" in
   space-between richiesto. Il nome nel titolo del `PageHeader` non ha `numberOfLines`, quindi può sborare (il
   nome più in basso nella pagina, invece, ha già `numberOfLines={1}`).
   **Cosa fare**: **`PageHeader.tsx` è un componente condiviso in tutta l'app — non va modificato senza
-  permesso esplicito.** Due strade possibili da decidere con l'utente: (a) un header dedicato solo per questa
-  pagina, oppure (b) un piccolo intervento su `PageHeader.tsx` (es. `numberOfLines` sul titolo, riordino
-  azioni) se l'utente autorizza a toccarlo. Il truncate del nome andrebbe in entrambi i casi.
+  permesso esplicito.** Due strade possibili: (a) un header dedicato solo per questa pagina, senza toccare
+  `PageHeader.tsx`; (b) un piccolo intervento sul componente condiviso (`numberOfLines` sul titolo, riordino
+  azioni), solo se autorizzato. Il 25/11/2026 l'utente ha rimandato la decisione.
   **Fatto quando**: nella pagina profilo amico, back/nome/rimuovi sono disposti come richiesto e il nome non
   sbora mai, anche se molto lungo.
 
