@@ -71,8 +71,11 @@ export function useNotifications() {
     await markAsReadMutate({ variables: { id } });
   };
 
+  const unreadCount = notifications.filter((n) => !n.markedAsRead).length;
+
   return {
     notifications,
+    unreadCount,
     loading,
     error: error ?? null,
     markAsRead,
