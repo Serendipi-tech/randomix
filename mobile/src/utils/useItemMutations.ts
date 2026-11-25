@@ -1,9 +1,44 @@
-import { useMutation } from '@apollo/client';
+import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { ItemMutations, RatingMutations } from '@randomix/graphql-schema';
 import type { CompletionStatus } from './useListDetail';
 
 const { ADD_ITEM_TO_LIST, UPDATE_USER_ITEM, REMOVE_ITEM_FROM_LIST } = ItemMutations;
 const { RATE_ITEM } = RatingMutations;
+
+// Stessa selezione campi di UPDATE_USER_ITEM: serve a leggere dalla cache i campi non toccati dal
+// cambio di stato, per costruire un optimisticResponse completo senza inventare valori.
+const USER_ITEM_OPTIMISTIC_FRAGMENT = gql`
+  fragment UserItemOptimisticFields on User_Item {
+    id
+    name
+    description
+    note
+    status
+    isHidden
+    category {
+      id
+      name
+      icon
+    }
+    tags {
+      id
+      name
+      color
+    }
+  }
+`;
+
+interface UserItemOptimisticFields {
+  __typename: 'User_Item';
+  id: string;
+  name: string;
+  description: string | null;
+  note: string | null;
+  status: CompletionStatus;
+  isHidden: boolean;
+  category: { __typename: 'Category'; id: string; name: string; icon: string };
+  tags: Array<{ __typename: 'Tag'; id: string; name: string; color: string }>;
+}
 
 export interface AddItemInput {
   listId: string;
@@ -28,6 +63,8 @@ interface AddItemToListResult {
 }
 
 export function useItemMutations() {
+  const client = useApolloClient();
+
   // ListDetail va ricaricata: cambia l'elenco items della lista aperta.
   // ProfileStats va ricaricata: un nuovo item cambia itemsCount di categoria nel profilo.
   const [addMutation, { loading: adding, error: addError }] = useMutation<AddItemToListResult>(ADD_ITEM_TO_LIST, {
@@ -56,7 +93,29 @@ export function useItemMutations() {
   };
 
   const updateUserItem = async (id: string, input: UpdateUserItemInput) => {
-    await updateMutation({ variables: { id, input } });
+    // Optimistic update solo per il cambio di stato: lo SegmentedControl deve rispondere subito, senza
+    // attendere il giro di rete. Gli altri campi vengono letti dalla cache (già coerenti), non inventati:
+    // se l'item non è ancora in cache, niente optimisticResponse (si torna al comportamento normale).
+    const cached =
+      input.status !== undefined
+        ? client.cache.readFragment<UserItemOptimisticFields>({
+            id: client.cache.identify({ __typename: 'User_Item', id }),
+            fragment: USER_ITEM_OPTIMISTIC_FRAGMENT,
+            fragmentName: 'UserItemOptimisticFields',
+          })
+        : null;
+
+    await updateMutation({
+      variables: { id, input },
+      ...(cached && {
+        optimisticResponse: {
+          updateUserItem: {
+            ...cached,
+            status: input.status,
+          },
+        },
+      }),
+    });
   };
 
   const removeItemFromList = async (id: string) => {

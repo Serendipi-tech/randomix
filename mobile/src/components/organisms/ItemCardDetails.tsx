@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDirtyState } from '@/utils/useDirtyState';
 import {
@@ -16,6 +17,7 @@ import {
 import { ChevronDown, ChevronUp, Info, Pencil, Tag as TagIcon, Trash2 } from 'lucide-react-native';
 import { Colors, Spacing } from '@/constants/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { getLucideIcon } from '@/utils/lucideIconRegistry';
 import { BottomSheet } from '@/components/organisms/BottomSheet';
 import { SectionLabel } from '@/components/atoms/SectionLabel';
 import { SegmentedControl } from '@/components/atoms/SegmentedControl';
@@ -34,6 +36,8 @@ import { useFriendRatings } from '@/utils/useFriendRatings';
 
 // Tag già collegati all'item: qui basta id/name/color, non serve isSystem (solo la picker lo usa)
 type AttachedTag = { id: string; name: string; color: string };
+
+type IconComponent = ComponentType<{ size?: number; color?: string }>;
 
 export type ItemCardDetailsProps = {
   visible: boolean;
@@ -171,6 +175,10 @@ export function ItemCardDetails({
   const canEditCategory = Boolean(categoryOptions && onChangeCategory);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
 
+  // Icona della categoria corrente: risolta dalle opzioni già disponibili (stesso registro del picker)
+  const categoryIconSlug = categoryOptions?.find((option) => option.value === categoryId)?.icon;
+  const CategoryIcon = categoryIconSlug ? (getLucideIcon(categoryIconSlug) as IconComponent | undefined) : undefined;
+
   // Rileva il troncamento confrontando l'altezza del titolo visibile (numberOfLines) con quella di una
   // copia invisibile senza limite, stessa larghezza: se la seconda è più alta, il testo è stato tagliato.
   // Uso onLayout (non onTextLayout/lines: meno affidabile sulla nuova architettura RN) per entrambe.
@@ -228,11 +236,15 @@ export function ItemCardDetails({
               {category ? (
                 canEditCategory ? (
                   <Pressable onPress={() => setShowCategoryPicker(true)} hitSlop={4} style={styles.categoryPressable}>
+                    {CategoryIcon && <CategoryIcon size={12} color={colors.textColor} />}
                     <Text style={[styles.category, { color: colors.textColor }]}>{category}</Text>
                     <Pencil size={11} color={colors.textColor} style={styles.categoryEditIcon} />
                   </Pressable>
                 ) : (
-                  <Text style={[styles.category, { color: colors.textColor }]}>{category}</Text>
+                  <View style={styles.categoryPressable}>
+                    {CategoryIcon && <CategoryIcon size={12} color={colors.textColor} />}
+                    <Text style={[styles.category, { color: colors.textColor }]}>{category}</Text>
+                  </View>
                 )
               ) : (
                 <View />
