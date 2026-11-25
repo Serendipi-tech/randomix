@@ -123,7 +123,7 @@ a mano quando cambia uno stato) · l'elenco delle schede.
 | T30 | `myLists` non filtra le liste nascoste | [`group-list/[groupListId].tsx`](../mobile/src/app/(app)/(tabs)/(groups)/group-list/[groupListId].tsx) | Una lista `isHidden` può essere condivisa in un `GroupList` | ✅ | 🟡 | 🟡 | 🟢 |
 | T31 | Statistiche profilo in riga, non in lista | [`profile-stats-panel.tsx`](../mobile/src/components/molecules/profile-stats-panel.tsx) | Lists/Completed/Friends sono tre righe impilate, non affiancate | ⏳ | 🟢 | 🟢 | 🟢 |
 | T32 | Badge notifiche non lette in navbar | [`app-tabs.tsx`](../mobile/src/components/app-tabs.tsx) | Nessun contatore sulla tab Notifiche, nemmeno il meccanismo di base | ⏳ | 🟡 | 🟢 | 🟡 |
-| T33 | Apertura/lettura estesa di una notifica (con azioni) | [`notifications.tsx`](../mobile/src/app/(app)/(tabs)/notifications.tsx) | Il tap su una notifica solo la segna letta; serve una vista con azioni contestuali | ⏳ | 🟢 | 🟢 | 🟡 |
+| T33 | Apertura/lettura estesa di una notifica (con azioni) | [`notifications.tsx`](../mobile/src/app/(app)/(tabs)/notifications.tsx) | Bloccato: il modello dati non supporta oggi notifiche legate a lista/gruppo | ⏸️ | 🟢 | 🟢 | 🟡 |
 | T34 | Sistema di aggiunta amici (+ e BottomSheet) | [`friends.tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friends.tsx) | La ricerca è un campo sempre visibile in testa alla lista, non un + con sheet | ⏳ | 🟡 | 🟡 | 🟡 |
 | T35 | Tab Amici non resetta sul profilo amico | [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx) | Ritoccare "Amici" in navbar non torna alla lista; a volte compare "Couldn't load this profile" | ⏳ | 🔴 | 🟡 | 🟡 |
 | T36 | Header profilo amico: layout e nome troncato | [`friend/[id].tsx`](../mobile/src/app/(app)/(tabs)/(friends)/friend/[id].tsx), [`PageHeader.tsx`](../mobile/src/components/molecules/PageHeader.tsx) | Serve "Rimuovi"/"Indietro" in space-between col nome; il nome nell'header non ha truncate | ⏸️ | 🟢 | 🟢 | 🟢 |
@@ -139,7 +139,7 @@ a mano quando cambia uno stato) · l'elenco delle schede.
 | T46 | Cambio di stato item percepito lento | [`useItemMutations.ts`](../mobile/src/utils/useItemMutations.ts) | Nessun `optimisticResponse`, l'UI aspetta il giro di rete completo | ⏳ | 🟡 | 🟡 | 🟡 |
 | T47 | Pagina/flusso unico di modifica item | [`ItemCardDetails.tsx`](../mobile/src/components/organisms/ItemCardDetails.tsx) | Editing frammentato in micro-pencil separati, nessuna icona Pencil dedicata fra Tag e Trash | ⏳ | 🟡 | 🟡 | 🟡 |
 | T48 | UI membership/upgrade deve usare l'accent Cyan | [`settings.tsx`](../mobile/src/app/(app)/settings.tsx) | La UI membership reale usa `primary`, non l'accent `colors.accent` già mockato in colors-showcase | ⏳ | 🟢 | 🟢 | 🟢 |
-| T49 | Modalità "Carta Forbice Pietra" nel Randomizzatore | [`randomizer.tsx`](../mobile/src/app/(app)/(tabs)/(home)/randomizer.tsx) | Confermata assenza: i modi sono solo numbers/letters/colors/dice/bottle | ⏳ | 🟢 | 🟢 | 🟡 |
+| T49 | Modalità "Carta Forbice Pietra" nel Randomizzatore | [`random.ts`](../mobile/src/utils/random.ts) | Il randomizzatore è ora tutto client-side (merge di una collega, 25/11/2026) — nessun backend da toccare | ⏳ | 🟢 | 🟢 | 🟢 |
 
 ---
 
@@ -902,10 +902,14 @@ Incrocio urgenza × rischio (per l'urgenza 🔴 sono indicati anche gli id):
 - [ ] [TODO] Modalità "Carta Forbice Pietra" nel Randomizzatore
 - 🏷️ Area: 🎲 Randomizzatore
 - ⏳ Da fare (da [`altri-errori.md`](altri-errori.md), 25/11/2026) · Urgenza 🟢 · Rischio 🟢 · Effort 🟡
-- [`randomizer.tsx`](../mobile/src/app/(app)/(tabs)/(home)/randomizer.tsx), [`randomizer.queries.ts`](../web/graphql/models/randomizer/randomizer.queries.ts)
-- **Problema**: confermato sul codice — i modi disponibili sono solo numbers/letters/colors/dice/bottle;
-  nessuna modalità "sasso-carta-forbice" esiste né lato UI né lato resolver.
-  **Cosa fare**: nuovo resolver (es. `rockPaperScissors`, ritorna una delle tre opzioni) e nuova card modalità
-  in `randomizer.tsx`, stessa struttura griglia→stage delle altre modalità.
+- [`random.ts`](../mobile/src/utils/random.ts), [`useRandomizer.ts`](../mobile/src/utils/useRandomizer.ts), [`randomizer.tsx`](../mobile/src/app/(app)/(tabs)/(home)/randomizer.tsx), [`ModeGrid.tsx`](../mobile/src/components/randomizer/ModeGrid.tsx)
+- **Problema**: confermato sul codice — i modi disponibili sono numbers/letters/colors/dice/bottle/coin;
+  nessuna modalità "sasso-carta-forbice" esiste. **Scope cambiato il 25/11/2026**: una collega ha nel
+  frattempo spostato tutto il randomizzatore lato client (`random.ts`, commento esplicito: "risultati usa e
+  getta, non passano dal backend") — niente più resolver GraphQL da scrivere, stesso pattern già usato per
+  "coin" (riuso lato client, zero round-trip di rete).
+  **Cosa fare**: funzione pura in `random.ts` (es. `randomChoice` su un array di 3 opzioni, o equivalente);
+  wrapper in `useRandomizer.ts` (stesso pattern di `drawWinnerIndex`); nuova card in `ModeGrid`/`randomizer.tsx`,
+  stessa struttura griglia→stage delle altre modalità.
   **Fatto quando**: dalla griglia del randomizzatore è selezionabile "Carta Forbice Pietra" e produce un
-  risultato casuale fra le tre opzioni.
+  risultato casuale fra le tre opzioni, calcolato sul device come le altre modalità.

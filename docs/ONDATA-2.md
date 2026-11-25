@@ -233,14 +233,16 @@ nessun placeholder immagine presente.
 
 | Foglia | Task | File | Quando parte |
 |---|---|---|---|
-| R1 | T49 | `randomizer.tsx`, `web/graphql/models/randomizer/randomizer.queries.ts` (nuovo resolver), `packages/graphql-schema/gql_crud/randomizer/randomizer.queries.ts` (nuova operation condivisa), `mobile/src/utils/useRandomizer.ts` (nuova funzione `generateRockPaperScissors`) | subito |
+| R1 | T49 | `mobile/src/utils/random.ts` (nuova funzione pura), `mobile/src/utils/useRandomizer.ts` (nuovo wrapper), `mobile/src/app/(app)/(tabs)/(home)/randomizer.tsx`, `mobile/src/components/randomizer/ModeGrid.tsx` (se serve) | subito |
 
-**Controllo sulla base (Randomizzatore)**: i modi esistenti in `randomizer.tsx` sono
-numbers/letters/colors/dice/bottle; `randomizer.queries.ts` ha **4** resolver (`randomNumbers/Letters/Colors`,
-`rollDice`) — "bottle" riusa `randomNumbers` lato client, non ha un resolver proprio — stesso pattern
-(`builder.queryField`) dei 4 esistenti da ricalcare per il nuovo. **Dopo** aver aggiunto il resolver ed esteso
-l'operation condivisa, eseguire `npm run codegen` in `packages/graphql-schema` prima di cablare
-`useRandomizer.ts`/`randomizer.tsx`.
+**Controllo sulla base (Randomizzatore) — riscritto dopo l'incidente del 25/11/2026** (vedi «Incidente» in
+fondo al file): il randomizzatore **non è più su GraphQL**. Una collega ha mosso tutto il calcolo lato
+client in `random.ts` (`randomInt`, `drawUnique`, `randomNumbers`, `randomLetters`, `randomColors`,
+`rollDice`), consumato da `useRandomizer.ts` (nessuna query/mutation, solo funzioni sincrone/async locali) —
+il commento nel file lo dice esplicitamente: risultati "usa e getta", non serve il backend. I modi oggi sono
+numbers/letters/colors/dice/bottle/coin (6, non 5): "coin" già riusa `generateNumbers(0,1,1)` lato client
+come trucco, stesso spirito di quanto va fatto per "carta forbice pietra". **Nessun file in
+`web/graphql/` o `packages/graphql-schema/` va toccato per questo task**, e non serve `npm run codegen`.
 
 **Verifica propria R1**: dalla griglia del randomizzatore, una nuova card "Carta Forbice Pietra" produce un
 risultato casuale fra le tre opzioni, stessa struttura griglia→stage delle altre modalità, nessuna modalità
@@ -304,6 +306,51 @@ controllato su tutta la catena, non solo sul resolver.
 `lucideIconRegistry.ts` (dove è definito) nel mandato I1; `randomizer.queries.ts` ha 4 resolver per 5
 modalità (bottle riusa `randomNumbers` lato client), precisato nel controllo-base R1; P1 ora specifica che
 icona/label/value/detail di ogni `StatRow` vanno mantenuti nel passaggio a riga, non tagliati.
+
+---
+
+## Incidente — merge di una collega durante l'ondata (25/11/2026)
+
+A metà lancio (8 foglie "subito" partite dal commit `19d847d`), una collega ha pushato lavoro su `main`
+(commit `2541064` + merge `f4d4f07`) che tocca tra l'altro **l'intero randomizzatore**: `randomizer.tsx`,
+`ModeGrid.tsx`, `useRandomizer.ts`, `NumberResults.tsx`, `LetterResults.tsx`, `ColorResults.tsx`,
+`DiceResults.tsx`, `CustomFacesChip.tsx`, più file nuovi (`BottleSpinner.tsx`, `BottleNamesInput.tsx`,
+`CoinResults.tsx`, `ParticipantsSheet.tsx`). Il cambio rilevante per questa ondata: **il randomizzatore non
+passa più dal backend** — ogni modalità (numeri/lettere/colori/dadi/bottiglia/moneta) è calcolata sul device
+in `mobile/src/utils/random.ts`.
+
+**Effetto su R1 (T49)**: il mandato originale (nuovo resolver GraphQL + codegen) era scritto per
+un'architettura che non esiste più. Riscritto per lo stesso pattern client-side già usato da "coin".
+
+**Nessun'altra foglia tocca gli stessi file** del merge della collega (verificato: nessuna sovrapposizione
+con `app-tabs.tsx`, `useNotifications.ts`, `friends.tsx`, `profile-stats-panel.tsx`, `settings.tsx`,
+`index.tsx`/`list-form.tsx`, `ItemCard*.tsx`, `useItemMutations.ts` — tutti fuori dall'elenco di file
+toccati dal merge), quindi nessun altro mandato va rivisto.
+
+**Foglie morte per limite di sessione (tetto d'uso, non un errore di codice)**, nello stesso momento: N1,
+P1, S1, R1, I1. Per ciascuna, prima di rilanciare, controllato lo spazio di lavoro (regola 13):
+- **N1**: worktree con 8 righe di diff non committate (`app-tabs.tsx`, `useNotifications.ts`) — troppo
+  piccole per valere la pena di trapiantarle fra worktree diversi; worktree rimosso, foglia rilanciata da
+  zero.
+- **P1, S1, R1, I1**: nessun worktree rimasto (erano morte prima di scrivere modifiche sostanziali — pulizia
+  automatica di un worktree senza modifiche). Rilanciate da zero.
+
+**Tutte le foglie rilanciate partono dal nuovo HEAD, `f4d4f07`** (non più `19d847d`) — la "versione di
+partenza" dichiarata nel mandato originale non vale più, corretta regola 10. F1 e H1 (già consegnate,
+commit `24c649d` e `d29ab20`, basate su `19d847d`) non toccano nessuno dei file del merge della collega:
+verranno unite normalmente, nessuna necessità di rifarle.
+
+**Secondo incidente — `git stash` è condiviso fra worktree, non isolato come i file**: durante il lancio,
+R1 ha usato `git stash`/`git stash pop` per metterne via temporaneamente il proprio lavoro; lo stash è
+risultato **globale al repository** (la lista è tenuta nel `.git` comune a tutti i worktree, non per-copia),
+e il pop di R1 ha estratto lo stash di **un'altra foglia viva nello stesso momento** (S1 — i file coincidono
+esattamente: `settings.tsx`, `profile.json`, `membership/membership.queries.ts`, `membership/index.ts`). R1
+ha salvato il diff estraneo su file prima di scartarlo dalla propria copia (nessun danno al lavoro reale di
+S1, che vive nel SUO worktree, non in quello di R1) e ha rifatto le proprie 4 modifiche da zero. **Nuovo
+divieto per tutte le foglie future, oltre a quelli già in regola 14**: mai usare `git stash` (né `pop` né
+`apply`) dentro una foglia isolata — è un comando che, come quelli già vietati, attraversa i confini del
+worktree e può travolgere il lavoro di un fratello. Se serve "mettere via" del lavoro temporaneamente, usare
+un commit locale (anche provvisorio, da amend/squash dopo) sul proprio branch, mai lo stash.
 
 ---
 
