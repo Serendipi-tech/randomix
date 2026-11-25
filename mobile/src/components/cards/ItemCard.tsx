@@ -63,6 +63,8 @@ export function ItemCard({
   const colors = Colors[colorScheme];
   const [detailOpen, setDetailOpen] = useState(false);
   const [ratingEditorVisible, setRatingEditorVisible] = useState(false);
+  // getLucideIcon legge da una mappa statica fissata all'import (ICON_REGISTRY): non crea mai un
+  // componente nuovo, è un falso positivo della regola (soppresso dove l'uso JSX viene segnalato, poco sotto).
   const CategoryIcon = categoryIcon ? getLucideIcon(categoryIcon) : undefined;
 
   const hasFooter = (tags && tags.length > 0) || rating !== undefined;
@@ -79,6 +81,7 @@ export function ItemCard({
             <View style={styles.header}>
               {category && (
                 <View style={styles.categoryGroup}>
+                  {/* eslint-disable-next-line react-hooks/static-components -- vedi commento sopra */}
                   {CategoryIcon && <CategoryIcon size={13} color={colors.textColor} />}
                   <Text style={[styles.category, { color: colors.textColor }]} numberOfLines={1}>
                     {category}

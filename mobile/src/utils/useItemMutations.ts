@@ -37,7 +37,7 @@ interface UserItemOptimisticFields {
   status: CompletionStatus;
   isHidden: boolean;
   category: { __typename: 'Category'; id: string; name: string; icon: string };
-  tags: Array<{ __typename: 'Tag'; id: string; name: string; color: string }>;
+  tags: { __typename: 'Tag'; id: string; name: string; color: string }[];
 }
 
 export interface AddItemInput {
