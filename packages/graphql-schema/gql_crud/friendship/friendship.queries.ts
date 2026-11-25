@@ -52,6 +52,17 @@ export const FRIEND_PROFILE: DocumentNode = parse(`
         color
         description
         itemCount
+        items {
+          id
+          name
+          note
+          status
+          category {
+            id
+            name
+            icon
+          }
+        }
       }
       stats {
         categoryStats {

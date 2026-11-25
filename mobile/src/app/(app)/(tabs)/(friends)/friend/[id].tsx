@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
+import { resolveListIcon } from '@/constants/list-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useNavbarClearance } from '@/utils/useNavbarClearance';
 import { RadialBackground } from '@/components/molecules/radial-background';
@@ -14,16 +15,29 @@ import { Button } from '@/components/atoms/Button';
 import { PageHeader } from '@/components/molecules/PageHeader';
 import { Tabs } from '@/components/molecules/Tabs';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
+import { BottomSheet } from '@/components/organisms/BottomSheet';
 import { ProfileStatsGroup } from '@/components/molecules/profile-stats-group';
 import { ListCard } from '@/components/cards/ListCard';
-import { useFriendProfile } from '@/utils/useFriendProfile';
+import { ItemCard } from '@/components/cards/ItemCard';
+import { useFriendProfile, type FriendList } from '@/utils/useFriendProfile';
 import { useRemoveFriend } from '@/utils/useFriends';
 import { useProfileStats } from '@/utils/useProfileStats';
 
 const SKELETON_COUNT = 3;
 
+type ThemeColors = (typeof Colors)[keyof typeof Colors];
+
+// Stessa mappa stato -> colore usata in list/[id].tsx per gli item della propria lista
+function resolveItemStatusColor(status: string, colors: ThemeColors): string {
+  if (status === 'IN_PROGRESS') return colors.warning;
+  if (status === 'COMPLETED') return colors.success;
+  return colors.border;
+}
+
 export default function FriendProfileScreen() {
   const { t } = useTranslation('friends');
+  // Namespace 'lists': riuso le etichette di stato e lo stato vuoto già tradotti per le liste proprie
+  const { t: tLists } = useTranslation('lists');
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
   const router = useRouter();
@@ -31,16 +45,13 @@ export default function FriendProfileScreen() {
 
   const { id } = useLocalSearchParams<{ id: string }>();
   const { profile, loading, error } = useFriendProfile(id);
-  const {
-    categoryStats: myCategoryStats,
-    completionBreakdown: myCompletionBreakdown,
-    drawAcceptance: myDrawAcceptance,
-  } = useProfileStats();
+  const { categoryStats: myCategoryStats, completionBreakdown: myCompletionBreakdown } = useProfileStats();
   const { removeFriend } = useRemoveFriend();
 
   const [statsTab, setStatsTab] = useState(0);
   const [showLists, setShowLists] = useState(false);
   const [confirmingRemove, setConfirmingRemove] = useState(false);
+  const [selectedList, setSelectedList] = useState<FriendList | null>(null);
 
   const showSkeleton = loading && !profile;
 
@@ -86,7 +97,7 @@ export default function FriendProfileScreen() {
               icon={List}
               color={list.color}
               itemsCount={list.itemCount}
-              onPress={() => {}}
+              onPress={() => setSelectedList(list)}
             />
           )}
           ListHeaderComponent={
@@ -109,7 +120,6 @@ export default function FriendProfileScreen() {
                   label={profile.user.username}
                   categoryStats={profile.stats.categoryStats}
                   completionBreakdown={profile.stats.completionBreakdown}
-                  drawAcceptance={profile.stats.drawAcceptance}
                 />
               ) : (
                 <View style={styles.compareGroup}>
@@ -117,13 +127,11 @@ export default function FriendProfileScreen() {
                     label={t('friend.stats.you')}
                     categoryStats={myCategoryStats}
                     completionBreakdown={myCompletionBreakdown}
-                    drawAcceptance={myDrawAcceptance}
                   />
                   <ProfileStatsGroup
                     label={profile.user.username}
                     categoryStats={profile.stats.categoryStats}
                     completionBreakdown={profile.stats.completionBreakdown}
-                    drawAcceptance={profile.stats.drawAcceptance}
                   />
                 </View>
               )}
@@ -164,6 +172,50 @@ export default function FriendProfileScreen() {
         onConfirm={handleRemoveConfirmed}
         onCancel={() => setConfirmingRemove(false)}
       />
+
+      <BottomSheet visible={selectedList != null} onClose={() => setSelectedList(null)}>
+        {selectedList && (
+          <View style={styles.sheetContent}>
+            <View style={styles.sheetHeader}>
+              {(() => {
+                const ListIcon = resolveListIcon(selectedList.icon);
+                return <ListIcon size={20} color={selectedList.color} />;
+              })()}
+              <Text style={[styles.sheetTitle, { color: colors.textColor }]} numberOfLines={1}>
+                {selectedList.name}
+              </Text>
+            </View>
+            <FlatList
+              style={styles.sheetList}
+              data={selectedList.items}
+              keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.sheetListContent}
+              renderItem={({ item }) => (
+                <View style={styles.sheetItemRow}>
+                  <ItemCard
+                    title={item.name}
+                    category={item.category.name}
+                    categoryIcon={item.category.icon}
+                    status={tLists(`status.${item.status}`)}
+                    statusColor={resolveItemStatusColor(item.status, colors)}
+                  />
+                  {item.note ? (
+                    <Text style={[styles.sheetItemNote, { color: colors.textColor }]}>{item.note}</Text>
+                  ) : null}
+                </View>
+              )}
+              ListEmptyComponent={
+                <View style={styles.empty}>
+                  <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
+                    {tLists('detail.emptyTitle')}
+                  </Text>
+                </View>
+              }
+            />
+          </View>
+        )}
+      </BottomSheet>
     </SafeAreaView>
   );
 }
@@ -204,5 +256,35 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     textAlign: 'center',
+  },
+  sheetContent: {
+    flex: 1,
+    gap: Spacing.three,
+    paddingHorizontal: Spacing.four,
+  },
+  sheetHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
+  sheetTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  sheetList: {
+    flex: 1,
+  },
+  sheetListContent: {
+    gap: Spacing.two + Spacing.one,
+    paddingBottom: Spacing.four,
+  },
+  sheetItemRow: {
+    gap: Spacing.one,
+  },
+  sheetItemNote: {
+    fontSize: 14,
+    opacity: 0.7,
+    paddingHorizontal: Spacing.one,
   },
 });
