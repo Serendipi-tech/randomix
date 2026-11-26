@@ -59,6 +59,9 @@ export function useMembershipPlans() {
 
   // Nessuna subscription attiva = piano FREE implicito (stessa convenzione del pannello admin)
   const currentPlan: MembershipPlanId = myData?.myMembership?.plan ?? 'FREE';
+  // Finché la risposta non è arrivata il piano non è noto: senza questa distinzione il FREE
+  // implicito farebbe comparire per un istante le proposte di upgrade anche a chi ha già un piano
+  const isFreePlan = myData !== undefined && currentPlan === 'FREE';
 
   const plans: MembershipPlanCard[] = (plansData?.membershipPlans ?? []).map((membership) => ({
     id: membership.id,
@@ -71,6 +74,8 @@ export function useMembershipPlans() {
 
   return {
     plans,
+    currentPlan,
+    isFreePlan,
     loading: plansLoading || myLoading,
     error: plansError ?? myError ?? null,
   };

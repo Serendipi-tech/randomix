@@ -12,7 +12,7 @@ export function useListDraw() {
   const [drawMutation, { loading: drawing, error: drawError }] =
     useMutation<DrawFromListMutation>(DRAW_FROM_LIST);
 
-  // ProfileStats va ricaricata: l'accettazione incrementa acceptedCount, mostrato in drawAcceptance
+  // ProfileStats va ricaricata: l'accettazione incrementa acceptedCount, che pesa sulle statistiche
   const [acceptMutation, { loading: accepting, error: acceptError }] = useMutation(ACCEPT_DRAW, {
     refetchQueries: ['ProfileStats'],
   });
