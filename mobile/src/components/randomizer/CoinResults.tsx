@@ -161,12 +161,12 @@ function CrownSymbol() {
   );
 }
 
-/** Croce: due bracci arrotondati, uguali. */
+/** Croce: una X, due bracci arrotondati uguali incrociati in diagonale. */
 function CrossSymbol() {
   return (
     <>
-      <Rect x={44} y={26} width={12} height={48} rx={4} />
-      <Rect x={32} y={44} width={36} height={12} rx={4} />
+      <Rect x={44} y={24} width={12} height={52} rx={5} transform="rotate(45 50 50)" />
+      <Rect x={44} y={24} width={12} height={52} rx={5} transform="rotate(-45 50 50)" />
     </>
   );
 }

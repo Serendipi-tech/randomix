@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Minus, Plus } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { useRepeatPress } from '@/utils/useRepeatPress';
 
 type StepperProps = {
   value: number;
@@ -11,7 +12,8 @@ type StepperProps = {
   step?: number;
 };
 
-/** Controllo numerico a incremento/decremento, con i limiti decisi dal chiamante. */
+/** Controllo numerico a incremento/decremento, con i limiti decisi dal chiamante.
+ *  Tenendo premuto avanza da solo, e dopo un po' a gruppi (vedi `useRepeatPress`). */
 export function Stepper({ value, min, max, onChange, step = 1 }: StepperProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
@@ -19,10 +21,21 @@ export function Stepper({ value, min, max, onChange, step = 1 }: StepperProps) {
   const decrease = () => onChange(Math.max(min, value - step));
   const increase = () => onChange(Math.min(max, value + step));
 
+  const repeatDecrease = useRepeatPress((multiplier) => {
+    if (value <= min) return false;
+    onChange(Math.max(min, value - step * multiplier));
+  });
+  const repeatIncrease = useRepeatPress((multiplier) => {
+    if (value >= max) return false;
+    onChange(Math.min(max, value + step * multiplier));
+  });
+
   return (
     <View style={styles.row}>
       <Pressable
         onPress={decrease}
+        onPressIn={repeatDecrease.start}
+        onPressOut={repeatDecrease.stop}
         disabled={value <= min}
         style={({ pressed }) => [
           styles.btn,
@@ -35,6 +48,8 @@ export function Stepper({ value, min, max, onChange, step = 1 }: StepperProps) {
       <Text style={[styles.value, { color: colors.textColor }]}>{value}</Text>
       <Pressable
         onPress={increase}
+        onPressIn={repeatIncrease.start}
+        onPressOut={repeatIncrease.stop}
         disabled={value >= max}
         style={({ pressed }) => [
           styles.btn,

@@ -9,8 +9,13 @@ import { CardShell } from '@/components/cards/CardShell';
 const DEFAULT_HEIGHT = 96;
 // Padding del CardShell, annullato col margine negativo per ottenere il layout full-bleed
 const SHELL_PADDING = 16;
-// L'icona ruotata deve coprire la card fino ai bordi: il resto viene tagliato
+// L'icona ruotata deve coprire la card in altezza: il resto viene tagliato
 const ICON_SIZE_RATIO = 1.9;
+// Spostamento dell'icona verso sinistra, in quote del suo lato: il nome al centro resta su
+// sfondo quasi pulito invece di sovrapporsi alla parte piu' densa del disegno
+const ICON_SHIFT_RATIO = 0.35;
+// Opacita' dell'icona di sfondo: sotto questa soglia il nome si legge a colpo d'occhio
+const ICON_OPACITY = 0.18;
 
 type TileCardProps = {
   icon: ComponentType<{ size?: number; color?: string }>;
@@ -38,7 +43,10 @@ export function TileCard({ icon: Icon, label, color, onPress, height = DEFAULT_H
           style={StyleSheet.absoluteFill}
         />
 
-        <View style={styles.iconLayer} pointerEvents="none">
+        <View
+          style={[styles.iconLayer, { left: -height * ICON_SIZE_RATIO * ICON_SHIFT_RATIO }]}
+          pointerEvents="none"
+        >
           <Icon size={height * ICON_SIZE_RATIO} color={color} />
         </View>
 
@@ -57,17 +65,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
   },
-  // Icona come texture di sfondo: ruotata e attenuata, non deve competere col nome
+  // Icona come texture di sfondo: ruotata, spinta a sinistra e attenuata, non deve competere col nome
   iconLayer: {
     position: 'absolute',
     top: 0,
-    left: 0,
-    right: 0,
     bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
     transform: [{ rotate: '-30deg' }],
-    opacity: 0.35,
+    opacity: ICON_OPACITY,
   },
   label: {
     fontSize: 16,

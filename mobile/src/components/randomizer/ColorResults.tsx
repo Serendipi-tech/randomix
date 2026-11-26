@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
+import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   Easing,
   Extrapolation,
+  cancelAnimation,
   interpolate,
   useAnimatedProps,
   useSharedValue,
@@ -13,11 +14,15 @@ import Svg, { Path } from 'react-native-svg';
 import { Colors } from '@/constants/theme';
 import { buildFillWavePath } from '@/utils/buildFillWavePath';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { useCopyToClipboard } from '@/utils/useCopyToClipboard';
+import { useRevealCascade } from '@/utils/useRevealCascade';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 type ColorResultsProps = {
   values: string[];
+  /** Messaggio di conferma mostrato dopo aver copiato un hex. */
+  copiedLabel: string;
 };
 
 const FILL_DURATION = 800;
@@ -32,40 +37,66 @@ const MAX_SWATCH_SIZE = 96;
 
 /** Tondi colore che si riempiono dal basso con l'onda della navbar, hex sotto in textColor
  *  attenuato (mai il token "disabled" per un testo che non è disabilitato, solo secondario). */
-export function ColorResults({ values }: ColorResultsProps) {
+export function ColorResults({ values, copiedLabel }: ColorResultsProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
+  const { copy } = useCopyToClipboard();
 
   const [rowWidth, setRowWidth] = useState(0);
+  const { delays, skipped, skip } = useRevealCascade(values.length, FILL_DURATION);
   const onLayout = (e: LayoutChangeEvent) => setRowWidth(e.nativeEvent.layout.width);
   const size = rowWidth
     ? Math.min(MAX_SWATCH_SIZE, Math.floor((rowWidth - GAP * (PER_ROW - 1)) / PER_ROW))
     : 0;
 
   return (
-    <View style={styles.wrap} onLayout={onLayout}>
+    // il tocco sullo sfondo salta l'attesa, quello su un colore ne copia l'hex
+    <Pressable style={styles.wrap} onLayout={onLayout} onPress={skip}>
       {size > 0 &&
         values.map((value, i) => (
-          <View key={`${value}-${i}`} style={styles.item}>
-            <Swatch hex={value} delay={i * FILL_DURATION} size={size} />
+          <Pressable
+            key={`${value}-${i}`}
+            style={styles.item}
+            onPress={() => copy(value, copiedLabel)}
+          >
+            <Swatch hex={value} delay={delays[i]} size={size} skip={skipped} />
             <Text style={[styles.hex, { color: colors.textColor, opacity: 0.55 }]}>{value}</Text>
-          </View>
+          </Pressable>
         ))}
-    </View>
+    </Pressable>
   );
 }
 
-function Swatch({ hex, delay, size }: { hex: string; delay: number; size: number }) {
+function Swatch({
+  hex,
+  delay,
+  size,
+  skip,
+}: {
+  hex: string;
+  delay: number;
+  size: number;
+  skip: boolean;
+}) {
   const progress = useSharedValue(0);
   const crestX = useSharedValue(size * CREST_FROM_RATIO);
 
   useEffect(() => {
+    // Salto dell'attesa: il tondo risulta pieno subito
+    if (skip) {
+      cancelAnimation(progress);
+      cancelAnimation(crestX);
+      progress.value = 1;
+      crestX.value = size * CREST_TO_RATIO;
+      return;
+    }
+
     const config = { duration: FILL_DURATION, easing: Easing.out(Easing.cubic) };
     progress.value = withDelay(delay, withTiming(1, config));
     // la cresta scorre in x mentre il livello sale: stesso timing, nessuna oscillazione dopo
     crestX.value = withDelay(delay, withTiming(size * CREST_TO_RATIO, config));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- sola animazione d'ingresso, nessun valore reattivo da risincronizzare
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- animazione d'ingresso: riparte solo al salto
+  }, [skip]);
 
   const waveProps = useAnimatedProps(() => {
     const waveY = interpolate(
