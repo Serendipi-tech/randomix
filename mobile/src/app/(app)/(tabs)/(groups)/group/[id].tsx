@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LayoutGrid, List } from 'lucide-react-native';
 import { Colors, Spacing } from '@/constants/theme';
 import { useNavbarClearance } from '@/utils/useNavbarClearance';
 import { DEFAULT_LIST_ICON_KEY, resolveListIcon, type ListIconKey } from '@/constants/list-icons';
@@ -160,7 +159,7 @@ export default function GroupDetailScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <RadialBackground colorScheme={colorScheme} />
-      <PageHeader icon={LayoutGrid} title={group?.name ?? ''} onBack={() => router.back()} />
+      <PageHeader onBack={() => router.back()} />
 
       {showSkeleton ? (
         <View style={styles.skeletonContainer}>

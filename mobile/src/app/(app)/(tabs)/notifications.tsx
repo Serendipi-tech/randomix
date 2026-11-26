@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { Bell } from 'lucide-react-native';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
@@ -29,7 +28,7 @@ export default function NotificationsScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <RadialBackground colorScheme={colorScheme} />
-      <PageHeader icon={Bell} title={t('title')} />
+      <PageHeader />
       <FlatList
         showsVerticalScrollIndicator={false}
         data={showSkeleton ? [] : notifications}

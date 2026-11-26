@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { List, UserMinus, Users } from 'lucide-react-native';
+import { List, UserMinus } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -66,8 +66,6 @@ export default function FriendProfileScreen() {
     <SafeAreaView style={styles.safe}>
       <RadialBackground colorScheme={colorScheme} />
       <PageHeader
-        icon={Users}
-        title={profile?.user.username ?? ''}
         onBack={() => router.back()}
         action={{ icon: UserMinus, onPress: () => setConfirmingRemove(true) }}
       />

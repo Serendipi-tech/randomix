@@ -1,7 +1,7 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Package, Plus } from 'lucide-react-native';
+import { Plus } from 'lucide-react-native';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
@@ -124,7 +124,7 @@ export default function ItemFormScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <RadialBackground colorScheme={colorScheme} />
-      <PageHeader icon={Package} title={t('itemForm.titleAdd')} onBack={() => router.back()} />
+      <PageHeader onBack={() => router.back()} />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Input
           label={t('itemForm.name')}

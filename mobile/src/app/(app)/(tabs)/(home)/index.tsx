@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Home, List, Plus, Shuffle } from 'lucide-react-native';
+import { List, Plus } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,12 +8,14 @@ import { resolveListIcon } from '@/constants/list-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
 import { PageHeader } from '@/components/molecules/PageHeader';
+import { PremiumBanner } from '@/components/molecules/premium-banner';
 import { EmptyState } from '@/components/molecules/EmptyState';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ListCard } from '@/components/cards/ListCard';
-import { ContentCard } from '@/components/cards/ContentCard';
+import { RandomizerCard } from '@/components/cards/RandomizerCard';
 import { useMyLists } from '@/utils/useLists';
 import { useNavbarClearance } from '@/utils/useNavbarClearance';
+import { useMembershipPlans } from '@/utils/useMembershipPlans';
 import { useProfile } from '@/utils/useProfile';
 
 const SKELETON_COUNT = 6;
@@ -25,6 +27,7 @@ export default function HomeScreen() {
 
   const { lists, loading, error, loadMore } = useMyLists();
   const { profile } = useProfile();
+  const { isFreePlan } = useMembershipPlans();
   // clearance in fondo alla lista per non finire sotto la pillola-navbar (regola condivisa)
   const listBottomPadding = useNavbarClearance();
 
@@ -34,18 +37,24 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <RadialBackground colorScheme={colorScheme} />
-      <PageHeader
-        icon={Home}
-        title={t('title')}
-        action={{ icon: Plus, onPress: () => router.push('/list-form') }}
-      />
+      <PageHeader action={{ icon: Plus, onPress: () => router.push('/list-form') }} />
+
+      {/* Solo a piano gratuito accertato: a piano attivo, o finché non si sa, non si propone nulla */}
+      {isFreePlan && (
+        <View style={styles.premiumWrap}>
+          <PremiumBanner
+            title={t('premium.title')}
+            subtitle={t('premium.subtitle')}
+            ctaLabel={t('premium.cta')}
+            onPress={() => router.push('/plans')}
+          />
+        </View>
+      )}
 
       <View style={styles.randomizerWrap}>
-        <ContentCard
-          variant="outlined"
-          icon={Shuffle}
+        <RandomizerCard
           title={t('randomizer')}
-          description={t('randomizerSubtitle')}
+          subtitle={t('randomizerSubtitle')}
           onPress={() => router.push('/randomizer')}
         />
       </View>
@@ -98,6 +107,10 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
+  },
+  premiumWrap: {
+    marginHorizontal: Spacing.four,
+    marginBottom: Spacing.two,
   },
   randomizerWrap: {
     marginHorizontal: Spacing.four,
