@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { ChevronRight } from 'lucide-react-native';
 import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,11 +13,9 @@ import Svg, {
 import { Colors } from '@/constants/theme';
 import { hexToRgba, mixColors } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { useTranslation } from 'react-i18next';
 
 type PremiumBannerProps = {
-  title: string;
-  subtitle: string;
-  ctaLabel: string;
   onPress: () => void;
 };
 
@@ -82,11 +80,19 @@ const SPARKLE_LIGHTEN = 0.45;
 
 /** Banda "passa a premium": corona dorata, titolo e sottotitolo, pillola di invito a destra.
  *  Tutta la banda è premibile — la pillola fa parte del disegno, non è un secondo bersaglio.
- *  Puro render da props. */
-export function PremiumBanner({ title, subtitle, ctaLabel, onPress }: PremiumBannerProps) {
+ *  La copy è sempre la stessa ovunque compaia, quindi vive nel namespace `premium` invece di
+ *  essere ripetuta da ogni chiamante: dall'esterno arriva solo l'azione. */
+export function PremiumBanner({ onPress }: PremiumBannerProps) {
+  const { t } = useTranslation('premium');
+  const title = t('title');
+  const subtitle = t('subtitle');
+  const ctaLabel = t('cta');
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   const [ctaWidth, setCtaWidth] = useState(0);
+  // Gli id dei gradienti SVG sono globali: con due banner montati insieme (le tab restano vive)
+  // il secondo perderebbe i riempimenti, quindi vanno resi univoci per istanza
+  const instanceId = useId();
 
   const onCtaLayout = (e: LayoutChangeEvent) => setCtaWidth(e.nativeEvent.layout.width);
 
@@ -145,7 +151,7 @@ export function PremiumBanner({ title, subtitle, ctaLabel, onPress }: PremiumBan
                 }}
               >
                 <SparkGlyph
-                  gradientId={`premiumSpark${i}`}
+                  gradientId={`premiumSpark-${instanceId}-${i}`}
                   size={sparkle.size}
                   color={mixColors(colors.accent, LIGHT_INK, SPARKLE_LIGHTEN)}
                   mirrored={sparkle.mirrored}
@@ -155,7 +161,7 @@ export function PremiumBanner({ title, subtitle, ctaLabel, onPress }: PremiumBan
         </View>
 
         <View style={styles.crown}>
-          <CrownGlyph gold={colors.secondary} warm={colors.warning} />
+          <CrownGlyph gold={colors.secondary} warm={colors.warning} instanceId={instanceId} />
         </View>
 
         <View style={styles.texts}>
@@ -231,9 +237,11 @@ function SparkGlyph({
 /** Corona a tre punte, sottile, con alone dorato attorno. Niente ombre interne: il gradiente va
  *  dall'oro a un oro appena più caldo, non più scuro. La `Crown` di lucide, riempita, risultava un
  *  blocco unico senza stacco fra le punte. */
-function CrownGlyph({ gold, warm }: { gold: string; warm: string }) {
+function CrownGlyph({ gold, warm, instanceId }: { gold: string; warm: string; instanceId: string }) {
   // Metà strada verso l'arancio del tema: resta oro, vira appena sul caldo
   const amber = mixColors(gold, warm, 0.5);
+  const fillId = `premiumCrown-${instanceId}`;
+  const glowId = `premiumCrownGlow-${instanceId}`;
 
   return (
     <Svg
@@ -242,27 +250,27 @@ function CrownGlyph({ gold, warm }: { gold: string; warm: string }) {
       viewBox={`${CROWN_VIEWBOX.x} ${CROWN_VIEWBOX.y} ${CROWN_VIEWBOX.width} ${CROWN_VIEWBOX.height}`}
     >
       <Defs>
-        <SvgLinearGradient id="premiumCrown" x1="0" y1="0" x2="0" y2="1">
+        <SvgLinearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
           <Stop offset="0" stopColor={gold} />
           <Stop offset="1" stopColor={amber} />
         </SvgLinearGradient>
         {/* Alone: sfuma a zero prima del bordo del viewBox, quindi non si vede dove finisce */}
-        <RadialGradient id="premiumCrownGlow" cx="50%" cy="50%" r="50%">
+        <RadialGradient id={glowId} cx="50%" cy="50%" r="50%">
           <Stop offset="0" stopColor={gold} stopOpacity={0.45} />
           <Stop offset="0.55" stopColor={gold} stopOpacity={0.16} />
           <Stop offset="1" stopColor={gold} stopOpacity={0} />
         </RadialGradient>
       </Defs>
 
-      <Circle cx={24} cy={21} r={30} fill="url(#premiumCrownGlow)" />
+      <Circle cx={24} cy={21} r={30} fill={`url(#${glowId})`} />
 
       <Path
         d="M 7 31 L 3 9 L 15.5 19 L 24 5 L 32.5 19 L 45 9 L 41 31 Z"
-        fill="url(#premiumCrown)"
+        fill={`url(#${fillId})`}
       />
       <Path
         d="M 7 32.5 L 41 32.5 Q 43 32.5 43 34.5 L 43 36 Q 43 38 41 38 L 7 38 Q 5 38 5 36 L 5 34.5 Q 5 32.5 7 32.5 Z"
-        fill="url(#premiumCrown)"
+        fill={`url(#${fillId})`}
       />
       <Circle cx={16} cy={35.2} r={1.6} fill={amber} opacity={0.7} />
       <Circle cx={24} cy={35.2} r={1.6} fill={amber} opacity={0.7} />

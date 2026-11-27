@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { LogOut, MessageSquare, Settings } from 'lucide-react-native';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Spacing } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 import { AVATAR_PRESETS, resolveAvatarUri } from '@/constants/avatar-presets';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
@@ -23,10 +24,12 @@ import { useAuth } from '@/utils/useAuth';
 import { useProfile } from '@/utils/useProfile';
 import { useMyFriends } from '@/utils/useFriends';
 import { useProfileStats } from '@/utils/useProfileStats';
+import { useMembershipPlans } from '@/utils/useMembershipPlans';
+import { PremiumBanner } from '@/components/molecules/premium-banner';
 
 const USERNAME_MIN_LENGTH = 3;
-// Deve combaciare con AVATAR_SIZE/2 di ProfileHeader: spazio per l'avatar che sfonda la card.
-const HERO_TOP_SPACE = 48;
+// Deve combaciare con RING_SIZE/2 di ProfileHeader: spazio per l'avatar che sfonda il blocco.
+const HERO_TOP_SPACE = 55;
 // Deve combaciare con BAR_HEIGHT di components/app-tabs.tsx: spazio per non finire sotto la tab bar.
 const NAVBAR_HEIGHT = 68;
 
@@ -41,6 +44,7 @@ export default function ProfileScreen() {
   const { profile, loading: loadingProfile, updateProfile, saving, saveError } = useProfile();
   const { friends } = useMyFriends();
   const { categoryStats, completionBreakdown } = useProfileStats();
+  const { isFreePlan } = useMembershipPlans();
 
   const [editing, setEditing] = useState(false);
   const [username, setUsername] = useState('');
@@ -74,18 +78,6 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <RadialBackground colorScheme={colorScheme} />
-      {/* Barra azioni senza titolo: la pagina si identifica già dalla tab attiva */}
-      <View style={styles.topBar}>
-        <Pressable onPress={() => router.push('/feedback')} hitSlop={10}>
-          <MessageSquare size={24} color={colors.textColor} />
-        </Pressable>
-        <Pressable onPress={() => router.push('/settings')} hitSlop={10}>
-          <Settings size={24} color={colors.textColor} />
-        </Pressable>
-        <Pressable onPress={() => setConfirmingLogout(true)} hitSlop={10}>
-          <LogOut size={24} color={colors.textColor} />
-        </Pressable>
-      </View>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={[styles.content, { paddingBottom: NAVBAR_HEIGHT + insets.bottom + Spacing.five }]}
@@ -95,7 +87,7 @@ export default function ProfileScreen() {
           <ListCardSkeleton colorScheme={colorScheme} />
         ) : profile && !editing ? (
           <>
-            <Animated.View entering={FadeInDown.duration(500)} style={styles.heroSpace}>
+            <View style={styles.heroSpace}>
               <ProfileHeader
                 username={profile.username}
                 email={profile.email}
@@ -107,20 +99,57 @@ export default function ProfileScreen() {
                   date: new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
                 })}
               />
-            </Animated.View>
-            <Animated.View entering={FadeInDown.delay(120).duration(400)} style={styles.statsGap}>
+            </View>
+            {/* Barra azioni senza titolo: la pagina si identifica già dalla tab attiva */}
+            <View style={styles.actionBar}>
+              <LinearGradient
+                colors={['transparent', colors.secondaryGradient]}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={styles.actionRule}
+              />
+              {[
+                { icon: MessageSquare, onPress: () => router.push('/feedback') },
+                { icon: Settings, onPress: () => router.push('/settings') },
+                { icon: LogOut, onPress: () => setConfirmingLogout(true) },
+              ].map(({ icon: ActionIcon, onPress }, index) => (
+                <Pressable
+                  key={index}
+                  onPress={onPress}
+                  hitSlop={6}
+                  style={({ pressed }) => [
+                    styles.actionButton,
+                    { backgroundColor: hexToRgba(colors.primary, 0.25), opacity: pressed ? 0.6 : 1 },
+                  ]}
+                >
+                  <ActionIcon size={20} color={colors.textColor} />
+                </Pressable>
+              ))}
+              <LinearGradient
+                colors={[colors.secondaryGradient, 'transparent']}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={styles.actionRule}
+              />
+            </View>
+
+            <View style={styles.statsGap}>
               <ProfileStatsPanel
                 listsCount={profile.listsCount}
                 totalItemsCount={profile.totalItemsCount}
                 completedItemsCount={profile.completedItemsCount}
                 friendsCount={friends.length}
               />
-              <ProfileCategoryStats categoryStats={categoryStats} />
+              {/* Solo a piano gratuito accertato: a piano attivo, o finché non si sa, non si propone nulla */}
+              {isFreePlan && (
+                <PremiumBanner onPress={() => router.push('/plans')} />
+              )}
               {completionBreakdown && <ProfileCompletionDonut breakdown={completionBreakdown} />}
-            </Animated.View>
+              <ProfileCategoryStats categoryStats={categoryStats} />
+            </View>
           </>
         ) : profile ? (
-          <Animated.View entering={FadeIn.duration(300)}>
+          <View>
             <CardShell backgroundColor={colors.foreground} borderColor={colors.border}>
               <View style={styles.editSection}>
                 <Input
@@ -154,7 +183,7 @@ export default function ProfileScreen() {
                 />
               </View>
             </CardShell>
-          </Animated.View>
+          </View>
         ) : null}
       </ScrollView>
 
@@ -177,14 +206,23 @@ const styles = StyleSheet.create({
   // flexShrink:0: con contenuto più alto dello schermo si rifiuta di restringersi e trabocca
   // invece di lasciare scrollare il figlio. Assoluto = dimensionato dai bordi, ignora quel flex a monte.
   safe: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
-  topBar: {
+  actionBar: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
     alignItems: 'center',
-    gap: Spacing.three,
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.four,
-    paddingBottom: Spacing.three,
+    justifyContent: 'center',
+    gap: Spacing.two + Spacing.one,
+  },
+  // Riga decorativa ai lati dei bottoni: sfuma verso l'esterno
+  actionRule: {
+    flex: 1,
+    height: 1,
+  },
+  actionButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   scroll: {
     flex: 1,
@@ -192,6 +230,7 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: Spacing.four,
+    paddingTop: Spacing.four,
     gap: Spacing.two + Spacing.one,
   },
   heroSpace: {
