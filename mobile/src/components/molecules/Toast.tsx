@@ -22,19 +22,21 @@ export function Toast({ message, type, duration = 3000, onDismiss }: ToastProps)
 
   const translateY = useSharedValue(-100);
 
-  // Map toast type to color and icon hint
+  // Colore d'accento per tipo, stesso ruolo di Button variant="confirm"/"destructive": bordo
+  // pieno + sfondo sfumato nello stesso colore, non un riempimento pieno (poco leggibile col
+  // verde/rosso del tema, molto saturi)
   const getTypeStyles = () => {
     switch (type) {
       case 'success':
-        return { backgroundColor: colors.success, label: '✓' };
+        return { accentColor: colors.success, label: '✓' };
       case 'error':
-        return { backgroundColor: colors.error, label: '!' };
+        return { accentColor: colors.error, label: '!' };
       case 'info':
-        return { backgroundColor: colors.info, label: 'ℹ' };
+        return { accentColor: colors.info, label: 'ℹ' };
     }
   };
 
-  const { backgroundColor, label } = getTypeStyles();
+  const { accentColor, label } = getTypeStyles();
 
   useEffect(() => {
     // Slide in from top
@@ -70,14 +72,21 @@ export function Toast({ message, type, duration = 3000, onDismiss }: ToastProps)
         styles.container,
         animatedStyle,
         {
-          backgroundColor,
+          // Base piena (card del tema): resta leggibile a prescindere da cosa c'e' sotto il
+          // toast (sfondi radiali diversi per schermata). La tinta di stato va sopra questa base,
+          // non sopra la pagina reale, cosi' non si "perde" come con un overlay trasparente puro.
+          backgroundColor: colors.foreground,
+          borderWidth: 1.5,
+          borderColor: accentColor,
           boxShadow: `0px 4px 12px ${hexToRgba(colors.shadow, 0.3)}`,
         },
       ]}
     >
+      {/* Tinta di stato, stessa proporzione dell'Alert di colors-showcase (hexToRgba 0.1) */}
+      <View style={[StyleSheet.absoluteFill, styles.tint, { backgroundColor: hexToRgba(accentColor, 0.1) }]} />
       <View style={styles.content}>
-        <Text style={styles.icon}>{label}</Text>
-        <Text style={[styles.message, { color: '#fff' }]}>{message}</Text>
+        <Text style={[styles.icon, { color: accentColor }]}>{label}</Text>
+        <Text style={[styles.message, { color: colors.textColor }]}>{message}</Text>
       </View>
     </Animated.View>
   );
@@ -95,6 +104,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     marginTop: 48,
+    overflow: 'hidden',
+  },
+  tint: {
+    borderRadius: 10,
   },
   content: {
     flexDirection: 'row',
@@ -104,7 +117,6 @@ const styles = StyleSheet.create({
   icon: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#fff',
   },
   message: {
     flex: 1,

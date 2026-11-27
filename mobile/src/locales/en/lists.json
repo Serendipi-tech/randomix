@@ -69,6 +69,7 @@
   },
   "itemForm": {
     "titleAdd": "Add item",
+    "added": "Item added",
     "titleEdit": "Edit item",
     "name": "Name",
     "namePlaceholder": "Item name",
