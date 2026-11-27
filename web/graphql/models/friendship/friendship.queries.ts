@@ -5,6 +5,7 @@ import {
   FriendProfileRef,
   FriendRequestRef,
   PublicUserRef,
+  SentFriendRequestRef,
   UserSearchResultRef,
   type FriendRelation,
 } from './index';
@@ -120,6 +121,20 @@ builder.queryField('friendRequests', (t) =>
       return prisma.friendship.findMany({
         where: { receiverId: ctx.userId, status: 'PENDING' },
         include: { sender: true },
+        orderBy: { createdAt: 'desc' },
+      });
+    },
+  }),
+);
+
+builder.queryField('sentFriendRequests', (t) =>
+  t.field({
+    type: [SentFriendRequestRef],
+    resolve: async (_root, _args, ctx) => {
+      requireAuth(ctx.userId);
+      return prisma.friendship.findMany({
+        where: { senderId: ctx.userId, status: 'PENDING' },
+        include: { receiver: true },
         orderBy: { createdAt: 'desc' },
       });
     },

@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
+import { resolveListIcon } from '@/constants/list-icons';
 import { useAppTheme } from '@/utils/useAppTheme';
 import type { CategoryStat } from '@/utils/useProfileStats';
 import { CardShell } from '@/components/cards/CardShell';
-import { SectionLabel } from '@/components/atoms/SectionLabel';
 import { SegmentedControl } from '@/components/atoms/SegmentedControl';
 import { HorizontalBarList, type BarDatum } from '@/components/atoms/horizontal-bar-list';
 
@@ -31,9 +31,8 @@ export function ProfileCategoryStats({ categoryStats }: ProfileCategoryStatsProp
   );
 
   return (
-    <CardShell>
-      <View style={{ gap: 14 }}>
-        <SectionLabel>{t('charts.categories.title')}</SectionLabel>
+    <CardShell title={t('charts.categories.title')}>
+      <View style={styles.content}>
         <SegmentedControl
           value={metric}
           onChange={setMetric}
@@ -62,11 +61,12 @@ function buildBars(
   const key = metric === 'used' ? 'itemsCount' : 'drawCount';
   const sorted = [...categoryStats].filter((c) => c[key] > 0).sort((a, b) => b[key] - a[key]);
 
-  const top = sorted.slice(0, MAX_CATEGORIES).map((c, i) => ({
+  const top: BarDatum[] = sorted.slice(0, MAX_CATEGORIES).map((c, i) => ({
     key: c.categoryId,
     label: c.name,
     value: c[key],
     color: palette[i % palette.length],
+    icon: resolveListIcon(c.icon),
   }));
 
   const restSum = sorted.slice(MAX_CATEGORIES).reduce((sum, c) => sum + c[key], 0);
@@ -76,3 +76,8 @@ function buildBars(
 
   return top;
 }
+
+const styles = StyleSheet.create({
+  // Stacco fra il controllo a segmenti e le barre (il titolo lo distanzia gia' CardShell)
+  content: { gap: 14 },
+});

@@ -31,6 +31,17 @@ FriendRequestRef.implement({
   }),
 });
 
+// Richiesta d'amicizia inviata dall'utente corrente: qui l'altro capo della coppia è il destinatario
+export const SentFriendRequestRef = builder.objectRef<Friendship & { receiver: User }>('SentFriendRequest');
+
+SentFriendRequestRef.implement({
+  fields: (t) => ({
+    id: t.exposeID('id'),
+    receiver: t.field({ type: PublicUserRef, resolve: (parent) => parent.receiver }),
+    createdAt: t.expose('createdAt', { type: 'DateTime' }),
+  }),
+});
+
 interface UserSearchResultShape {
   user: User;
   relation: FriendRelation;

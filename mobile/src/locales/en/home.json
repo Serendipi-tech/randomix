@@ -1,5 +1,6 @@
 {
   "title": "Your lists",
+  "seeAll": "See All",
   "addList": "+ New",
   "randomizer": "Randomizer",
   "randomizerSubtitle": "Numbers, letters, colors and dice",
@@ -7,10 +8,5 @@
     "title": "No lists yet",
     "subtitle": "Create a list to get started."
   },
-  "error": "Couldn't load your lists. Please try again.",
-  "premium": {
-    "title": "Go Premium",
-    "subtitle": "Unlock more features!",
-    "cta": "Upgrade"
-  }
+  "error": "Couldn't load your lists. Please try again."
 }

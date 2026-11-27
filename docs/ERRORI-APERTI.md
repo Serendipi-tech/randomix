@@ -240,6 +240,63 @@
 
 ---
 
+## E09
+
+- [?] [TODO] `DATABASE_URL` punta al pooler Supabase in *session mode*: 15 connessioni in tutto
+- 🏷️ Area: 🗄️ Database e infrastruttura
+- ⏸️ In attesa di chi ha accesso alle env di Vercel (aperto il 27/11/2026) · Urgenza 🟡 · Rischio 🟡 · Effort 🟢
+- [`builder.ts:12`](../web/graphql/builder.ts#L12), `web/.env` (`DATABASE_URL`), env di produzione su Vercel
+- **Problema**: la stringa di connessione usa `aws-0-eu-west-1.pooler.supabase.com:**5432**`, cioè il
+  pooler in *session mode*, che tiene al massimo **15 client contemporanei** (`pool_size: 15`). Ogni
+  istanza serverless calda su Vercel e ogni processo locale (dev server, script) si prende una o più
+  sessioni e le tiene; esaurite le 15, qualsiasi query nuova muore con:
+
+  ```
+  (EMAXCONNSESSION) max clients reached in session mode - max clients are limited to pool_size: 15
+  ```
+
+  Visto dal vivo il 27/11/2026: l'app mostrava pagine vuote a rotazione (notifiche e liste in errore,
+  profilo funzionante) e lo stesso errore arrivava anche a uno script locale sul DB. **Non è un bug
+  del codice applicativo**: le query sono corrette, è il pool che le rifiuta.
+
+  **Mitigazione già fatta** (`web/graphql/builder.ts`): il `Pool` di node-postgres era creato senza
+  opzioni, quindi usava il suo default di **10 connessioni per istanza** — due lambda calde bastavano a
+  saturare il pooler. Ora il massimo è 3 per istanza con rilascio dopo 10s di inattività, e il
+  `PrismaClient` viene riusato tramite `globalThis` in sviluppo (prima ogni hot-reload di
+  `npm run dev` ne lasciava dietro uno con le connessioni ancora aperte). Questo riduce il consumo ma
+  **non toglie il tetto**.
+
+  **Aggiramento in atto (27/11/2026)**: non potendo toccare le env di produzione, `builder.ts`
+  riscrive la stringa a runtime (`toTransactionPooler`), sostituendo `:5432` con `:6543` prima di
+  passarla al driver. Verificato in locale: le sei query parallele di `profileStats` passano senza
+  errori sul transaction mode. **Funziona, ma la configurazione sta nel posto sbagliato**: va spostata
+  nella variabile d'ambiente e la funzione va tolta.
+
+  **Cosa fare**: mettere la porta **6543** direttamente in `DATABASE_URL`, cioè il pooler in
+  *transaction mode*, e rimuovere `toTransactionPooler` da `builder.ts`:
+
+  ```
+  postgresql://<user>:<password>@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1
+  ```
+
+  Va cambiata sia in `web/.env` sia nelle env di produzione su Vercel, poi serve un redeploy. Fatto
+  questo, la riscrittura nel codice diventa un no-op e va cancellata.
+  Compatibilità: il progetto usa il driver adapter `@prisma/adapter-pg`, e `pg` non usa prepared
+  statement con nome, quindi il transaction mode non rompe nulla. Le transazioni interattive
+  (`prisma.$transaction` con callback) non sono usate nei resolver; se un domani servissero, vanno
+  sulla connessione diretta, non sul pooler.
+
+  **Fatto quando**: `DATABASE_URL` in produzione è sulla 6543, `toTransactionPooler` non esiste più e
+  l'app regge i refresh ripetuti senza più `EMAXCONNSESSION`.
+
+- **Note**: l'alternativa è alzare il `pool_size`, che però dipende dalla dimensione di compute del
+  progetto Supabase, quindi significa passare a un piano superiore. L'altra strada già prevista in
+  [`CLAUDE.md`](../CLAUDE.md) è Prisma Accelerate come layer di pooling, ma è un cambio più grosso.
+  L'area 🗄️ non esiste nella legenda di [`TODO.md`](TODO.md): aggiunta qui perché il problema non
+  appartiene a nessuna funzione dell'app.
+
+---
+
 ## N01 — Nota: il lint non è una fonte affidabile allo stato attuale
 
 Non è un errore ma serve saperlo, per non perdere tempo. `npx eslint .` su `mobile/` riporta **160

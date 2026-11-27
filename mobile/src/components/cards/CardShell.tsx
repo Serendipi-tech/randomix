@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/constants/theme';
+import { SectionLabel } from '@/components/atoms/SectionLabel';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
 
@@ -25,6 +26,16 @@ type CardShellProps = {
   gradientColors?: readonly [string, string];
   /** Solo per variant `gradient`: spessore dell'anello colorato. Default 1.5. */
   gradientBorderWidth?: number;
+  /** Solo per variant `gradient`: riempimento interno sfumato (sinistra→destra) invece del colore
+   *  piatto. Stesso guscio di RandomizerCard, senza i suoi decori. */
+  backgroundGradient?: readonly [string, string];
+  /** Raggio degli angoli. Default 12 (SHELL_RADIUS). */
+  radius?: number;
+  /** Padding interno del contenuto. Default 16. */
+  padding?: number;
+  /** Titolo opzionale in cima alla card: già stilato (SectionLabel `heading`) e distanziato dal
+   *  contenuto, così la spaziatura non va ripetuta da ogni card. */
+  title?: string;
 };
 
 /** Guscio visivo condiviso da tutte le varianti di Card: bordo, raggio, background e clipping.
@@ -38,27 +49,57 @@ export function CardShell({
   onPress,
   gradientColors,
   gradientBorderWidth,
+  backgroundGradient,
+  radius = SHELL_RADIUS,
+  padding,
+  title,
 }: CardShellProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
   const accent = borderColor ?? colors.border;
 
+  const content = title ? (
+    <View style={styles.titledContent}>
+      <SectionLabel variant="heading">{title}</SectionLabel>
+      {children}
+    </View>
+  ) : (
+    children
+  );
+
   if (variant === 'gradient') {
     const fill = gradientColors ?? ([colors.secondary, colors.secondaryGradient] as const);
     const ringWidth = gradientBorderWidth ?? 1.5;
-    const innerRadius = Math.max(0, SHELL_RADIUS - ringWidth);
+    const innerRadius = Math.max(0, radius - ringWidth);
 
     const gradientContent = (
       <LinearGradient
         colors={fill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={[styles.gradientRing, { padding: ringWidth }]}
+        style={[styles.gradientRing, { padding: ringWidth, borderRadius: radius }]}
       >
-        <View style={[styles.gradientInner, { backgroundColor: backgroundColor ?? colors.foreground, borderRadius: innerRadius }]}>
-          {children}
-        </View>
+        {backgroundGradient ? (
+          <LinearGradient
+            colors={backgroundGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.gradientInner, { borderRadius: innerRadius }, padding !== undefined && { padding }]}
+          >
+            {content}
+          </LinearGradient>
+        ) : (
+          <View
+            style={[
+              styles.gradientInner,
+              { backgroundColor: backgroundColor ?? colors.foreground, borderRadius: innerRadius },
+              padding !== undefined && { padding },
+            ]}
+          >
+            {content}
+          </View>
+        )}
       </LinearGradient>
     );
 
@@ -81,6 +122,7 @@ export function CardShell({
           borderLeftWidth: 3,
         }
       : {
+          borderRadius: radius,
           backgroundColor: backgroundColor ?? colors.foreground,
           borderColor: accent,
           ...(borderWidth !== undefined ? { borderWidth } : null),
@@ -89,12 +131,12 @@ export function CardShell({
   if (onPress) {
     return (
       <Pressable onPress={onPress} style={({ pressed }) => [styles.shell, shellStyle, { opacity: pressed ? 0.85 : 1 }]}>
-        {children}
+        {content}
       </Pressable>
     );
   }
 
-  return <View style={[styles.shell, shellStyle]}>{children}</View>;
+  return <View style={[styles.shell, shellStyle]}>{content}</View>;
 }
 
 const styles = StyleSheet.create({
@@ -111,5 +153,9 @@ const styles = StyleSheet.create({
   gradientInner: {
     padding: 16,
     overflow: 'hidden',
+  },
+  // Distanza fra titolo e contenuto: unica per tutte le card titolate
+  titledContent: {
+    gap: 14,
   },
 });

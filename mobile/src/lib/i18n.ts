@@ -11,13 +11,14 @@ import errors from '@/locales/en/errors.json';
 import groups from '@/locales/en/groups.json';
 import navigation from '@/locales/en/navigation.json';
 import feedback from '@/locales/en/feedback.json';
+import premium from '@/locales/en/premium.json';
 
 i18n.use(initReactI18next).init({
   lng: 'en',
   fallbackLng: 'en',
   compatibilityJSON: 'v4',
   resources: {
-    en: { auth, home, profile, friends, notifications, lists, randomizer, errors, groups, navigation, feedback },
+    en: { auth, home, profile, friends, notifications, lists, randomizer, errors, groups, navigation, feedback, premium },
   },
   interpolation: { escapeValue: false },
 });

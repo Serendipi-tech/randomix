@@ -3,8 +3,9 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Defs, LinearGradient as SvgLinearGradient, Path, Stop } from 'react-native-svg';
 import { Colors } from '@/constants/theme';
-import { hexToRgba, mixColors } from '@/utils/color';
+import { hexToRgba, mixColors, surfaceFillGradient } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { EdgeVeil } from '@/components/atoms/EdgeVeil';
 
 type RandomizerCardProps = {
   title: string;
@@ -32,16 +33,6 @@ const ICON_SIZE = 36;
 const ARROW_SIZE = 36;
 const DIVIDER_HEIGHT = 38;
 
-// Sfondo interno: viola medio, non il quasi nero delle superfici — il foreground tirato verso il
-// primario, un po' di più a sinistra, e poi virato verso il rosso: viola rossastro, non magenta
-const FILL_LEFT = 0.18;
-const FILL_RIGHT = 0.05;
-const FILL_RED_TINT = 0.13;
-// Bagliore dorato del bordo sinistro: `GOLD_VEIL_END` è la quota di larghezza su cui si spegne,
-// espressa come posizione dello stop (non come punto finale dell'asse, che lascerebbe il colore
-// finale a proseguire e renderebbe la banda molto più larga)
-const GOLD_VEIL_ALPHA = 0.22;
-const GOLD_VEIL_END = 0.1;
 
 
 /** Accesso al randomizzatore: anello a gradiente oro→magenta, icona shuffle disegnata con lo
@@ -61,18 +52,7 @@ export function RandomizerCard({ title, subtitle, onPress }: RandomizerCardProps
         style={styles.ring}
       >
         <LinearGradient
-          colors={[
-            mixColors(
-              mixColors(colors.foreground, colors.primary, FILL_LEFT),
-              colors.extraColors.one,
-              FILL_RED_TINT,
-            ),
-            mixColors(
-              mixColors(colors.foreground, colors.primary, FILL_RIGHT),
-              colors.extraColors.one,
-              FILL_RED_TINT,
-            ),
-          ]}
+          colors={surfaceFillGradient(colors.foreground, colors.primary, colors.extraColors.one)}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.inner}
@@ -97,18 +77,7 @@ export function RandomizerCard({ title, subtitle, onPress }: RandomizerCardProps
             </Svg>
           </View>
 
-          <LinearGradient
-            colors={[
-              hexToRgba(colors.secondary, GOLD_VEIL_ALPHA),
-              hexToRgba(colors.secondary, 0),
-              hexToRgba(colors.secondary, 0),
-            ]}
-            locations={[0, GOLD_VEIL_END, 1]}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
-            style={styles.goldVeil}
-            pointerEvents="none"
-          />
+          <EdgeVeil color={colors.secondary} />
 
 
           <ShuffleGlyph from={gradient[0]} to={gradient[1]} />
@@ -186,28 +155,26 @@ const styles = StyleSheet.create({
     // La rotazione avviene attorno al centro del riquadro, non attorno alla punta
     transform: [{ rotate: '20deg' }],
   },
-  goldVeil: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
   divider: {
     width: 1,
     height: DIVIDER_HEIGHT,
   },
   texts: {
     flex: 1,
-    gap: 2,
+    gap: 0,
+    // Compensazione ottica: il descender del sottotitolo sborda sotto il line box e il blocco sembra basso.
+    // translateY e non margin, così non altera l'altezza della riga (e quindi della card)
+    transform: [{ translateY: -2 }],
   },
   title: {
     fontSize: 18,
+    lineHeight: 20,
     fontWeight: '700',
   },
   // Riga descrittiva, trattata come didascalia: a misura piena il testo non sta su una riga sola
   subtitle: {
     fontSize: 12,
+    lineHeight: 14,
     opacity: 0.8,
   },
   // Solo sfondo: chiaro al 10%, nessun contorno

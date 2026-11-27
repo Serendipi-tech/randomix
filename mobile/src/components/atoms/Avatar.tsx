@@ -16,11 +16,14 @@ type AvatarProps = {
   ring?: boolean;
   /** Diametro del ring esterno. Default 60 (dimensione storica, invariata per i chiamanti esistenti). */
   size?: number;
+  /** Spessore totale di bordo + padding attorno all'immagine. Default 8 (RING_INSET storico):
+   *  con 0 l'immagine riempie tutto il diametro, utile quando l'anello lo disegna il chiamante. */
+  inset?: number;
 };
 
 /** Avatar circolare con ring colorato ricavato dal colore dominante dell'immagine.
  *  Senza `uri` mostra un riempimento di fallback; senza `name` non mostra la label. */
-export function Avatar({ uri, name, fallbackColor, ring = true, size = DEFAULT_SIZE }: AvatarProps) {
+export function Avatar({ uri, name, fallbackColor, ring = true, size = DEFAULT_SIZE, inset = RING_INSET }: AvatarProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
@@ -29,14 +32,21 @@ export function Avatar({ uri, name, fallbackColor, ring = true, size = DEFAULT_S
   // L'hook va chiamato sempre (regole degli hook): senza uri passiamo stringa vuota e non mostriamo il ring.
   const ringColor = useDominantColor(resolvedUri ?? '', fallbackColor);
   const showRing = ring && !!resolvedUri;
-  const innerSize = size - RING_INSET;
+  const innerSize = size - inset;
 
   return (
     <View style={[styles.avatarItem, { width: size }]}>
       <View
         style={[
           styles.avatarRing,
-          { width: size, height: size, borderRadius: size / 2, borderColor: showRing ? ringColor : 'transparent' },
+          {
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            borderColor: showRing ? ringColor : 'transparent',
+            borderWidth: inset / 2,
+            padding: inset / 2,
+          },
         ]}
       >
         {resolvedUri ? (
@@ -65,10 +75,8 @@ export function Avatar({ uri, name, fallbackColor, ring = true, size = DEFAULT_S
 const styles = StyleSheet.create({
   avatarItem: { alignItems: 'center' },
   avatarRing: {
-    borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 2,
   },
   avatar: {
     alignItems: 'center',

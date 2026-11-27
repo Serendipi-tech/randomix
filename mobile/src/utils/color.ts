@@ -47,3 +47,18 @@ export function mixColors(base: string, tint: string, amount: number): string {
   const bl = channel(a.b, b.b);
   return `#${((1 << 24) + (r << 16) + (g << 8) + bl).toString(16).slice(1)}`;
 }
+
+// Sfondo interno delle card a guscio sfumato: viola medio, non il quasi nero delle superfici —
+// il foreground tirato verso il primario, un po' di più a sinistra, e poi virato verso il rosso
+const SURFACE_FILL_LEFT = 0.18;
+const SURFACE_FILL_RIGHT = 0.05;
+const SURFACE_FILL_RED_TINT = 0.13;
+
+/** Coppia di colori (sinistra, destra) del riempimento sfumato condiviso da RandomizerCard e dalla
+ *  variante `gradient-fill` di CardShell. */
+export function surfaceFillGradient(foreground: string, primary: string, redTint: string): readonly [string, string] {
+  return [
+    mixColors(mixColors(foreground, primary, SURFACE_FILL_LEFT), redTint, SURFACE_FILL_RED_TINT),
+    mixColors(mixColors(foreground, primary, SURFACE_FILL_RIGHT), redTint, SURFACE_FILL_RED_TINT),
+  ] as const;
+}
