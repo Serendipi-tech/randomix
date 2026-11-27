@@ -31,11 +31,15 @@ type CardShellProps = {
   backgroundGradient?: readonly [string, string];
   /** Raggio degli angoli. Default 12 (SHELL_RADIUS). */
   radius?: number;
-  /** Padding interno del contenuto. Default 16. */
+  /** Padding interno del contenuto. Default 16 (vale per tutte le varianti). */
   padding?: number;
   /** Titolo opzionale in cima alla card: già stilato (SectionLabel `heading`) e distanziato dal
    *  contenuto, così la spaziatura non va ripetuta da ogni card. */
   title?: string;
+  /** Bordo sinistro d'accento, più spesso degli altri tre: col raggio della card il giunto fra i
+   *  due spessori si chiude a punta sulle due curve. */
+  accentEdgeColor?: string;
+  accentEdgeWidth?: number;
 };
 
 /** Guscio visivo condiviso da tutte le varianti di Card: bordo, raggio, background e clipping.
@@ -53,6 +57,8 @@ export function CardShell({
   radius = SHELL_RADIUS,
   padding,
   title,
+  accentEdgeColor,
+  accentEdgeWidth,
 }: CardShellProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
@@ -126,6 +132,10 @@ export function CardShell({
           backgroundColor: backgroundColor ?? colors.foreground,
           borderColor: accent,
           ...(borderWidth !== undefined ? { borderWidth } : null),
+          ...(padding !== undefined ? { padding } : null),
+          ...(accentEdgeColor !== undefined
+            ? { borderLeftColor: accentEdgeColor, borderLeftWidth: accentEdgeWidth ?? 4 }
+            : null),
         };
 
   if (onPress) {

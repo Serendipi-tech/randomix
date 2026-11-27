@@ -7,8 +7,14 @@ import { useAppTheme } from '@/utils/useAppTheme';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'confirm' | 'gradient' | 'soft';
 
+/** `compact`: misura ridotta per le azioni dentro una card o una riga, dove i 48px starebbero stretti. */
+export type ButtonSize = 'default' | 'compact';
+
 // Altezza unica per ogni variante: i bottoni sono sempre allineati tra loro
 const BUTTON_HEIGHT = 48;
+const BUTTON_HEIGHT_COMPACT = 32;
+const ICON_SIZE = 18;
+const ICON_SIZE_COMPACT = 15;
 
 // Unione dei due schemi: `Colors[colorScheme]` non è restringibile a un solo scheme (literal `as const`)
 type ThemeColors = typeof Colors.light | typeof Colors.dark;
@@ -24,6 +30,8 @@ type ButtonProps = {
   icon?: ComponentType<{ size?: number; color?: string }>;
   /** Solo per variant `soft`, alternativa a `icon`: quadretto colorato (per trigger tipo "scegli colore"). */
   swatchColor?: string;
+  /** Misura del bottone. Default `default` (48px). */
+  size?: ButtonSize;
 };
 
 type VariantStyle = {
@@ -39,7 +47,16 @@ type VariantStyle = {
 /** In base a `variant` renderizza il tipo di bottone: shell unica, nessun bottone annidato.
  *  `disabled` forza la variante `ghost` e disabilita l'interazione; `loading` mostra uno spinner
  *  mantenendo la variante e blocca l'interazione. */
-export function Button({ variant = 'primary', label, onPress, disabled = false, loading = false, icon: Icon, swatchColor }: ButtonProps) {
+export function Button({
+  variant = 'primary',
+  label,
+  onPress,
+  disabled = false,
+  loading = false,
+  icon: Icon,
+  swatchColor,
+  size = 'default',
+}: ButtonProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   // disabled forza sempre l'aspetto ghost, a prescindere dalla variante richiesta
@@ -51,12 +68,15 @@ export function Button({ variant = 'primary', label, onPress, disabled = false, 
     Platform.OS === 'web' ? ({ transitionProperty: 'transform', transitionDuration: '80ms' } as ViewStyle) : {};
 
   const v = resolveVariant(effectiveVariant, colors);
+  const isCompact = size === 'compact';
+  const sizeStyle = isCompact ? styles.buttonCompact : null;
 
   if (effectiveVariant === 'soft') {
     return (
       <Pressable
         style={({ pressed }) => [
           styles.softButton,
+          sizeStyle,
           pressTransition,
           { backgroundColor: colors.foreground },
           pressed && !isBlocked ? styles.pressed : null,
@@ -65,7 +85,7 @@ export function Button({ variant = 'primary', label, onPress, disabled = false, 
         disabled={isBlocked}
         android_ripple={{ color: colors.textColor, radius: 8 }}
       >
-        {Icon && <Icon size={18} color={colors.textColor} />}
+        {Icon && <Icon size={isCompact ? ICON_SIZE_COMPACT : ICON_SIZE} color={colors.textColor} />}
         {swatchColor && <View style={[styles.swatch, { backgroundColor: swatchColor }]} />}
         {label ? <Text style={[styles.softLabel, { color: colors.textColor }]}>{label}</Text> : null}
       </Pressable>
@@ -75,7 +95,7 @@ export function Button({ variant = 'primary', label, onPress, disabled = false, 
   if (v.isGradient) {
     return (
       <Pressable
-        style={({ pressed }) => [styles.button, pressTransition, styles.gradientClip, pressed && !isBlocked ? styles.pressed : null]}
+        style={({ pressed }) => [styles.button, sizeStyle, pressTransition, styles.gradientClip, pressed && !isBlocked ? styles.pressed : null]}
         onPress={onPress}
         disabled={isBlocked}
         android_ripple={{ color: colors.textColor, radius: 8 }}
@@ -86,7 +106,7 @@ export function Button({ variant = 'primary', label, onPress, disabled = false, 
           end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFill}
         />
-        <ButtonContent label={label} icon={Icon} color={v.textColor} fontWeight={v.fontWeight} loading={loading} />
+        <ButtonContent label={label} icon={Icon} color={v.textColor} fontWeight={v.fontWeight} loading={loading} compact={isCompact} />
       </Pressable>
     );
   }
@@ -95,6 +115,7 @@ export function Button({ variant = 'primary', label, onPress, disabled = false, 
     <Pressable
       style={({ pressed }) => [
         styles.button,
+        sizeStyle,
         pressTransition,
         { backgroundColor: v.backgroundColor, borderWidth: v.borderWidth, borderColor: v.borderColor },
         disabled ? styles.disabled : null,
@@ -104,7 +125,7 @@ export function Button({ variant = 'primary', label, onPress, disabled = false, 
       disabled={isBlocked}
       android_ripple={{ color: v.rippleColor, radius: 8 }}
     >
-      <ButtonContent label={label} icon={Icon} color={v.textColor} fontWeight={v.fontWeight} loading={loading} />
+      <ButtonContent label={label} icon={Icon} color={v.textColor} fontWeight={v.fontWeight} loading={loading} compact={isCompact} />
     </Pressable>
   );
 }
@@ -115,12 +136,14 @@ function ButtonContent({
   fontWeight,
   loading,
   icon: Icon,
+  compact = false,
 }: {
   label?: string;
   color: string;
   fontWeight: '600' | '700';
   loading: boolean;
   icon?: ComponentType<{ size?: number; color?: string }>;
+  compact?: boolean;
 }) {
   if (loading) {
     return (
@@ -131,9 +154,11 @@ function ButtonContent({
   }
 
   return (
-    <View style={styles.contentRow}>
-      {Icon && <Icon size={18} color={color} />}
-      {label ? <Text style={[styles.label, { color, fontWeight }]}>{label}</Text> : null}
+    <View style={[styles.contentRow, compact && styles.contentRowCompact]}>
+      {Icon && <Icon size={compact ? ICON_SIZE_COMPACT : ICON_SIZE} color={color} />}
+      {label ? (
+        <Text style={[styles.label, compact && styles.labelCompact, { color, fontWeight }]}>{label}</Text>
+      ) : null}
     </View>
   );
 }
@@ -168,6 +193,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
   },
+  buttonCompact: {
+    height: BUTTON_HEIGHT_COMPACT,
+    paddingHorizontal: 14,
+  },
   gradientClip: {
     overflow: 'hidden',
   },
@@ -195,6 +224,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
+  contentRowCompact: {
+    gap: 6,
+  },
   label: {
     fontSize: 18,
     lineHeight: 18,
@@ -204,6 +236,10 @@ const styles = StyleSheet.create({
     // disattivandolo, con lineHeight esplicita, il testo resta centrato su entrambe le piattaforme
     includeFontPadding: false,
     textAlignVertical: 'center',
+  },
+  labelCompact: {
+    fontSize: 14,
+    lineHeight: 14,
   },
   pressed: {
     transform: [{ scale: 0.97 }],

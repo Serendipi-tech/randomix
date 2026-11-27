@@ -37,8 +37,8 @@ export function ProfileCategoryStats({ categoryStats }: ProfileCategoryStatsProp
           value={metric}
           onChange={setMetric}
           options={[
-            { value: 'used', label: t('charts.categories.used') },
-            { value: 'drawn', label: t('charts.categories.drawn') },
+            { value: 'used', label: t('charts.categories.used'), activeColor: colors.primary },
+            { value: 'drawn', label: t('charts.categories.drawn'), activeColor: colors.primary },
           ]}
         />
         {bars.length > 0 ? (

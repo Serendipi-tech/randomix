@@ -7,6 +7,7 @@ const { ACCEPT_FRIEND_REQUEST, REJECT_FRIEND_REQUEST } = FriendshipMutations;
 
 export interface FriendRequest {
   id: string;
+  createdAt: string;
   sender: Friend;
 }
 
@@ -35,6 +36,8 @@ export function useFriendRequests() {
   return {
     requests: data?.friendRequests ?? [],
     loading,
+    // Prima risposta non ancora arrivata (i refetch non contano): vedi useNotifications
+    initialLoading: loading && !data,
     error: error ?? null,
     acceptRequest,
     rejectRequest,

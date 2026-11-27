@@ -1,9 +1,32 @@
 {
   "title": "Notifications",
-  "requests": {
-    "title": "Friend requests",
+  "filters": {
+    "all": "All",
+    "system": "System",
+    "friends": "Friends"
+  },
+  "sections": {
+    "new": "New",
+    "old": "Old"
+  },
+  "time": {
+    "now": "just now",
+    "minute": "{{count}}m ago",
+    "hour": "{{count}}h ago",
+    "day": "{{count}}d ago",
+    "week": "{{count}}w ago"
+  },
+  "friendRequest": {
     "accept": "Accept",
-    "reject": "Reject"
+    "decline": "Decline",
+    "incoming": {
+      "body": "Wants to be your friend"
+    },
+    "sent": {
+      "body": "Request sent",
+      "status": "Pending",
+      "cancel": "Cancel"
+    }
   },
   "empty": {
     "title": "No notifications yet",

@@ -26,6 +26,7 @@ export interface AppNotification {
   markedAsRead: boolean;
   sender: NotificationSender | null;
   timeLabel: string;
+  createdAt: string;
 }
 
 interface RawNotification {
@@ -65,6 +66,7 @@ export function useNotifications() {
     markedAsRead: n.markedAsRead,
     sender: n.sender,
     timeLabel: formatTimeLabel(n.createdAt),
+    createdAt: n.createdAt,
   }));
 
   const markAsRead = async (id: string) => {
@@ -77,6 +79,9 @@ export function useNotifications() {
     notifications,
     unreadCount,
     loading,
+    // `loading` resta true anche durante i refetch con dati in cache: questo invece dice solo
+    // "non c'è ancora niente da mostrare", ed è ciò che decide lo skeleton
+    initialLoading: loading && !data,
     error: error ?? null,
     markAsRead,
     refetch,

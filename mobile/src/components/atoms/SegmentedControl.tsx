@@ -63,7 +63,6 @@ export function SegmentedControl<T extends string>({ options, value, onChange }:
             {
               width: itemWidth,
               backgroundColor: hexToRgba(activeColor, 0.3),
-              borderColor: hexToRgba(colors.textColor, 0.22),
             },
           ]}
         />
@@ -102,7 +101,6 @@ const styles = StyleSheet.create({
     top: TRACK_PADDING,
     bottom: TRACK_PADDING,
     borderRadius: 9,
-    borderWidth: 1,
   },
   item: {
     flex: 1,
