@@ -9,6 +9,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
 import { PageHeader } from '@/components/molecules/PageHeader';
 import { PremiumBanner } from '@/components/molecules/premium-banner';
+import { SectionHeader } from '@/components/molecules/SectionHeader';
 import { EmptyState } from '@/components/molecules/EmptyState';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ListCard } from '@/components/cards/ListCard';
@@ -42,12 +43,7 @@ export default function HomeScreen() {
       {/* Solo a piano gratuito accertato: a piano attivo, o finché non si sa, non si propone nulla */}
       {isFreePlan && (
         <View style={styles.premiumWrap}>
-          <PremiumBanner
-            title={t('premium.title')}
-            subtitle={t('premium.subtitle')}
-            ctaLabel={t('premium.cta')}
-            onPress={() => router.push('/plans')}
-          />
+          <PremiumBanner onPress={() => router.push('/plans')} />
         </View>
       )}
 
@@ -57,6 +53,10 @@ export default function HomeScreen() {
           subtitle={t('randomizerSubtitle')}
           onPress={() => router.push('/randomizer')}
         />
+      </View>
+
+      <View style={styles.sectionHeaderWrap}>
+        <SectionHeader title={t('title')} />
       </View>
 
       {showSkeleton ? (
@@ -116,13 +116,19 @@ const styles = StyleSheet.create({
     marginHorizontal: Spacing.four,
     marginBottom: Spacing.two,
   },
+  sectionHeaderWrap: {
+    marginLeft: Spacing.four + 5,
+    marginRight: Spacing.four + 5,
+    marginTop: 10,
+    marginBottom: Spacing.one - 5,
+  },
   list: {
     flex: 1,
   },
   listContent: {
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.two,
-    gap: Spacing.two + Spacing.one,
+    gap: Spacing.two - Spacing.half,
   },
   listContentEmpty: {
     flexGrow: 1,
