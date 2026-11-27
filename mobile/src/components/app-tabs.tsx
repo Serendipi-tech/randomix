@@ -57,8 +57,8 @@ function NotificationsBadge() {
   if (unreadCount === 0) return null;
 
   return (
-    <View style={[styles.badge, { backgroundColor: colors.secondary }]}>
-      <Text style={[styles.badgeText, { color: colors.foreground }]}>{unreadCount}</Text>
+    <View style={[styles.badge, { backgroundColor: colors.error }]}>
+      <Text style={styles.badgeText}>{unreadCount}</Text>
     </View>
   );
 }
@@ -330,17 +330,25 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   badge: {
+    // Offset rispetto alla cella 44x44 della tab: l'icona (24px) sta al centro, quindi questi
+    // valori appoggiano il badge sull'angolo in alto a destra della campana, non fuori dalla cella
     position: 'absolute',
-    top: -4,
-    right: -4,
-    minWidth: 24,
-    height: 24,
-    borderRadius: 12,
+    top: 3,
+    right: 6,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    paddingHorizontal: 3,
     alignItems: 'center',
     justifyContent: 'center',
   },
   badgeText: {
+    // Inchiostro fisso: il badge e' sempre rosso pieno, in entrambi i temi
+    color: Colors.dark.textColor,
     fontSize: 11,
-    fontWeight: '600',
+    lineHeight: 16,
+    includeFontPadding: false,
+    textAlign: 'center',
+    fontWeight: '700',
   },
 });
