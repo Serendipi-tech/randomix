@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client';
 import { FriendshipQueries } from '@randomix/graphql-schema';
 import type { Friend } from '@/utils/useFriends';
-import type { CategoryStat, CompletionBreakdown, DrawAcceptance } from '@/utils/useProfileStats';
+import type { CategoryStat, CompletionBreakdown } from '@/utils/useProfileStats';
 import type { CompletionStatus } from '@/utils/useListDetail';
 
 const { FRIEND_PROFILE } = FriendshipQueries;
@@ -31,7 +31,6 @@ export interface FriendList {
 export interface FriendStats {
   categoryStats: CategoryStat[];
   completionBreakdown: CompletionBreakdown;
-  drawAcceptance: DrawAcceptance;
 }
 
 interface FriendProfileQuery {

@@ -6,8 +6,7 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Spacing } from '@/constants/theme';
-import { resolveListIcon } from '@/constants/list-icons';
-import { darkenColor, hexToRgba } from '@/utils/color';
+import { hexToRgba } from '@/utils/color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
@@ -82,9 +81,6 @@ export default function ListDetailScreen() {
     <SafeAreaView style={styles.safe}>
       <RadialBackground colorScheme={colorScheme} />
       <PageHeader
-        icon={resolveListIcon(list?.icon)}
-        title={list?.name ?? ''}
-        iconGradient={list ? [list.color, darkenColor(list.color, 0.15)] : undefined}
         onBack={() => router.back()}
         action={
           list
@@ -266,9 +262,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  // Con descrizione: metà dello spazio (30px) che il PageHeader lascia sotto di sé; senza descrizione i pulsanti restano a ridosso dell'header
+  // Con descrizione: metà dello spazio (14px) che il PageHeader lascia sotto di sé; senza descrizione i pulsanti restano a ridosso dell'header
   itemsBarSpaced: {
-    paddingTop: 15,
+    paddingTop: 7,
   },
   itemsActions: {
     flex: 1,

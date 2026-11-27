@@ -17,16 +17,10 @@ export interface CompletionBreakdown {
   completed: number;
 }
 
-export interface DrawAcceptance {
-  accepted: number;
-  skipped: number;
-}
-
 interface ProfileStatsQuery {
   profileStats: {
     categoryStats: CategoryStat[];
     completionBreakdown: CompletionBreakdown;
-    drawAcceptance: DrawAcceptance;
   };
 }
 
@@ -38,7 +32,6 @@ export function useProfileStats() {
   return {
     categoryStats: data?.profileStats.categoryStats ?? [],
     completionBreakdown: data?.profileStats.completionBreakdown ?? null,
-    drawAcceptance: data?.profileStats.drawAcceptance ?? null,
     loading,
     error: error ?? null,
   };

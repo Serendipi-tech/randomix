@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Users } from 'lucide-react-native';
+import { Plus } from 'lucide-react-native';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
@@ -51,7 +51,7 @@ export default function FriendsScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <RadialBackground colorScheme={colorScheme} />
-      <PageHeader icon={Users} title={t('title')} />
+      <PageHeader />
       <FlatList
         showsVerticalScrollIndicator={false}
         data={showFriendsSkeleton ? [] : friends}

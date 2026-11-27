@@ -2,7 +2,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ApolloError } from '@apollo/client';
-import { List, Pencil } from 'lucide-react-native';
+import { Pencil } from 'lucide-react-native';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
@@ -179,7 +179,7 @@ export default function ListFormScreen() {
 
   const goToPlans = () => {
     setShowLimitReachedSheet(false);
-    router.push('/settings');
+    router.push('/plans');
   };
 
   const handleDeleteConfirmed = async () => {
@@ -194,11 +194,7 @@ export default function ListFormScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <RadialBackground colorScheme={colorScheme} />
-      <PageHeader
-        icon={List}
-        title={isEdit ? t('form.titleEdit') : t('form.titleCreate')}
-        onBack={() => router.back()}
-      />
+      <PageHeader onBack={() => router.back()} />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Anteprima in cima: si aggiorna mentre modifichi nome/icona/colore/categoria */}
         <View pointerEvents="none">

@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LayoutGrid } from 'lucide-react-native';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '@/constants/theme';
@@ -70,7 +69,7 @@ export default function GroupsScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <RadialBackground colorScheme={colorScheme} />
-      <PageHeader icon={LayoutGrid} title={t('title')} />
+      <PageHeader />
       <FlatList
         showsVerticalScrollIndicator={false}
         data={showSkeleton ? [] : groups}

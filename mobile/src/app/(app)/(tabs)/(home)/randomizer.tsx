@@ -10,11 +10,9 @@ import {
   Hash,
   Palette,
   Scissors,
-  Shuffle,
   Sparkles,
   Type,
   Users,
-  Wine,
 } from 'lucide-react-native';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,6 +25,7 @@ import { SectionLabel } from '@/components/atoms/SectionLabel';
 import { Stepper } from '@/components/atoms/Stepper';
 import { PageHeader } from '@/components/molecules/PageHeader';
 import { ModeGrid, type ModeGridItem } from '@/components/randomizer/ModeGrid';
+import { BottleIcon } from '@/components/randomizer/BottleGlyph';
 import { CustomFacesChip } from '@/components/randomizer/CustomFacesChip';
 import { NumberResults } from '@/components/randomizer/NumberResults';
 import { LetterResults } from '@/components/randomizer/LetterResults';
@@ -34,10 +33,13 @@ import { ColorResults } from '@/components/randomizer/ColorResults';
 import { DiceResults } from '@/components/randomizer/DiceResults';
 import { CustomFacesSheet } from '@/components/randomizer/CustomFacesSheet';
 import { ParticipantsSheet } from '@/components/randomizer/ParticipantsSheet';
-import { BottleSpinner, BOTTLE_SPIN_DURATION } from '@/components/randomizer/BottleSpinner';
+import { WinnerPopup } from '@/components/randomizer/WinnerPopup';
+import { BottleSpinner } from '@/components/randomizer/BottleSpinner';
 import { CoinResults, type CoinSide } from '@/components/randomizer/CoinResults';
 import { Switch } from '@/components/atoms/Switch';
+import { useMyFriends } from '@/utils/useFriends';
 import { useRandomizer } from '@/utils/useRandomizer';
+import type { Participant } from '@/utils/participants';
 import type { RockPaperScissorsChoice } from '@/utils/random';
 
 type Mode = 'numbers' | 'letters' | 'colors' | 'dice' | 'bottle' | 'coin' | 'rps';
@@ -68,28 +70,36 @@ export default function RandomizerScreen() {
     loading,
     error,
   } = useRandomizer();
+  const { friends } = useMyFriends();
 
   const [mode, setMode] = useState<Mode | null>(null);
   const [min, setMin] = useState(1);
   const [max, setMax] = useState(100);
-  const [count, setCount] = useState(1);
+  // Un conteggio per modalità: cambiando randomizzatore non si eredita la scelta dell'altro.
+  // Vivono con la schermata, quindi uscendo dalla pagina tornano ai valori di partenza.
+  const [numberCount, setNumberCount] = useState(1);
+  const [letterCount, setLetterCount] = useState(1);
+  const [colorCount, setColorCount] = useState(1);
+  const [diceCount, setDiceCount] = useState(2);
   const [allowRepeats, setAllowRepeats] = useState(false);
   const [faces, setFaces] = useState(6);
-  const [diceCount, setDiceCount] = useState(2);
   const [results, setResults] = useState<string[]>([]);
   const [localError, setLocalError] = useState<string | null>(null);
   const [facesSheetOpen, setFacesSheetOpen] = useState(false);
+  // Cambia a ogni estrazione: rimonta i risultati, così l'animazione riparte da zero
+  const [drawKey, setDrawKey] = useState(0);
 
-  const [names, setNames] = useState<string[]>([]);
+  const [participants, setParticipants] = useState<Participant[]>([]);
   const [participantsSheetOpen, setParticipantsSheetOpen] = useState(false);
   const [winnerIndex, setWinnerIndex] = useState<number | null>(null);
+  const [winnerPopupOpen, setWinnerPopupOpen] = useState(false);
   // Cambia a ogni giro per far ripartire l'animazione della bottiglia e della moneta
   const [spinKey, setSpinKey] = useState(0);
-  // Tiene il bottone occupato per tutta la durata del giro, non solo della query
+  // Tiene il bottone occupato per tutto il giro della bottiglia, non solo per l'estrazione
   const [spinBusy, setSpinBusy] = useState(false);
 
   // Nessun selettore di modalità: senza partecipanti il giro è solo visivo, con due o più si estrae
-  const withNames = names.length > 0;
+  const withNames = participants.length > 0;
 
   // Senza ripetizioni non si possono estrarre più numeri di quanti ne contiene il range
   const numberMaxCount = allowRepeats ? 100 : Math.min(100, Math.max(1, max - min + 1));
@@ -97,11 +107,12 @@ export default function RandomizerScreen() {
   // Spegnendo le ripetizioni il conteggio può superare il nuovo tetto: lo riporto dentro
   const onAllowRepeatsChange = (next: boolean) => {
     setAllowRepeats(next);
-    if (!next) setCount((c) => Math.min(c, Math.min(100, Math.max(1, max - min + 1))));
+    if (!next) setNumberCount((c) => Math.min(c, Math.min(100, Math.max(1, max - min + 1))));
   };
 
   const resetBottle = () => {
     setWinnerIndex(null);
+    setWinnerPopupOpen(false);
     setSpinKey(0);
     setSpinBusy(false);
   };
@@ -132,11 +143,11 @@ export default function RandomizerScreen() {
           setLocalError(t('invalidInput'));
           return;
         }
-        setResults((await generateNumbers(min, max, count, allowRepeats)).map(String));
+        setResults((await generateNumbers(min, max, numberCount, allowRepeats)).map(String));
       } else if (mode === 'letters') {
-        setResults(await generateLetters(count));
+        setResults(await generateLetters(letterCount));
       } else if (mode === 'colors') {
-        setResults(await generateColors(count));
+        setResults(await generateColors(colorCount));
       } else if (mode === 'dice') {
         setResults((await generateDice(diceCount, faces)).map(String));
       } else if (mode === 'bottle') {
@@ -150,6 +161,7 @@ export default function RandomizerScreen() {
       } else if (mode === 'rps') {
         setResults([await generateRockPaperScissors()]);
       }
+      setDrawKey((k) => k + 1);
     } catch (e) {
       setLocalError((e as Error).message);
     }
@@ -159,39 +171,43 @@ export default function RandomizerScreen() {
    *  il giro è puramente visivo. */
   const spinBottle = async () => {
     if (withNames) {
-      if (names.length < 2) {
+      if (participants.length < 2) {
         setLocalError(t('bottle.minNames'));
         return;
       }
-      setWinnerIndex(await drawWinnerIndex(names.length));
+      setWinnerIndex(await drawWinnerIndex(participants.length));
     } else {
       setWinnerIndex(null);
     }
 
+    setWinnerPopupOpen(false);
     setSpinKey((k) => k + 1);
     setSpinBusy(true);
-    setTimeout(() => setSpinBusy(false), BOTTLE_SPIN_DURATION);
   };
 
   const displayError = localError ?? error?.message ?? null;
+  const winner = winnerIndex != null ? participants[winnerIndex] : null;
 
   // Esito corrente della modalità "Carta Forbice Pietra", estratto da `results`
   const rpsChoice = mode === 'rps' ? (results[0] as RockPaperScissorsChoice | undefined) : undefined;
+  // Moneta e bottiglia hanno un'area risultati sempre a schermo: senza questo filtro ne
+  // comparirebbe una seconda, vuota, che si prende metà dello spazio e li sposta in alto
+  const hasInlineResults = results.length > 0 && mode !== 'coin' && mode !== 'bottle';
 
   const modeItems: ModeGridItem[] = [
     { key: 'numbers', icon: Hash, label: t('modes.numbers'), tint: colors.extraColors.nine },
     { key: 'letters', icon: Type, label: t('modes.letters'), tint: colors.extraColors.six },
     { key: 'colors', icon: Palette, label: t('modes.colors'), tint: colors.extraColors.eight },
     { key: 'dice', icon: Dices, label: t('modes.dice'), tint: colors.extraColors.four },
-    { key: 'bottle', icon: Wine, label: t('modes.bottle'), tint: colors.extraColors.five },
+    { key: 'bottle', icon: BottleIcon, label: t('modes.bottle'), tint: colors.extraColors.five },
     { key: 'coin', icon: Coins, label: t('modes.coin'), tint: colors.extraColors.two },
-    { key: 'rps', icon: Scissors, label: t('modes.rps'), tint: colors.extraColors.seven },
+    // "Carta Forbice Pietra" resta implementata ma fuori dalla griglia: si riprenderà in futuro
   ];
 
   return (
     <SafeAreaView style={styles.safe}>
       <RadialBackground colorScheme={colorScheme} />
-      <PageHeader icon={Shuffle} title={mode ? t(`modes.${mode}`) : t('title')} onBack={goBack} />
+      <PageHeader onBack={goBack} />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {!mode && <ModeGrid items={modeItems} onSelect={openMode} />}
 
@@ -213,7 +229,12 @@ export default function RandomizerScreen() {
               {/* Stepper e toggle sulla stessa riga: il toggle cambia il significato del conteggio */}
               <View style={styles.countRow}>
                 <View style={styles.countItem}>
-                  <Stepper value={count} min={1} max={numberMaxCount} onChange={setCount} />
+                  <Stepper
+                    value={numberCount}
+                    min={1}
+                    max={numberMaxCount}
+                    onChange={setNumberCount}
+                  />
                 </View>
                 <View style={[styles.countItem, styles.toggleControl]}>
                   <Text style={[styles.toggleLabel, { color: colors.textColor }]}>
@@ -229,14 +250,14 @@ export default function RandomizerScreen() {
         {mode === 'letters' && (
           <View style={styles.panel}>
             <SectionLabel>{t('fields.count')}</SectionLabel>
-            <Stepper value={count} min={1} max={26} onChange={setCount} />
+            <Stepper value={letterCount} min={1} max={26} onChange={setLetterCount} />
           </View>
         )}
 
         {mode === 'colors' && (
           <View style={styles.panel}>
             <SectionLabel>{t('fields.count')}</SectionLabel>
-            <Stepper value={count} min={1} max={100} onChange={setCount} />
+            <Stepper value={colorCount} min={1} max={100} onChange={setColorCount} />
           </View>
         )}
 
@@ -273,16 +294,24 @@ export default function RandomizerScreen() {
             <Button
               variant="secondary"
               icon={Users}
-              label={withNames ? t('bottle.participantsCount', { count: names.length }) : t('bottle.participants')}
+              label={
+                withNames
+                  ? t('bottle.participantsCount', { count: participants.length })
+                  : t('bottle.participants')
+              }
               onPress={() => setParticipantsSheetOpen(true)}
             />
             {!withNames && (
-              <Text style={[styles.hint, { color: colors.textColor }]}>{t('bottle.spinOnlyHint')}</Text>
+              <Text style={[styles.hint, { color: colors.textColor }]}>
+                {t('bottle.spinOnlyHint')}
+              </Text>
             )}
           </View>
         )}
 
-        {mode && displayError && <Text style={[styles.error, { color: colors.error }]}>{displayError}</Text>}
+        {mode && displayError && (
+          <Text style={[styles.error, { color: colors.error }]}>{displayError}</Text>
+        )}
 
         {mode && (
           <Button
@@ -307,19 +336,27 @@ export default function RandomizerScreen() {
             {/* key: ogni lancio rimonta la ruota, che riparte da ferma senza stato da azzerare */}
             <BottleSpinner
               key={spinKey}
-              names={names}
+              participants={participants}
               winnerIndex={winnerIndex}
               spinning={spinKey > 0}
+              onSettled={() => {
+                setSpinBusy(false);
+                setWinnerPopupOpen(winnerIndex != null);
+              }}
             />
           </View>
         )}
 
-        {mode && results.length > 0 && (
-          <View style={styles.resultArea}>
+        {mode && hasInlineResults && (
+          <View key={drawKey} style={styles.resultArea}>
             {mode === 'numbers' && <NumberResults values={results} />}
             {mode === 'letters' && <LetterResults values={results} />}
-            {mode === 'colors' && <ColorResults values={results} />}
-            {mode === 'dice' && <DiceResults values={results} faces={faces} totalLabel={t('total')} />}
+            {mode === 'colors' && (
+              <ColorResults values={results} copiedLabel={t('colors.copied')} />
+            )}
+            {mode === 'dice' && (
+              <DiceResults values={results} faces={faces} totalLabel={t('total')} />
+            )}
             {mode === 'rps' && rpsChoice && (
               <View style={styles.rpsResult}>
                 {(() => {
@@ -335,14 +372,25 @@ export default function RandomizerScreen() {
         )}
       </ScrollView>
 
+      <WinnerPopup
+        visible={winnerPopupOpen}
+        winner={winner}
+        title={t('bottle.winnerTitle')}
+        closeLabel={t('bottle.close')}
+        onClose={() => setWinnerPopupOpen(false)}
+      />
+
       <ParticipantsSheet
         visible={participantsSheetOpen}
-        names={names}
+        participants={participants}
+        friends={friends}
         namePlaceholder={t('bottle.namePlaceholder')}
         emptyLabel={t('bottle.noParticipants')}
+        friendsLabel={t('bottle.friends')}
+        noFriendsLabel={t('bottle.noFriends')}
         onClose={() => setParticipantsSheetOpen(false)}
         onChange={(next) => {
-          setNames(next);
+          setParticipants(next);
           // cambiare i partecipanti invalida il giro precedente
           resetBottle();
         }}

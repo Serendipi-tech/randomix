@@ -1,9 +1,9 @@
 import { type ComponentType } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
 import { Colors, Spacing } from '@/constants/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { RandoLogo } from '@/components/molecules/rando-logo';
 
 type PageHeaderAction = {
   icon: ComponentType<{ size?: number; color?: string }>;
@@ -11,97 +11,66 @@ type PageHeaderAction = {
 };
 
 type PageHeaderProps = {
-  icon: ComponentType<{ size?: number; color?: string }>;
-  title: string;
+  /** Ritorno indietro: senza questo la cella di sinistra resta vuota. */
   onBack?: () => void;
-  subtitle?: string;
+  /** Azione specifica della pagina (aggiungi, modifica…), a destra. */
   action?: PageHeaderAction;
-  /** Gradiente dell'icona: se assente usa il gradiente di default del tema. */
-  iconGradient?: readonly [string, string];
 };
 
-/** Intestazione di pagina: icona su gradient fisso + titolo, back e/o azione extra opzionali (icona e onPress passati dal chiamante) a destra, sottotitolo opzionale. */
-export function PageHeader({ icon: Icon, title, onBack, subtitle, action, iconGradient }: PageHeaderProps) {
+// Logo ridotto: stessa immagine usata fuori dall'app, qui alla misura di una riga d'intestazione
+const LOGO_SIZE = 44;
+const ICON_SIZE = 24;
+
+/** Intestazione di pagina a tre celle: indietro a sinistra, logo dell'app al centro, azione della
+ *  pagina a destra. Nessun titolo: il nome della pagina non compare mai. Le celle laterali hanno
+ *  lo stesso peso, così il logo resta centrato anche quando una delle due è vuota. */
+export function PageHeader({ onBack, action }: PageHeaderProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
-  const gradient: readonly [string, string] = iconGradient ?? [colors.secondary, colors.secondaryGradient];
 
   return (
-    <View style={styles.wrapper}>
-      <View style={styles.topRow}>
-        <View style={styles.content}>
-          <LinearGradient
-            colors={gradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.icon}
-          >
-            <Icon size={24} color={colors.textColor} />
-          </LinearGradient>
-          <Text style={[styles.title, { color: colors.textColor }]}>{title}</Text>
-        </View>
-        {(action || onBack) && (
-          <View style={styles.actions}>
-            {action && (
-              <Pressable onPress={action.onPress} hitSlop={10}>
-                <action.icon size={24} color={colors.textColor} />
-              </Pressable>
-            )}
-            {onBack && (
-              <Pressable onPress={onBack} hitSlop={10}>
-                <ChevronLeft size={24} color={colors.textColor} />
-              </Pressable>
-            )}
-          </View>
+    <View style={styles.row}>
+      <View style={[styles.side, styles.left]}>
+        {onBack && (
+          <Pressable onPress={onBack} hitSlop={10}>
+            <ChevronLeft size={ICON_SIZE} color={colors.textColor} />
+          </Pressable>
         )}
       </View>
-      {subtitle && <Text style={[styles.subtitle, { color: colors.textColor }]}>{subtitle}</Text>}
+
+      <RandoLogo size={LOGO_SIZE} />
+
+      <View style={[styles.side, styles.right]}>
+        {action && (
+          <Pressable onPress={action.onPress} hitSlop={10}>
+            <action.icon size={ICON_SIZE} color={colors.textColor} />
+          </Pressable>
+        )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flexDirection: 'column',
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.four,
-    paddingBottom: 30,
-    gap: 8,
-  },
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    // 10px in meno sopra e sotto rispetto ai passi del tema (16 e 24), piu' 5px di respiro in alto
+    paddingTop: Spacing.three - 10 + 5,
+    paddingBottom: Spacing.four - 10,
     gap: 12,
   },
-  actions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+  // Stesso peso a destra e a sinistra: il logo sta al centro della riga, non del contenuto
+  side: {
     flex: 1,
-  },
-  icon: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    alignItems: 'center',
     justifyContent: 'center',
+    minHeight: ICON_SIZE,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    fontFamily: 'Inter',
-    marginBottom: 2,
+  left: {
+    alignItems: 'flex-start',
   },
-  // Sottotitolo attenuato via opacity sul textColor (come SectionLabel), invece di un grigio hardcoded
-  subtitle: {
-    fontSize: 14,
-    fontFamily: 'Inter',
-    opacity: 0.6,
+  right: {
+    alignItems: 'flex-end',
   },
 });

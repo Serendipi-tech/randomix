@@ -19,7 +19,6 @@ import { ProfileHeader } from '@/components/molecules/profile-header';
 import { ProfileStatsPanel } from '@/components/molecules/profile-stats-panel';
 import { ProfileCategoryStats } from '@/components/molecules/profile-category-stats';
 import { ProfileCompletionDonut } from '@/components/molecules/profile-completion-donut';
-import { ProfileDrawAcceptance } from '@/components/molecules/profile-draw-acceptance';
 import { useAuth } from '@/utils/useAuth';
 import { useProfile } from '@/utils/useProfile';
 import { useMyFriends } from '@/utils/useFriends';
@@ -41,7 +40,7 @@ export default function ProfileScreen() {
 
   const { profile, loading: loadingProfile, updateProfile, saving, saveError } = useProfile();
   const { friends } = useMyFriends();
-  const { categoryStats, completionBreakdown, drawAcceptance } = useProfileStats();
+  const { categoryStats, completionBreakdown } = useProfileStats();
 
   const [editing, setEditing] = useState(false);
   const [username, setUsername] = useState('');
@@ -118,7 +117,6 @@ export default function ProfileScreen() {
               />
               <ProfileCategoryStats categoryStats={categoryStats} />
               {completionBreakdown && <ProfileCompletionDonut breakdown={completionBreakdown} />}
-              {drawAcceptance && <ProfileDrawAcceptance acceptance={drawAcceptance} />}
             </Animated.View>
           </>
         ) : profile ? (

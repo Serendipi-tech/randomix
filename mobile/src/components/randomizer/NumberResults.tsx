@@ -1,8 +1,16 @@
 import { useEffect, useState } from 'react';
-import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
+import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, {
+  Easing,
+  cancelAnimation,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from 'react-native-reanimated';
 import { Colors } from '@/constants/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { useRevealCascade } from '@/utils/useRevealCascade';
 
 type NumberResultsProps = {
   values: string[];
@@ -20,6 +28,7 @@ const MAX_CELL_SIZE = 62;
 /** Numeri come rullo di contachilometri: scorrono cifre casuali e si fermano sul valore vero. */
 export function NumberResults({ values }: NumberResultsProps) {
   const [rowWidth, setRowWidth] = useState(0);
+  const { delays, skipped, skip } = useRevealCascade(values.length, SPIN_DURATION);
 
   const onLayout = (e: LayoutChangeEvent) => setRowWidth(e.nativeEvent.layout.width);
 
@@ -28,16 +37,26 @@ export function NumberResults({ values }: NumberResultsProps) {
     : 0;
 
   return (
-    <View style={styles.wrap} onLayout={onLayout}>
+    <Pressable style={styles.wrap} onLayout={onLayout} onPress={skip}>
       {cellSize > 0 &&
         values.map((value, i) => (
-          <Reel key={`${value}-${i}`} value={value} delay={i * SPIN_DURATION} size={cellSize} />
+          <Reel key={`${value}-${i}`} value={value} delay={delays[i]} size={cellSize} skip={skipped} />
         ))}
-    </View>
+    </Pressable>
   );
 }
 
-function Reel({ value, delay, size }: { value: string; delay: number; size: number }) {
+function Reel({
+  value,
+  delay,
+  size,
+  skip,
+}: {
+  value: string;
+  delay: number;
+  size: number;
+  skip: boolean;
+}) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   const translateY = useSharedValue(0);
@@ -53,16 +72,22 @@ function Reel({ value, delay, size }: { value: string; delay: number; size: numb
   const [fillers] = useState(() => Array.from({ length: FILLER_DIGITS }, () => Math.abs(Math.round(Math.random() * 9))));
 
   useEffect(() => {
+    // +1: la striscia parte dallo zero, quindi c'è una cella in più prima dei riempitivi
+    const stop = -((FILLER_DIGITS + 1) * itemHeight);
+
+    // Salto dell'attesa: il rullo si ferma subito sul valore estratto
+    if (skip) {
+      cancelAnimation(translateY);
+      translateY.value = stop;
+      return;
+    }
+
     translateY.value = withDelay(
       delay,
-      // +1: la striscia parte dallo zero, quindi c'è una cella in più prima dei riempitivi
-      withTiming(-((FILLER_DIGITS + 1) * itemHeight), {
-        duration: SPIN_DURATION,
-        easing: Easing.bezier(0.12, 0.75, 0.2, 1),
-      }),
+      withTiming(stop, { duration: SPIN_DURATION, easing: Easing.bezier(0.12, 0.75, 0.2, 1) }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- sola animazione d'ingresso, nessun valore reattivo da risincronizzare
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- animazione d'ingresso: riparte solo al salto
+  }, [skip]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],

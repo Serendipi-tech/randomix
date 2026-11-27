@@ -63,7 +63,7 @@ export default function FeedbackScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <RadialBackground colorScheme={colorScheme} />
-      <PageHeader icon={MessageSquare} title={t('title')} onBack={() => router.back()} />
+      <PageHeader onBack={() => router.back()} />
       <View style={styles.content}>
         <Animated.View entering={FadeInDown.duration(400)}>
           <CardShell backgroundColor={colors.foreground} borderColor={colors.border}>

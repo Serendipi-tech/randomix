@@ -24,3 +24,26 @@ export function hexToRgba(color: string, alpha: number): string {
   const { r, g, b } = parseColor(color);
   return `rgba(${r},${g},${b},${alpha})`;
 }
+
+/** Luminanza relativa percepita (0 = nero, 1 = bianco): pesa i canali come li vede l'occhio. */
+export function colorLuminance(color: string): number {
+  const { r, g, b } = parseColor(color);
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
+/** True se sul colore serve inchiostro scuro: usato per scegliere il testo senza fissarlo a mano. */
+export function isLightColor(color: string): boolean {
+  return colorLuminance(color) > 0.6;
+}
+
+/** Mescola due colori: `amount` 0 restituisce `base`, 1 restituisce `tint`. Serve a tirare un
+ *  token verso un altro (es. lo sfondo verso l'accent) senza inventare valori fuori dal tema. */
+export function mixColors(base: string, tint: string, amount: number): string {
+  const a = parseColor(base);
+  const b = parseColor(tint);
+  const channel = (from: number, to: number) => Math.round(from + (to - from) * amount);
+  const r = channel(a.r, b.r);
+  const g = channel(a.g, b.g);
+  const bl = channel(a.b, b.b);
+  return `#${((1 << 24) + (r << 16) + (g << 8) + bl).toString(16).slice(1)}`;
+}

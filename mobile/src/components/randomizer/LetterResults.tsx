@@ -1,11 +1,19 @@
 import { useEffect, useState } from 'react';
-import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
+import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Type } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
+import Animated, {
+  Easing,
+  cancelAnimation,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from 'react-native-reanimated';
 import { Colors } from '@/constants/theme';
-import { darkenColor } from '@/utils/color';
+import { darkenColor, isLightColor } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { useRevealCascade } from '@/utils/useRevealCascade';
 
 type LetterResultsProps = {
   values: string[];
@@ -24,33 +32,43 @@ const MAX_TILE_SIZE = 70;
 export function LetterResults({ values }: LetterResultsProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
-  const cycle = [colors.primary, colors.extraColors.three, colors.extraColors.six, colors.extraColors.eight, colors.secondaryGradient, colors.accent];
+  // Rotazione di tinte sature: nessuna e' cosi' chiara da richiedere un trattamento a parte, cosi'
+  // tutte le tessere hanno lo stesso gradiente e la lettera resta leggibile su ognuna
+  const cycle = [
+    colors.primary,
+    colors.extraColors.three,
+    colors.extraColors.six,
+    colors.extraColors.eight,
+    colors.secondaryGradient,
+  ];
 
   const [rowWidth, setRowWidth] = useState(0);
+  const { delays, skipped, skip } = useRevealCascade(values.length, FLIP_DURATION);
   const onLayout = (e: LayoutChangeEvent) => setRowWidth(e.nativeEvent.layout.width);
   const tileSize = rowWidth
     ? Math.min(MAX_TILE_SIZE, Math.floor((rowWidth - GAP * (PER_ROW - 1)) / PER_ROW))
     : 0;
 
   return (
-    <View style={styles.wrap} onLayout={onLayout}>
+    <Pressable style={styles.wrap} onLayout={onLayout} onPress={skip}>
       {tileSize > 0 &&
         values.map((value, i) => {
           const base = cycle[i % cycle.length];
-          const ink = base === colors.accent ? colors.background : colors.textColor;
           return (
             <LetterTile
               key={`${value}-${i}`}
               letter={value}
-              delay={i * FLIP_DURATION}
+              delay={delays[i]}
               from={base}
               to={darkenColor(base, DARKEN_AMOUNT)}
-              ink={ink}
+              // inchiostro scelto sul contrasto, non sul singolo colore: nessuna lettera resta nera
+              ink={isLightColor(base) ? colors.background : colors.textColor}
               size={tileSize}
+              skip={skipped}
             />
           );
         })}
-    </View>
+    </Pressable>
   );
 }
 
@@ -61,6 +79,7 @@ function LetterTile({
   to,
   ink,
   size,
+  skip,
 }: {
   letter: string;
   delay: number;
@@ -68,18 +87,26 @@ function LetterTile({
   to: string;
   ink: string;
   size: number;
+  skip: boolean;
 }) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   const rotation = useSharedValue(0);
 
   useEffect(() => {
+    // Salto dell'attesa: la tessera si gira subito
+    if (skip) {
+      cancelAnimation(rotation);
+      rotation.value = 180;
+      return;
+    }
+
     rotation.value = withDelay(
       delay,
       withTiming(180, { duration: FLIP_DURATION, easing: Easing.out(Easing.cubic) }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- sola animazione d'ingresso, nessun valore reattivo da risincronizzare
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- animazione d'ingresso: riparte solo al salto
+  }, [skip]);
 
   const frontStyle = useAnimatedStyle(() => ({
     transform: [{ perspective: 600 }, { rotateY: `${rotation.value}deg` }],

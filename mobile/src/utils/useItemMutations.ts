@@ -76,8 +76,8 @@ export function useItemMutations() {
   const [updateMutation, { loading: updating, error: updateError }] = useMutation(UPDATE_USER_ITEM);
 
   // ListDetail va ricaricata per l'elenco items. ProfileStats va ricaricata anche qui: la riga
-  // List_UserItem eliminata porta con sé count/acceptedCount/skippedCount, quindi drawCount e
-  // drawAcceptance esposti dal profilo possono scendere insieme alla rimozione.
+  // List_UserItem eliminata porta con sé count/acceptedCount/skippedCount, quindi il drawCount
+  // esposto dal profilo può scendere insieme alla rimozione.
   const [removeMutation, { loading: removing, error: removeError }] = useMutation(
     REMOVE_ITEM_FROM_LIST,
     { refetchQueries: ['ListDetail', 'ProfileStats'] },

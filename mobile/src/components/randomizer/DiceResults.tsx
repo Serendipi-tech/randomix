@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   Easing,
   Extrapolation,
+  cancelAnimation,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
@@ -11,6 +12,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Colors } from '@/constants/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { useRevealCascade } from '@/utils/useRevealCascade';
 import { DiceFace } from '@/components/randomizer/DiceFace';
 
 const TUMBLE_DURATION = 850;
@@ -27,16 +29,18 @@ export function DiceResults({ values, faces, totalLabel }: DiceResultsProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   const total = values.reduce((sum, v) => sum + Number(v), 0);
+  const { delays, skipped, skip } = useRevealCascade(values.length, TUMBLE_DURATION);
 
   return (
-    <View style={styles.wrap}>
+    <Pressable style={styles.wrap} onPress={skip}>
       <View style={styles.row}>
         {values.map((value, i) => (
           <TumblingDie
             key={`${value}-${i}`}
             value={Number(value)}
             faces={faces}
-            delay={i * TUMBLE_DURATION}
+            delay={delays[i]}
+            skip={skipped}
           />
         ))}
       </View>
@@ -45,20 +49,37 @@ export function DiceResults({ values, faces, totalLabel }: DiceResultsProps) {
           {totalLabel}: {total}
         </Text>
       )}
-    </View>
+    </Pressable>
   );
 }
 
-function TumblingDie({ value, faces, delay }: { value: number; faces: number; delay: number }) {
+function TumblingDie({
+  value,
+  faces,
+  delay,
+  skip,
+}: {
+  value: number;
+  faces: number;
+  delay: number;
+  skip: boolean;
+}) {
   const progress = useSharedValue(0);
 
   useEffect(() => {
+    // Salto dell'attesa: il dado appare subito fermo sul risultato
+    if (skip) {
+      cancelAnimation(progress);
+      progress.value = 1;
+      return;
+    }
+
     progress.value = withDelay(
       delay,
       withTiming(1, { duration: TUMBLE_DURATION, easing: Easing.out(Easing.cubic) }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- sola animazione d'ingresso, nessun valore reattivo da risincronizzare
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- animazione d'ingresso: riparte solo al salto
+  }, [skip]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const stops = [0, 0.35, 0.7, 1];

@@ -2,7 +2,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dices } from 'lucide-react-native';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { ZoomIn } from 'react-native-reanimated';
@@ -59,7 +58,7 @@ export default function DrawScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <RadialBackground colorScheme={colorScheme} />
-      <PageHeader icon={Dices} title={t('draw.title')} onBack={() => router.back()} />
+      <PageHeader onBack={() => router.back()} />
 
       <View style={styles.center}>
         <StickerShape variant="star" color={colors.warning} size={22} rotation={-12} style={styles.stickerStar} />
