@@ -19,6 +19,12 @@ export const REJECT_FRIEND_REQUEST: DocumentNode = parse(`
   }
 `);
 
+export const CANCEL_FRIEND_REQUEST: DocumentNode = parse(`
+  mutation CancelFriendRequest($id: ID!) {
+    cancelFriendRequest(id: $id)
+  }
+`);
+
 export const REMOVE_FRIEND: DocumentNode = parse(`
   mutation RemoveFriend($userId: ID!) {
     removeFriend(userId: $userId)

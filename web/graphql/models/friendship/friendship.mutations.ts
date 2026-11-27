@@ -82,6 +82,24 @@ builder.mutationField('rejectFriendRequest', (t) =>
   }),
 );
 
+builder.mutationField('cancelFriendRequest', (t) =>
+  t.boolean({
+    args: { id: t.arg.id({ required: true }) },
+    resolve: async (_root, { id }, ctx) => {
+      requireAuth(ctx.userId);
+      // solo il mittente può ritirare una richiesta ancora in sospeso
+      const request = await prisma.friendship.findFirst({
+        where: { id: String(id), senderId: ctx.userId, status: 'PENDING' },
+      });
+      if (!request) {
+        throw new GraphQLError('Richiesta non trovata.', { extensions: { code: 'NOT_FOUND' } });
+      }
+      await prisma.friendship.update({ where: { id: request.id }, data: { status: 'CANCELED' } });
+      return true;
+    },
+  }),
+);
+
 builder.mutationField('removeFriend', (t) =>
   t.boolean({
     args: { userId: t.arg.id({ required: true }) },
