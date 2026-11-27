@@ -17,6 +17,7 @@ import { useItemMutations } from '@/utils/useItemMutations';
 import { useListCategories } from '@/utils/useListCategories';
 import { useListDetail } from '@/utils/useListDetail';
 import { useTags, type Tag as TagData } from '@/utils/useTags';
+import { useToast } from '@/utils/useToast';
 
 type ItemFormParams = {
   listId?: string;
@@ -36,6 +37,7 @@ export default function ItemFormScreen() {
   const params = useLocalSearchParams<ItemFormParams>();
 
   const { addItemToList, updateUserItem, saving, error } = useItemMutations();
+  const toast = useToast();
   const { list } = useListDetail(params.listId);
   const { categories: allMacroCategories } = useListCategories();
   const {
@@ -89,16 +91,14 @@ export default function ItemFormScreen() {
     return updated;
   };
 
+  // Nome e categoria obbligatori: il bottone resta disabilitato finche' non sono compilati,
+  // niente errore mostrato dopo il tap
+  const canSave = name.trim().length > 0 && !!category;
+
   const save = async () => {
     setLocalError(null);
-    if (!name.trim()) {
-      setLocalError(t('itemForm.nameRequired'));
-      return;
-    }
-    if (!category) {
-      setLocalError(t('itemForm.categoryRequired'));
-      return;
-    }
+    // Il bottone e' disabilitato senza categoria: qui serve solo a restringere il tipo per TS
+    if (!category) return;
     if (!params.listId) {
       setLocalError(t('itemForm.missingFields'));
       return;
@@ -113,6 +113,7 @@ export default function ItemFormScreen() {
       if (userItemId && selectedTags.length > 0) {
         await updateUserItem(userItemId, { tagIds: selectedTags.map((tag) => tag.id) });
       }
+      toast.success(t('itemForm.added'));
       router.back();
     } catch (e) {
       setLocalError((e as Error).message);
@@ -179,7 +180,7 @@ export default function ItemFormScreen() {
           <Button variant="secondary" label={t('itemForm.cancel')} onPress={() => router.back()} />
         </View>
         <View style={styles.actionItem}>
-          <Button variant="primary" label={t('itemForm.add')} onPress={save} loading={saving} />
+          <Button variant="primary" label={t('itemForm.add')} onPress={save} loading={saving} disabled={!canSave} />
         </View>
       </View>
 
