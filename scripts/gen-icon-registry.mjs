@@ -1,11 +1,16 @@
-// Genera src/utils/lucideIconRegistry.ts: import espliciti delle SOLE icone Lucide sfogliabili dal
-// picker (cap 30/categoria dopo dedup), così Metro non impacchetta l'intera libreria (~1600 icone),
-// che faceva crashare Expo Go per memoria.
+// Genera mobile/src/utils/lucideIconRegistry.ts e web/src/utils/lucideIconRegistry.ts dalla STESSA
+// lista curata di icone, perché il picker admin (web) non proponga mai un'icona che mobile non può
+// disegnare — causa del bug "categoria senza icona" (molte Category/ListCategory usavano nomi fuori
+// dal sottoinsieme bundlato lato mobile). Prima era generato solo lato mobile (per limitare cosa
+// Metro impacchetta, ~1600 icone totali farebbero crashare Expo Go per memoria); ora un solo script
+// scrive entrambi i registri, così non possono più disallinearsi per dimenticanza.
 //
-// Rigenerare dopo aver cambiato CATEGORY_KEYWORDS / MAX_ICONS_PER_CATEGORY:
-//   node mobile/scripts/gen-icon-registry.mjs
+// Rigenerare dopo aver cambiato CATEGORY_KEYWORDS / MAX_ICONS_PER_CATEGORY / ICON_WHITELIST:
+//   node scripts/gen-icon-registry.mjs
 //
-// NB: la logica di dedup/categoria/cap qui deve restare identica a src/utils/lucideIconCategories.ts.
+// NB: la logica di raggruppamento per categoria in web/src/utils/lucideIconCategories.ts resta
+// dinamica (serve anche per i tab/la ricerca del picker), ma filtra già solo sui nomi che
+// getLucideIcon riconosce — da qui in poi è lo stesso elenco curato, non più l'intera libreria.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -13,12 +18,21 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 const here = dirname(fileURLToPath(import.meta.url));
-const mobileRoot = join(here, '..');
+const repoRoot = join(here, '..');
 
 const tags = require('lucide-static/tags.json');
-// nomi export validi ricavati dai typings del pacchetto installato
-const dts = readFileSync(join(mobileRoot, '../node_modules/lucide-react-native/dist/lucide-react-native.d.ts'), 'utf8');
-const validSet = new Set([...dts.matchAll(/^declare const ([A-Za-z0-9_]+)/gm)].map((m) => m[1]));
+
+// Nomi export validi: intersezione fra lucide-react-native (mobile) e lucide-react (web) — un'icona
+// deve esistere in entrambe le librerie per poter finire nel registro condiviso.
+const nativeDts = readFileSync(
+  join(repoRoot, 'node_modules/lucide-react-native/dist/lucide-react-native.d.ts'),
+  'utf8',
+);
+const reactDts = readFileSync(join(repoRoot, 'node_modules/lucide-react/dist/lucide-react.d.ts'), 'utf8');
+const namesIn = (src) => new Set([...src.matchAll(/^declare const ([A-Za-z0-9_]+)/gm)].map((m) => m[1]));
+const nativeValid = namesIn(nativeDts);
+const reactValid = namesIn(reactDts);
+const validSet = new Set([...nativeValid].filter((n) => reactValid.has(n)));
 
 const CATEGORY_KEYWORDS = [
   ['people', ['person', 'people', 'user', 'face', 'body', 'human', 'baby', 'animal', 'pet']],
@@ -64,6 +78,19 @@ const ICON_WHITELIST = [
   'Gift',          // Wishlist
   'Sparkles',      // Bucket List
   'Shapes',        // Anything
+  // Icone delle Category (item) realmente in uso in produzione, non coperte dalle liste per parola chiave sopra
+  'BookImage',     // Fumetti
+  'Puzzle',        // Altri giochi
+  'Dice5',         // Giochi da tavolo
+  'Layers',        // Giochi di carte
+  'Store',         // Negozi
+  'Wrench',        // Servizi
+  'Utensils',      // Cibo
+  'PenLine',       // Fanfiction
+  'Video',         // Video
+  'Trophy',        // Sport
+  'CalendarDays',  // Eventi
+  'Sparkle',       // Personalizzato
 ];
 
 const splitWords = (n) => n.match(/[A-Z][a-z0-9]*/g) ?? [n];
@@ -102,44 +129,61 @@ for (const { p, h } of dedupedIcons) {
   if (c) buckets.get(c[0]).push(p); else other.push(p);
 }
 const browsable = new Set();
-// Aggiungi le icone dalla whitelist se valide
 for (const icon of ICON_WHITELIST) {
   if (validSet.has(icon)) browsable.add(icon);
 }
-// Aggiungi le altre icone, limitandole per categoria
 for (const [key] of CATEGORY_KEYWORDS) buckets.get(key).sort().slice(0, MAX).forEach((n) => browsable.add(n));
 other.sort().slice(0, MAX).forEach((n) => browsable.add(n));
 const names = [...browsable].sort();
 
-const out = [
-  '// File GENERATO da scripts/gen-icon-registry.mjs — non modificare a mano.',
-  '// Import espliciti delle sole icone sfogliabili dal picker: Metro impacchetta solo queste, non',
-  "// l'intera libreria lucide-react-native (~1600 icone), che faceva crashare Expo Go per memoria.",
-  "import type { ComponentType } from 'react';",
-  'import {',
-  ...names.map((n) => `  ${n},`),
-  "} from 'lucide-react-native';",
-  '',
-  'type IconComponent = ComponentType<{ size?: number; color?: string }>;',
-  '',
-  'const ICON_REGISTRY: Record<string, IconComponent> = {',
-  ...names.map((n) => `  ${n},`),
-  '};',
-  '',
-  '/** Risolve un nome export PascalCase sul componente Lucide, se incluso nel registry. */',
-  'export function getLucideIcon(name: string): IconComponent | undefined {',
-  '  return ICON_REGISTRY[name];',
-  '}',
-  '',
-  '/** kebab-case (slug) -> PascalCase, formato export di lucide-react-native. */',
-  'export function slugToPascalCase(slug: string): string {',
-  '  return slug',
-  "    .split('-')",
-  '    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))',
-  "    .join('');",
-  '}',
-  '',
-].join('\n');
+function registryFile(packageName, header) {
+  return [
+    ...header,
+    "import type { ComponentType } from 'react';",
+    'import {',
+    ...names.map((n) => `  ${n},`),
+    `} from '${packageName}';`,
+    '',
+    'type IconComponent = ComponentType<{ size?: number; color?: string }>;',
+    '',
+    'const ICON_REGISTRY: Record<string, IconComponent> = {',
+    ...names.map((n) => `  ${n},`),
+    '};',
+    '',
+    '/** Risolve un nome export PascalCase sul componente Lucide, se incluso nel registry. */',
+    'export function getLucideIcon(name: string): IconComponent | undefined {',
+    '  return ICON_REGISTRY[name];',
+    '}',
+    '',
+    '/** kebab-case (slug) -> PascalCase, formato export di lucide. */',
+    'export function slugToPascalCase(slug: string): string {',
+    '  return slug',
+    "    .split('-')",
+    '    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))',
+    "    .join('');",
+    '}',
+    '',
+  ].join('\n');
+}
 
-writeFileSync(join(mobileRoot, 'src/utils/lucideIconRegistry.ts'), out);
-console.log(`generated registry with ${names.length} icons`);
+writeFileSync(
+  join(repoRoot, 'mobile/src/utils/lucideIconRegistry.ts'),
+  registryFile('lucide-react-native', [
+    '// File GENERATO da scripts/gen-icon-registry.mjs (radice del repo) — non modificare a mano.',
+    '// Import espliciti delle sole icone sfogliabili dal picker: Metro impacchetta solo queste, non',
+    "// l'intera libreria lucide-react-native (~1600 icone), che faceva crashare Expo Go per memoria.",
+    '// Stesso elenco di web/src/utils/lucideIconRegistry.ts: un admin non può scegliere un\'icona che',
+    "// questo file non contiene, altrimenti su mobile non verrebbe mostrata (bug T09, 26/11/2026).",
+  ]),
+);
+
+writeFileSync(
+  join(repoRoot, 'web/src/utils/lucideIconRegistry.ts'),
+  registryFile('lucide-react', [
+    '// File GENERATO da scripts/gen-icon-registry.mjs (radice del repo) — non modificare a mano.',
+    '// Stesso elenco curato di mobile/src/utils/lucideIconRegistry.ts, non la libreria intera: così il',
+    "// picker admin non può proporre un'icona che mobile non riesce a disegnare (bug T09, 26/11/2026).",
+  ]),
+);
+
+console.log(`generato: mobile/src/utils/lucideIconRegistry.ts e web/src/utils/lucideIconRegistry.ts con ${names.length} icone`);
