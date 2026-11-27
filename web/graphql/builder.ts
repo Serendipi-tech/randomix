@@ -9,8 +9,26 @@ export interface Context {
   userId: string | null;
 }
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-export const prisma = new PrismaClient({ adapter });
+// Il pooler Supabase in session mode accetta in tutto 15 client: il default di node-postgres (10 per
+// pool) basta a saturarlo con due istanze serverless calde. Qui ogni istanza ne tiene al massimo 3 e
+// le rilascia appena restano inattive, così le connessioni tornano disponibili fra un'invocazione e
+// l'altra invece di restare appese.
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
+  max: 3,
+  idleTimeoutMillis: 10_000,
+  connectionTimeoutMillis: 10_000,
+});
+
+// In dev Next ricarica i moduli a ogni salvataggio: senza singleton ogni hot-reload lascerebbe dietro
+// un client con le sue connessioni ancora aperte, ed è così che il pool si esaurisce in locale.
+const globalForPrisma = globalThis as unknown as { prismaClient?: PrismaClient };
+
+export const prisma = globalForPrisma.prismaClient ?? new PrismaClient({ adapter });
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prismaClient = prisma;
+}
 
 export const builder = new SchemaBuilder<{
   PrismaTypes: PrismaTypes;
