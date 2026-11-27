@@ -15,7 +15,22 @@ export const FRIEND_REQUESTS: DocumentNode = parse(`
   query FriendRequests {
     friendRequests {
       id
+      createdAt
       sender {
+        id
+        username
+        avatarUrl
+      }
+    }
+  }
+`);
+
+export const SENT_FRIEND_REQUESTS: DocumentNode = parse(`
+  query SentFriendRequests {
+    sentFriendRequests {
+      id
+      createdAt
+      receiver {
         id
         username
         avatarUrl
