@@ -3,9 +3,11 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { LogOut, MessageSquare, Settings } from 'lucide-react-native';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Spacing } from '@/constants/theme';
+import { Motion } from '@/constants/motion';
 import { hexToRgba } from '@/utils/color';
 import { AVATAR_PRESETS, resolveAvatarUri } from '@/constants/avatar-presets';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -15,8 +17,10 @@ import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
 import { FormError } from '@/components/molecules/form-error';
 import { CardShell } from '@/components/cards/CardShell';
-import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ProfileHeader } from '@/components/molecules/profile-header';
+import { DevErrorNotice } from '@/components/atoms/DevErrorNotice';
+import { CardSkeleton } from '@/components/atoms/CardSkeleton';
+import { SkeletonLine } from '@/components/atoms/SkeletonLine';
 import { ProfileStatsPanel } from '@/components/molecules/profile-stats-panel';
 import { ProfileCategoryStats } from '@/components/molecules/profile-category-stats';
 import { ProfileCompletionDonut } from '@/components/molecules/profile-completion-donut';
@@ -25,13 +29,15 @@ import { useProfile } from '@/utils/useProfile';
 import { useMyFriends } from '@/utils/useFriends';
 import { useProfileStats } from '@/utils/useProfileStats';
 import { useMembershipPlans } from '@/utils/useMembershipPlans';
-import { PremiumBanner } from '@/components/molecules/premium-banner';
+import { PremiumBanner, PREMIUM_BANNER_HEIGHT } from '@/components/molecules/premium-banner';
 
 const USERNAME_MIN_LENGTH = 3;
 // Deve combaciare con RING_SIZE/2 di ProfileHeader: spazio per l'avatar che sfonda il blocco.
 const HERO_TOP_SPACE = 55;
 // Deve combaciare con BAR_HEIGHT di components/app-tabs.tsx: spazio per non finire sotto la tab bar.
 const NAVBAR_HEIGHT = 68;
+// Stesso diametro dell'avatar dell'hero (ring compresi), così il blocco non cambia altezza al caricamento
+const AVATAR_SKELETON_SIZE = 110;
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -43,8 +49,8 @@ export default function ProfileScreen() {
 
   const { profile, loading: loadingProfile, updateProfile, saving, saveError } = useProfile();
   const { friends } = useMyFriends();
-  const { categoryStats, completionBreakdown } = useProfileStats();
-  const { isFreePlan } = useMembershipPlans();
+  const { categoryStats, completionBreakdown, loading: loadingStats, error: statsError } = useProfileStats();
+  const { isFreePlan, planKnown, hasPaidPlan } = useMembershipPlans();
 
   const [editing, setEditing] = useState(false);
   const [username, setUsername] = useState('');
@@ -84,7 +90,16 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
       >
         {loadingProfile && !profile ? (
-          <ListCardSkeleton colorScheme={colorScheme} />
+          <View style={styles.statsGap}>
+            <View style={styles.heroSkeleton}>
+              <SkeletonLine width={AVATAR_SKELETON_SIZE} height={AVATAR_SKELETON_SIZE} radius={AVATAR_SKELETON_SIZE / 2} />
+              <SkeletonLine width={140} height={16} />
+              <SkeletonLine width={180} height={12} />
+            </View>
+            <CardSkeleton variant="gradient" rows={2} />
+            <CardSkeleton titled circleSize={70} rows={3} />
+            <CardSkeleton titled rows={4} />
+          </View>
         ) : profile && !editing ? (
           <>
             <View style={styles.heroSpace}>
@@ -95,6 +110,7 @@ export default function ProfileScreen() {
                 colorScheme={colorScheme}
                 editLabel={t('edit')}
                 onEditPress={startEditing}
+                showCrown={hasPaidPlan}
                 memberSinceLabel={t('memberSince', {
                   date: new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
                 })}
@@ -140,12 +156,33 @@ export default function ProfileScreen() {
                 completedItemsCount={profile.completedItemsCount}
                 friendsCount={friends.length}
               />
-              {/* Solo a piano gratuito accertato: a piano attivo, o finché non si sa, non si propone nulla */}
-              {isFreePlan && (
-                <PremiumBanner onPress={() => router.push('/plans')} />
+              {/* Spazio riservato finché il piano non è noto: vedi la home, stesso ragionamento */}
+              {planKnown ? (
+                isFreePlan && (
+                  <Animated.View entering={FadeIn.duration(Motion.contentFade)}>
+                    <PremiumBanner onPress={() => router.push('/plans')} />
+                  </Animated.View>
+                )
+              ) : (
+                <SkeletonLine height={PREMIUM_BANNER_HEIGHT} radius={12} />
               )}
-              {completionBreakdown && <ProfileCompletionDonut breakdown={completionBreakdown} />}
-              <ProfileCategoryStats categoryStats={categoryStats} />
+              <DevErrorNotice error={statsError} source="profileStats" />
+              {/* Skeleton per blocco: le statistiche arrivano da una query a parte, senza
+                  placeholder le due card comparirebbero di colpo a pagina già disegnata */}
+              {completionBreakdown ? (
+                <Animated.View entering={FadeIn.duration(Motion.contentFade)}>
+                  <ProfileCompletionDonut breakdown={completionBreakdown} />
+                </Animated.View>
+              ) : (
+                loadingStats && <CardSkeleton titled circleSize={70} rows={3} />
+              )}
+              {loadingStats && categoryStats.length === 0 ? (
+                <CardSkeleton titled rows={4} />
+              ) : (
+                <Animated.View entering={FadeIn.duration(Motion.contentFade)}>
+                  <ProfileCategoryStats categoryStats={categoryStats} />
+                </Animated.View>
+              )}
             </View>
           </>
         ) : profile ? (
@@ -235,6 +272,12 @@ const styles = StyleSheet.create({
   },
   heroSpace: {
     marginTop: HERO_TOP_SPACE,
+  },
+  heroSkeleton: {
+    marginTop: HERO_TOP_SPACE,
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: Spacing.three,
   },
   statsGap: {
     gap: Spacing.two + Spacing.one,

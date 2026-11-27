@@ -5,6 +5,7 @@ import { Calendar, Pencil } from 'lucide-react-native';
 import { Colors, DisplayFonts } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { Avatar } from '@/components/atoms/Avatar';
+import { PremiumCrown, crownBoxSize } from '@/components/atoms/premium-crown';
 
 const AVATAR_SIZE = 96;
 // Doppio bordo: anello interno nel colore dello sfondo, anello esterno a gradiente.
@@ -17,6 +18,13 @@ const RING_SIZE = INNER_RING_SIZE + OUTER_RING_WIDTH * 2;
 // Alone dietro l'anello: molto più largo del ring, così la sfumatura ha spazio per spegnersi
 const GLOW_SIZE = RING_SIZE + 130;
 
+// Corona dei piani a pagamento: appoggiata sull'angolo in alto a sinistra dell'anello e inclinata.
+// Il riquadro svg è più grande del disegno (margine per l'alone), quindi la posizione si calcola
+// dalla sua misura invece che a occhio
+const CROWN_HEIGHT = 34;
+const CROWN_BOX = crownBoxSize(CROWN_HEIGHT);
+const CROWN_TILT = '-28deg';
+
 interface ProfileHeaderProps {
   username: string;
   email: string;
@@ -26,6 +34,8 @@ interface ProfileHeaderProps {
   onEditPress: () => void;
   /** Riga opzionale sotto l'email, es. "Member since March 2025" — già formattata dal chiamante. */
   memberSinceLabel?: string;
+  /** Corona sull'avatar: solo per chi ha un piano a pagamento. */
+  showCrown?: boolean;
 }
 
 /** Hero del profilo: avatar grande con anello a gradiente e alone, che sfonda il bordo superiore
@@ -39,6 +49,7 @@ export function ProfileHeader({
   editLabel,
   onEditPress,
   memberSinceLabel,
+  showCrown = false,
 }: ProfileHeaderProps) {
   const colors = Colors[colorScheme];
 
@@ -90,6 +101,11 @@ export function ProfileHeader({
               <Avatar uri={avatarUrl ?? undefined} fallbackColor={colors.primary} size={AVATAR_SIZE} ring={false} inset={0} />
             </View>
           </LinearGradient>
+          {showCrown && (
+            <View style={styles.crown} pointerEvents="none">
+              <PremiumCrown height={CROWN_HEIGHT} />
+            </View>
+          )}
           <Pressable
             onPress={onEditPress}
             hitSlop={8}
@@ -149,6 +165,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+  },
+  crown: {
+    position: 'absolute',
+    // Scostamenti ricavati dal riquadro: un terzo del riquadro resta sopra/fuori dall'anello, il
+    // resto lo copre, così la corona appoggia sul bordo invece di galleggiare staccata
+    left: -CROWN_BOX.width / 3,
+    top: -CROWN_BOX.height / 3,
+    transform: [{ rotate: CROWN_TILT }],
   },
   editBadge: {
     position: 'absolute',

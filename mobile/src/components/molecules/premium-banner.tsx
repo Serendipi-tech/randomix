@@ -13,6 +13,7 @@ import Svg, {
 import { Colors } from '@/constants/theme';
 import { hexToRgba, mixColors } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { PremiumCrown } from '@/components/atoms/premium-crown';
 import { useTranslation } from 'react-i18next';
 
 type PremiumBannerProps = {
@@ -51,10 +52,7 @@ const BUBBLES = [
 const BUBBLE_FILL_ALPHA = 0.07;
 const BUBBLES_BOX = { width: 130, height: 60 };
 
-// Il viewBox è più largo della corona: l'alone deve avere spazio attorno senza essere tagliato
-const CROWN_VIEWBOX = { x: -10, y: -10, width: 68, height: 60 };
 const CROWN_HEIGHT = 26;
-const CROWN_SCALE = CROWN_HEIGHT / 40;
 // Il riquadro della corona ha un margine trasparente attorno al disegno (serve all'alone): questo
 // valore negativo ne riassorbe una parte, avvicinando i testi senza spostare la corona
 const CROWN_TEXT_SPACING = -6;
@@ -161,7 +159,7 @@ export function PremiumBanner({ onPress }: PremiumBannerProps) {
         </View>
 
         <View style={styles.crown}>
-          <CrownGlyph gold={colors.secondary} warm={colors.warning} instanceId={instanceId} />
+          <PremiumCrown height={CROWN_HEIGHT} />
         </View>
 
         <View style={styles.texts}>
@@ -234,53 +232,12 @@ function SparkGlyph({
   );
 }
 
-/** Corona a tre punte, sottile, con alone dorato attorno. Niente ombre interne: il gradiente va
- *  dall'oro a un oro appena più caldo, non più scuro. La `Crown` di lucide, riempita, risultava un
- *  blocco unico senza stacco fra le punte. */
-function CrownGlyph({ gold, warm, instanceId }: { gold: string; warm: string; instanceId: string }) {
-  // Metà strada verso l'arancio del tema: resta oro, vira appena sul caldo
-  const amber = mixColors(gold, warm, 0.5);
-  const fillId = `premiumCrown-${instanceId}`;
-  const glowId = `premiumCrownGlow-${instanceId}`;
-
-  return (
-    <Svg
-      width={CROWN_VIEWBOX.width * CROWN_SCALE}
-      height={CROWN_VIEWBOX.height * CROWN_SCALE}
-      viewBox={`${CROWN_VIEWBOX.x} ${CROWN_VIEWBOX.y} ${CROWN_VIEWBOX.width} ${CROWN_VIEWBOX.height}`}
-    >
-      <Defs>
-        <SvgLinearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0" stopColor={gold} />
-          <Stop offset="1" stopColor={amber} />
-        </SvgLinearGradient>
-        {/* Alone: sfuma a zero prima del bordo del viewBox, quindi non si vede dove finisce */}
-        <RadialGradient id={glowId} cx="50%" cy="50%" r="50%">
-          <Stop offset="0" stopColor={gold} stopOpacity={0.45} />
-          <Stop offset="0.55" stopColor={gold} stopOpacity={0.16} />
-          <Stop offset="1" stopColor={gold} stopOpacity={0} />
-        </RadialGradient>
-      </Defs>
-
-      <Circle cx={24} cy={21} r={30} fill={`url(#${glowId})`} />
-
-      <Path
-        d="M 7 31 L 3 9 L 15.5 19 L 24 5 L 32.5 19 L 45 9 L 41 31 Z"
-        fill={`url(#${fillId})`}
-      />
-      <Path
-        d="M 7 32.5 L 41 32.5 Q 43 32.5 43 34.5 L 43 36 Q 43 38 41 38 L 7 38 Q 5 38 5 36 L 5 34.5 Q 5 32.5 7 32.5 Z"
-        fill={`url(#${fillId})`}
-      />
-      <Circle cx={16} cy={35.2} r={1.6} fill={amber} opacity={0.7} />
-      <Circle cx={24} cy={35.2} r={1.6} fill={amber} opacity={0.7} />
-      <Circle cx={32} cy={35.2} r={1.6} fill={amber} opacity={0.7} />
-    </Svg>
-  );
-}
-
 // Stesso valore di SHELL_RADIUS in CardShell: la banda si allinea alle card che le stanno attorno
 const RADIUS = 12;
+
+/** Altezza della banda, fissata qui perché chi la mostra in modo condizionale possa riservarne lo
+ *  spazio con un placeholder della stessa misura mentre il piano non è ancora noto. */
+export const PREMIUM_BANNER_HEIGHT = 52;
 
 const styles = StyleSheet.create({
   wrap: {
@@ -291,6 +248,7 @@ const styles = StyleSheet.create({
     opacity: 0.85,
   },
   banner: {
+    minHeight: PREMIUM_BANNER_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,

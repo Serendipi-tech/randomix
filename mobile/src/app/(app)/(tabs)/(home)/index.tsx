@@ -2,16 +2,19 @@ import { useRouter } from 'expo-router';
 import { List, Plus } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Spacing } from '@/constants/theme';
+import { Motion } from '@/constants/motion';
 import { resolveListIcon } from '@/constants/list-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
 import { PageHeader } from '@/components/molecules/PageHeader';
-import { PremiumBanner } from '@/components/molecules/premium-banner';
+import { PremiumBanner, PREMIUM_BANNER_HEIGHT } from '@/components/molecules/premium-banner';
 import { SectionHeader } from '@/components/molecules/SectionHeader';
 import { EmptyState } from '@/components/molecules/EmptyState';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
+import { SkeletonLine } from '@/components/atoms/SkeletonLine';
 import { ListCard } from '@/components/cards/ListCard';
 import { RandomizerCard } from '@/components/cards/RandomizerCard';
 import { useMyLists } from '@/utils/useLists';
@@ -28,7 +31,7 @@ export default function HomeScreen() {
 
   const { lists, loading, error, loadMore } = useMyLists();
   const { profile } = useProfile();
-  const { isFreePlan } = useMembershipPlans();
+  const { isFreePlan, planKnown } = useMembershipPlans();
   // clearance in fondo alla lista per non finire sotto la pillola-navbar (regola condivisa)
   const listBottomPadding = useNavbarClearance();
 
@@ -40,10 +43,18 @@ export default function HomeScreen() {
       <RadialBackground colorScheme={colorScheme} />
       <PageHeader action={{ icon: Plus, onPress: () => router.push('/list-form') }} />
 
-      {/* Solo a piano gratuito accertato: a piano attivo, o finché non si sa, non si propone nulla */}
-      {isFreePlan && (
+      {/* Finché il piano non è noto lo spazio è riservato da un placeholder della stessa altezza:
+          senza, la banda comparirebbe di colpo spingendo giù il resto della pagina. A piano attivo
+          non si propone nulla. */}
+      {planKnown ? (
+        isFreePlan && (
+          <Animated.View style={styles.premiumWrap} entering={FadeIn.duration(Motion.contentFade)}>
+            <PremiumBanner onPress={() => router.push('/plans')} />
+          </Animated.View>
+        )
+      ) : (
         <View style={styles.premiumWrap}>
-          <PremiumBanner onPress={() => router.push('/plans')} />
+          <SkeletonLine height={PREMIUM_BANNER_HEIGHT} radius={12} />
         </View>
       )}
 
@@ -66,39 +77,42 @@ export default function HomeScreen() {
           ))}
         </View>
       ) : (
-        <FlatList
-          style={styles.list}
-          showsVerticalScrollIndicator={false}
-          data={lists}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={[
-            styles.listContent,
-            { paddingBottom: listBottomPadding },
-            lists.length === 0 && styles.listContentEmpty,
-          ]}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.4}
-          renderItem={({ item }) => (
-            <ListCard
-              title={item.name}
-              category={item.categories[0]?.name}
-              icon={resolveListIcon(item.icon)}
-              color={item.color}
-              itemsCount={item.itemCount}
-              isHidden={item.isHidden}
-              onPress={() => router.push({ pathname: '/list/[id]', params: { id: item.id } })}
-            />
-          )}
-          ListEmptyComponent={
-            <View style={styles.empty}>
-              <EmptyState
-                icon={List}
-                title={error ? t('error') : t('empty.title')}
-                subtitle={error ? undefined : t('empty.subtitle')}
+        // Fade solo in opacità: il contenuto prende il posto dello skeleton senza spostare nulla
+        <Animated.View style={styles.list} entering={FadeIn.duration(Motion.contentFade)}>
+          <FlatList
+            style={styles.list}
+            showsVerticalScrollIndicator={false}
+            data={lists}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={[
+              styles.listContent,
+              { paddingBottom: listBottomPadding },
+              lists.length === 0 && styles.listContentEmpty,
+            ]}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.4}
+            renderItem={({ item }) => (
+              <ListCard
+                title={item.name}
+                category={item.categories[0]?.name}
+                icon={resolveListIcon(item.icon)}
+                color={item.color}
+                itemsCount={item.itemCount}
+                isHidden={item.isHidden}
+                onPress={() => router.push({ pathname: '/list/[id]', params: { id: item.id } })}
               />
-            </View>
-          }
-        />
+            )}
+            ListEmptyComponent={
+              <View style={styles.empty}>
+                <EmptyState
+                  icon={List}
+                  title={error ? t('error') : t('empty.title')}
+                  subtitle={error ? undefined : t('empty.subtitle')}
+                />
+              </View>
+            }
+          />
+        </Animated.View>
       )}
     </SafeAreaView>
   );

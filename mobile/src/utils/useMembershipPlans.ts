@@ -62,6 +62,8 @@ export function useMembershipPlans() {
   // Finché la risposta non è arrivata il piano non è noto: senza questa distinzione il FREE
   // implicito farebbe comparire per un istante le proposte di upgrade anche a chi ha già un piano
   const isFreePlan = myData !== undefined && currentPlan === 'FREE';
+  // Piano acquistato: il trial non conta, è gratuito a tempo
+  const hasPaidPlan = myData !== undefined && currentPlan !== 'FREE' && currentPlan !== 'FREE_TRIAL';
 
   const plans: MembershipPlanCard[] = (plansData?.membershipPlans ?? []).map((membership) => ({
     id: membership.id,
@@ -76,6 +78,10 @@ export function useMembershipPlans() {
     plans,
     currentPlan,
     isFreePlan,
+    hasPaidPlan,
+    // Distingue "piano noto" da "ancora in attesa": finché è false chi mostra proposte di upgrade
+    // può riservare lo spazio invece di inserirle di colpo a pagina già disegnata
+    planKnown: myData !== undefined,
     loading: plansLoading || myLoading,
     error: plansError ?? myError ?? null,
   };

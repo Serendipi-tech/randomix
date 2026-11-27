@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { StyleSheet } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -13,10 +12,14 @@ import { hexToRgba } from '@/utils/color';
 
 type SkeletonLineProps = {
   width?: number | `${number}%`;
+  /** Altezza della linea. Default 12 (riga di testo). */
+  height?: number;
+  /** Raggio degli angoli. Default metà dell'altezza, cioè pillola. */
+  radius?: number;
 };
 
 /** Linea skeleton con pulse (opacità in loop) tinta dal bordo del tema. */
-export function SkeletonLine({ width = '100%' }: SkeletonLineProps) {
+export function SkeletonLine({ width = '100%', height = 12, radius }: SkeletonLineProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   const pulse = useSharedValue(0);
@@ -37,9 +40,10 @@ export function SkeletonLine({ width = '100%' }: SkeletonLineProps) {
   return (
     <Animated.View
       style={[
-        styles.line,
         {
           width,
+          height,
+          borderRadius: radius ?? height / 2,
           backgroundColor: hexToRgba(colors.border, 0.5),
           boxShadow: `0px 0px 6px ${hexToRgba(colors.border, 0.3)}`,
         },
@@ -48,10 +52,3 @@ export function SkeletonLine({ width = '100%' }: SkeletonLineProps) {
     />
   );
 }
-
-const styles = StyleSheet.create({
-  line: {
-    height: 12,
-    borderRadius: 6,
-  },
-});
