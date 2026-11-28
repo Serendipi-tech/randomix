@@ -1,131 +1,75 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { MessageSquare } from 'lucide-react-native';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Animated, { FadeInDown } from 'react-native-reanimated';
-import { Colors, Spacing } from '@/constants/theme';
+import { Plus } from 'lucide-react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
 import { PageHeader } from '@/components/molecules/PageHeader';
-import { Button } from '@/components/atoms/Button';
-import { Input } from '@/components/molecules/Input';
+import { SectionHeader } from '@/components/molecules/SectionHeader';
 import { EmptyState } from '@/components/molecules/EmptyState';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
-import { BottomSheet } from '@/components/organisms/BottomSheet';
-import { SegmentedControl } from '@/components/atoms/SegmentedControl';
-import { SectionLabel } from '@/components/atoms/SectionLabel';
-import { CardShell } from '@/components/cards/CardShell';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
-import { FormError } from '@/components/molecules/form-error';
 import { FeedbackCard } from '@/components/cards/FeedbackCard';
-import { useFeedbacks, type FeedbackType } from '@/utils/useFeedbacks';
+import { useFeedbacks } from '@/utils/useFeedbacks';
+
+const SKELETON_COUNT = 3;
 
 export default function FeedbackScreen() {
   const router = useRouter();
   const { t } = useTranslation('feedback');
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
-  const colors = Colors[colorScheme];
+  const insets = useSafeAreaInsets();
 
-  const { items, loading, creating, createFeedback, deleteFeedback, canDelete } = useFeedbacks();
-
-  const [formOpen, setFormOpen] = useState(false);
-  const [type, setType] = useState<FeedbackType>('COMMENT');
-  const [title, setTitle] = useState('');
-  const [text, setText] = useState('');
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const { items, loading, deleteFeedback, canDelete } = useFeedbacks();
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-
-  const resetForm = () => {
-    setType('COMMENT');
-    setTitle('');
-    setText('');
-    setSubmitError(null);
-  };
-
-  const submitFeedback = async () => {
-    setSubmitError(null);
-    try {
-      await createFeedback({ type, title, text });
-      resetForm();
-      setFormOpen(false);
-    } catch (e) {
-      setSubmitError((e as Error).message);
-    }
-  };
 
   const confirmDelete = async () => {
     if (pendingDeleteId) await deleteFeedback(pendingDeleteId);
     setPendingDeleteId(null);
   };
 
+  const showSkeleton = loading && items.length === 0;
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <RadialBackground colorScheme={colorScheme} />
-      <PageHeader onBack={() => router.back()} />
-      <View style={styles.content}>
-        <Animated.View entering={FadeInDown.duration(400)}>
-          <CardShell backgroundColor={colors.foreground} borderColor={colors.border}>
-            <View style={styles.actionSection}>
-              <Text style={[styles.banner, { color: colors.disabled }]}>{t('banner')}</Text>
-              <Button label={t('send')} onPress={() => setFormOpen(true)} />
-            </View>
-          </CardShell>
-        </Animated.View>
+      {/* L'invio sta nell'intestazione, non in una card in cima: resta raggiungibile anche dopo
+          aver scorso la cronologia */}
+      <PageHeader
+        onBack={() => router.back()}
+        action={{ icon: Plus, onPress: () => router.push('/feedback/new') }}
+      />
 
-        <Animated.View entering={FadeInDown.delay(120).duration(400)} style={styles.listWrap}>
-          <SectionLabel>{t('history')}</SectionLabel>
-          {loading && items.length === 0 ? (
-            <ListCardSkeleton colorScheme={colorScheme} />
-          ) : (
-            <FlatList
-              data={items}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={styles.list}
-              ListEmptyComponent={
-                <EmptyState icon={MessageSquare} title={t('empty.title')} subtitle={t('empty.subtitle')} />
-              }
-              renderItem={({ item }) => (
-                <FeedbackCard
-                  item={item}
-                  deletable={canDelete(item)}
-                  onDelete={() => setPendingDeleteId(item.id)}
-                />
-              )}
-            />
-          )}
-        </Animated.View>
+      <View style={styles.headerWrap}>
+        <SectionHeader title={t('history')} count={items.length} />
       </View>
 
-      <BottomSheet visible={formOpen} onClose={() => setFormOpen(false)}>
-        <View style={styles.form}>
-          <SegmentedControl
-            value={type}
-            onChange={setType}
-            options={[
-              { value: 'COMMENT', label: t('type.comment') },
-              { value: 'SUGGESTION', label: t('type.suggestion'), activeColor: colors.warning },
-              { value: 'BUG', label: t('type.bug'), activeColor: colors.error },
-            ]}
-          />
-          <Input placeholder={t('form.titlePlaceholder')} value={title} onChangeText={setTitle} />
-          <Input
-            variant="textarea"
-            placeholder={t('form.messagePlaceholder')}
-            value={text}
-            onChangeText={setText}
-            maxLength={3000}
-          />
-          {submitError && <FormError message={submitError} />}
-          <Button
-            label={t('form.submit')}
-            onPress={submitFeedback}
-            loading={creating}
-            disabled={text.trim().length === 0}
-          />
+      {showSkeleton ? (
+        <View style={styles.skeletonWrap}>
+          {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+            <ListCardSkeleton key={i} colorScheme={colorScheme} />
+          ))}
         </View>
-      </BottomSheet>
+      ) : (
+        <FlatList
+          style={styles.list}
+          data={items}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + Spacing.five }]}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={<EmptyState title={t('empty.title')} subtitle={t('empty.subtitle')} />}
+          renderItem={({ item }) => (
+            <FeedbackCard
+              item={item}
+              deletable={canDelete(item)}
+              onDelete={() => setPendingDeleteId(item.id)}
+            />
+          )}
+        />
+      )}
 
       <ConfirmSheet
         visible={pendingDeleteId !== null}
@@ -142,29 +86,23 @@ export default function FeedbackScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
-  content: {
-    flex: 1,
+  // Assoluto e non flex:1: con il contenuto più alto dello schermo un contenitore flex a monte
+  // si rifiuta di restringersi e la lista non scorre (stesso motivo del profilo)
+  safe: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
+  headerWrap: {
     paddingHorizontal: Spacing.four,
-    gap: Spacing.three,
-  },
-  actionSection: {
-    gap: 12,
-  },
-  banner: {
-    fontSize: 14,
-  },
-  listWrap: {
-    flex: 1,
-    gap: Spacing.two,
+    paddingBottom: Spacing.two,
   },
   list: {
-    gap: Spacing.two,
-    paddingBottom: Spacing.six,
+    flex: 1,
+    minHeight: 0,
   },
-  form: {
+  listContent: {
     paddingHorizontal: Spacing.four,
-    paddingBottom: Spacing.four,
-    gap: Spacing.three,
+    gap: Spacing.two,
+  },
+  skeletonWrap: {
+    paddingHorizontal: Spacing.four,
+    gap: Spacing.two,
   },
 });
