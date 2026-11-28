@@ -111,3 +111,37 @@ export function formatDetailRows(membership: MembershipData, t: Translate): Memb
     },
   ];
 }
+
+export interface MembershipHighlight {
+  key: string;
+  title: string;
+  caption: string;
+}
+
+const UPGRADE_NS = `${PLANS_NS}.upgrade.features`;
+
+/** Punti di forza del piano a pagamento, per la pagina di upgrade: titolo costruito sul valore
+ *  reale del piano, didascalia fissa. */
+export function formatHighlights(membership: MembershipData, t: Translate): MembershipHighlight[] {
+  const amount = (key: string, value: number | null) =>
+    value == null ? t(`${UPGRADE_NS}.${key}.unlimited`) : t(`${UPGRADE_NS}.${key}.limited`, { count: value });
+  const caption = (key: string) => t(`${UPGRADE_NS}.${key}.caption`);
+
+  return [
+    { key: 'lists', title: amount('lists', membership.maxLists), caption: caption('lists') },
+    {
+      key: 'itemsPerList',
+      title: amount('itemsPerList', membership.maxItemsPerList),
+      caption: caption('itemsPerList'),
+    },
+    {
+      key: 'groups',
+      title: amount('groups', membership.maxGroupsCreatable),
+      caption: caption('groups'),
+    },
+    { key: 'imageUpload', title: t(`${UPGRADE_NS}.imageUpload.title`), caption: caption('imageUpload') },
+    { key: 'hideItems', title: t(`${UPGRADE_NS}.hideItems.title`), caption: caption('hideItems') },
+    { key: 'noAds', title: t(`${UPGRADE_NS}.noAds.title`), caption: caption('noAds') },
+    { key: 'support', title: t(`${UPGRADE_NS}.support.title`), caption: caption('support') },
+  ];
+}
