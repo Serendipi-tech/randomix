@@ -38,8 +38,10 @@ export function UserSearchRow({
           onPress={onAdd}
           disabled={disabled}
           hitSlop={8}
-          style={[styles.addButton, disabled && styles.addDisabled]}>
-          <Text style={styles.addLabel}>{addLabel}</Text>
+          style={[styles.addButton, { backgroundColor: colors.accent }, disabled && styles.addDisabled]}>
+          {/* accent e' sempre un ciano chiaro, in entrambi gli schemi: testo scuro fisso, non
+              il textColor del tema (che in dark diventerebbe chiaro su chiaro) */}
+          <Text style={[styles.addLabel, { color: Colors.light.textColor }]}>{addLabel}</Text>
         </Pressable>
       )}
     </View>
