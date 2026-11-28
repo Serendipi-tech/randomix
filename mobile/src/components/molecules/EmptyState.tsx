@@ -1,33 +1,29 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { Colors } from '@/constants/theme';
-import { hexToRgba } from '@/utils/color';
+import { Colors, DisplayFonts, Spacing } from '@/constants/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { Button } from '@/components/atoms/Button';
 
 type EmptyStateProps = {
-  icon: React.ComponentType<{ size?: number; color?: string }>;
   title: string;
   subtitle?: string;
   actionLabel?: string;
   onAction?: () => void;
 };
 
-/** Placeholder per liste vuote: nessuno sfondo, badge icona tinto `primary`.
- *  La CTA opzionale (actionLabel + onAction) renderizza un Button primary a tutta larghezza. */
-export function EmptyState({ icon: Icon, title, subtitle, actionLabel, onAction }: EmptyStateProps) {
+/** Placeholder per elenchi vuoti: titolo e spiegazione centrati, con una CTA opzionale in fondo.
+ *  Puro render da props. */
+export function EmptyState({ title, subtitle, actionLabel, onAction }: EmptyStateProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
   return (
     <View style={styles.container}>
-      <View style={[styles.iconBadge, { backgroundColor: hexToRgba(colors.primary, 0.12) }]}>
-        <Icon size={20} color={colors.primary} />
-      </View>
       <Text style={[styles.title, { color: colors.textColor }]}>{title}</Text>
-      {subtitle && <Text style={[styles.subtitle, { color: colors.textColor }]}>{subtitle}</Text>}
+      {subtitle && <Text style={[styles.subtitle, { color: colors.disabled }]}>{subtitle}</Text>}
+
       {actionLabel && onAction && (
         <View style={styles.action}>
-          <Button variant="primary" label={actionLabel} onPress={onAction} />
+          <Button variant="secondary" label={actionLabel} onPress={onAction} />
         </View>
       )}
     </View>
@@ -37,31 +33,23 @@ export function EmptyState({ icon: Icon, title, subtitle, actionLabel, onAction 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    paddingVertical: 12,
-    paddingHorizontal: 12,
+    paddingVertical: Spacing.three,
     alignItems: 'center',
-  },
-  iconBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
   },
   title: {
-    fontWeight: '700',
-    fontSize: 18,
-    marginBottom: 4,
+    fontSize: 16,
+    lineHeight: 21,
     textAlign: 'center',
+    fontFamily: DisplayFonts.semiBold,
   },
   subtitle: {
-    fontSize: 15,
-    opacity: 0.65,
+    marginTop: Spacing.one,
+    fontSize: 13,
+    lineHeight: 18,
     textAlign: 'center',
   },
   action: {
-    marginTop: 18,
+    marginTop: Spacing.three,
     alignSelf: 'stretch',
   },
 });

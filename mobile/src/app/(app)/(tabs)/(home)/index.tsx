@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { List, Plus } from 'lucide-react-native';
+import { Plus } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
@@ -103,13 +103,10 @@ export default function HomeScreen() {
               />
             )}
             ListEmptyComponent={
-              <View style={styles.empty}>
-                <EmptyState
-                  icon={List}
-                  title={error ? t('error') : t('empty.title')}
-                  subtitle={error ? undefined : t('empty.subtitle')}
-                />
-              </View>
+              <EmptyState
+                title={error ? t('error') : t('empty.title')}
+                subtitle={error ? undefined : t('empty.subtitle')}
+              />
             }
           />
         </Animated.View>
@@ -146,11 +143,6 @@ const styles = StyleSheet.create({
   },
   listContentEmpty: {
     flexGrow: 1,
-  },
-  empty: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.five,
   },
 });
 

@@ -12,6 +12,7 @@ import { RadialBackground } from '@/components/molecules/radial-background';
 import { ListCardSkeleton } from '@/components/atoms/list-card-skeleton';
 import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { PageHeader } from '@/components/molecules/PageHeader';
+import { EmptyState } from '@/components/molecules/EmptyState';
 import { ItemCard } from '@/components/cards/ItemCard';
 import { CardShell } from '@/components/cards/CardShell';
 import { Button } from '@/components/atoms/Button';
@@ -96,11 +97,7 @@ export default function ListDetailScreen() {
           ))}
         </View>
       ) : !list ? (
-        <View style={styles.empty}>
-          <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
-            {error ? t('detail.error') : t('detail.notFound')}
-          </Text>
-        </View>
+        <EmptyState title={error ? t('detail.error') : t('detail.notFound')} />
       ) : (
         <>
           {/* Header fisso: descrizione e azioni non scrollano, solo la lista item sotto scorre */}
@@ -193,14 +190,10 @@ export default function ListDetailScreen() {
               />
             )}
             ListEmptyComponent={
-              <View style={styles.empty}>
-                <Text style={[styles.emptyTitle, { color: colors.textColor }]}>
-                  {t('detail.emptyTitle')}
-                </Text>
-                <Text style={[styles.emptySubtitle, { color: colors.disabled }]}>
-                  {t('detail.emptySubtitle')}
-                </Text>
-              </View>
+              <EmptyState
+                title={t('detail.emptyTitle')}
+                subtitle={t('detail.emptySubtitle')}
+              />
             }
             />
             {/* Fade in cima alla lista: gli item scrollati svaniscono sotto l'header fisso. Nascosto se la lista è vuota */}
@@ -274,19 +267,5 @@ const styles = StyleSheet.create({
   },
   randomizeFill: {
     flex: 1,
-  },
-  empty: {
-    alignItems: 'center',
-    paddingTop: Spacing.five,
-    paddingHorizontal: Spacing.five,
-    gap: Spacing.two,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    textAlign: 'center',
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    textAlign: 'center',
   },
 });
