@@ -2,6 +2,7 @@ import { GraphQLError } from 'graphql';
 import { builder, prisma } from '../../builder';
 import { ProfileStatsRef, type ProfileStatsShape } from '../profileStats/index';
 import {
+  AnsweredFriendRequestRef,
   FriendProfileRef,
   FriendRequestRef,
   PublicUserRef,
@@ -122,6 +123,24 @@ builder.queryField('friendRequests', (t) =>
         where: { receiverId: ctx.userId, status: 'PENDING' },
         include: { sender: true },
         orderBy: { createdAt: 'desc' },
+      });
+    },
+  }),
+);
+
+// Quante voci storiche tenere nel feed: oltre, la pagina notifiche diventerebbe un archivio
+const ANSWERED_HISTORY_LIMIT = 20;
+
+builder.queryField('answeredFriendRequests', (t) =>
+  t.field({
+    type: [AnsweredFriendRequestRef],
+    resolve: async (_root, _args, ctx) => {
+      requireAuth(ctx.userId);
+      return prisma.friendship.findMany({
+        where: { receiverId: ctx.userId, status: { in: ['ACCEPTED', 'REJECTED'] } },
+        include: { sender: true },
+        orderBy: { updatedAt: 'desc' },
+        take: ANSWERED_HISTORY_LIMIT,
       });
     },
   }),

@@ -100,3 +100,18 @@ export const FRIEND_PROFILE: DocumentNode = parse(`
     }
   }
 `);
+
+export const ANSWERED_FRIEND_REQUESTS: DocumentNode = parse(`
+  query AnsweredFriendRequests {
+    answeredFriendRequests {
+      id
+      accepted
+      answeredAt
+      sender {
+        id
+        username
+        avatarUrl
+      }
+    }
+  }
+`);

@@ -42,6 +42,20 @@ SentFriendRequestRef.implement({
   }),
 });
 
+// Richiesta ricevuta e gia' chiusa: resta nel feed come voce storica, con l'esito
+export const AnsweredFriendRequestRef = builder.objectRef<Friendship & { sender: User }>(
+  'AnsweredFriendRequest',
+);
+
+AnsweredFriendRequestRef.implement({
+  fields: (t) => ({
+    id: t.exposeID('id'),
+    sender: t.field({ type: PublicUserRef, resolve: (parent) => parent.sender }),
+    accepted: t.boolean({ resolve: (parent) => parent.status === 'ACCEPTED' }),
+    answeredAt: t.expose('updatedAt', { type: 'DateTime' }),
+  }),
+});
+
 interface UserSearchResultShape {
   user: User;
   relation: FriendRelation;

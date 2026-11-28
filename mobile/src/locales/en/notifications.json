@@ -3,7 +3,8 @@
   "filters": {
     "all": "All",
     "system": "System",
-    "friends": "Friends"
+    "friends": "Friends",
+    "groups": "Groups"
   },
   "sections": {
     "new": "New",
@@ -26,11 +27,36 @@
       "body": "Request sent",
       "status": "Pending",
       "cancel": "Cancel"
+    },
+    "answered": {
+      "accepted": "You accepted the request",
+      "declined": "You declined the request"
+    }
+  },
+  "groupInvite": {
+    "incoming": {
+      "body": "{{username}} invited you"
+    },
+    "sent": {
+      "body": "Invite sent to {{username}}"
+    },
+    "answered": {
+      "accepted": "You joined this group",
+      "declined": "You declined {{username}}'s invite"
     }
   },
   "empty": {
     "title": "No notifications yet",
     "subtitle": "We'll let you know when something happens."
   },
-  "error": "Couldn't load your notifications. Please try again."
+  "error": "Couldn't load your notifications. Please try again.",
+  "detail": {
+    "notFound": "This notification is no longer available.",
+    "deleteConfirm": {
+      "title": "Delete notification",
+      "message": "This notification will be permanently removed.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    }
+  }
 }

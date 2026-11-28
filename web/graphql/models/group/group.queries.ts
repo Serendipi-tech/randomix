@@ -1,6 +1,12 @@
 import { GraphQLError } from 'graphql';
 import { builder, prisma } from '../../builder';
-import { GroupDetailRef, GroupInviteRef, GroupSummaryRef } from './index';
+import {
+  AnsweredGroupInviteRef,
+  GroupDetailRef,
+  GroupInviteRef,
+  GroupSummaryRef,
+  SentGroupInviteRef,
+} from './index';
 
 function requireAuth(userId: string | null): asserts userId is string {
   if (!userId) {
@@ -99,6 +105,75 @@ builder.queryField('myGroupInvites', (t) =>
           groupId: n.groupId!,
           groupName: n.group!.name,
           sender: n.sender!,
+          createdAt: n.createdAt,
+        }));
+    },
+  }),
+);
+
+// Quante voci storiche tenere nel feed, come per le amicizie
+const ANSWERED_HISTORY_LIMIT = 20;
+
+builder.queryField('answeredGroupInvites', (t) =>
+  t.field({
+    type: [AnsweredGroupInviteRef],
+    resolve: async (_root, _args, ctx) => {
+      requireAuth(ctx.userId);
+      const notifications = await prisma.notification.findMany({
+        where: {
+          receiverId: ctx.userId,
+          notificationType: 'GROUP_INVITE',
+          markedAsRead: true,
+          groupId: { not: null },
+        },
+        include: { sender: true, group: true },
+        orderBy: { updatedAt: 'desc' },
+        take: ANSWERED_HISTORY_LIMIT,
+      });
+
+      // Accettato = oggi l'utente è membro di quel gruppo; rifiutato altrimenti
+      const memberships = await prisma.group_User.findMany({
+        where: { userId: ctx.userId, groupId: { in: notifications.map((n) => n.groupId!) } },
+        select: { groupId: true },
+      });
+      const joined = new Set(memberships.map((m) => m.groupId));
+
+      return notifications
+        .filter((n) => n.sender && n.group)
+        .map((n) => ({
+          id: n.id,
+          groupId: n.groupId!,
+          groupName: n.group!.name,
+          sender: n.sender!,
+          accepted: joined.has(n.groupId!),
+          answeredAt: n.updatedAt,
+        }));
+    },
+  }),
+);
+
+builder.queryField('sentGroupInvites', (t) =>
+  t.field({
+    type: [SentGroupInviteRef],
+    resolve: async (_root, _args, ctx) => {
+      requireAuth(ctx.userId);
+      const notifications = await prisma.notification.findMany({
+        where: {
+          senderId: ctx.userId,
+          notificationType: 'GROUP_INVITE',
+          markedAsRead: false,
+          groupId: { not: null },
+        },
+        include: { receiver: true, group: true },
+        orderBy: { createdAt: 'desc' },
+      });
+      return notifications
+        .filter((n) => n.group)
+        .map((n) => ({
+          id: n.id,
+          groupId: n.groupId!,
+          groupName: n.group!.name,
+          receiver: n.receiver,
           createdAt: n.createdAt,
         }));
     },

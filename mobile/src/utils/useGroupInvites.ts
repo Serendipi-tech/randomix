@@ -22,11 +22,11 @@ export function useGroupInvites() {
   });
 
   const [acceptMutate, { loading: accepting }] = useMutation(ACCEPT_GROUP_INVITE, {
-    refetchQueries: ['MyGroupInvites', 'MyGroups'],
+    refetchQueries: ['MyGroupInvites', 'MyGroups', 'AnsweredGroupInvites'],
   });
 
   const [rejectMutate, { loading: rejecting }] = useMutation(REJECT_GROUP_INVITE, {
-    refetchQueries: ['MyGroupInvites'],
+    refetchQueries: ['MyGroupInvites', 'AnsweredGroupInvites'],
   });
 
   const acceptInvite = (notificationId: string) =>

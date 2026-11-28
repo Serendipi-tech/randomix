@@ -70,6 +70,22 @@ export const MY_GROUP_INVITES: DocumentNode = parse(`
   }
 `);
 
+export const SENT_GROUP_INVITES: DocumentNode = parse(`
+  query SentGroupInvites {
+    sentGroupInvites {
+      id
+      groupId
+      groupName
+      receiver {
+        id
+        username
+        avatarUrl
+      }
+      createdAt
+    }
+  }
+`);
+
 // Disabilitato insieme a Item lato server (groupListMergedItems commentato in group.queries.ts):
 // il merge deduplicava item condivisi tra membri, concetto che non esiste più con item personali.
 // export const GROUP_LIST_MERGED_ITEMS: DocumentNode = parse(`
@@ -87,5 +103,22 @@ export const MY_GROUP_INVITES: DocumentNode = parse(`
 export const GROUP_LIST_SHARED_LIST_IDS: DocumentNode = parse(`
   query GroupListSharedListIds($groupListId: ID!) {
     groupListSharedListIds(groupListId: $groupListId)
+  }
+`);
+
+export const ANSWERED_GROUP_INVITES: DocumentNode = parse(`
+  query AnsweredGroupInvites {
+    answeredGroupInvites {
+      id
+      groupId
+      groupName
+      accepted
+      answeredAt
+      sender {
+        id
+        username
+        avatarUrl
+      }
+    }
   }
 `);
