@@ -17,6 +17,7 @@ type SignupFormProps = {
   onConfirmPasswordChange: (value: string) => void;
   error: string | null;
   loading: boolean;
+  canSubmit: boolean;
   onSubmit: () => void;
 };
 
@@ -33,6 +34,7 @@ export function SignupForm({
   onConfirmPasswordChange,
   error,
   loading,
+  canSubmit,
   onSubmit,
 }: SignupFormProps) {
   const { t } = useTranslation('auth');
@@ -71,7 +73,7 @@ export function SignupForm({
 
       {error && <FormError message={error} />}
 
-      <Button label={t('register.submit')} onPress={onSubmit} loading={loading} />
+      <Button label={t('register.submit')} onPress={onSubmit} loading={loading} disabled={!canSubmit} />
     </View>
   );
 }

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './useAuth';
 import { getAuthErrorMessage } from './getAuthErrorMessage';
-import { getPasswordStrength } from './passwordStrength';
+import { isPasswordValid } from './passwordStrength';
 
 /** Stato, validazioni e invio del form di registrazione. */
 export function useSignupForm() {
@@ -21,15 +21,18 @@ export function useSignupForm() {
       return t('register.missingFields');
     }
     if (password !== confirmPassword) return t('register.passwordMismatch');
-
-    const { rules } = getPasswordStrength(password);
-    if (!rules.length || !rules.letter || !rules.number || !rules.special) {
-      return t('register.passwordTooShort');
-    }
+    if (!isPasswordValid(password)) return t('register.passwordTooShort');
     if (username.trim().length < 3) return t('register.usernameTooShort');
 
     return null;
   };
+
+  // Submit disabilitato finche' i vincoli non sono soddisfatti: niente errore da mostrare dopo il tap
+  const canSubmit =
+    !!email.trim() &&
+    username.trim().length >= 3 &&
+    isPasswordValid(password) &&
+    password === confirmPassword;
 
   const submit = async () => {
     const validationError = validate();
@@ -55,5 +58,6 @@ export function useSignupForm() {
     error,
     submit,
     loading,
+    canSubmit,
   };
 }

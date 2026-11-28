@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePasswordReset } from './usePasswordReset';
 import { getAuthErrorMessage } from './getAuthErrorMessage';
-import { getPasswordStrength } from './passwordStrength';
+import { isPasswordValid } from './passwordStrength';
 
 export type RecoveryStep = 'request' | 'confirm';
 
@@ -41,8 +41,7 @@ export function usePasswordRecoveryForm() {
       setError(t('resetPassword.passwordMismatch'));
       return false;
     }
-    const { rules } = getPasswordStrength(newPassword);
-    if (!rules.length || !rules.letter || !rules.number || !rules.special) {
+    if (!isPasswordValid(newPassword)) {
       setError(t('resetPassword.passwordTooShort'));
       return false;
     }
@@ -54,6 +53,11 @@ export function usePasswordRecoveryForm() {
       return false;
     }
   };
+
+  // Submit disabilitato finche' i vincoli non sono soddisfatti: niente errore da mostrare dopo il tap
+  const canSubmitRequest = !!email.trim();
+  const canSubmitConfirm =
+    !!otp.trim() && isPasswordValid(newPassword) && newPassword === confirmPassword;
 
   const reset = () => {
     setStep('request');
@@ -78,6 +82,8 @@ export function usePasswordRecoveryForm() {
     loading,
     submitRequest,
     submitConfirm,
+    canSubmitRequest,
+    canSubmitConfirm,
     reset,
   };
 }

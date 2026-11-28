@@ -16,6 +16,7 @@ import { Collapsible } from '@/components/ui/collapsible';
 import { useProfile } from '@/utils/useProfile';
 import { useEmailChange } from '@/utils/useEmailChange';
 import { useChangePassword } from '@/utils/useChangePassword';
+import { isPasswordValid } from '@/utils/passwordStrength';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -77,12 +78,12 @@ export default function SettingsScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordLocalError, setPasswordLocalError] = useState<string | null>(null);
 
+  // Submit disabilitato finche' i vincoli non sono soddisfatti: niente errore da mostrare dopo il tap
+  const canSubmitPassword =
+    oldPassword.length > 0 && isPasswordValid(newPassword) && newPassword === confirmPassword;
+
   const submitPassword = async () => {
     setPasswordLocalError(null);
-    if (newPassword !== confirmPassword) {
-      setPasswordLocalError(t('settings.password.mismatch'));
-      return;
-    }
     try {
       await changePassword({ oldPassword, newPassword });
       setOldPassword('');
@@ -176,7 +177,7 @@ export default function SettingsScreen() {
                 label={t('settings.password.submit')}
                 onPress={submitPassword}
                 loading={passwordLoading}
-                disabled={!oldPassword || !newPassword || !confirmPassword}
+                disabled={!canSubmitPassword}
               />
             </View>
           </CardShell>

@@ -59,6 +59,7 @@ export default function SignupScreen() {
             onConfirmPasswordChange={form.setConfirmPassword}
             error={form.error}
             loading={form.loading}
+            canSubmit={form.canSubmit}
             onSubmit={form.submit}
           />
 

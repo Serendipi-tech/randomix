@@ -20,6 +20,8 @@ type AuthRecoverFaceProps = {
   onConfirmPasswordChange: (value: string) => void;
   error: string | null;
   loading: boolean;
+  canSubmitRequest: boolean;
+  canSubmitConfirm: boolean;
   onSubmitRequest: () => void;
   onSubmitConfirm: () => void;
   onBack: () => void;
@@ -39,6 +41,8 @@ export function AuthRecoverFace({
   onConfirmPasswordChange,
   error,
   loading,
+  canSubmitRequest,
+  canSubmitConfirm,
   onSubmitRequest,
   onSubmitConfirm,
   onBack,
@@ -65,6 +69,7 @@ export function AuthRecoverFace({
           label={t('forgotPassword.submit')}
           onPress={onSubmitRequest}
           loading={loading}
+          disabled={!canSubmitRequest}
         />
 
         <View style={styles.spacer} />
@@ -106,6 +111,7 @@ export function AuthRecoverFace({
         label={t('resetPassword.submit')}
         onPress={onSubmitConfirm}
         loading={loading}
+        disabled={!canSubmitConfirm}
       />
 
       <View style={styles.spacer} />

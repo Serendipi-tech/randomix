@@ -10,12 +10,13 @@ import {
   type TextInputProps,
   type ViewStyle,
 } from 'react-native';
-import { Eye, EyeOff } from 'lucide-react-native';
+import { Check, Eye, EyeOff, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
-import { getPasswordStrength } from '@/utils/passwordStrength';
+import { isPasswordValid } from '@/utils/passwordStrength';
 import { useAppTheme } from '@/utils/useAppTheme';
-import { PasswordStrengthIndicator } from '@/components/molecules/PasswordStrengthIndicator';
+
+type ThemeColors = typeof Colors.light | typeof Colors.dark;
 
 export type InputVariant = 'text' | 'password' | 'textarea';
 
@@ -128,27 +129,30 @@ export function Input({
         />
         {isPassword && (
           <View style={styles.passwordControls}>
-            {showStrength && <PasswordIndicator value={value} t={t} />}
             <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={13} disabled={disabled}>
               {showPassword ? <EyeOff size={18} color={colors.disabled} /> : <Eye size={18} color={colors.disabled} />}
             </Pressable>
           </View>
         )}
       </View>
+      {isPassword && showStrength && <PasswordChecklist value={value} t={t} colors={colors} />}
     </View>
   );
 }
 
-/** Deriva regole e livello dal valore e li passa all'indicatore (label tradotte via namespace `auth`). */
-function PasswordIndicator({ value, t }: { value: string; t: (key: string) => string }) {
-  const { rules, level } = getPasswordStrength(value);
-  const strengthRules = [
-    { label: t('passwordRules.length'), met: rules.length },
-    { label: t('passwordRules.letter'), met: rules.letter },
-    { label: t('passwordRules.number'), met: rules.number },
-    { label: t('passwordRules.special'), met: rules.special },
-  ];
-  return <PasswordStrengthIndicator rules={strengthRules} level={level} />;
+/** Spunta live il vincolo reale (8 caratteri) mentre l'utente scrive, sempre visibile sotto il
+ *  campo (niente tap su un'icona): niente da scoprire solo dopo aver provato a inviare. */
+function PasswordChecklist({ value, t, colors }: { value: string; t: (key: string) => string; colors: ThemeColors }) {
+  if (!value) return null;
+  const valid = isPasswordValid(value);
+  const tickColor = valid ? colors.success : colors.error;
+
+  return (
+    <View style={styles.checklistRow}>
+      {valid ? <Check size={14} color={tickColor} /> : <X size={14} color={tickColor} />}
+      <Text style={[styles.checklistText, { color: tickColor }]}>{t('passwordRules.length')}</Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -190,6 +194,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+  },
+  checklistRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+  },
+  checklistText: {
+    fontSize: 13,
   },
   disabled: {
     opacity: 0.5,

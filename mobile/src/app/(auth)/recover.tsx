@@ -63,6 +63,8 @@ export default function RecoverScreen() {
             onConfirmPasswordChange={form.setConfirmPassword}
             error={form.error}
             loading={form.loading}
+            canSubmitRequest={form.canSubmitRequest}
+            canSubmitConfirm={form.canSubmitConfirm}
             onSubmitRequest={form.submitRequest}
             onSubmitConfirm={onSubmitConfirm}
             onBack={() => router.back()}

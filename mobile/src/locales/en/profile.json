@@ -57,7 +57,6 @@
       "oldPlaceholder": "Current password",
       "newPlaceholder": "New password",
       "confirmPlaceholder": "Confirm new password",
-      "mismatch": "Passwords don't match",
       "submit": "Update password"
     },
     "payments": {
