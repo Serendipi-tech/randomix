@@ -1,7 +1,7 @@
 model User {
     id String @id @default(cuid())
 
-    username     String  @unique
+    username     String  @unique @db.VarChar(20)
     email        String  @unique
     passwordHash String?
 
@@ -56,6 +56,10 @@ model Friendship {
     receiverId String
 
     status STATUS_FRIENDSHIP @default(PENDING)
+
+    // Quando il destinatario toglie dal feed la voce "hai accettato/rifiutato": l'amicizia non
+    // viene toccata, sparisce solo la riga dalle notifiche
+    answerDismissedAt DateTime?
 
     sender   User @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
     receiver User @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)

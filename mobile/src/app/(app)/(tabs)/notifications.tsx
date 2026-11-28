@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Bell } from 'lucide-react-native';
+import { Bell, Megaphone, Users } from 'lucide-react-native';
 import { Colors, Spacing } from '@/constants/theme';
 import { Motion } from '@/constants/motion';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -26,6 +27,7 @@ import {
 const SKELETON_COUNT = 4;
 
 export default function NotificationsScreen() {
+  const router = useRouter();
   const { t } = useTranslation('notifications');
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
@@ -41,6 +43,11 @@ export default function NotificationsScreen() {
     acceptRequest,
     rejectRequest,
     cancelRequest,
+    acceptInvite,
+    rejectInvite,
+    cancelInvite,
+    dismissRequest,
+    dismissInvite,
     answering,
   } = useNotificationFeed();
 
@@ -55,6 +62,7 @@ export default function NotificationsScreen() {
     { value: 'all', label: t('filters.all'), activeColor: colors.primary },
     { value: 'system', label: t('filters.system'), activeColor: colors.primary },
     { value: 'friends', label: t('filters.friends'), activeColor: colors.primary },
+    { value: 'groups', label: t('filters.groups'), activeColor: colors.primary },
   ];
 
   // Testi e aspetto per tipo di riga: le richieste non hanno titolo/corpo in DB, li compone i18n.
@@ -82,6 +90,90 @@ export default function NotificationsScreen() {
       );
     }
 
+    if (item.kind === 'friendRequestAnswered') {
+      return (
+        <NotificationCard
+          title={username}
+          body={t(item.accepted ? 'friendRequest.answered.accepted' : 'friendRequest.answered.declined')}
+          timeLabel={timeLabel}
+          accentColor={colors.secondary}
+          avatar={item.user}
+          status={{
+            kind: item.accepted ? 'accepted' : 'declined',
+            label: t(item.accepted ? 'status.accepted' : 'status.declined'),
+          }}
+          cancelAction={{
+            label: t('remove'),
+            onPress: () => dismissRequest(item.id),
+            disabled: answering,
+          }}
+        />
+      );
+    }
+
+    if (item.kind === 'groupInviteAnswered') {
+      return (
+        <NotificationCard
+          title={item.group?.name ?? ''}
+          body={t(item.accepted ? 'groupInvite.answered.accepted' : 'groupInvite.answered.declined', {
+            username,
+          })}
+          timeLabel={timeLabel}
+          accentColor={colors.info}
+          icon={Users}
+          status={{
+            kind: item.accepted ? 'accepted' : 'declined',
+            label: t(item.accepted ? 'status.accepted' : 'status.declined'),
+          }}
+          cancelAction={{
+            label: t('remove'),
+            onPress: () => dismissInvite(item.id),
+            disabled: answering,
+          }}
+        />
+      );
+    }
+
+    if (item.kind === 'groupInvite') {
+      return (
+        <NotificationCard
+          title={item.group?.name ?? ''}
+          body={t('groupInvite.incoming.body', { username })}
+          timeLabel={timeLabel}
+          accentColor={colors.info}
+          unread={item.unread}
+          icon={Users}
+          actions={{
+            acceptLabel: t('friendRequest.accept'),
+            rejectLabel: t('friendRequest.decline'),
+            onAccept: () => acceptInvite(item.id),
+            onReject: () => rejectInvite(item.id),
+            disabled: answering,
+          }}
+        />
+      );
+    }
+
+    if (item.kind === 'groupInviteSent') {
+      return (
+        <NotificationCard
+          title={item.group?.name ?? ''}
+          body={t('groupInvite.sent.body', { username })}
+          timeLabel={timeLabel}
+          accentColor={colors.info}
+          icon={Users}
+          status={{ kind: 'pending', label: t('friendRequest.sent.status') }}
+          cancelAction={{
+            label: t('friendRequest.sent.cancel'),
+            onPress: () => {
+              if (item.group && item.targetUserId) cancelInvite(item.group.id, item.targetUserId);
+            },
+            disabled: answering,
+          }}
+        />
+      );
+    }
+
     if (item.kind === 'friendRequestSent') {
       return (
         <NotificationCard
@@ -90,7 +182,7 @@ export default function NotificationsScreen() {
           timeLabel={timeLabel}
           accentColor={colors.secondaryGradient}
           avatar={item.user}
-          statusLabel={t('friendRequest.sent.status')}
+          status={{ kind: 'pending', label: t('friendRequest.sent.status') }}
           cancelAction={{
             label: t('friendRequest.sent.cancel'),
             onPress: () => cancelRequest(item.id),
@@ -100,6 +192,9 @@ export default function NotificationsScreen() {
       );
     }
 
+    // Solo le notifiche di sistema hanno una pagina propria: le altre si leggono dalla riga
+    const isSystem = item.notificationType === 'SYSTEM';
+
     return (
       <NotificationCard
         title={item.title ?? ''}
@@ -107,8 +202,14 @@ export default function NotificationsScreen() {
         timeLabel={timeLabel}
         accentColor={colors.primary}
         unread={item.unread}
-        icon={Bell}
-        onPress={item.unread ? () => markAsRead(item.id) : undefined}
+        icon={isSystem ? Megaphone : Bell}
+        onPress={
+          isSystem
+            ? () => router.push({ pathname: '/notification/[id]', params: { id: item.id } })
+            : item.unread
+              ? () => markAsRead(item.id)
+              : undefined
+        }
       />
     );
   };

@@ -1,8 +1,7 @@
 {
   "title": "Feedback",
   "cancel": "Cancel",
-  "banner": "You can remove a feedback only until our team starts reviewing it.",
-  "send": "Send feedback",
+  "sent": "Thanks, we got your feedback.",
   "history": "Your feedback",
   "empty": {
     "title": "No feedback yet",
@@ -19,13 +18,15 @@
     "done": "Reviewed"
   },
   "form": {
+    "heading": "New feedback",
     "titlePlaceholder": "Short summary (optional)",
     "messagePlaceholder": "Tell us more...",
-    "submit": "Send"
+    "submit": "Send",
+    "counter": "{{length}}/{{max}}"
   },
   "deleteConfirm": {
     "title": "Delete feedback",
-    "message": "This feedback will be permanently removed.",
+    "message": "This feedback will be permanently removed. Once our team starts reviewing it, it can no longer be deleted.",
     "confirm": "Delete"
   }
 }

@@ -124,3 +124,27 @@ builder.mutationField('removeFriend', (t) =>
     },
   }),
 );
+
+// Toglie dal feed una richiesta già chiusa. Non cancella la riga: un'amicizia accettata deve
+// restare, qui sparisce solo la voce storica nelle notifiche.
+builder.mutationField('dismissFriendRequest', (t) =>
+  t.boolean({
+    args: { id: t.arg.id({ required: true }) },
+    resolve: async (_root, { id }, ctx) => {
+      if (!ctx.userId) {
+        throw new GraphQLError('Non autenticato.', { extensions: { code: 'UNAUTHENTICATED' } });
+      }
+      const request = await prisma.friendship.findFirst({
+        where: { id: String(id), receiverId: ctx.userId, status: { in: ['ACCEPTED', 'REJECTED'] } },
+      });
+      if (!request) {
+        throw new GraphQLError('Richiesta non trovata.', { extensions: { code: 'NOT_FOUND' } });
+      }
+      await prisma.friendship.update({
+        where: { id: request.id },
+        data: { answerDismissedAt: new Date() },
+      });
+      return true;
+    },
+  }),
+);

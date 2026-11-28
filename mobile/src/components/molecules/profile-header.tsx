@@ -23,7 +23,7 @@ const GLOW_SIZE = RING_SIZE + 130;
 // dalla sua misura invece che a occhio
 const CROWN_HEIGHT = 34;
 const CROWN_BOX = crownBoxSize(CROWN_HEIGHT);
-const CROWN_TILT = '-28deg';
+const CROWN_TILT = '-41deg';
 
 interface ProfileHeaderProps {
   username: string;

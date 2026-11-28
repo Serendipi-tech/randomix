@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { NotificationMutations, NotificationQueries } from '@randomix/graphql-schema';
 
 const { MY_NOTIFICATIONS } = NotificationQueries;
-const { MARK_NOTIFICATION_AS_READ } = NotificationMutations;
+const { DELETE_NOTIFICATION, MARK_NOTIFICATION_AS_READ } = NotificationMutations;
 
 export type NotificationType =
   | 'CHALLENGE_NEW'
@@ -69,8 +69,17 @@ export function useNotifications() {
     createdAt: n.createdAt,
   }));
 
+  const [deleteMutate, { loading: deleting }] = useMutation(DELETE_NOTIFICATION, {
+    refetchQueries: ['MyNotifications'],
+  });
+
   const markAsRead = async (id: string) => {
     await markAsReadMutate({ variables: { id } });
+  };
+
+  // Lato server passano solo le notifiche di sistema: le altre si chiudono rispondendo
+  const deleteNotification = async (id: string) => {
+    await deleteMutate({ variables: { id } });
   };
 
   const unreadCount = notifications.filter((n) => !n.markedAsRead).length;
@@ -84,6 +93,8 @@ export function useNotifications() {
     initialLoading: loading && !data,
     error: error ?? null,
     markAsRead,
+    deleteNotification,
+    deleting,
     refetch,
   };
 }

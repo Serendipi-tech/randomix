@@ -20,7 +20,7 @@ import { Colors } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { buildFillWavePath } from '@/utils/buildFillWavePath';
-import { useNotifications } from '@/utils/useNotifications';
+import { usePendingNotificationsCount } from '@/utils/usePendingNotifications';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
@@ -48,17 +48,17 @@ const HIDDEN_PATHS = ['/list-form', '/item-form', '/draw', '/randomizer'];
 
 type SideTabName = keyof typeof SIDE_TAB_ICONS;
 
-/** Badge numerato per le notifiche non lette. */
+/** Badge numerato: stesso insieme della sezione "new" della pagina notifiche. */
 function NotificationsBadge() {
-  const { unreadCount } = useNotifications();
+  const pendingCount = usePendingNotificationsCount();
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
 
-  if (unreadCount === 0) return null;
+  if (pendingCount === 0) return null;
 
   return (
     <View style={[styles.badge, { backgroundColor: colors.error }]}>
-      <Text style={styles.badgeText}>{unreadCount}</Text>
+      <Text style={styles.badgeText}>{pendingCount}</Text>
     </View>
   );
 }

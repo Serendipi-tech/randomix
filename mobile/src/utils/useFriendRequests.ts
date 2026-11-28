@@ -16,7 +16,7 @@ interface FriendRequestsQuery {
 }
 
 // accettare/rifiutare cambia sia le richieste sia la lista amici
-const REFETCH_ON_ANSWER = ['FriendRequests', 'MyFriends'];
+const REFETCH_ON_ANSWER = ['FriendRequests', 'MyFriends', 'AnsweredFriendRequests'];
 
 export function useFriendRequests() {
   const { data, loading, error } = useQuery<FriendRequestsQuery>(FRIEND_REQUESTS, {

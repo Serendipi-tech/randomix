@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { LogOut, MessageSquare, Settings } from 'lucide-react-native';
+import { MessageSquare, Settings } from 'lucide-react-native';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,7 +12,6 @@ import { hexToRgba } from '@/utils/color';
 import { AVATAR_PRESETS, resolveAvatarUri } from '@/constants/avatar-presets';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { RadialBackground } from '@/components/molecules/radial-background';
-import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/molecules/Input';
 import { FormError } from '@/components/molecules/form-error';
@@ -24,14 +23,15 @@ import { SkeletonLine } from '@/components/atoms/SkeletonLine';
 import { ProfileStatsPanel } from '@/components/molecules/profile-stats-panel';
 import { ProfileCategoryStats } from '@/components/molecules/profile-category-stats';
 import { ProfileCompletionDonut } from '@/components/molecules/profile-completion-donut';
-import { useAuth } from '@/utils/useAuth';
 import { useProfile } from '@/utils/useProfile';
 import { useMyFriends } from '@/utils/useFriends';
 import { useProfileStats } from '@/utils/useProfileStats';
-import { useMembershipPlans } from '@/utils/useMembershipPlans';
+import { useMyPlan } from '@/utils/useMyPlan';
 import { PremiumBanner, PREMIUM_BANNER_HEIGHT } from '@/components/molecules/premium-banner';
 
 const USERNAME_MIN_LENGTH = 3;
+// Stesso limite del DB (User.username @db.VarChar(20))
+const USERNAME_MAX_LENGTH = 20;
 // Deve combaciare con RING_SIZE/2 di ProfileHeader: spazio per l'avatar che sfonda il blocco.
 const HERO_TOP_SPACE = 55;
 // Deve combaciare con BAR_HEIGHT di components/app-tabs.tsx: spazio per non finire sotto la tab bar.
@@ -44,19 +44,17 @@ export default function ProfileScreen() {
   const { t } = useTranslation('profile');
   const colorScheme: 'light' | 'dark' = useColorScheme() === 'dark' ? 'dark' : 'light';
   const colors = Colors[colorScheme];
-  const { logout } = useAuth();
   const insets = useSafeAreaInsets();
 
   const { profile, loading: loadingProfile, updateProfile, saving, saveError } = useProfile();
   const { friends } = useMyFriends();
   const { categoryStats, completionBreakdown, loading: loadingStats, error: statsError } = useProfileStats();
-  const { isFreePlan, planKnown, hasPaidPlan } = useMembershipPlans();
+  const { isFreePlan, planKnown, hasPaidPlan } = useMyPlan();
 
   const [editing, setEditing] = useState(false);
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
-  const [confirmingLogout, setConfirmingLogout] = useState(false);
 
   const startEditing = () => {
     setUsername(profile?.username ?? '');
@@ -127,7 +125,6 @@ export default function ProfileScreen() {
               {[
                 { icon: MessageSquare, onPress: () => router.push('/feedback') },
                 { icon: Settings, onPress: () => router.push('/settings') },
-                { icon: LogOut, onPress: () => setConfirmingLogout(true) },
               ].map(({ icon: ActionIcon, onPress }, index) => (
                 <Pressable
                   key={index}
@@ -194,6 +191,7 @@ export default function ProfileScreen() {
                   autoCapitalize="none"
                   value={username}
                   onChangeText={setUsername}
+                  maxLength={USERNAME_MAX_LENGTH}
                 />
                 <Text style={[styles.avatarLabel, { color: colors.textColor }]}>{t('avatarLabel')}</Text>
                 <View style={styles.avatarRow}>
@@ -224,16 +222,6 @@ export default function ProfileScreen() {
         ) : null}
       </ScrollView>
 
-      <ConfirmSheet
-        visible={confirmingLogout}
-        title={t('logoutConfirm.title')}
-        message={t('logoutConfirm.message')}
-        confirmLabel={t('logoutConfirm.confirm')}
-        cancelLabel={t('cancel')}
-        colorScheme={colorScheme}
-        onConfirm={logout}
-        onCancel={() => setConfirmingLogout(false)}
-      />
     </SafeAreaView>
   );
 }

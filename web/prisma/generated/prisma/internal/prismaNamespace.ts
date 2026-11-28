@@ -2219,6 +2219,7 @@ export const FriendshipScalarFieldEnum = {
   senderId: 'senderId',
   receiverId: 'receiverId',
   status: 'status',
+  answerDismissedAt: 'answerDismissedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

@@ -6,3 +6,9 @@ export const MARK_NOTIFICATION_AS_READ: DocumentNode = parse(`
     markNotificationAsRead(id: $id)
   }
 `);
+
+export const DELETE_NOTIFICATION: DocumentNode = parse(`
+  mutation DeleteNotification($id: ID!) {
+    deleteNotification(id: $id)
+  }
+`);

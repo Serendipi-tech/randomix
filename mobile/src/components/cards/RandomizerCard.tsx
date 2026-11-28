@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { ChevronRight } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -42,6 +43,10 @@ export function RandomizerCard({ title, subtitle, onPress }: RandomizerCardProps
   const colors = Colors[colorScheme];
   // Stessa coppia per anello, icona e pennellata: la card ha un unico filo cromatico
   const gradient: readonly [string, string] = [colors.secondary, colors.extraColors.eight];
+  // Gli id dei gradienti SVG valgono per tutto il documento: con due istanze montate insieme (o
+  // durante un rimontaggio della schermata) un id fisso viene rimosso sotto i piedi dell'altra
+  // copia, che resta senza riempimento. Uno per istanza evita il conflitto.
+  const instanceId = useId();
 
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.wrap, pressed && styles.pressed]}>
@@ -61,26 +66,26 @@ export function RandomizerCard({ title, subtitle, onPress }: RandomizerCardProps
             <Svg width={STROKE_BOX.width} height={STROKE_BOX.height}>
               <Defs>
                 {/* Ogni pennellata svanisce verso il basso a sinistra e si accende in alto a destra */}
-                <SvgLinearGradient id="randomizerBrushGold" x1="0" y1="1" x2="1" y2="0">
+                <SvgLinearGradient id={`randomizerBrushGold-${instanceId}`} x1="0" y1="1" x2="1" y2="0">
                   <Stop offset="0" stopColor={gradient[0]} stopOpacity={0} />
                   <Stop offset="0.55" stopColor={gradient[0]} stopOpacity={0.22} />
                   <Stop offset="1" stopColor={gradient[0]} stopOpacity={0.45} />
                 </SvgLinearGradient>
-                <SvgLinearGradient id="randomizerBrushMagenta" x1="0" y1="1" x2="1" y2="0">
+                <SvgLinearGradient id={`randomizerBrushMagenta-${instanceId}`} x1="0" y1="1" x2="1" y2="0">
                   <Stop offset="0" stopColor={gradient[1]} stopOpacity={0} />
                   <Stop offset="0.55" stopColor={gradient[1]} stopOpacity={0.2} />
                   <Stop offset="1" stopColor={gradient[1]} stopOpacity={0.4} />
                 </SvgLinearGradient>
               </Defs>
-              <Path d={STROKE_PATH_SECOND} fill="url(#randomizerBrushMagenta)" />
-              <Path d={STROKE_PATH} fill="url(#randomizerBrushGold)" />
+              <Path d={STROKE_PATH_SECOND} fill={`url(#randomizerBrushMagenta-${instanceId})`} />
+              <Path d={STROKE_PATH} fill={`url(#randomizerBrushGold-${instanceId})`} />
             </Svg>
           </View>
 
           <EdgeVeil color={colors.secondary} />
 
 
-          <ShuffleGlyph from={gradient[0]} to={gradient[1]} />
+          <ShuffleGlyph from={gradient[0]} to={gradient[1]} gradientId={`randomizerShuffle-${instanceId}`} />
 
           <View style={[styles.divider, { backgroundColor: hexToRgba(colors.textColor, 0.22) }]} />
 
@@ -104,18 +109,27 @@ export function RandomizerCard({ title, subtitle, onPress }: RandomizerCardProps
 
 /** Shuffle disegnata a mano: le icone di lucide accettano un solo colore, e mascherarle con un
  *  gradiente non regge su tutte le piattaforme. Qui il gradiente è il tratto stesso. */
-function ShuffleGlyph({ from, to }: { from: string; to: string }) {
+function ShuffleGlyph({
+  from,
+  to,
+  gradientId,
+}: {
+  from: string;
+  to: string;
+  /** Id univoco per istanza: vedi il commento in RandomizerCard. */
+  gradientId: string;
+}) {
   return (
     <Svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24">
       <Defs>
-        <SvgLinearGradient id="randomizerShuffle" x1="0" y1="0" x2="1" y2="1">
+        <SvgLinearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
           <Stop offset="0" stopColor={from} />
           <Stop offset="1" stopColor={to} />
         </SvgLinearGradient>
       </Defs>
       <Path
         d="M2 6h1.972a4 4 0 0 1 3.6 2.2M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22M18 14l4 4-4 4M18 2l4 4-4 4"
-        stroke="url(#randomizerShuffle)"
+        stroke={`url(#${gradientId})`}
         strokeWidth={2.2}
         strokeLinecap="round"
         strokeLinejoin="round"

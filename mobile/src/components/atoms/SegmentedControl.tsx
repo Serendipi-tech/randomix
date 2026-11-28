@@ -70,14 +70,8 @@ export function SegmentedControl<T extends string>({ options, value, onChange }:
       {options.map((option) => {
         const isActive = option.value === value;
         return (
-          <Pressable
-            key={option.value}
-            onPress={() => onChange(option.value)}
-            style={({ pressed }) => [styles.item, { opacity: pressed && !isActive ? 0.6 : 1 }]}
-          >
-            <Text
-              style={[styles.label, isActive ? styles.labelActive : styles.labelIdle, { color: colors.textColor }]}
-            >
+          <Pressable key={option.value} onPress={() => onChange(option.value)} style={styles.item}>
+            <Text style={[styles.label, !isActive && styles.labelIdle, { color: colors.textColor }]}>
               {option.label}
             </Text>
           </Pressable>
@@ -110,15 +104,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Peso identico in ogni stato: cambiandolo la larghezza del testo salta mentre il thumb
+  // scorre, e il segmento sembra sfarfallare. La selezione si legge dal thumb e dall'opacità.
+  // Il discendente della riga è spazio vuoto che conta nel centraggio: senza questo compenso le
+  // parole risultano più in basso del centro del blocco (stesso accorgimento del banner premium).
   label: {
     fontSize: 14,
-    textAlign: 'center',
-  },
-  labelActive: {
+    lineHeight: 18,
+    marginBottom: 3,
     fontWeight: '600',
+    textAlign: 'center',
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
   labelIdle: {
-    fontWeight: '500',
-    opacity: 0.75,
+    opacity: 0.6,
   },
 });

@@ -13,6 +13,7 @@ export const ADMIN_CREATE_MEMBERSHIP: DocumentNode = parse(`
       maxLists
       maxItemsPerList
       hideItemsEnabled
+      imageUploadEnabled
       maxGroupsCreatable
       maxGroupsJoinable
       showAds
@@ -34,6 +35,7 @@ export const ADMIN_UPDATE_MEMBERSHIP: DocumentNode = parse(`
       maxLists
       maxItemsPerList
       hideItemsEnabled
+      imageUploadEnabled
       maxGroupsCreatable
       maxGroupsJoinable
       showAds

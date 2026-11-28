@@ -116,3 +116,46 @@ GroupInviteRef.implement({
     createdAt: t.expose('createdAt', { type: 'DateTime' }),
   }),
 });
+
+export interface AnsweredGroupInviteShape {
+  id: string;
+  groupId: string;
+  groupName: string;
+  sender: User;
+  accepted: boolean;
+  answeredAt: Date;
+}
+
+/** Invito ricevuto e gia' chiuso: resta nel feed come voce storica, con l'esito. */
+export const AnsweredGroupInviteRef = builder.objectRef<AnsweredGroupInviteShape>('AnsweredGroupInvite');
+AnsweredGroupInviteRef.implement({
+  fields: (t) => ({
+    id: t.exposeID('id'),
+    groupId: t.exposeID('groupId'),
+    groupName: t.exposeString('groupName'),
+    sender: t.field({ type: PublicUserRef, resolve: (inv) => inv.sender }),
+    accepted: t.exposeBoolean('accepted'),
+    answeredAt: t.expose('answeredAt', { type: 'DateTime' }),
+  }),
+});
+
+export interface SentGroupInviteShape {
+  id: string;
+  groupId: string;
+  groupName: string;
+  receiver: User;
+  createdAt: Date;
+}
+
+/** Invito in attesa inviato dall'utente corrente: simmetrico a GroupInvite, ma con il
+ *  destinatario al posto del mittente. */
+export const SentGroupInviteRef = builder.objectRef<SentGroupInviteShape>('SentGroupInvite');
+SentGroupInviteRef.implement({
+  fields: (t) => ({
+    id: t.exposeID('id'),
+    groupId: t.exposeID('groupId'),
+    groupName: t.exposeString('groupName'),
+    receiver: t.field({ type: PublicUserRef, resolve: (inv) => inv.receiver }),
+    createdAt: t.expose('createdAt', { type: 'DateTime' }),
+  }),
+});

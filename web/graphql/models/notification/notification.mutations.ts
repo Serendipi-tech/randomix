@@ -24,3 +24,22 @@ builder.mutationField('markNotificationAsRead', (t) =>
     },
   }),
 );
+
+// Solo le notifiche di sistema si eliminano: le altre nascono da un'azione fra utenti (amicizie,
+// gruppi, sfide) e si chiudono rispondendo, non cancellandole.
+builder.mutationField('deleteNotification', (t) =>
+  t.boolean({
+    args: { id: t.arg.id({ required: true }) },
+    resolve: async (_root, { id }, ctx) => {
+      requireAuth(ctx.userId);
+      const notif = await prisma.notification.findFirst({
+        where: { id: String(id), receiverId: ctx.userId, notificationType: 'SYSTEM' },
+      });
+      if (!notif) {
+        throw new GraphQLError('Notifica non trovata.', { extensions: { code: 'NOT_FOUND' } });
+      }
+      await prisma.notification.delete({ where: { id: notif.id } });
+      return true;
+    },
+  }),
+);

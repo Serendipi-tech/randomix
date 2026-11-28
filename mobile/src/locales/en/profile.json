@@ -7,7 +7,7 @@
   "usernameTooShort": "Username must be at least 3 characters.",
   "avatarLabel": "Profile image",
   "memberSince": "Member since {{date}}",
-  "logout": "Log out",
+  "logout": "Logout",
   "stats": {
     "lists": "Lists",
     "itemsDetail": "{{count}} items · {{avg}}/list",
@@ -37,22 +37,30 @@
     }
   },
   "logoutConfirm": {
-    "title": "Log out",
+    "title": "Logout",
     "message": "Are you sure you want to log out?",
-    "confirm": "Log out"
+    "confirm": "Logout"
   },
   "settings": {
     "title": "Settings",
+    "sections": {
+      "account": "Account",
+      "subscription": "Subscription",
+      "session": "Session"
+    },
     "email": {
+      "row": "Email",
       "heading": "Email",
       "flowExplanation": "Two steps: send a verification code to your new address, then enter it below to confirm the change.",
       "current": "Current email",
       "newPlaceholder": "New email",
       "sendCode": "Send code",
       "otpPlaceholder": "Verification code",
-      "confirm": "Confirm"
+      "confirm": "Confirm",
+      "editAddress": "Use another address"
     },
     "password": {
+      "row": "Password",
       "heading": "Password",
       "oldPlaceholder": "Current password",
       "newPlaceholder": "New password",
@@ -60,6 +68,7 @@
       "submit": "Update password"
     },
     "payments": {
+      "row": "Your plan",
       "heading": "Payments",
       "description": "Subscription plans and billing.",
       "cta": "View plans",
@@ -94,6 +103,68 @@
           "itemsPerListUnlimited": "Unlimited items/list",
           "groups": "{{count}} groups",
           "groupsUnlimited": "Unlimited groups"
+        },
+        "myPlan": {
+          "eyebrowLead": "Current",
+          "eyebrowWord": "Plan",
+          "detailsTitle": "Plan details",
+          "noExpiry": "No expiry date",
+          "rows": {
+            "lists": "Lists",
+            "itemsPerList": "Items per list",
+            "groupsCreatable": "Groups you can create",
+            "groupsJoinable": "Groups you can join",
+            "hideItems": "Hidden items",
+            "imageUpload": "Image uploads on items",
+            "noAds": "Ad-free",
+            "support": "Support"
+          },
+          "upTo": "Up to {{count}}",
+          "unlimited": "Unlimited",
+          "support": {
+            "LOW": "Standard",
+            "MEDIUM": "Priority",
+            "HIGH": "Dedicated"
+          },
+          "comparePlans": "Compare all plans"
+        },
+        "upgrade": {
+          "title": "Randomix {{plan}}",
+          "priceLabel": "Monthly plan",
+          "cta": "Upgrade to Premium",
+          "features": {
+            "lists": {
+              "unlimited": "Unlimited lists",
+              "limited": "Up to {{count}} lists",
+              "caption": "Create as many lists as you want."
+            },
+            "itemsPerList": {
+              "unlimited": "Unlimited items",
+              "limited": "Up to {{count}} items per list",
+              "caption": "Fill every list without running out of room."
+            },
+            "groups": {
+              "unlimited": "Unlimited groups",
+              "limited": "Up to {{count}} groups",
+              "caption": "Draw together with more people."
+            },
+            "imageUpload": {
+              "title": "Images on items",
+              "caption": "Add your own pictures to any item."
+            },
+            "hideItems": {
+              "title": "Hidden items",
+              "caption": "Keep an item to yourself inside a shared list."
+            },
+            "noAds": {
+              "title": "No ads",
+              "caption": "Nothing between you and your lists."
+            },
+            "support": {
+              "title": "Priority support",
+              "caption": "Your messages go to the front of the queue."
+            }
+          }
         }
       }
     }
