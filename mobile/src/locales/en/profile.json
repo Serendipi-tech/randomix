@@ -43,16 +43,24 @@
   },
   "settings": {
     "title": "Settings",
+    "sections": {
+      "account": "Account",
+      "subscription": "Subscription",
+      "session": "Session"
+    },
     "email": {
+      "row": "Email",
       "heading": "Email",
       "flowExplanation": "Two steps: send a verification code to your new address, then enter it below to confirm the change.",
       "current": "Current email",
       "newPlaceholder": "New email",
       "sendCode": "Send code",
       "otpPlaceholder": "Verification code",
-      "confirm": "Confirm"
+      "confirm": "Confirm",
+      "editAddress": "Use another address"
     },
     "password": {
+      "row": "Password",
       "heading": "Password",
       "oldPlaceholder": "Current password",
       "newPlaceholder": "New password",
@@ -61,6 +69,7 @@
       "submit": "Update password"
     },
     "payments": {
+      "row": "Your plan",
       "heading": "Payments",
       "description": "Subscription plans and billing.",
       "cta": "View plans",
@@ -95,6 +104,30 @@
           "itemsPerListUnlimited": "Unlimited items/list",
           "groups": "{{count}} groups",
           "groupsUnlimited": "Unlimited groups"
+        },
+        "myPlan": {
+          "eyebrowLead": "Current",
+          "eyebrowWord": "Plan",
+          "detailsTitle": "Plan details",
+          "noExpiry": "No expiry date",
+          "rows": {
+            "lists": "Lists",
+            "itemsPerList": "Items per list",
+            "groupsCreatable": "Groups you can create",
+            "groupsJoinable": "Groups you can join",
+            "hideItems": "Hidden items",
+            "imageUpload": "Image uploads on items",
+            "noAds": "Ad-free",
+            "support": "Support"
+          },
+          "upTo": "Up to {{count}}",
+          "unlimited": "Unlimited",
+          "support": {
+            "LOW": "Standard",
+            "MEDIUM": "Priority",
+            "HIGH": "Dedicated"
+          },
+          "comparePlans": "Compare all plans"
         }
       }
     }
