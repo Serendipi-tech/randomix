@@ -30,3 +30,9 @@ export const REMOVE_FRIEND: DocumentNode = parse(`
     removeFriend(userId: $userId)
   }
 `);
+
+export const DISMISS_FRIEND_REQUEST: DocumentNode = parse(`
+  mutation DismissFriendRequest($id: ID!) {
+    dismissFriendRequest(id: $id)
+  }
+`);

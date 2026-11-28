@@ -46,6 +46,8 @@ export default function NotificationsScreen() {
     acceptInvite,
     rejectInvite,
     cancelInvite,
+    dismissRequest,
+    dismissInvite,
     answering,
   } = useNotificationFeed();
 
@@ -96,6 +98,15 @@ export default function NotificationsScreen() {
           timeLabel={timeLabel}
           accentColor={colors.secondary}
           avatar={item.user}
+          status={{
+            kind: item.accepted ? 'accepted' : 'declined',
+            label: t(item.accepted ? 'status.accepted' : 'status.declined'),
+          }}
+          cancelAction={{
+            label: t('remove'),
+            onPress: () => dismissRequest(item.id),
+            disabled: answering,
+          }}
         />
       );
     }
@@ -110,6 +121,15 @@ export default function NotificationsScreen() {
           timeLabel={timeLabel}
           accentColor={colors.info}
           icon={Users}
+          status={{
+            kind: item.accepted ? 'accepted' : 'declined',
+            label: t(item.accepted ? 'status.accepted' : 'status.declined'),
+          }}
+          cancelAction={{
+            label: t('remove'),
+            onPress: () => dismissInvite(item.id),
+            disabled: answering,
+          }}
         />
       );
     }
@@ -142,7 +162,7 @@ export default function NotificationsScreen() {
           timeLabel={timeLabel}
           accentColor={colors.info}
           icon={Users}
-          statusLabel={t('friendRequest.sent.status')}
+          status={{ kind: 'pending', label: t('friendRequest.sent.status') }}
           cancelAction={{
             label: t('friendRequest.sent.cancel'),
             onPress: () => {
@@ -162,7 +182,7 @@ export default function NotificationsScreen() {
           timeLabel={timeLabel}
           accentColor={colors.secondaryGradient}
           avatar={item.user}
-          statusLabel={t('friendRequest.sent.status')}
+          status={{ kind: 'pending', label: t('friendRequest.sent.status') }}
           cancelAction={{
             label: t('friendRequest.sent.cancel'),
             onPress: () => cancelRequest(item.id),

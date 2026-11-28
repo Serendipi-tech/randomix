@@ -1,5 +1,10 @@
 {
   "title": "Notifications",
+  "remove": "Remove",
+  "status": {
+    "accepted": "Accepted",
+    "declined": "Declined"
+  },
   "filters": {
     "all": "All",
     "system": "System",

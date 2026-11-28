@@ -589,3 +589,27 @@ builder.mutationField('removeListFromGroupList', (t) =>
 //     },
 //   }),
 // );
+
+// Toglie dal feed un invito già chiuso: la notifica non serve più, l'eventuale appartenenza al
+// gruppo vive in Group_User e resta intatta.
+builder.mutationField('dismissGroupInvite', (t) =>
+  t.boolean({
+    args: { notificationId: t.arg.id({ required: true }) },
+    resolve: async (_root, { notificationId }, ctx) => {
+      requireAuth(ctx.userId);
+      const notification = await prisma.notification.findFirst({
+        where: {
+          id: String(notificationId),
+          receiverId: ctx.userId,
+          notificationType: 'GROUP_INVITE',
+          markedAsRead: true,
+        },
+      });
+      if (!notification) {
+        throw new GraphQLError('Invito non trovato.', { extensions: { code: 'NOT_FOUND' } });
+      }
+      await prisma.notification.delete({ where: { id: notification.id } });
+      return true;
+    },
+  }),
+);

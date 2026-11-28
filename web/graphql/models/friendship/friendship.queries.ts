@@ -137,7 +137,11 @@ builder.queryField('answeredFriendRequests', (t) =>
     resolve: async (_root, _args, ctx) => {
       requireAuth(ctx.userId);
       return prisma.friendship.findMany({
-        where: { receiverId: ctx.userId, status: { in: ['ACCEPTED', 'REJECTED'] } },
+        where: {
+          receiverId: ctx.userId,
+          status: { in: ['ACCEPTED', 'REJECTED'] },
+          answerDismissedAt: null,
+        },
         include: { sender: true },
         orderBy: { updatedAt: 'desc' },
         take: ANSWERED_HISTORY_LIMIT,

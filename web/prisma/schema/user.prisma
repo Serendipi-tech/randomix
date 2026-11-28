@@ -57,6 +57,10 @@ model Friendship {
 
     status STATUS_FRIENDSHIP @default(PENDING)
 
+    // Quando il destinatario toglie dal feed la voce "hai accettato/rifiutato": l'amicizia non
+    // viene toccata, sparisce solo la riga dalle notifiche
+    answerDismissedAt DateTime?
+
     sender   User @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
     receiver User @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
 

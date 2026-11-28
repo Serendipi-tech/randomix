@@ -1,12 +1,14 @@
 import type { ComponentType } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Check, Clock, X } from 'lucide-react-native';
+import { Check, Clock, Trash2, X } from 'lucide-react-native';
 import { Colors, DisplayFonts } from '@/constants/theme';
 import { hexToRgba } from '@/utils/color';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { CardShell } from '@/components/cards/CardShell';
 import { UserAvatar } from '@/components/atoms/user-avatar';
 import { Button } from '@/components/atoms/Button';
+
+export type NotificationStatusKind = 'pending' | 'accepted' | 'declined';
 
 export type NotificationCardActions = {
   acceptLabel: string;
@@ -28,12 +30,13 @@ type NotificationCardProps = {
   icon?: ComponentType<{ size?: number; color?: string }>;
   /** Avatar al posto del riquadro icona (notifiche legate a una persona). */
   avatar?: { username: string; avatarUrl: string | null };
-  /** Pill di stato a destra del corpo (es. richiesta in attesa). */
-  statusLabel?: string;
+  /** Esito della riga, a destra del corpo: orologio in attesa, spunta se accettata, croce se
+   *  rifiutata. Icona sola, non premibile; l'etichetta serve all'accessibilità. */
+  status?: { kind: NotificationStatusKind; label: string };
   /** Coppia di azioni accetta/rifiuta sotto il corpo. */
   actions?: NotificationCardActions;
-  /** Ritiro di una richiesta inviata: tondo con la X accanto alla pill di stato, senza etichetta
-   *  (la label serve all'accessibilità). */
+  /** Ritiro o rimozione della riga: cestino tondo a destra del corpo, senza etichetta (la label
+   *  serve all'accessibilità). */
   cancelAction?: { label: string; onPress: () => void; disabled?: boolean };
   /** Tap sull'intera card (es. segnare come letta); le azioni interne restano prioritarie. */
   onPress?: () => void;
@@ -47,6 +50,8 @@ const CARD_RADIUS = 16;
 const ACCENT_EDGE_WIDTH = 3;
 const BODY_MAX_LINES = 1;
 
+const STATUS_ICONS = { pending: Clock, accepted: Check, declined: X } as const;
+
 /** Card di una riga del feed notifiche: barra d'accento a sinistra, avatar o icona, titolo con
  *  orario, corpo e, opzionali, azioni o pill di stato. Componente dumb: testi e handler da props. */
 export function NotificationCard({
@@ -57,13 +62,14 @@ export function NotificationCard({
   unread = false,
   icon: Icon,
   avatar,
-  statusLabel,
+  status,
   actions,
   cancelAction,
   onPress,
 }: NotificationCardProps) {
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
+  const StatusIcon = STATUS_ICONS[status?.kind ?? 'pending'];
 
   return (
     <CardShell
@@ -92,23 +98,26 @@ export function NotificationCard({
             <Text style={[styles.time, { color: colors.textColor }]}>{timeLabel}</Text>
           </View>
 
-          {(body || statusLabel) && (
+          {(body || status) && (
             <View style={styles.bodyRow}>
               {body && (
                 <Text style={[styles.body, { color: colors.textColor }]} numberOfLines={BODY_MAX_LINES}>
                   {body}
                 </Text>
               )}
-              {statusLabel && (
-                <View
-                  style={[
-                    styles.status,
-                    { backgroundColor: hexToRgba(colors.warning, 0.18), borderColor: hexToRgba(colors.warning, 0.4) },
-                  ]}
-                >
-                  <Clock size={STATUS_ICON_SIZE} color={colors.warning} strokeWidth={2.4} />
-                  <Text style={[styles.statusLabel, { color: colors.warning }]}>{statusLabel}</Text>
-                </View>
+              {status && (
+                <StatusIcon
+                  size={STATUS_ICON_SIZE + 4}
+                  color={
+                    status.kind === 'accepted'
+                      ? colors.success
+                      : status.kind === 'declined'
+                        ? colors.error
+                        : colors.warning
+                  }
+                  strokeWidth={2.4}
+                  accessibilityLabel={status.label}
+                />
               )}
               {cancelAction && (
                 <Pressable
@@ -121,7 +130,7 @@ export function NotificationCard({
                     { backgroundColor: hexToRgba(colors.error, 0.15), opacity: pressed ? 0.7 : 1 },
                   ]}
                 >
-                  <X size={STATUS_ICON_SIZE + 1} color={colors.error} strokeWidth={3} />
+                  <Trash2 size={STATUS_ICON_SIZE + 2} color={colors.error} strokeWidth={2.2} />
                 </Pressable>
               )}
             </View>
@@ -201,20 +210,7 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     opacity: 0.75,
   },
-  status: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    borderRadius: 999,
-    borderWidth: 1,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  statusLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  // Azione di ritiro: un tondo piccolo accanto alla pill, non un bottone a tutta riga
+  // Azione di ritiro o rimozione: un tondo piccolo in fondo alla riga, non un bottone a tutta larghezza
   cancel: {
     width: 24,
     height: 24,

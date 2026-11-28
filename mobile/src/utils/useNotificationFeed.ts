@@ -7,9 +7,9 @@ import { useGroupInvites } from '@/utils/useGroupInvites';
 import { toRelativeTime, type RelativeTime } from '@/utils/relativeTime';
 
 const { ANSWERED_FRIEND_REQUESTS, SENT_FRIEND_REQUESTS } = FriendshipQueries;
-const { CANCEL_FRIEND_REQUEST } = FriendshipMutations;
+const { CANCEL_FRIEND_REQUEST, DISMISS_FRIEND_REQUEST } = FriendshipMutations;
 const { ANSWERED_GROUP_INVITES, SENT_GROUP_INVITES } = GroupQueries;
-const { REVOKE_GROUP_INVITE } = GroupMutations;
+const { DISMISS_GROUP_INVITE, REVOKE_GROUP_INVITE } = GroupMutations;
 
 /** Tab del feed: `system` tiene le notifiche generate dall'app, `friends` le richieste d'amicizia,
  *  `groups` gli inviti ai gruppi. */
@@ -109,6 +109,11 @@ interface AnsweredGroupInvitesQuery {
  *  "precedenti". */
 export function useNotificationFeed() {
   const [filter, setFilter] = useState<NotificationFilter>('all');
+  // Esito delle risposte date in questa sessione: la riga cambia subito, senza aspettare il
+  // viaggio di andata e ritorno delle query che la ricollocano in "old"
+  const [answeredNow, setAnsweredNow] = useState<Record<string, boolean>>({});
+  // Righe tolte dal feed in questa sessione: stesso motivo, sparizione immediata
+  const [dismissedNow, setDismissedNow] = useState<string[]>([]);
 
   const {
     notifications,
@@ -155,6 +160,13 @@ export function useNotificationFeed() {
     fetchPolicy: 'cache-and-network',
   });
 
+  const [dismissRequestMutation] = useMutation(DISMISS_FRIEND_REQUEST, {
+    refetchQueries: ['AnsweredFriendRequests'],
+  });
+  const [dismissInviteMutation] = useMutation(DISMISS_GROUP_INVITE, {
+    refetchQueries: ['AnsweredGroupInvites'],
+  });
+
   const sections = useMemo<FeedSection[]>(() => {
     const now = Date.now();
 
@@ -169,14 +181,18 @@ export function useNotificationFeed() {
       notificationType: notification.notificationType,
     }));
 
-    const fromRequests: FeedItem[] = requests.map((request) => ({
-      id: request.id,
-      kind: 'friendRequest',
-      createdAt: request.createdAt,
-      relative: toRelativeTime(request.createdAt, now),
-      unread: true,
-      user: request.sender,
-    }));
+    const fromRequests: FeedItem[] = requests.map((request) => {
+      const answered = answeredNow[request.id];
+      return {
+        id: request.id,
+        kind: answered === undefined ? 'friendRequest' : 'friendRequestAnswered',
+        createdAt: request.createdAt,
+        relative: toRelativeTime(request.createdAt, now),
+        unread: answered === undefined,
+        user: request.sender,
+        accepted: answered,
+      };
+    });
 
     const fromSent: FeedItem[] = (sentData?.sentFriendRequests ?? []).map((request) => ({
       id: request.id,
@@ -187,15 +203,19 @@ export function useNotificationFeed() {
       user: request.receiver,
     }));
 
-    const fromInvites: FeedItem[] = groupInvites.map((invite) => ({
-      id: invite.id,
-      kind: 'groupInvite',
-      createdAt: invite.createdAt,
-      relative: toRelativeTime(invite.createdAt, now),
-      unread: true,
-      user: invite.sender,
-      group: { id: invite.groupId, name: invite.groupName },
-    }));
+    const fromInvites: FeedItem[] = groupInvites.map((invite) => {
+      const answered = answeredNow[invite.id];
+      return {
+        id: invite.id,
+        kind: answered === undefined ? 'groupInvite' : 'groupInviteAnswered',
+        createdAt: invite.createdAt,
+        relative: toRelativeTime(invite.createdAt, now),
+        unread: answered === undefined,
+        user: invite.sender,
+        group: { id: invite.groupId, name: invite.groupName },
+        accepted: answered,
+      };
+    });
 
     const fromSentInvites: FeedItem[] = (sentInvitesData?.sentGroupInvites ?? []).map((invite) => ({
       id: invite.id,
@@ -242,6 +262,8 @@ export function useNotificationFeed() {
       ...fromAnsweredRequests,
       ...fromAnsweredInvites,
     ]
+      .filter((item) => !dismissedNow.includes(item.id))
+      .filter((item, index, list) => list.findIndex((other) => other.id === item.id) === index)
       .filter((item) => {
         if (filter === 'all') return true;
         if (filter === 'system') return item.kind === 'notification';
@@ -264,6 +286,8 @@ export function useNotificationFeed() {
     sentInvitesData,
     answeredRequestsData,
     answeredInvitesData,
+    answeredNow,
+    dismissedNow,
     filter,
   ]);
 
@@ -282,12 +306,33 @@ export function useNotificationFeed() {
       (loadingSentInvites && !sentInvitesData),
     error: notificationsError,
     markAsRead,
-    acceptRequest,
-    rejectRequest,
+    acceptRequest: async (id: string) => {
+      setAnsweredNow((current) => ({ ...current, [id]: true }));
+      await acceptRequest(id);
+    },
+    rejectRequest: async (id: string) => {
+      setAnsweredNow((current) => ({ ...current, [id]: false }));
+      await rejectRequest(id);
+    },
     /** Ritira una richiesta inviata e ancora in sospeso. */
     cancelRequest: (id: string) => cancelMutation({ variables: { id } }),
-    acceptInvite,
-    rejectInvite,
+    acceptInvite: async (id: string) => {
+      setAnsweredNow((current) => ({ ...current, [id]: true }));
+      await acceptInvite(id);
+    },
+    rejectInvite: async (id: string) => {
+      setAnsweredNow((current) => ({ ...current, [id]: false }));
+      await rejectInvite(id);
+    },
+    /** Toglie dal feed una voce già chiusa: l'amicizia o l'iscrizione al gruppo restano. */
+    dismissRequest: async (id: string) => {
+      setDismissedNow((current) => [...current, id]);
+      await dismissRequestMutation({ variables: { id } });
+    },
+    dismissInvite: async (id: string) => {
+      setDismissedNow((current) => [...current, id]);
+      await dismissInviteMutation({ variables: { notificationId: id } });
+    },
     /** Ritira un invito a un gruppo: la revoca lato server va per gruppo + destinatario. */
     cancelInvite: (groupId: string, userId: string) => revokeMutation({ variables: { groupId, userId } }),
     answering: answering || canceling || answeringInvites || revoking,

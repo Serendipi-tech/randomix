@@ -139,3 +139,9 @@ export const REMOVE_LIST_FROM_GROUP_LIST: DocumentNode = parse(`
 //     acceptGroupDraw(groupListId: $groupListId, itemId: $itemId)
 //   }
 // `);
+
+export const DISMISS_GROUP_INVITE: DocumentNode = parse(`
+  mutation DismissGroupInvite($notificationId: ID!) {
+    dismissGroupInvite(notificationId: $notificationId)
+  }
+`);
