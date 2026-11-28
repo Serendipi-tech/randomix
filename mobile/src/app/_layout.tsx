@@ -16,6 +16,7 @@ import { AppThemeProvider } from '@/utils/useAppTheme';
 import { AuthIntroReplayProvider } from '@/utils/useAuthIntroReplay';
 import { ToastProvider } from '@/utils/useToast';
 import { tokenStorage } from '@/utils/tokenStorage';
+import { prefetchMyPlan } from '@/utils/useMyPlan';
 import '../global.css';
 
 SplashScreen.preventAutoHideAsync();
@@ -35,6 +36,8 @@ export default function RootLayout() {
           return;
         }
 
+        // Sessione ripresa senza passare dal login: il piano va caricato anche qui
+        await prefetchMyPlan();
         router.replace('/(app)/(tabs)/(home)');
       } finally {
         setAuthReady(true);

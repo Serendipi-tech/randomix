@@ -1,36 +1,21 @@
 import { useQuery } from '@apollo/client';
 import { useTranslation } from 'react-i18next';
 import { MembershipQueries } from '@randomix/graphql-schema';
+import {
+  formatEndDateLabel,
+  formatLimitsSummary,
+  formatPrice,
+  planLabel,
+  type MembershipData,
+} from './membershipFormat';
+import { useMyPlan } from './useMyPlan';
 
-const { MEMBERSHIP_PLANS, MY_MEMBERSHIP } = MembershipQueries;
+const { MEMBERSHIP_PLANS } = MembershipQueries;
 
-export type MembershipPlanId = 'FREE' | 'PREMIUM' | 'UNLIMITED' | 'FREE_TRIAL' | 'FULL_ACCESS';
-type BillingOption = 'NEVER' | 'MONTHLY' | 'YEARLY';
-type SupportPriority = 'LOW' | 'MEDIUM' | 'HIGH';
-
-interface MembershipData {
-  id: string;
-  plan: MembershipPlanId;
-  description: string | null;
-  price: number;
-  currency: string;
-  billing: BillingOption;
-  maxLists: number | null;
-  maxItemsPerList: number | null;
-  hideItemsEnabled: boolean | null;
-  maxGroupsCreatable: number | null;
-  maxGroupsJoinable: number | null;
-  showAds: boolean | null;
-  supportPriority: SupportPriority | null;
-  endDate: string | null;
-}
+export type { MembershipPlanId } from './membershipFormat';
 
 interface MembershipPlansQuery {
   membershipPlans: MembershipData[];
-}
-
-interface MyMembershipQuery {
-  myMembership: MembershipData | null;
 }
 
 export interface MembershipPlanCard {
@@ -42,32 +27,19 @@ export interface MembershipPlanCard {
   endDateLabel: string | null;
 }
 
+/** Catalogo dei piani per il confronto. Il piano in uso arriva da `useMyPlan` (query leggera già in
+ *  cache dall'accesso): qui non si interroga di nuovo la subscription. */
 export function useMembershipPlans() {
   const { t } = useTranslation('profile');
+  const { currentPlan } = useMyPlan();
 
-  const {
-    data: plansData,
-    loading: plansLoading,
-    error: plansError,
-  } = useQuery<MembershipPlansQuery>(MEMBERSHIP_PLANS, { fetchPolicy: 'cache-and-network' });
+  const { data, loading, error } = useQuery<MembershipPlansQuery>(MEMBERSHIP_PLANS, {
+    fetchPolicy: 'cache-and-network',
+  });
 
-  const {
-    data: myData,
-    loading: myLoading,
-    error: myError,
-  } = useQuery<MyMembershipQuery>(MY_MEMBERSHIP, { fetchPolicy: 'cache-and-network' });
-
-  // Nessuna subscription attiva = piano FREE implicito (stessa convenzione del pannello admin)
-  const currentPlan: MembershipPlanId = myData?.myMembership?.plan ?? 'FREE';
-  // Finché la risposta non è arrivata il piano non è noto: senza questa distinzione il FREE
-  // implicito farebbe comparire per un istante le proposte di upgrade anche a chi ha già un piano
-  const isFreePlan = myData !== undefined && currentPlan === 'FREE';
-  // Piano acquistato: il trial non conta, è gratuito a tempo
-  const hasPaidPlan = myData !== undefined && currentPlan !== 'FREE' && currentPlan !== 'FREE_TRIAL';
-
-  const plans: MembershipPlanCard[] = (plansData?.membershipPlans ?? []).map((membership) => ({
+  const plans: MembershipPlanCard[] = (data?.membershipPlans ?? []).map((membership) => ({
     id: membership.id,
-    planLabel: t(`settings.payments.plans.planNames.${membership.plan}`),
+    planLabel: planLabel(membership.plan, t),
     priceLabel: formatPrice(membership, t),
     limitsSummary: formatLimitsSummary(membership, t),
     isCurrent: membership.plan === currentPlan,
@@ -77,42 +49,7 @@ export function useMembershipPlans() {
   return {
     plans,
     currentPlan,
-    isFreePlan,
-    hasPaidPlan,
-    // Distingue "piano noto" da "ancora in attesa": finché è false chi mostra proposte di upgrade
-    // può riservare lo spazio invece di inserirle di colpo a pagina già disegnata
-    planKnown: myData !== undefined,
-    loading: plansLoading || myLoading,
-    error: plansError ?? myError ?? null,
+    loading,
+    error: error ?? null,
   };
-}
-
-function formatPrice(membership: MembershipData, t: (key: string) => string): string {
-  if (membership.price === 0) {
-    return t('settings.payments.plans.free');
-  }
-  const billingSuffix = t(`settings.payments.plans.billing.${membership.billing}`);
-  return `${membership.price} ${membership.currency} ${billingSuffix}`;
-}
-
-function formatEndDateLabel(endDate: string, t: (key: string, opts?: Record<string, unknown>) => string): string {
-  const date = new Date(endDate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
-  return t('settings.payments.plans.endDateLabel', { date });
-}
-
-function formatLimitsSummary(membership: MembershipData, t: (key: string, opts?: Record<string, unknown>) => string): string {
-  const lists =
-    membership.maxLists == null
-      ? t('settings.payments.plans.limits.listsUnlimited')
-      : t('settings.payments.plans.limits.lists', { count: membership.maxLists });
-  const items =
-    membership.maxItemsPerList == null
-      ? t('settings.payments.plans.limits.itemsPerListUnlimited')
-      : t('settings.payments.plans.limits.itemsPerList', { count: membership.maxItemsPerList });
-  const groups =
-    membership.maxGroupsCreatable == null
-      ? t('settings.payments.plans.limits.groupsUnlimited')
-      : t('settings.payments.plans.limits.groups', { count: membership.maxGroupsCreatable });
-
-  return [lists, items, groups].join(' · ');
 }

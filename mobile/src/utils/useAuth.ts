@@ -2,6 +2,7 @@ import { useMutation } from '@apollo/client';
 import { useRouter } from 'expo-router';
 import { UserMutations } from '@randomix/graphql-schema';
 import { tokenStorage } from './tokenStorage';
+import { prefetchMyPlan } from './useMyPlan';
 
 const { LOGIN_WITH_CREDENTIALS, LOGIN_WITH_GOOGLE, LOGOUT, REGISTER_WITH_CREDENTIALS } =
   UserMutations;
@@ -49,6 +50,8 @@ export function useAuth() {
 
   const afterAuth = async (accessToken: string, refreshToken: string) => {
     await tokenStorage.saveTokens(accessToken, refreshToken);
+    // Tipo di account prima di entrare: i banner premium sono gia' decisi alla prima pagina
+    await prefetchMyPlan();
     router.replace('/(app)/(tabs)/(home)');
   };
 

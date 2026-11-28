@@ -19,7 +19,7 @@ import { ListCard } from '@/components/cards/ListCard';
 import { RandomizerCard } from '@/components/cards/RandomizerCard';
 import { useMyLists } from '@/utils/useLists';
 import { useNavbarClearance } from '@/utils/useNavbarClearance';
-import { useMembershipPlans } from '@/utils/useMembershipPlans';
+import { useMyPlan } from '@/utils/useMyPlan';
 import { useProfile } from '@/utils/useProfile';
 
 const SKELETON_COUNT = 6;
@@ -31,7 +31,7 @@ export default function HomeScreen() {
 
   const { lists, loading, error, loadMore } = useMyLists();
   const { profile } = useProfile();
-  const { isFreePlan, planKnown } = useMembershipPlans();
+  const { isFreePlan, planKnown } = useMyPlan();
   // clearance in fondo alla lista per non finire sotto la pillola-navbar (regola condivisa)
   const listBottomPadding = useNavbarClearance();
 

@@ -28,7 +28,7 @@ import { useAuth } from '@/utils/useAuth';
 import { useProfile } from '@/utils/useProfile';
 import { useMyFriends } from '@/utils/useFriends';
 import { useProfileStats } from '@/utils/useProfileStats';
-import { useMembershipPlans } from '@/utils/useMembershipPlans';
+import { useMyPlan } from '@/utils/useMyPlan';
 import { PremiumBanner, PREMIUM_BANNER_HEIGHT } from '@/components/molecules/premium-banner';
 
 const USERNAME_MIN_LENGTH = 3;
@@ -50,7 +50,7 @@ export default function ProfileScreen() {
   const { profile, loading: loadingProfile, updateProfile, saving, saveError } = useProfile();
   const { friends } = useMyFriends();
   const { categoryStats, completionBreakdown, loading: loadingStats, error: statsError } = useProfileStats();
-  const { isFreePlan, planKnown, hasPaidPlan } = useMembershipPlans();
+  const { isFreePlan, planKnown, hasPaidPlan } = useMyPlan();
 
   const [editing, setEditing] = useState(false);
   const [username, setUsername] = useState('');
