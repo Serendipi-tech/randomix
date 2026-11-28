@@ -135,7 +135,7 @@ export default function FriendsScreen() {
             value={search.query}
             onChangeText={search.setQuery}
           />
-          {search.error && <Text style={styles.error}>{t('search.error')}</Text>}
+          {search.error && <Text style={[styles.error, { color: colors.error }]}>{t('search.error')}</Text>}
           {search.results.map((result) => (
             <UserSearchRow
               key={result.user.id}
@@ -170,7 +170,6 @@ const styles = StyleSheet.create({
   },
   error: {
     fontSize: 14,
-    color: Colors.light.error,
     textAlign: 'center',
   },
   sectionTitle: {

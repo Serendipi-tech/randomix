@@ -171,7 +171,7 @@ export default function ItemFormScreen() {
           />
         </View>
 
-        {displayError && <Text style={styles.error}>{displayError}</Text>}
+        {displayError && <Text style={[styles.error, { color: colors.error }]}>{displayError}</Text>}
       </ScrollView>
 
       {/* Azioni fisse in fondo alla pagina, stessa struttura di list-form */}
@@ -233,7 +233,6 @@ const styles = StyleSheet.create({
   },
   error: {
     fontSize: 14,
-    color: Colors.light.error,
     textAlign: 'center',
   },
   tagsHeader: {

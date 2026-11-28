@@ -265,7 +265,7 @@ export default function ListFormScreen() {
           <Switch value={isHidden} onChange={setIsHidden} />
         </View>
 
-        {displayError && <Text style={styles.error}>{displayError}</Text>}
+        {displayError && <Text style={[styles.error, { color: colors.error }]}>{displayError}</Text>}
       </ScrollView>
 
       {/* Azioni fisse in fondo alla pagina */}
@@ -382,7 +382,6 @@ const styles = StyleSheet.create({
   },
   error: {
     fontSize: 14,
-    color: Colors.light.error,
     textAlign: 'center',
   },
   limitSheetContent: {

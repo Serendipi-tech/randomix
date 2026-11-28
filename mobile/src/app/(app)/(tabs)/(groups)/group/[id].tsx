@@ -233,7 +233,7 @@ export default function GroupDetailScreen() {
                     accentColor={listColor}
                     colorScheme={colorScheme}
                   />
-                  {listError && <Text style={styles.listError}>{listError}</Text>}
+                  {listError && <Text style={[styles.listError, { color: colors.error }]}>{listError}</Text>}
                   <Button
                     label={t('detail.newList.submit')}
                     onPress={handleCreateList}
@@ -425,7 +425,6 @@ const styles = StyleSheet.create({
   },
   listError: {
     fontSize: 14,
-    color: Colors.light.error,
     textAlign: 'center',
   },
   inviteList: { gap: Spacing.two },

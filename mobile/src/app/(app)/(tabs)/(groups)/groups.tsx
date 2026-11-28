@@ -111,7 +111,7 @@ export default function GroupsScreen() {
                   maxLength={GROUP_DESCRIPTION_MAX_LENGTH}
                 />
                 {createError && (
-                  <Text style={styles.errorText}>{createError}</Text>
+                  <Text style={[styles.errorText, { color: colors.error }]}>{createError}</Text>
                 )}
                 <Button
                   label={t('createModal.submit')}
@@ -204,7 +204,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: Colors.light.error,
     textAlign: 'center',
   },
   empty: {
