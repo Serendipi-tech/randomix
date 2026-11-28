@@ -29,6 +29,7 @@ export function useMembershipForm({ initial, defaultPlan, onSaved, onDeleted }: 
     initial?.maxItemsPerList != null ? String(initial.maxItemsPerList) : '',
   );
   const [hideItemsEnabled, setHideItemsEnabled] = useState(initial?.hideItemsEnabled ?? false);
+  const [imageUploadEnabled, setImageUploadEnabled] = useState(initial?.imageUploadEnabled ?? false);
   const [maxGroupsCreatable, setMaxGroupsCreatable] = useState(
     initial?.maxGroupsCreatable != null ? String(initial.maxGroupsCreatable) : '',
   );
@@ -52,6 +53,7 @@ export function useMembershipForm({ initial, defaultPlan, onSaved, onDeleted }: 
       maxLists: maxLists.trim() ? parseInt(maxLists, 10) : null,
       maxItemsPerList: maxItemsPerList.trim() ? parseInt(maxItemsPerList, 10) : null,
       hideItemsEnabled,
+      imageUploadEnabled,
       maxGroupsCreatable: maxGroupsCreatable.trim() ? parseInt(maxGroupsCreatable, 10) : null,
       maxGroupsJoinable: maxGroupsJoinable.trim() ? parseInt(maxGroupsJoinable, 10) : null,
       showAds,
@@ -89,6 +91,8 @@ export function useMembershipForm({ initial, defaultPlan, onSaved, onDeleted }: 
     setMaxItemsPerList,
     hideItemsEnabled,
     setHideItemsEnabled,
+    imageUploadEnabled,
+    setImageUploadEnabled,
     maxGroupsCreatable,
     setMaxGroupsCreatable,
     maxGroupsJoinable,

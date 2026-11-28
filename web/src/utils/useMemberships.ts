@@ -16,6 +16,7 @@ export interface Membership {
   maxLists: number | null;
   maxItemsPerList: number | null;
   hideItemsEnabled: boolean | null;
+  imageUploadEnabled: boolean | null;
   maxGroupsCreatable: number | null;
   maxGroupsJoinable: number | null;
   showAds: boolean | null;

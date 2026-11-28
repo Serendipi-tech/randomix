@@ -11,6 +11,7 @@ const MEMBERSHIP_FIELDS = `
   maxLists
   maxItemsPerList
   hideItemsEnabled
+  imageUploadEnabled
   maxGroupsCreatable
   maxGroupsJoinable
   showAds
@@ -30,6 +31,18 @@ export const MY_MEMBERSHIP: DocumentNode = parse(`
   query MyMembership {
     myMembership {
       ${MEMBERSHIP_FIELDS}
+    }
+  }
+`);
+
+/** Solo il tipo di piano, niente prezzi né limiti: viene caricata all'accesso perché i banner
+ *  premium siano già decisi quando le pagine si disegnano. Deliberatamente separata da
+ *  MY_MEMBERSHIP, che serve alla pagina del piano personale. */
+export const MY_PLAN: DocumentNode = parse(`
+  query MyPlan {
+    myMembership {
+      id
+      plan
     }
   }
 `);

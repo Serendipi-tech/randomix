@@ -6,6 +6,7 @@ export interface MembershipLimitations {
   maxLists?: number | null;
   maxItemsPerList?: number | null;
   hideItemsEnabled?: boolean | null;
+  imageUploadEnabled?: boolean | null;
   maxGroupsCreatable?: number | null;
   maxGroupsJoinable?: number | null;
   showAds?: boolean | null;
@@ -21,6 +22,7 @@ const NO_PLAN_FALLBACK: MembershipLimitations = {
   maxGroupsCreatable: 0,
   maxGroupsJoinable: 0,
   hideItemsEnabled: false,
+  imageUploadEnabled: false,
   showAds: true,
   supportPriority: 'LOW',
 };
@@ -33,6 +35,7 @@ const ADMIN_UNLIMITED: MembershipLimitations = {
   maxGroupsCreatable: null,
   maxGroupsJoinable: null,
   hideItemsEnabled: true,
+  imageUploadEnabled: true,
   showAds: false,
   supportPriority: 'HIGH',
 };

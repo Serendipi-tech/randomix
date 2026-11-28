@@ -40,6 +40,8 @@ export function MembershipFormModal({ initial, defaultPlan, onClose }: Membershi
     setMaxItemsPerList,
     hideItemsEnabled,
     setHideItemsEnabled,
+    imageUploadEnabled,
+    setImageUploadEnabled,
     maxGroupsCreatable,
     setMaxGroupsCreatable,
     maxGroupsJoinable,
@@ -149,6 +151,16 @@ export function MembershipFormModal({ initial, defaultPlan, onClose }: Membershi
             className="h-4 w-4 rounded border-border"
           />
           Permetti di nascondere gli item agli altri
+        </label>
+
+        <label className="flex items-center gap-2 text-sm text-text-color">
+          <input
+            type="checkbox"
+            checked={imageUploadEnabled}
+            onChange={(e) => setImageUploadEnabled(e.target.checked)}
+            className="h-4 w-4 rounded border-border"
+          />
+          Permetti il caricamento di immagini negli item
         </label>
 
         <label className="flex items-center gap-2 text-sm text-text-color">

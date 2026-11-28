@@ -14,6 +14,7 @@ const MembershipInput = builder.inputType('MembershipInput', {
     maxLists: t.int({ required: false }),
     maxItemsPerList: t.int({ required: false }),
     hideItemsEnabled: t.boolean({ required: false }),
+    imageUploadEnabled: t.boolean({ required: false }),
     maxGroupsCreatable: t.int({ required: false }),
     maxGroupsJoinable: t.int({ required: false }),
     showAds: t.boolean({ required: false }),
@@ -25,6 +26,7 @@ interface LimitationsInput {
   maxLists?: number | null;
   maxItemsPerList?: number | null;
   hideItemsEnabled?: boolean | null;
+  imageUploadEnabled?: boolean | null;
   maxGroupsCreatable?: number | null;
   maxGroupsJoinable?: number | null;
   showAds?: boolean | null;
@@ -36,6 +38,7 @@ function buildLimitations(input: LimitationsInput) {
     maxLists,
     maxItemsPerList,
     hideItemsEnabled,
+    imageUploadEnabled,
     maxGroupsCreatable,
     maxGroupsJoinable,
     showAds,
@@ -46,6 +49,7 @@ function buildLimitations(input: LimitationsInput) {
     maxLists == null &&
     maxItemsPerList == null &&
     hideItemsEnabled == null &&
+    imageUploadEnabled == null &&
     maxGroupsCreatable == null &&
     maxGroupsJoinable == null &&
     showAds == null &&
@@ -56,6 +60,7 @@ function buildLimitations(input: LimitationsInput) {
     maxLists: maxLists ?? null,
     maxItemsPerList: maxItemsPerList ?? null,
     hideItemsEnabled: hideItemsEnabled ?? null,
+    imageUploadEnabled: imageUploadEnabled ?? null,
     maxGroupsCreatable: maxGroupsCreatable ?? null,
     maxGroupsJoinable: maxGroupsJoinable ?? null,
     showAds: showAds ?? null,

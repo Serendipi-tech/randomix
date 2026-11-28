@@ -9,6 +9,7 @@ interface MembershipLimitations {
   maxLists?: number | null;
   maxItemsPerList?: number | null;
   hideItemsEnabled?: boolean | null;
+  imageUploadEnabled?: boolean | null;
   maxGroupsCreatable?: number | null;
   maxGroupsJoinable?: number | null;
   showAds?: boolean | null;
@@ -43,6 +44,10 @@ export const MembershipRef = builder.prismaObject('Membership', {
     hideItemsEnabled: t.boolean({
       nullable: true,
       resolve: (m) => (m.limitations as MembershipLimitations | null)?.hideItemsEnabled ?? null,
+    }),
+    imageUploadEnabled: t.boolean({
+      nullable: true,
+      resolve: (m) => (m.limitations as MembershipLimitations | null)?.imageUploadEnabled ?? null,
     }),
     maxGroupsCreatable: t.int({
       nullable: true,
