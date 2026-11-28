@@ -16,8 +16,8 @@ import { ConfirmSheet } from '@/components/molecules/confirm-sheet';
 import { toRelativeTime } from '@/utils/relativeTime';
 import { useNotifications } from '@/utils/useNotifications';
 
-const TILE_SIZE = 64;
-const TILE_ICON = 30;
+const TILE_SIZE = 36;
+const TILE_ICON = 19;
 const TIME_ICON = 14;
 
 /** Notifica di sistema per esteso: solo queste hanno una pagina propria (le altre si risolvono
@@ -64,20 +64,13 @@ export default function NotificationDetailScreen() {
         {notification ? (
           <CardShell backgroundColor={colors.foreground} borderColor={colors.border}>
             <View style={styles.block}>
-              <View style={[styles.tile, { backgroundColor: hexToRgba(colors.primary, 0.3) }]}>
-                <Megaphone size={TILE_ICON} color={colors.textColor} strokeWidth={1.9} />
+              <View style={styles.titleRow}>
+                <View style={[styles.tile, { backgroundColor: hexToRgba(colors.primary, 0.3) }]}>
+                  <Megaphone size={TILE_ICON} color={colors.textColor} strokeWidth={1.9} />
+                </View>
+                <Text style={[styles.title, { color: colors.textColor }]}>{notification.title}</Text>
               </View>
 
-              <View
-                style={[
-                  styles.chip,
-                  { backgroundColor: hexToRgba(colors.primary, 0.22), borderColor: hexToRgba(colors.primary, 0.45) },
-                ]}
-              >
-                <Text style={[styles.chipLabel, { color: colors.textColor }]}>{t('filters.system')}</Text>
-              </View>
-
-              <Text style={[styles.title, { color: colors.textColor }]}>{notification.title}</Text>
               {notification.body && (
                 <Text style={[styles.body, { color: colors.disabled }]}>{notification.body}</Text>
               )}
@@ -123,39 +116,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.four,
   },
   block: {
-    alignItems: 'center',
     paddingVertical: Spacing.two,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.three,
   },
   tile: {
     width: TILE_SIZE,
     height: TILE_SIZE,
-    borderRadius: 18,
+    borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  chip: {
-    marginTop: Spacing.three,
-    borderRadius: 999,
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-  },
-  chipLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
   title: {
-    marginTop: Spacing.two + Spacing.half,
-    fontSize: 20,
-    lineHeight: 26,
-    textAlign: 'center',
-    fontFamily: DisplayFonts.extraBold,
+    flex: 1,
+    fontSize: 19,
+    lineHeight: 25,
+    fontFamily: DisplayFonts.semiBold,
   },
+  // Testo a pacchetto pieno: i margini destro e sinistro restano dritti come in un articolo
   body: {
-    marginTop: Spacing.two,
+    marginTop: Spacing.three,
     fontSize: 14,
     lineHeight: 20,
-    textAlign: 'center',
+    textAlign: 'justify',
   },
   timeRow: {
     marginTop: Spacing.four,

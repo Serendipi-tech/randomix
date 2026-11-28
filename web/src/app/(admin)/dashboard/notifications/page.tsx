@@ -5,6 +5,7 @@ import { useActiveUsersCount } from '@/utils/useActiveUsersCount';
 import { useBroadcastHistory } from '@/utils/useBroadcastHistory';
 import { useBroadcastForm } from '@/utils/useBroadcastForm';
 import { Input } from '@/components/molecules/Input';
+import { Textarea } from '@/components/molecules/Textarea';
 import { Button } from '@/components/atoms/Button';
 import { FormError } from '@/components/molecules/FormError';
 import { Card } from '@/components/molecules/Card';
@@ -38,7 +39,7 @@ export default function NotificationsPage() {
       <section className="flex max-w-lg flex-col gap-4 rounded-2xl border border-border bg-foreground p-6">
         <h2 className="text-lg font-semibold text-text-color">Invia broadcast</h2>
         <Input name="title" label="Titolo" value={title} onChangeText={setTitle} required />
-        <Input name="body" label="Corpo (opzionale)" value={body} onChangeText={setBody} />
+        <Textarea name="body" label="Corpo (opzionale)" value={body} onChangeText={setBody} />
 
         <p className="text-sm text-disabled">
           {countLoading ? 'Calcolo destinatari…' : `Verrà inviato a ${count} utenti attivi`}
@@ -67,7 +68,7 @@ export default function NotificationsPage() {
                 <span className="truncate text-sm font-semibold text-text-color">{entry.title}</span>
                 <span className="shrink-0 text-xs text-disabled">{dateFormatter.format(new Date(entry.sentAt))}</span>
               </div>
-              {entry.body && <p className="text-xs text-disabled">{entry.body}</p>}
+              {entry.body && <p className="whitespace-pre-line text-xs text-disabled">{entry.body}</p>}
               <p className="text-xs text-disabled">{entry.recipientCount} destinatari</p>
             </Card>
           ))}
