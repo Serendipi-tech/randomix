@@ -106,10 +106,16 @@ const styles = StyleSheet.create({
   },
   // Peso identico in ogni stato: cambiandolo la larghezza del testo salta mentre il thumb
   // scorre, e il segmento sembra sfarfallare. La selezione si legge dal thumb e dall'opacità.
+  // Il discendente della riga è spazio vuoto che conta nel centraggio: senza questo compenso le
+  // parole risultano più in basso del centro del blocco (stesso accorgimento del banner premium).
   label: {
     fontSize: 14,
+    lineHeight: 18,
+    marginBottom: 3,
     fontWeight: '600',
     textAlign: 'center',
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
   labelIdle: {
     opacity: 0.6,
