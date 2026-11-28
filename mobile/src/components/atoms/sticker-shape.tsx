@@ -1,7 +1,11 @@
 import { useEffect } from 'react';
 import { StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import { Colors } from '@/constants/theme';
-import { hexToRgba } from '@/utils/color';
+import { hexToRgba, isLightColor } from '@/utils/color';
+
+// Stesso criterio di Badge.tsx: l'inchiostro dipende dalla tinta passata (arbitraria), non dal tema
+const DARK_INK = Colors.dark.background;
+const LIGHT_INK = Colors.dark.textColor;
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -50,6 +54,8 @@ export function StickerShape({
     ],
   }));
 
+  const ink = isLightColor(color) ? DARK_INK : LIGHT_INK;
+
   return (
     <Animated.View
       pointerEvents="none"
@@ -67,13 +73,13 @@ export function StickerShape({
     >
       {variant === 'die' && (
         <>
-          <View style={[styles.pip, dieDotStyle(size, 0.28, 0.28)]} />
-          <View style={[styles.pip, dieDotStyle(size, 0.72, 0.72)]} />
+          <View style={[styles.pip, dieDotStyle(size, 0.28, 0.28), { backgroundColor: hexToRgba(ink, 0.9) }]} />
+          <View style={[styles.pip, dieDotStyle(size, 0.72, 0.72), { backgroundColor: hexToRgba(ink, 0.9) }]} />
         </>
       )}
-      {variant === 'star' && <Text style={[styles.glyph, { fontSize: size * 0.55 }]}>★</Text>}
+      {variant === 'star' && <Text style={[styles.glyph, { fontSize: size * 0.55, color: ink }]}>★</Text>}
       {variant === 'chip' && (
-        <Text style={[styles.label, { fontSize: size * 0.48 }]}>{label}</Text>
+        <Text style={[styles.label, { fontSize: size * 0.48, color: ink }]}>{label}</Text>
       )}
     </Animated.View>
   );
@@ -102,12 +108,7 @@ const styles = StyleSheet.create({
   },
   pip: {
     position: 'absolute',
-    backgroundColor: hexToRgba(Colors.light.border, 0.9),
   },
-  glyph: {
-    color: Colors.light.border,
-  },
-  label: {
-    color: Colors.light.border,
-  },
+  glyph: {},
+  label: {},
 });

@@ -38,7 +38,8 @@ export function FriendRequestRow({
         hitSlop={8}
         accessibilityLabel={acceptLabel}
         style={[styles.actionButton, { backgroundColor: colors.success }]}>
-        <Text style={styles.acceptGlyph}>✓</Text>
+        {/* success e' sempre un verde vivido: ink scuro fisso, non border (troppo chiaro anche lui) */}
+        <Text style={[styles.acceptGlyph, { color: Colors.light.textColor }]}>✓</Text>
       </Pressable>
       <Pressable
         onPress={onReject}
@@ -46,7 +47,8 @@ export function FriendRequestRow({
         hitSlop={8}
         accessibilityLabel={rejectLabel}
         style={[styles.actionButton, { backgroundColor: colors.border }]}>
-        <Text style={[styles.rejectGlyph, { color: colors.disabled }]}>✕</Text>
+        {/* textColor (non disabled): border e disabled sono troppo simili in dark mode */}
+        <Text style={[styles.rejectGlyph, { color: colors.textColor }]}>✕</Text>
       </Pressable>
     </View>
   );
@@ -73,7 +75,6 @@ const styles = StyleSheet.create({
   },
   acceptGlyph: {
     fontSize: 16,
-    color: Colors.light.border,
   },
   rejectGlyph: {
     fontSize: 14,

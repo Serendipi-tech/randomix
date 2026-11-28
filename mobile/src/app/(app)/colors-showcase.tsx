@@ -243,7 +243,7 @@ function FeatureRowCopy({ Icon, tint, gradient, title, subtitle, colorScheme }: 
         <View style={authStyles.featureIconClip}>
           <LinearGradient colors={gradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
           <View style={authStyles.featureIconStack}>
-            <Icon size={22} color={Colors.light.border} strokeWidth={2.5} />
+            <Icon size={22} color={Colors.light.textColor} strokeWidth={2.5} />
           </View>
         </View>
       </View>

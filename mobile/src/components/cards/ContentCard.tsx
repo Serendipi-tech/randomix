@@ -23,6 +23,9 @@ export function ContentCard({ title, description, variant, icon: Icon, onPress }
   const { colorScheme } = useAppTheme();
   const colors = Colors[colorScheme];
   const isFilled = variant === 'filled';
+  // filled = sfondo sempre secondary (oro, chiaro in entrambi i temi): ink scuro fisso, non il
+  // textColor del tema (in dark diventerebbe quasi bianco, illeggibile sull'oro)
+  const inkColor = isFilled ? Colors.light.textColor : colors.textColor;
 
   return (
     <CardShell
@@ -33,17 +36,17 @@ export function ContentCard({ title, description, variant, icon: Icon, onPress }
     >
       <View style={styles.row}>
         {Icon && (
-          <View style={[styles.iconWrap, { backgroundColor: hexToRgba(colors.textColor, 0.15) }]}>
-            <Icon size={22} color={colors.textColor} />
+          <View style={[styles.iconWrap, { backgroundColor: hexToRgba(inkColor, 0.15) }]}>
+            <Icon size={22} color={inkColor} />
           </View>
         )}
         <View style={styles.textBlock}>
-          <Text style={[styles.title, { color: colors.textColor }]}>{title}</Text>
-          {description && <Text style={[styles.description, { color: colors.textColor }]}>{description}</Text>}
+          <Text style={[styles.title, { color: inkColor }]}>{title}</Text>
+          {description && <Text style={[styles.description, { color: inkColor }]}>{description}</Text>}
         </View>
         {onPress && (
-          <View style={[styles.arrow, { backgroundColor: hexToRgba(colors.textColor, 0.15) }]}>
-            <ChevronRight size={18} color={colors.textColor} />
+          <View style={[styles.arrow, { backgroundColor: hexToRgba(inkColor, 0.15) }]}>
+            <ChevronRight size={18} color={inkColor} />
           </View>
         )}
       </View>

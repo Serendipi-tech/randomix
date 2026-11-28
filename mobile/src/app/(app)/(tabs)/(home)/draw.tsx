@@ -163,21 +163,23 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 14,
     borderRadius: 12,
-    backgroundColor: hexToRgba(Colors.light.border, 0.25),
+    backgroundColor: hexToRgba(Colors.dark.textColor, 0.25),
   },
   // 12px consentito solo per i badge
+  // Card sempre su gradiente vivido (colore lista + primary): testo chiaro fisso, non il
+  // textColor del tema (diventerebbe scuro in light mode, illeggibile sul viola)
   categoryLabel: {
     fontSize: 12,
-    color: Colors.light.border,
+    color: Colors.dark.textColor,
   },
   itemName: {
     fontSize: 28,
-    color: Colors.light.border,
+    color: Colors.dark.textColor,
     textAlign: 'center',
   },
   ratingText: {
     fontSize: 20,
-    color: Colors.light.border,
+    color: Colors.dark.textColor,
     letterSpacing: 4,
   },
   tagRow: {
@@ -193,11 +195,11 @@ const styles = StyleSheet.create({
   },
   tagLabel: {
     fontSize: 12,
-    color: Colors.light.border,
+    color: Colors.dark.textColor,
   },
   acceptedText: {
     fontSize: 16,
-    color: Colors.light.border,
+    color: Colors.dark.textColor,
   },
   errorTitle: {
     fontSize: 16,

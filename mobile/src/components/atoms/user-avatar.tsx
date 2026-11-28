@@ -37,7 +37,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Sfondo sempre primary (viola medio, fisso): ink chiaro fisso, non border (troppo simile al bg)
   initial: {
-    color: Colors.light.border,
+    color: Colors.dark.textColor,
   },
 });

@@ -28,7 +28,8 @@ export function FeatureRow({ Icon, tint, gradient, title, subtitle, colorScheme 
           {/* l'SVG dell'icona non è "positioned" come le View su web: senza questo, il gradiente
               assoluto dipinge sempre sopra di lui a prescindere dall'ordine nel JSX */}
           <View style={styles.iconStack}>
-            <Icon size={22} color={Colors.light.border} strokeWidth={2.5} />
+            {/* gradient = sempre tinta base chiara (secondary/warning/accent/success): ink scuro fisso, non border */}
+            <Icon size={22} color={Colors.light.textColor} strokeWidth={2.5} />
           </View>
         </View>
       </View>
