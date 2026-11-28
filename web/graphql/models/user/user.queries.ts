@@ -21,6 +21,11 @@ const UpdateProfileInput = builder.inputType('UpdateProfileInput', {
   }),
 });
 
+// Stessi limiti del DB (User.username @db.VarChar(20)): qui l'errore è leggibile, lì sarebbe un
+// vincolo di colonna violato
+const USERNAME_MIN_LENGTH = 3;
+const USERNAME_MAX_LENGTH = 20;
+
 builder.mutationField('updateProfile', (t) =>
   t.prismaField({
     type: 'User',
@@ -29,11 +34,19 @@ builder.mutationField('updateProfile', (t) =>
       if (!ctx.userId) {
         throw new GraphQLError('Non autenticato.', { extensions: { code: 'UNAUTHENTICATED' } });
       }
+      const username = input.username?.trim();
+      if (username != null && (username.length < USERNAME_MIN_LENGTH || username.length > USERNAME_MAX_LENGTH)) {
+        throw new GraphQLError(
+          `Lo username deve avere fra ${USERNAME_MIN_LENGTH} e ${USERNAME_MAX_LENGTH} caratteri.`,
+          { extensions: { code: 'BAD_USER_INPUT' } },
+        );
+      }
+
       return prisma.user.update({
         ...query,
         where: { id: ctx.userId },
         data: {
-          ...(input.username != null && { username: input.username }),
+          ...(username != null && { username }),
           ...(input.avatarUrl !== undefined && { avatarUrl: input.avatarUrl }),
           ...(input.language !== undefined && { language: input.language }),
         },

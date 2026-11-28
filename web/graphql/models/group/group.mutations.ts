@@ -45,6 +45,25 @@ async function checkMaxGroupsJoinableLimit(userId: string) {
   }
 }
 
+// Stessi limiti del DB (Group.name @db.VarChar(30), description @db.VarChar(100)): qui l'errore è
+// leggibile, lì sarebbe un vincolo di colonna violato
+const GROUP_NAME_MAX_LENGTH = 30;
+const GROUP_DESCRIPTION_MAX_LENGTH = 100;
+
+function assertGroupText(name: string | null | undefined, description: string | null | undefined) {
+  if (name != null && (name.trim().length === 0 || name.trim().length > GROUP_NAME_MAX_LENGTH)) {
+    throw new GraphQLError(`Il nome del gruppo può avere al massimo ${GROUP_NAME_MAX_LENGTH} caratteri.`, {
+      extensions: { code: 'BAD_USER_INPUT' },
+    });
+  }
+  if (description != null && description.trim().length > GROUP_DESCRIPTION_MAX_LENGTH) {
+    throw new GraphQLError(
+      `La descrizione può avere al massimo ${GROUP_DESCRIPTION_MAX_LENGTH} caratteri.`,
+      { extensions: { code: 'BAD_USER_INPUT' } },
+    );
+  }
+}
+
 // ---- CRUD Gruppo ----
 
 builder.mutationField('createGroup', (t) =>
@@ -56,6 +75,7 @@ builder.mutationField('createGroup', (t) =>
     },
     resolve: async (_root, { name, description }, ctx) => {
       requireAuth(ctx.userId);
+      assertGroupText(name, description);
       await checkMaxGroupsCreatableLimit(ctx.userId);
       const group = await prisma.group.create({
         data: {
@@ -90,6 +110,7 @@ builder.mutationField('updateGroup', (t) =>
       });
       if (!membership) throw new GraphQLError('Gruppo non trovato.', { extensions: { code: 'NOT_FOUND' } });
       requireRole(membership.role, ['OWNER', 'ADMIN']);
+      assertGroupText(name, description);
       const group = await prisma.group.update({
         where: { id },
         data: {

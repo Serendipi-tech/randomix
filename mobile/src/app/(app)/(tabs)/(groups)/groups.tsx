@@ -16,6 +16,10 @@ import { GroupInviteRow } from '@/components/group/group-invite-row';
 import { useMyGroups, useCreateGroup, type GroupSummary } from '@/utils/useGroups';
 import { useGroupInvites } from '@/utils/useGroupInvites';
 
+// Stessi limiti del DB (Group.name @db.VarChar(30), description @db.VarChar(100))
+const GROUP_NAME_MAX_LENGTH = 30;
+const GROUP_DESCRIPTION_MAX_LENGTH = 100;
+
 const SKELETON_COUNT = 3;
 
 export default function GroupsScreen() {
@@ -98,11 +102,13 @@ export default function GroupsScreen() {
                   value={groupName}
                   onChangeText={setGroupName}
                   autoCapitalize="words"
+                  maxLength={GROUP_NAME_MAX_LENGTH}
                 />
                 <Input
                   placeholder={t('createModal.descriptionPlaceholder')}
                   value={groupDescription}
                   onChangeText={setGroupDescription}
+                  maxLength={GROUP_DESCRIPTION_MAX_LENGTH}
                 />
                 {createError && (
                   <Text style={styles.errorText}>{createError}</Text>

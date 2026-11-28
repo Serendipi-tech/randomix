@@ -1,8 +1,8 @@
 model Group {
     id String @id @default(cuid())
 
-    name        String
-    description String?
+    name        String  @db.VarChar(30)
+    description String? @db.VarChar(100)
 
     ownerId String
     owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
